@@ -2,7 +2,7 @@
     "reps": [
         {
             "name": "Ring",
-            "namespace": "neuroscheme",
+            "namespace": "neuroscheme::shiftgen",
             "properties": [
                 {
                     "name": "angle",
@@ -17,7 +17,7 @@
         },
         {
             "name": "NeuronRep",
-            "namespace": "neuroscheme",
+            "namespace": "neuroscheme::shiftgen",
             "properties": [
                 {
                     "name": "bg",

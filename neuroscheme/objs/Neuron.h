@@ -22,38 +22,12 @@
 #ifndef __NEUROSCHEME__NEURON__
 #define __NEUROSCHEME__NEURON__
 
-#include <shift/shift.h>
-#include "../Color.h"
+#include <shift_Neuron.h>
 
 namespace neuroscheme
 {
 
-  class Neuron : public shift::Object
-  {
-  public:
-    typedef enum
-    {
-      UNDEFINED_MORPHOLOGICAL_TYPE = 0,
-      INTERNEURON,
-      PYRAMIDAL
-    } TMorphologicalType;
-
-    typedef enum
-    {
-      UNDEFINED_FUNCTIONAL_TYPE = 0,
-      INHIBITORY,
-      EXCITATORY
-    } TFunctionalType;
-
-    Neuron( TMorphologicalType morphoType =  UNDEFINED_MORPHOLOGICAL_TYPE,
-            TFunctionalType funcType = UNDEFINED_FUNCTIONAL_TYPE,
-            float somaVolume = 0.0f,
-            float somaArea = 0.0f,
-            float dendVolume = 0.0f,
-            float dendArea = 0.0f );
-
-    Neuron( const Neuron& other );
-  };
+  using Neuron = shiftgen::Neuron;
 
 } // namespace neuroscheme
 

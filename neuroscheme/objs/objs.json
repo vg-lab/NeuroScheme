@@ -1,0 +1,54 @@
+{
+    "reps": [
+        {
+            "name": "Neuron",
+            "namespace": "neuroscheme::shiftgen",
+            "properties": [
+                {
+                    "name": "morphoType",
+                    "type": "TMorphologicalType"
+                },
+                {
+                    "name": "funcType",
+                    "type": "TFunctionalType"
+                },
+                {
+                    "name": "somaVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "somaArea",
+                    "type": "float"
+                },
+                {
+                    "name": "dendVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "dendArea",
+                    "type": "float"
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TMorphologicalType",
+                    "values": [
+                        "UNDEFINED_MORPHOLOGICAL_TYPE",
+                        "INTERNEURON",
+                        "PYRAMIDAL"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TFunctionalType",
+                    "values": [
+                        "UNDEFINED_FUNCTIONAL_TYPE",
+                        "INHIBITORY",
+                        "EXCITATORY"
+                    ]
+                }
+            ]
+        }
+    ]
+}
