@@ -1,0 +1,53 @@
+{
+    "reps": [
+        {
+            "name": "Ring",
+            "namespace": "neuroscheme",
+            "properties": [
+                {
+                    "name": "angle",
+                    "type": "int"
+                },
+                {
+                    "name": "color",
+                    "type": "Color"
+                }
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "NeuronRep",
+            "namespace": "neuroscheme",
+            "properties": [
+                {
+                    "name": "bg",
+                    "type": "Color"
+                },
+                {
+                    "name": "symbol",
+                    "type": "TSymbol"
+                },
+                {
+                    "name": "rings",
+                    "type": "Rings"
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TSymbol",
+                    "values": [
+                        "NO_SYMBOL",
+                        "TRIANGLE",
+                        "CIRCLE"
+                    ]
+                },
+                {
+                    "class": "vector",
+                    "element": "Ring",
+                    "name": "Rings"
+                }
+            ]
+        }
+    ]
+}

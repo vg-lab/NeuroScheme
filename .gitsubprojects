@@ -1,0 +1,2 @@
+# -*- mode: cmake -*-
+git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git master)
