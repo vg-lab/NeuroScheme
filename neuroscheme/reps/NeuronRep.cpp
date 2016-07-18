@@ -8,15 +8,15 @@ namespace neuroscheme
 {
 
 
-  Ring::Ring( void )
-    : neuroscheme::shiftgen::Ring( )
-  {
-  }
+  // Ring::Ring( void )
+  //   : neuroscheme::shiftgen::Ring( )
+  // {
+  // }
 
-  Ring::Ring( const Ring& other )
-    : neuroscheme::shiftgen::Ring( other )
-  {
-  }
+  // Ring::Ring( const Ring& other )
+  //   : neuroscheme::shiftgen::Ring( other )
+  // {
+  // }
 
   NeuronRep::NeuronRep( void )
     : neuroscheme::shiftgen::NeuronRep( )

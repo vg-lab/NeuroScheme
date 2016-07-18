@@ -52,9 +52,18 @@ MainWindow::MainWindow( QWidget* parent_ )
     auto graphicsItemRep =
       dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
       representation );
-    _canvas->scene( ).addItem( graphicsItemRep->item( ));
-    graphicsItemRep->item( )->setPos( x, 0 ); x+= 120;
-    // graphicsItemRep->item( )->setScale( 10 );
+    if ( !graphicsItemRep )
+    {
+      std::cerr << "Item null" << std::endl;
+    } else
+    {
+      _canvas->scene( ).addItem( graphicsItemRep->item( ));
+      if ( graphicsItemRep->item( ))
+      {
+        graphicsItemRep->item( )->setPos( x, 0 ); x+= 120;
+        // graphicsItemRep->item( )->setScale( 10 );
+      }
+    }
   }
 }
 

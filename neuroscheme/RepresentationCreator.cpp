@@ -84,9 +84,9 @@ namespace neuroscheme
           break;
         }
 
-        NeuronRep::Rings rings;
+        shiftgen::NeuronRep::Rings rings;
 
-        Ring somaRing;
+        shiftgen::Ring somaRing;
         somaRing.setProperty(
           "angle",
           int(
@@ -98,7 +98,7 @@ namespace neuroscheme
         somaRing.setProperty( "color", _greenMapper->map( ));
         rings.push_back( somaRing );
 
-        Ring dendRing;
+        shiftgen::Ring dendRing;
         dendRing.setProperty(
           "angle",
           int(
@@ -123,9 +123,12 @@ namespace neuroscheme
         auto columnRep = new ColumnRep( );
         NeuronRep meanNeuronRep;
 
-        NeuronRep::Rings rings;
+        meanNeuronRep.setProperty( "symbol", NeuronRep::NO_SYMBOL );
+        meanNeuronRep.setProperty( "bg", Color( 100, 100, 100 ));
 
-        Ring somaRing;
+        shiftgen::ColumnRep::Rings rings;
+
+        shiftgen::Ring somaRing;
         somaRing.setProperty(
           "angle",
           int(
@@ -138,7 +141,7 @@ namespace neuroscheme
         somaRing.setProperty( "color", _greenMapper->map( ));
         rings.push_back( somaRing );
 
-        Ring dendRing;
+        shiftgen::Ring dendRing;
         dendRing.setProperty(
           "angle",
           int(
@@ -151,47 +154,48 @@ namespace neuroscheme
         dendRing.setProperty( "color", _redMapper->map( ));
         rings.push_back( dendRing );
 
+        meanNeuronRep.registerProperty( "rings", rings );
+
         columnRep->registerProperty( "meanNeuron", meanNeuronRep );
 
         shiftgen::ColumnRep::ColumnLayers layersReps;
-        LayerRep layerRep;
+        shiftgen::LayerRep layerRep;
 
-        layerRep.setProperty(
-          "leftPerc",
-          int(
+        (void)_neuronsToPercentage;
+          layerRep.setProperty(
+            "leftPerc",
             roundf(
               _neuronsToPercentage->map(
                 column->getProperty( "Num Pyramidals" ).
-                value< float >( )))));
+                value< float >( ))));
         layerRep.setProperty(
           "rightPerc",
-          int(
-            roundf(
-              _neuronsToPercentage->map(
-                column->getProperty( "Num Interneurons" ).
-                value< float >( )))));
+          roundf(
+            _neuronsToPercentage->map(
+              column->getProperty( "Num Interneurons" ).
+              value< float >( ))));
         layersReps.push_back( layerRep );
 
-        // for ( unsigned int layer = 1; layer <= 6; ++layer )
-        // {
-        //   layerRep.setProperty(
-        //     "leftPerc",
-        //     int(
-        //       roundf(
-        //         _neuronsToPercentage->map(
-        //           column->getProperty(
-        //             std::string( "Num Pyr Layer" ) + std::to_string( layer )).
-        //           value< float >( )))));
-        //   layerRep.setProperty(
-        //     "rightPerc",
-        //     int(
-        //       roundf(
-        //         _neuronsToPercentage->map(
-        //           column->getProperty(
-        //             std::string( "Num Inter Layer" ) + std::to_string( layer )).
-        //           value< float >( )))));
-        //   layersReps.push_back( layerRep );
-        // }
+        for ( unsigned int layer = 1; layer <= 6; ++layer )
+        {
+          layerRep.setProperty(
+            "leftPerc",
+              roundf(
+                _neuronsToPercentage->map(
+                  column->getProperty(
+                    std::string( "Num Pyr Layer " ) +
+                    std::to_string( layer )).
+                  value< float >( ))));
+          layerRep.setProperty(
+            "rightPerc",
+              roundf(
+                _neuronsToPercentage->map(
+                  column->getProperty(
+                    std::string( "Num Inter Layer " ) +
+                    std::to_string( layer )).
+                  value< float >( ))));
+          layersReps.push_back( layerRep );
+        }
 
           // TODO: map percentages
         columnRep->registerProperty( "layers", layersReps );

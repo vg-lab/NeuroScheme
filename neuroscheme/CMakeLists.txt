@@ -61,6 +61,7 @@ set( NEUROSCHEME_SOURCES
   mappers/VariableMapper.cpp
   neuroScheme.cpp
   RepresentationCreator.cpp
+  reps/ColumnItem.cpp
   reps/ColumnRep.cpp
   reps/NeuronRep.cpp
   reps/NeuronItem.cpp
@@ -77,6 +78,7 @@ set( NEUROSCHEME_HEADERS
   mappers/VariableMapper.h
   RepresentationCreator.h
   objs/Neuron.h
+  reps/ColumnItem.h
   reps/ColumnRep.h
   reps/NeuronRep.h
   reps/NeuronItem.h

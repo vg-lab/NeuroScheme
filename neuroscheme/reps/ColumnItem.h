@@ -19,43 +19,28 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__NEURON_REP__
-#define __NEUROSCHEME__NEURON_REP__
+#ifndef __NEUROSCHEME__COLUMN_ITEM__
+#define __NEUROSCHEME__COLUMN_ITEM__
 
-#include "QGraphicsItemRepresentation.h"
-#include <shift/shift.h>
-// #include <shift_Ring.h>
-#include <shift_NeuronRep.h>
+#include "../Color.h"
+#include "ColumnRep.h"
+#include <QGraphicsEllipseItem>
 
 namespace neuroscheme
 {
 
-  // class Ring
-  //   : public shiftgen::Ring
-  // {
-
-  // public:
-  //   Ring( void );
-  //   Ring( const Ring& other );
-  //   virtual ~Ring( void ) {}
-
-  // };
-
-  // using Ring = shiftgen::Ring;
-//  typedef std::vector< Ring > Rings;
-
-  class NeuronRep
-    : public shiftgen::NeuronRep
-    , public QGraphicsItemRepresentation
+  class ColumnItem : public QGraphicsPathItem
   {
+
   public:
 
-    // typedef shiftgen::NeuronRep::Rings Rings;
+    ColumnItem( shiftgen::NeuronRep meanNeuron,
+                shiftgen::ColumnRep::ColumnLayers layers,
+                unsigned int size = 300 );
 
-    NeuronRep( void );
-    NeuronRep( const NeuronRep& );
-    virtual ~NeuronRep( void ) {}
-    QGraphicsItem* item( bool create = true );
+    virtual ~ColumnItem( void ) {}
+
+  protected:
 
   };
 
