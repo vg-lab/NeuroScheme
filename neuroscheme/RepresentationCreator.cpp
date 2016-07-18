@@ -1,6 +1,7 @@
 #include "RepresentationCreator.h"
 #include "objs/Neuron.h"
 #include "reps/NeuronRep.h"
+#include "reps/ColumnRep.h"
 #include "mappers/ColorMapper.h"
 #include "mappers/VariableMapper.h"
 
@@ -35,9 +36,13 @@ namespace neuroscheme
     const float maxNeuronSomaArea = 100.0f;
     const float maxNeuronDendArea = 100.0f;
     auto _somaAreaToAngle =
-      new MapperFloatToFloat( 0, maxNeuronSomaArea, 0, -360);
+      new MapperFloatToFloat( 0, maxNeuronSomaArea, 0.0f, -360.0f);
     auto _dendAreaToAngle =
-      new MapperFloatToFloat( 0, maxNeuronDendArea, 0, -360);
+      new MapperFloatToFloat( 0, maxNeuronDendArea, 0.0f, -360.0f );
+
+    const float maxNeurons = 100.0f;
+    auto _neuronsToPercentage =
+      new MapperFloatToFloat( 0, maxNeurons, 0.0f, 1.0f );
 
 
     for ( const auto obj : objects )
@@ -105,19 +110,96 @@ namespace neuroscheme
         dendRing.setProperty( "color", _redMapper->map( ));
         rings.push_back( dendRing );
 
-        // Ring dendRing;
-        // dendRing.setProperty( "angle", _dendAreaToAngle->map( 60 ));
-        // _greenMapper->value( ) =
-        //   neuron->getProperty( "dendArea" ).value< float >( );
-        // dendRing.setProperty("color", _redMapper->map( ));
-        // rings.push_back( dendRing );
-
 
         neuronRep->setProperty( "rings", rings );
 
         representations.push_back( neuronRep );
 
-      } // if its Neuron objetc
+      } // end if its Neuron objetc
+
+      if ( dynamic_cast< Column* >( obj ))
+      {
+        auto column = dynamic_cast< Column* >( obj );
+        auto columnRep = new ColumnRep( );
+        NeuronRep meanNeuronRep;
+
+        NeuronRep::Rings rings;
+
+        Ring somaRing;
+        somaRing.setProperty(
+          "angle",
+          int(
+            roundf(
+              _somaAreaToAngle->map(
+                column->getProperty( "meanSomaVolume" ).
+                value< float >( )))));
+        _greenMapper->value( ) =
+          column->getProperty( "meanSomaArea" ).value< float >( );
+        somaRing.setProperty( "color", _greenMapper->map( ));
+        rings.push_back( somaRing );
+
+        Ring dendRing;
+        dendRing.setProperty(
+          "angle",
+          int(
+            roundf(
+              _dendAreaToAngle->map(
+                column->getProperty( "meanDendVolume" ).
+                value< float >( )))));
+        _redMapper->value( ) =
+          column->getProperty( "meanDendArea" ).value< float >( );
+        dendRing.setProperty( "color", _redMapper->map( ));
+        rings.push_back( dendRing );
+
+        columnRep->registerProperty( "meanNeuron", meanNeuronRep );
+
+        shiftgen::ColumnRep::ColumnLayers layersReps;
+        LayerRep layerRep;
+
+        layerRep.setProperty(
+          "leftPerc",
+          int(
+            roundf(
+              _neuronsToPercentage->map(
+                column->getProperty( "Num Pyramidals" ).
+                value< float >( )))));
+        layerRep.setProperty(
+          "rightPerc",
+          int(
+            roundf(
+              _neuronsToPercentage->map(
+                column->getProperty( "Num Interneurons" ).
+                value< float >( )))));
+        layersReps.push_back( layerRep );
+
+        // for ( unsigned int layer = 1; layer <= 6; ++layer )
+        // {
+        //   layerRep.setProperty(
+        //     "leftPerc",
+        //     int(
+        //       roundf(
+        //         _neuronsToPercentage->map(
+        //           column->getProperty(
+        //             std::string( "Num Pyr Layer" ) + std::to_string( layer )).
+        //           value< float >( )))));
+        //   layerRep.setProperty(
+        //     "rightPerc",
+        //     int(
+        //       roundf(
+        //         _neuronsToPercentage->map(
+        //           column->getProperty(
+        //             std::string( "Num Inter Layer" ) + std::to_string( layer )).
+        //           value< float >( )))));
+        //   layersReps.push_back( layerRep );
+        // }
+
+          // TODO: map percentages
+        columnRep->registerProperty( "layers", layersReps );
+
+
+
+        representations.push_back( columnRep );
+      } // it its Column object
     } // for all objects
   } // create
 } // namespace neuroscheme

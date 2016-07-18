@@ -23,11 +23,13 @@
 #define __NEUROSCHEME__NEURON__
 
 #include <shift_Neuron.h>
+#include <shift_Column.h>
 
 namespace neuroscheme
 {
 
   using Neuron = shiftgen::Neuron;
+  using Column = shiftgen::Column;
 
 } // namespace neuroscheme
 

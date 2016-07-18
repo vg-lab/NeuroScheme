@@ -48,6 +48,47 @@
                     "name": "Rings"
                 }
             ]
+        },
+        {
+            "name": "LayerRep",
+            "namespace": "neuroscheme::shiftgen",
+            "properties": [
+                {
+                    "name": "leftPerc",
+                    "type": "float"
+                },
+                {
+                    "name": "rightPerc",
+                    "type": "float"
+                }
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "ColumnRep",
+            "namespace": "neuroscheme::shiftgen",
+            "properties": [
+                {
+                    "name": "layers",
+                    "type": "ColumnLayers"
+                },
+                {
+                    "name": "meanNeuron",
+                    "type": "NeuronRep"
+                }
+            ],
+            "types": [
+                {
+                    "class": "vector",
+                    "element": "Ring",
+                    "name": "Rings"
+                },
+                {
+                    "class": "vector",
+                    "element": "LayerRep",
+                    "name": "ColumnLayers"
+                }
+            ]
         }
     ]
 }

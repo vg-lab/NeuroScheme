@@ -1,7 +1,7 @@
 include( shift_generate_cxx )
 
 # Generate objects
-set( SHIFT_GENERATED_OBJECTS Neuron )
+set( SHIFT_GENERATED_OBJECTS Neuron Column )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -18,7 +18,7 @@ foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
 endforeach( )
 
 # Generate representations
-set( SHIFT_GENERATED_OBJECTS NeuronRep Ring )
+set( SHIFT_GENERATED_OBJECTS NeuronRep Ring LayerRep ColumnRep )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -61,6 +61,7 @@ set( NEUROSCHEME_SOURCES
   mappers/VariableMapper.cpp
   neuroScheme.cpp
   RepresentationCreator.cpp
+  reps/ColumnRep.cpp
   reps/NeuronRep.cpp
   reps/NeuronItem.cpp
   reps/RingItem.cpp
@@ -76,6 +77,7 @@ set( NEUROSCHEME_HEADERS
   mappers/VariableMapper.h
   RepresentationCreator.h
   objs/Neuron.h
+  reps/ColumnRep.h
   reps/NeuronRep.h
   reps/NeuronItem.h
   reps/RingItem.h
