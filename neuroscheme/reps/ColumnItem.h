@@ -25,22 +25,102 @@
 #include "../Color.h"
 #include "ColumnRep.h"
 #include <QGraphicsEllipseItem>
+#include <QGraphicsSceneMouseEvent>
+#include <QPropertyAnimation>
 
 namespace neuroscheme
 {
+  class CollapsableItem
+  {
+  public:
 
-  class ColumnItem : public QGraphicsPathItem
+    CollapsableItem( bool collapsed_ = true )
+      : _collapsed( collapsed_ ) { }
+    virtual ~CollapsableItem( void ) { }
+    virtual void toggleCollapse( void )
+    {
+      if ( _collapsed )
+        this->uncollapse( );
+      else
+        this->collapse( );
+    }
+    virtual void collapse(bool anim = true) = 0;
+    virtual void uncollapse(bool anim = true) = 0;
+  protected:
+    bool _collapsed;
+  };
+
+  class CollapseButton
+    : public QGraphicsEllipseItem
+  {
+
+  public:
+    CollapseButton( void );
+
+    void mousePressEvent( QGraphicsSceneMouseEvent* event );
+    void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+    void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
+
+  };
+
+  class ColumnLayerItem
+    : public QObject
+    , public QGraphicsPathItem
+
+  {
+    Q_OBJECT
+    Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
+
+  public:
+
+    ColumnLayerItem( unsigned int layer_,
+                     QGraphicsItem *parent_,
+                     const QPoint& pLayerUL,
+                     const QPoint& pLayerUM,
+                     const QPoint& pLayerUR,
+                     unsigned int layerHeight,
+                     unsigned int numNeuronsHeight,
+                     float percPyr,
+                     float percInter,
+                     const QBrush& brush_ );
+
+    unsigned int& layer( void );
+
+    virtual ~ColumnLayerItem( void ) {}
+
+
+  public slots:
+
+    void disable(void)
+    {
+      this->setEnabled( false );
+      this->setVisible( false );
+    }
+
+  protected:
+    unsigned int _layer;
+  };
+
+
+  class ColumnItem
+    : public QGraphicsPathItem
+    , public CollapsableItem
   {
 
   public:
 
-    ColumnItem( shiftgen::NeuronRep meanNeuron,
-                shiftgen::ColumnRep::ColumnLayers layers,
+    ColumnItem( const ColumnRep& columnRep,
                 unsigned int size = 300 );
 
     virtual ~ColumnItem( void ) {}
 
+    void collapse( bool anim = true );
+    void uncollapse( bool anim = true );
+
   protected:
+    QGraphicsLineItem* _collapseItemVerticalLine;
+    ColumnLayerItem* _layerItems[ 6 ];
+    QPropertyAnimation* _layerAnimations[ 6 ];
 
   };
 

@@ -23,9 +23,7 @@ namespace neuroscheme
   {
     if ( create && !_item )
     {
-      _item = new ColumnItem(
-        this->getProperty( "meanNeuron" ).value< NeuronRep >( ),
-        this->getProperty( "layers" ).value< ColumnLayers >( ));
+      _item = new ColumnItem( *this );
     }
     return _item;
     }

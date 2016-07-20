@@ -33,10 +33,7 @@ namespace neuroscheme
   {
     if ( create && !_item )
     {
-      _item = new NeuronItem(
-        this->getProperty( "bg" ).value< Color >( ),
-        this->getProperty( "symbol" ).value< TSymbol >( ),
-        this->getProperty( "rings" ).value< Rings >( ));
+      _item = new NeuronItem( *this );
     }
     return _item;
     }

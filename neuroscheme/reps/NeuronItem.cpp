@@ -4,11 +4,15 @@
 
 namespace neuroscheme
 {
-  NeuronItem::NeuronItem( Color bgColor,
-                          NeuronRep::TSymbol symbol,
-                          NeuronRep::Rings rings,
+  NeuronItem::NeuronItem( const NeuronRep& neuronRep,
                           unsigned int size )
   {
+    const Color& bgColor = neuronRep.getProperty( "bg" ).value< Color >( );
+    const NeuronRep::TSymbol& symbol =
+      neuronRep.getProperty( "symbol" ).value< NeuronRep::TSymbol >( );
+    const NeuronRep::Rings rings =
+      neuronRep.getProperty( "rings" ).value< NeuronRep::Rings >( );
+
     auto somaItem = new QGraphicsEllipseItem( );
     somaItem->setRect( - int( size ) / 2,
                        - int( size ) / 2,
@@ -97,5 +101,5 @@ namespace neuroscheme
     return symbolItem;
   }
 
- 
+
 } // namespace neuroscheme

@@ -34,9 +34,7 @@ namespace neuroscheme
 
   public:
 
-    NeuronItem( Color bgColor,
-                shiftgen::NeuronRep::TSymbol symbol,
-                shiftgen::NeuronRep::Rings rings,
+    NeuronItem( const NeuronRep& neuronRep,
                 unsigned int size = 100 );
 
     virtual ~NeuronItem( void ) {}
