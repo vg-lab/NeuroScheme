@@ -2,6 +2,7 @@
 #include "objs/Neuron.h"
 #include "reps/NeuronRep.h"
 #include "reps/ColumnRep.h"
+#include "reps/MiniColumnRep.h"
 #include "mappers/ColorMapper.h"
 #include "mappers/VariableMapper.h"
 
@@ -121,89 +122,115 @@ namespace neuroscheme
       {
         auto column = dynamic_cast< Column* >( obj );
         auto columnRep = new ColumnRep( );
-        NeuronRep meanNeuronRep;
-
-        meanNeuronRep.setProperty( "symbol", NeuronRep::NO_SYMBOL );
-        meanNeuronRep.setProperty( "bg", Color( 100, 100, 100 ));
-
-        shiftgen::ColumnRep::Rings rings;
-
-        shiftgen::Ring somaRing;
-        somaRing.setProperty(
-          "angle",
-          int(
-            roundf(
-              _somaAreaToAngle->map(
-                column->getProperty( "meanSomaVolume" ).
-                value< float >( )))));
-        _greenMapper->value( ) =
-          column->getProperty( "meanSomaArea" ).value< float >( );
-        somaRing.setProperty( "color", _greenMapper->map( ));
-        rings.push_back( somaRing );
-
-        shiftgen::Ring dendRing;
-        dendRing.setProperty(
-          "angle",
-          int(
-            roundf(
-              _dendAreaToAngle->map(
-                column->getProperty( "meanDendVolume" ).
-                value< float >( )))));
-        _redMapper->value( ) =
-          column->getProperty( "meanDendArea" ).value< float >( );
-        dendRing.setProperty( "color", _redMapper->map( ));
-        rings.push_back( dendRing );
-
-        meanNeuronRep.registerProperty( "rings", rings );
-
-        columnRep->registerProperty( "meanNeuron", meanNeuronRep );
-
-        shiftgen::ColumnRep::ColumnLayers layersReps;
-        shiftgen::LayerRep layerRep;
-
-        (void)_neuronsToPercentage;
-          layerRep.setProperty(
-            "leftPerc",
-            roundf(
-              _neuronsToPercentage->map(
-                column->getProperty( "Num Pyramidals" ).
-                value< float >( ))));
-        layerRep.setProperty(
-          "rightPerc",
-          roundf(
-            _neuronsToPercentage->map(
-              column->getProperty( "Num Interneurons" ).
-              value< float >( ))));
-        layersReps.push_back( layerRep );
-
-        for ( unsigned int layer = 1; layer <= 6; ++layer )
-        {
-          layerRep.setProperty(
-            "leftPerc",
-              roundf(
-                _neuronsToPercentage->map(
-                  column->getProperty(
-                    std::string( "Num Pyr Layer " ) +
-                    std::to_string( layer )).
-                  value< float >( ))));
-          layerRep.setProperty(
-            "rightPerc",
-              roundf(
-                _neuronsToPercentage->map(
-                  column->getProperty(
-                    std::string( "Num Inter Layer " ) +
-                    std::to_string( layer )).
-                  value< float >( ))));
-          layersReps.push_back( layerRep );
-        }
-
-          // TODO: map percentages
-        columnRep->registerProperty( "layers", layersReps );
-
-
-
+        _CreateColumnOrMiniColumn( column, columnRep,
+                                   *_somaAreaToAngle,
+                                   *_dendAreaToAngle,
+                                   *_greenMapper,
+                                   *_redMapper,
+                                   *_neuronsToPercentage );
         representations.push_back( columnRep );
+      } // it its MiniColumn object
+      if ( dynamic_cast< MiniColumn* >( obj ))
+      {
+        std::cout << "creating minicolumn rep" << std::endl;
+        auto miniColumn = dynamic_cast< MiniColumn* >( obj );
+        auto miniColumnRep = new MiniColumnRep( );
+        _CreateColumnOrMiniColumn( miniColumn, miniColumnRep,
+                                   *_somaAreaToAngle,
+                                   *_dendAreaToAngle,
+                                   *_greenMapper,
+                                   *_redMapper,
+                                   *_neuronsToPercentage );
+        representations.push_back( miniColumnRep );
       } // it its Column object
     } // for all objects
   } // create
+
+  void RepresentationCreator::_CreateColumnOrMiniColumn(
+    shift::Object *obj,
+    shift::Representation* rep,
+    MapperFloatToFloat& somaAreaToAngle,
+    MapperFloatToFloat& dendAreaToAngle,
+    ColorMapper& somaVolumeToColor,
+    ColorMapper& dendVolumeToColor,
+    MapperFloatToFloat& neuronsToPercentage )
+  {
+    NeuronRep meanNeuronRep;
+
+    meanNeuronRep.setProperty( "symbol", NeuronRep::NO_SYMBOL );
+    meanNeuronRep.setProperty( "bg", Color( 100, 100, 100 ));
+
+    shiftgen::NeuronAggregationRep::Rings rings;
+
+    shiftgen::Ring somaRing;
+    somaRing.setProperty(
+      "angle",
+      int(
+        roundf(
+          somaAreaToAngle.map(
+            obj->getProperty( "meanSomaVolume" ).
+            value< float >( )))));
+    somaVolumeToColor.value( ) =
+      obj->getProperty( "meanSomaArea" ).value< float >( );
+    somaRing.setProperty( "color", dendVolumeToColor.map( ));
+    rings.push_back( somaRing );
+
+    shiftgen::Ring dendRing;
+    dendRing.setProperty(
+      "angle",
+      int(
+        roundf(
+          dendAreaToAngle.map(
+            obj->getProperty( "meanDendVolume" ).
+            value< float >( )))));
+    dendVolumeToColor.value( ) =
+      obj->getProperty( "meanDendArea" ).value< float >( );
+    dendRing.setProperty( "color", dendVolumeToColor.map( ));
+    rings.push_back( dendRing );
+
+    meanNeuronRep.registerProperty( "rings", rings );
+
+    rep->registerProperty( "meanNeuron", meanNeuronRep );
+
+    shiftgen::NeuronAggregationRep::Layers layersReps;
+    shiftgen::LayerRep layerRep;
+
+    (void) neuronsToPercentage;
+    layerRep.setProperty(
+      "leftPerc",
+      roundf(
+        neuronsToPercentage.map(
+          obj->getProperty( "Num Pyramidals" ).
+          value< float >( ))));
+    layerRep.setProperty(
+      "rightPerc",
+      roundf(
+        neuronsToPercentage.map(
+          obj->getProperty( "Num Interneurons" ).
+          value< float >( ))));
+    layersReps.push_back( layerRep );
+
+    for ( unsigned int layer = 1; layer <= 6; ++layer )
+    {
+      layerRep.setProperty(
+        "leftPerc",
+        roundf(
+          neuronsToPercentage.map(
+            obj->getProperty(
+              std::string( "Num Pyr Layer " ) +
+              std::to_string( layer )).
+            value< float >( ))));
+      layerRep.setProperty(
+        "rightPerc",
+        roundf(
+          neuronsToPercentage.map(
+            obj->getProperty(
+              std::string( "Num Inter Layer " ) +
+              std::to_string( layer )).
+            value< float >( ))));
+      layersReps.push_back( layerRep );
+    }
+    rep->registerProperty( "layers", layersReps );
+
+  }
 } // namespace neuroscheme

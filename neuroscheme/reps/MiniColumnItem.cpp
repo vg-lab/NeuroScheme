@@ -1,5 +1,5 @@
 #include "../error.h"
-#include "ColumnItem.h"
+#include "MiniColumnItem.h"
 #include "NeuronItem.h"
 #include "CollapseButtonItem.h"
 #include <QPen>
@@ -7,37 +7,39 @@
 namespace neuroscheme
 {
 
-  ColumnItem::ColumnItem( const ColumnRep& columnRep,
-                          unsigned int size )
+  MiniColumnItem::MiniColumnItem( const MiniColumnRep& columnRep,
+                                  unsigned int size )
     : NeuronAggregationItem( )
   {
 
     const NeuronRep& meanNeuron =
       columnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
     const auto& layers =
-      columnRep.getProperty( "layers" ).value< ColumnRep::Layers >( );
+      columnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
 
     // Create the polygon for the basic column icon
     QPainterPath path_;
     QPolygon poly;
 
-    QPoint pUL ( -int( size )/3, -int( size )/4 );
-    QPoint pUR (  int( size )/3, -int( size )/4 );
-    QPoint pLR (  int( size )/3, +int( size )/24 );
-    QPoint pLM (              0, +int( size )/6 );
-    QPoint pLL ( -int( size )/3, +int( size )/24 );
+    QPoint pUL (-int(size)/3, -int(size)/24);
+    QPoint pUM (           0, -int(size)/6);
+    QPoint pUR ( int(size)/3, -int(size)/24);
 
-    poly << pUL << pUR << pLR << pLM << pLL;
+    QPoint pLR ( int(size)/3, +int(size)/24);
+    QPoint pLM (           0, +int(size)/6);
+    QPoint pLL (-int(size)/3, +int(size)/24);
+
+    poly << pLR << pLM << pLL
+         << pUL << pUM << pUR;
 
     path_.addPolygon( poly );
     path_.closeSubpath(  );
-
     _createNeuronAggregationItem(
       meanNeuron,
       layers,
       path_,
       pLL, pLM, pLR,
-      QColor( 114, 188, 196 ),
+      QColor( 126, 204, 145 ),
       size );
 
     //  this->setBrush( QBrush( QColor( 114, 188, 196 )));

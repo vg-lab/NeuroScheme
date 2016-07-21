@@ -65,12 +65,12 @@
             "types": [ ]
         },
         {
-            "name": "ColumnRep",
+            "name": "NeuronAggregationRep",
             "namespace": "neuroscheme::shiftgen",
             "properties": [
                 {
                     "name": "layers",
-                    "type": "ColumnLayers"
+                    "type": "Layers"
                 },
                 {
                     "name": "meanNeuron",
@@ -86,7 +86,7 @@
                 {
                     "class": "vector",
                     "element": "LayerRep",
-                    "name": "ColumnLayers"
+                    "name": "Layers"
                 }
             ]
         }

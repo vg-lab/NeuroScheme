@@ -43,6 +43,18 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
+  neurons.push_back( new neuroscheme::MiniColumn(
+                       100,
+                       75, 25,
+                       5, 0,
+                       10, 5,
+                       15, 10,
+                       20, 15,
+                       25, 20,
+                       30, 25,
+                       10.0f, 30.0f,
+                       30.0f, 50.0f ));
+
   neuroscheme::RepresentationCreator repCreator;
   repCreator.create( neurons, representations );
 

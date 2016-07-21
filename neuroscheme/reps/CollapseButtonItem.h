@@ -19,30 +19,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__COLUMN_ITEM__
-#define __NEUROSCHEME__COLUMN_ITEM__
+#ifndef __NEUROSCHEME__COLLAPSE_BUTTON_ITEM__
+#define __NEUROSCHEME__COLLAPSE_BUTTON_ITEM__
 
-#include "ColumnRep.h"
-#include "NeuronAggregationItem.h"
+#include <QGraphicsEllipseItem>
 
 namespace neuroscheme
 {
-
-
-  class ColumnItem
-    : public NeuronAggregationItem
+  class CollapseButtonItem
+    : public QGraphicsEllipseItem
   {
 
   public:
-
-    ColumnItem( const ColumnRep& columnRep,
-                unsigned int size = 300 );
-
-    virtual ~ColumnItem( void ) {}
+    CollapseButtonItem( void );
+    void mousePressEvent( QGraphicsSceneMouseEvent* event );
+    void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+    void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
   };
 
-
 } // namespace neuroscheme
 
-#endif
+#endif // __NEUROSCHEME__COLLAPSE_BUTTON_ITEM__

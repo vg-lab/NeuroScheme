@@ -19,26 +19,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__COLUMN_ITEM__
-#define __NEUROSCHEME__COLUMN_ITEM__
+#ifndef __NEUROSCHEME__MINICOLUMN_ITEM__
+#define __NEUROSCHEME__MINICOLUMN_ITEM__
 
-#include "ColumnRep.h"
+#include "MiniColumnRep.h"
 #include "NeuronAggregationItem.h"
 
 namespace neuroscheme
 {
 
 
-  class ColumnItem
+  class MiniColumnItem
     : public NeuronAggregationItem
   {
 
   public:
 
-    ColumnItem( const ColumnRep& columnRep,
-                unsigned int size = 300 );
+    MiniColumnItem( const MiniColumnRep& miniColumnRep,
+                    unsigned int size = 300 );
 
-    virtual ~ColumnItem( void ) {}
+    virtual ~MiniColumnItem( void ) {}
 
   };
 

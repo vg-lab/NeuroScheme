@@ -24,12 +24,14 @@
 
 #include <shift_Neuron.h>
 #include <shift_Column.h>
+#include <shift_MiniColumn.h>
 
 namespace neuroscheme
 {
 
   using Neuron = shiftgen::Neuron;
   using Column = shiftgen::Column;
+  using MiniColumn = shiftgen::MiniColumn;
 
 } // namespace neuroscheme
 

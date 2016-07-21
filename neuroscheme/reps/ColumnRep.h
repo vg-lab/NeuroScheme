@@ -24,7 +24,7 @@
 
 #include "QGraphicsItemRepresentation.h"
 #include <shift/shift.h>
-#include <shift_ColumnRep.h>
+#include <shift_NeuronAggregationRep.h>
 #include <shift_LayerRep.h>
 
 namespace neuroscheme
@@ -33,8 +33,13 @@ namespace neuroscheme
 
   using LayerRep = shiftgen::LayerRep;
 
+  namespace shiftgen
+  {
+    using ColumnRep = shiftgen::NeuronAggregationRep;
+  }
+
   class ColumnRep
-    : public shiftgen::ColumnRep
+    : public shiftgen::NeuronAggregationRep
     , public QGraphicsItemRepresentation
   {
   public:
