@@ -21,8 +21,8 @@ namespace neuroscheme
     QPainterPath path_;
     QPolygon poly;
 
-    QPoint pUL ( -int( size )/3, -int( size )/4 );
-    QPoint pUR (  int( size )/3, -int( size )/4 );
+    QPoint pUL ( -int( size )/3, -int( size )/6 );
+    QPoint pUR (  int( size )/3, -int( size )/6 );
     QPoint pLR (  int( size )/3, +int( size )/24 );
     QPoint pLM (              0, +int( size )/6 );
     QPoint pLL ( -int( size )/3, +int( size )/24 );

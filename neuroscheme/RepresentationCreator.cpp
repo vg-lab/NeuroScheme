@@ -116,7 +116,7 @@ namespace neuroscheme
 
         representations.push_back( neuronRep );
 
-      } // end if its Neuron objetc
+      } // end if its Neuron object
 
       if ( dynamic_cast< Column* >( obj ))
       {
@@ -158,7 +158,7 @@ namespace neuroscheme
     NeuronRep meanNeuronRep;
 
     meanNeuronRep.setProperty( "symbol", NeuronRep::NO_SYMBOL );
-    meanNeuronRep.setProperty( "bg", Color( 100, 100, 100 ));
+    meanNeuronRep.setProperty( "bg", Color( 200, 200, 200 ));
 
     shiftgen::NeuronAggregationRep::Rings rings;
 

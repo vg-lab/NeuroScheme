@@ -101,7 +101,7 @@ namespace neuroscheme
 //    this->setBrush( QBrush( QColor( 114, 188, 196 )));
     this->setBrush( QBrush( baseColor ));
 
-    unsigned int nrSize = size/6;
+    unsigned int nrSize = size/7;
 
     // Container for neuron
     QGraphicsEllipseItem *nrCont = new QGraphicsEllipseItem( this );
@@ -111,9 +111,9 @@ namespace neuroscheme
 
     nrCont->setPen( Qt::NoPen );
     nrCont->setBrush( QBrush( QColor( 255, 255, 255 )));
-    nrCont->setPos( 0, -int( size ) / 16 );
+    //nrCont->setPos( 0, -int( size ) / 16 );
 
-    auto _meanNeuronItem = new NeuronItem( meanNeuron, size / 6 );
+    auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize );
 
     _meanNeuronItem->setParentItem( nrCont );
 
@@ -187,9 +187,10 @@ namespace neuroscheme
                        pLayerUR - collapseButtonPos,
                        layerHeight, size/40,
                        percPyr, percInter,
-                       QBrush( QColor( baseColor.red( ) + i * 10,
-                                       baseColor.green( ) + i * 10,
-                                       baseColor.blue( ) + i * 5 )));
+                       QBrush(
+                         QColor( std::min( baseColor.red( ) + i * 8, 255 ),
+                                 std::min( baseColor.green( ) + i * 8, 255 ),
+                                 std::min( baseColor.blue( ) + i * 5 , 255 ))));
       layerItem->setFlag( QGraphicsItem::ItemStacksBehindParent );
       _layerItems[ i - 1 ] = layerItem;
       _layerAnimations[ i - 1 ] =
