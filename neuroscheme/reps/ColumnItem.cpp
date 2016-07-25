@@ -40,6 +40,7 @@ namespace neuroscheme
       QColor( 114, 188, 196 ),
       size );
 
+    this->_parentRep = &( const_cast< ColumnRep& >( columnRep ));
     //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
   }
 

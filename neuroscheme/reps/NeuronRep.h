@@ -24,33 +24,17 @@
 
 #include "QGraphicsItemRepresentation.h"
 #include <shift/shift.h>
-// #include <shift_Ring.h>
 #include <shift_NeuronRep.h>
 
 namespace neuroscheme
 {
 
-  // class Ring
-  //   : public shiftgen::Ring
-  // {
-
-  // public:
-  //   Ring( void );
-  //   Ring( const Ring& other );
-  //   virtual ~Ring( void ) {}
-
-  // };
-
-  // using Ring = shiftgen::Ring;
-//  typedef std::vector< Ring > Rings;
 
   class NeuronRep
     : public shiftgen::NeuronRep
     , public QGraphicsItemRepresentation
   {
   public:
-
-    // typedef shiftgen::NeuronRep::Rings Rings;
 
     NeuronRep( void );
     NeuronRep( const NeuronRep& );

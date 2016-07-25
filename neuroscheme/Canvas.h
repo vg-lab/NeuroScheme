@@ -31,6 +31,9 @@ namespace neuroscheme
     const GraphicsScene& scene( void ) const;
     GraphicsScene& scene( void );
 
+    const GraphicsView& view( void ) const;
+    GraphicsView& view( void );
+
   protected:
     GraphicsView* _graphicsView;
     GraphicsScene* _graphicsScene;

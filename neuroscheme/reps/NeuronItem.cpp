@@ -51,6 +51,7 @@ namespace neuroscheme
       ringCount++;
     }
 
+    this->_parentRep = &( const_cast< NeuronRep& >( neuronRep ));
   }
 
   QGraphicsItem* NeuronItem::_createSymbolItem( NeuronRep::TSymbol symbol,

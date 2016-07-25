@@ -43,4 +43,14 @@ namespace neuroscheme
     return *_graphicsScene;
   }
 
+  const GraphicsView& Canvas::view( void ) const
+  {
+    return *_graphicsView;
+  }
+
+  GraphicsView& Canvas::view( void )
+  {
+    return *_graphicsView;
+  }
+
 } // namespace neuroscheme

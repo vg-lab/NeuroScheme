@@ -23,13 +23,16 @@
 #define __NEUROSCHEME__NEURON_ITEM__
 
 #include "../Color.h"
+#include "Item.h"
 #include "NeuronRep.h"
 #include <QGraphicsEllipseItem>
 
 namespace neuroscheme
 {
 
-  class NeuronItem : public QGraphicsEllipseItem
+  class NeuronItem
+    : public QGraphicsEllipseItem
+    , public Item
   {
 
   public:

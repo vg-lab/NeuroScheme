@@ -4,6 +4,7 @@
 #include "reps/QGraphicsItemRepresentation.h"
 #include "objs/Neuron.h"
 #include "RepresentationCreator.h"
+#include "LayoutManager.h"
 
 
 MainWindow::MainWindow( QWidget* parent_ )
@@ -18,7 +19,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   shift::Objects neurons;
   shift::Representations representations;
 
-  for ( unsigned int i = 0; i < 4; i++ )
+  for ( unsigned int i = 0; i < 40; i++ )
   {
     neurons.push_back( new neuroscheme::Neuron(
                          neuroscheme::Neuron::INTERNEURON,
@@ -58,28 +59,61 @@ MainWindow::MainWindow( QWidget* parent_ )
   neuroscheme::RepresentationCreator repCreator;
   repCreator.create( neurons, representations );
 
-  unsigned int x = 0;
-  for ( const auto representation : representations )
-  {
-    auto graphicsItemRep =
-      dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
-      representation );
-    if ( !graphicsItemRep )
-    {
-      std::cerr << "Item null" << std::endl;
-    } else
-    {
-      _canvas->scene( ).addItem( graphicsItemRep->item( ));
-      if ( graphicsItemRep->item( ))
-      {
-        graphicsItemRep->item( )->setPos( x, 0 ); x+= 120;
-        // graphicsItemRep->item( )->setScale( 10 );
-      }
-    }
-  }
+  neuroscheme::LayoutManager::displayItems(
+    _canvas->scene( ), representations );
+  neuroscheme::LayoutManager::displayItems(
+    _canvas->scene( ), representations, true );
+
+  _representations = representations;
+
+  // unsigned int x = 0;
+  // for ( const auto representation : representations )
+  // {
+  //   auto graphicsItemRep =
+  //     dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
+  //     representation );
+  //   if ( !graphicsItemRep )
+  //   {
+  //     std::cerr << "Item null" << std::endl;
+  //   } else
+  //   {
+
+  //     _canvas->scene( ).addItem( graphicsItemRep->item( ));
+  //     if ( graphicsItemRep->item( ))
+  //     {
+  //       graphicsItemRep->item( )->setPos( x, 0 ); x+= 120;
+  //       // graphicsItemRep->item( )->setScale( 10 );
+  //     }
+  //   }
+  // }
 }
+
+void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
+{
+  std::cout << "MainWindow::resizeEvent" << std::endl;
+  const QSize viewerSize = _canvas->view( ).size( );
+  const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
+                               - viewerSize.height( ) / 2,
+                               viewerSize.width( ) -2,
+                               viewerSize.height( ) -2);
+
+  QTransform transf = _canvas->view( ).transform( );
+  _canvas->view( ).fitInView( rectf, Qt::KeepAspectRatio );
+  _canvas->view( ).setSceneRect( rectf );
+  _canvas->view( ).setTransform( transf );
+
+  std::cout << _canvas->view( ).width( ) << " x "
+            << _canvas->view( ).height( ) << std::endl;
+
+  neuroscheme::LayoutManager::displayItems(
+    _canvas->scene( ), _representations );
+
+}
+
+
 
 MainWindow::~MainWindow( void )
 {
   delete _ui;
+  delete _canvas;
 }

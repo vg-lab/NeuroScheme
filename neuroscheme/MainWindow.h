@@ -3,6 +3,7 @@
 
 #include <ui_MainWindow.h>
 #include <QMainWindow>
+#include <shift/shift.h>
 #include "Canvas.h"
 
 namespace Ui
@@ -19,11 +20,16 @@ public:
   explicit MainWindow( QWidget *parent = 0 );
   ~MainWindow( void );
 
+protected:
+
+  void resizeEvent( QResizeEvent* );
 
 private:
 
   neuroscheme::Canvas* _canvas;
   Ui::MainWindow* _ui;
+
+  shift::Representations _representations;
 
 }; // class MainWindow
 

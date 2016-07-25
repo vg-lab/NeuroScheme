@@ -7,15 +7,15 @@
 namespace neuroscheme
 {
 
-  MiniColumnItem::MiniColumnItem( const MiniColumnRep& columnRep,
+  MiniColumnItem::MiniColumnItem( const MiniColumnRep& miniColumnRep,
                                   unsigned int size )
     : NeuronAggregationItem( )
   {
 
     const NeuronRep& meanNeuron =
-      columnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
+      miniColumnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
     const auto& layers =
-      columnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
+      miniColumnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
 
     // Create the polygon for the basic column icon
     QPainterPath path_;
@@ -41,6 +41,8 @@ namespace neuroscheme
       pLL, pLM, pLR,
       QColor( 126, 204, 145 ),
       size );
+
+    this->_parentRep = &( const_cast< MiniColumnRep& >( miniColumnRep ));
 
     //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
   }

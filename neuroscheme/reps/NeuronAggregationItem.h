@@ -23,9 +23,10 @@
 #define __NEUROSCHEME__NEURON_AGGREGATION_ITEM__
 
 #include "../Color.h"
-#include "ColumnRep.h"
-#include "NeuronRep.h"
 #include "CollapsableItem.h"
+#include "ColumnRep.h"
+#include "Item.h"
+#include "NeuronRep.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>
 #include <QGraphicsPathItem>
@@ -79,6 +80,7 @@ namespace neuroscheme
 
   class NeuronAggregationItem
     : public QGraphicsPathItem
+    , public Item
     , public CollapsableItem
   {
 

@@ -114,6 +114,8 @@ namespace neuroscheme
     //nrCont->setPos( 0, -int( size ) / 16 );
 
     auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize );
+    // To avoid destruction of parent which is not dynamically allocated
+    _meanNeuronItem->parentRep( nullptr );
 
     _meanNeuronItem->setParentItem( nrCont );
 

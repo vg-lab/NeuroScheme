@@ -19,39 +19,45 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_QGRAPHICSITEM_REPRESENTATION__
-#define __NEUROSCHEME_QGRAPHICSITEM_REPRESENTATION__
+#ifndef __NEUROSCHEME_ITEM__
+#define __NEUROSCHEME_ITEM__
 
-#ifdef NEUROSCHEME_USE_QT5WIDGETS
-
-#include <QGraphicsItem>
-
+#include <shift/shift.h>
+#include "QGraphicsItemRepresentation.h"
 namespace neuroscheme
 {
 
-  class QGraphicsItemRepresentation
+  class Item
   {
 
   public:
 
-    QGraphicsItemRepresentation( void )
-      : _item( nullptr )
+    Item( void )
+      : _parentRep( nullptr )
     {}
-    virtual ~QGraphicsItemRepresentation( void ) {}
-    virtual QGraphicsItem* item( bool create = true ) = 0;
-    virtual void item( QGraphicsItem* item_ )
+    virtual ~Item( void )
     {
-      _item = item_;
+      auto parentRep =
+        dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+      if ( parentRep )
+        parentRep->item( nullptr );
+    }
+    virtual shift::Representation* parentRep( void ) const
+    {
+      return _parentRep;
+    }
+    virtual void parentRep( shift::Representation* parentRep_ )
+    {
+      _parentRep = parentRep_;
     }
 
   protected:
 
-    QGraphicsItem* _item;
+    shift::Representation* _parentRep;
 
   };
 
 
 } // namespace neuroscheme
 
-#endif // NEUROSCHEME_USE_QT5WIDGETS
-#endif // __NEUROSCHEME_QGRAPHICSITEM_REPRESENTATION__
+#endif // __NEUROSCHEME_ITEM__
