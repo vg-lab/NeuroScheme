@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QGraphicsView>
+#include <QMouseEvent>
 
 namespace neuroscheme
 {
@@ -10,10 +11,13 @@ namespace neuroscheme
   class GraphicsView : public QGraphicsView
   {
 
-    Q_OBJECT
-  public:
+    Q_OBJECT;
 
+  public:
     GraphicsView( QWidget* parent = 0 );
+
+  protected:
+    virtual void wheelEvent( QWheelEvent* event_ );
 
   }; // class GraphicsView
 

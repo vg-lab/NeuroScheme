@@ -9,6 +9,30 @@ namespace neuroscheme
   {
   }
 
+  void GraphicsView::wheelEvent( QWheelEvent* event_ )
+  {
+
+    setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
+
+    // Scale the view / do the zoom
+    double scaleFactor = 1.05;
+    int delta = event_->angleDelta( ).y( );
+
+    if ( delta > 0 )
+    {
+      // Zoom in
+      scale(scaleFactor, scaleFactor);
+    }
+    else if ( delta < 0 )
+    {
+      // Zooming out
+      this->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+    }
+
+    // Don't call superclass handler here
+    // as wheel is normally used for moving scrollbars
+  }
+
   Canvas::Canvas( QWidget * parent_ )
     : _graphicsView( new GraphicsView( parent_ )),
       _graphicsScene( new GraphicsScene )
