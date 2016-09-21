@@ -23,9 +23,11 @@
 #define __NEUROSCHEME__NEURON_AGGREGATION_ITEM__
 
 #include "../Color.h"
+#include "../InteractionManager.h"
 #include "CollapsableItem.h"
 #include "ColumnRep.h"
 #include "Item.h"
+#include "InteractiveItem.h"
 #include "NeuronRep.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>
@@ -82,17 +84,30 @@ namespace neuroscheme
     : public QGraphicsPathItem
     , public Item
     , public CollapsableItem
+    , public InteractiveItem
   {
 
   public:
 
-    NeuronAggregationItem( void ) {}
+    NeuronAggregationItem( void )
+    {
+      this->InteractiveItem::init( );
+    }
 
 
     virtual ~NeuronAggregationItem( void ) {}
 
     void collapse( bool anim = true );
     void uncollapse( bool anim = true );
+
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event )
+    {
+      InteractionManager::hoverEnterEvent( this, event );
+    }
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event )
+    {
+      InteractionManager::hoverLeaveEvent( this, event );
+    }
 
   protected:
 

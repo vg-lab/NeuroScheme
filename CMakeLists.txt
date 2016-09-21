@@ -28,6 +28,12 @@ if ( CMAKE_BUILD_TYPE MATCHES "Debug" )
   add_definitions( -DDEBUG )
 endif( )
 
+option( NEUROSCHEME_WITH_LOGGING "NEUROSCHEME_WITH_LOGGING" ON )
+if ( NEUROSCHEME_WITH_LOGGING )
+  add_definitions( -DNEUROSCHEME_WITH_LOGGING )
+endif( )
+
+
 include( GitExternal )
 
 # description

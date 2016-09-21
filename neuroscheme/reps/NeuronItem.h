@@ -23,8 +23,10 @@
 #define __NEUROSCHEME__NEURON_ITEM__
 
 #include "../Color.h"
+#include "../InteractionManager.h"
 #include "Item.h"
 #include "NeuronRep.h"
+#include "SelectableItem.h"
 #include <QGraphicsEllipseItem>
 
 namespace neuroscheme
@@ -33,6 +35,7 @@ namespace neuroscheme
   class NeuronItem
     : public QGraphicsEllipseItem
     , public Item
+    , public SelectableItem
   {
 
   public:
@@ -41,6 +44,28 @@ namespace neuroscheme
                 unsigned int size = 100 );
 
     virtual ~NeuronItem( void ) {}
+
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event )
+    {
+      std::cout << "enter" << std::endl;
+      InteractionManager::hoverEnterEvent( this, event );
+    }
+
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event )
+    {
+      InteractionManager::hoverLeaveEvent( this, event );
+    }
+
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+    {
+      InteractionManager::contextMenuEvent( this, event );
+    }
+
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event )
+    {
+      InteractionManager::mousePressEvent( this, event );
+    }
+
 
   protected:
 

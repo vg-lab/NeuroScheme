@@ -7,6 +7,14 @@ namespace neuroscheme
   NeuronItem::NeuronItem( const NeuronRep& neuronRep,
                           unsigned int size )
   {
+    std::cout << "accept events" << std::endl;
+    this->setAcceptHoverEvents( true );
+
+    int size_2 = ceil( float( size ) / 1.3f );
+    this->setRect ( -size_2, -size_2,
+                    size_2 * 2 , size_2 * 2 );
+    this->setPen( QPen( Qt::NoPen ));
+
     const Color& bgColor = neuronRep.getProperty( "bg" ).value< Color >( );
     const NeuronRep::TSymbol& symbol =
       neuronRep.getProperty( "symbol" ).value< NeuronRep::TSymbol >( );

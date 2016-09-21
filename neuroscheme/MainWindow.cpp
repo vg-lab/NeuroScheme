@@ -19,7 +19,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   shift::Objects neurons;
   shift::Representations representations;
 
-  for ( unsigned int i = 0; i < 40; i++ )
+  for ( unsigned int i = 0; i < 5; i++ )
   {
     neurons.push_back( new neuroscheme::Neuron(
                          neuroscheme::Neuron::INTERNEURON,
