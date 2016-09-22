@@ -11,7 +11,15 @@ namespace neuroscheme
 
   void RepresentationCreator::create(
     const shift::Objects& objects,
-    shift::Representations& representations )
+    shift::Representations& representations,
+    std::unordered_map< shift::Object*, shift::Representation* >& // objectsToReps
+    ,
+    std::unordered_map< shift::Representation*, shift::Object* >& // repsToObjects
+    ,
+    bool // linkObjectsToReps
+    ,
+    bool // linkRepsToObjs
+    )
   {
 
     auto _greenMapper = new DiscreteColorMapper( );

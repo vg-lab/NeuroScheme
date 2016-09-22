@@ -59,7 +59,10 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   neuroscheme::RepresentationCreatorManager::addCreator(
     new neuroscheme::RepresentationCreator );
-  neuroscheme::RepresentationCreatorManager::create( objects, representations );
+  neuroscheme::TObjectsToReps objsToReps;
+  neuroscheme::TRepsToObjects repsToObjs;
+  neuroscheme::RepresentationCreatorManager::create( objects, representations,
+                                                     objsToReps, repsToObjs );
 
   neuroscheme::LayoutManager::displayItems(
     _canvas->scene( ), representations );

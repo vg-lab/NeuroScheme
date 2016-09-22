@@ -7,13 +7,23 @@
 namespace neuroscheme
 {
 
-  class RepresentationCreator : shift::RepresentationCreator
+  typedef std::unordered_map< shift::Object*, shift::Representation* >
+  TObjectsToReps;
+  typedef std::unordered_map< shift::Representation*, shift::Object* >
+  TRepsToObjects;
+
+  class RepresentationCreator //: shift::RepresentationCreator
   {
   public:
     virtual ~RepresentationCreator( void ) {};
 
-    void create( const shift::Objects& objects,
-                 shift::Representations& representations );
+    void create(
+      const shift::Objects& objects,
+      shift::Representations& representations,
+      TObjectsToReps& objectsToReps,
+      TRepsToObjects& repsToObjects,
+      bool linkObjectsToReps = false,
+      bool linkRepsToObjs = false );
 
 
   protected:
@@ -38,10 +48,18 @@ namespace neuroscheme
     }
     static void create( const shift::Objects& objects,
                         shift::Representations& representations,
+                        TObjectsToReps& objectsToReps,
+                        TRepsToObjects& repsToObjects,
+                        bool linkObjectsToReps = false,
+                        bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 )
     {
       //TODO check if exists
-      _repCreators[ repCreatorId ]->create( objects, representations );
+      _repCreators[ repCreatorId ]->create( objects, representations,
+                                            objectsToReps,
+                                            repsToObjects,
+                                            linkObjectsToReps,
+                                            linkRepsToObjs );
     }
 
   protected:
