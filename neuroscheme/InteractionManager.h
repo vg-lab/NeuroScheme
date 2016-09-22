@@ -25,6 +25,7 @@
 #include "reps/SelectableItem.h"
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QMenu>
 #include <QPen>
 #include <iostream> // Borrar
 namespace neuroscheme
@@ -34,73 +35,26 @@ namespace neuroscheme
   public:
 
     static void hoverEnterEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneHoverEvent* /* event */ )
-    {
-      auto selectableItem = dynamic_cast< SelectableItem* >( item );
-      if ( selectableItem )
-      {
-        if ( selectableItem->selected( ))
-          item->setPen( _hoverSelectedPen );
-        else
-          item->setPen( _hoverUnselectedPen );
-      }
-      else
-      {
-        item->setPen( _hoverUnselectedPen );
-      }
-      std::cout << "InteractionManager::hover::enter" << std::endl;
-    }
+                                 QGraphicsSceneHoverEvent* event );
 
     static void hoverLeaveEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneHoverEvent* /* event */ )
-    {
-      auto selectableItem = dynamic_cast< SelectableItem* >( item );
-      if ( selectableItem )
-      {
-        if ( selectableItem->selected( ))
-          item->setPen( _selectedPen );
-        else
-          item->setPen( _unselectedPen );
-      }
-      else
-      {
-        item->setPen( _unselectedPen );
-      }
-      std::cout << "InteractionManager::hover::leave" << std::endl;
-    }
+                                 QGraphicsSceneHoverEvent* event );
 
-    static void contextMenuEvent(
-      QAbstractGraphicsShapeItem* /*item*/,
-      QGraphicsSceneContextMenuEvent* /*event*/ )
-    {
-      std::cout << "InteractionManager::contextMenu" << std::endl;
-    }
-
+    static void contextMenuEvent( QAbstractGraphicsShapeItem* item,
+                                  QGraphicsSceneContextMenuEvent* event );
 
     static void mousePressEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneMouseEvent* event )
-    {
-      if (event->buttons( ) & Qt::LeftButton)
-      {
-        std::cout << "InteractionManager::mousePressEvent::left" << std::endl;
-        auto selectableItem = dynamic_cast< SelectableItem* >( item );
-        if ( selectableItem )
-        {
-          selectableItem->toggleSelected( );
-          if ( selectableItem->selected( ))
-            item->setPen( _selectedPen );
-          else
-            item->setPen( _unselectedPen );
-        }
-      }
-    }
+                                 QGraphicsSceneMouseEvent* event );
 
     protected:
-    
+
     static QPen _selectedPen;
     static QPen _unselectedPen;
     static QPen _hoverSelectedPen;
     static QPen _hoverUnselectedPen;
+
+    static QMenu* _contextMenu;
+
 
   };
 }

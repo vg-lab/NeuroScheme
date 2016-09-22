@@ -233,4 +233,8 @@ namespace neuroscheme
     rep->registerProperty( "layers", layersReps );
 
   }
+
+  std::map< unsigned int, RepresentationCreator* >
+  RepresentationCreatorManager::_repCreators =
+    std::map< unsigned int, RepresentationCreator* >( );
 } // namespace neuroscheme

@@ -27,6 +27,27 @@ namespace neuroscheme
       MapperFloatToFloat& neuronsToPercentage );
   };
 
+  class RepresentationCreatorManager
+  {
+  public:
+    static void addCreator( RepresentationCreator* repCreator,
+                            unsigned int repCreatorId = 0 )
+    {
+      //TODO check if exists
+      _repCreators[ repCreatorId ] = repCreator;
+    }
+    static void create( const shift::Objects& objects,
+                        shift::Representations& representations,
+                        unsigned int repCreatorId = 0 )
+    {
+      //TODO check if exists
+      _repCreators[ repCreatorId ]->create( objects, representations );
+    }
+
+  protected:
+    static std::map< unsigned int, RepresentationCreator* > _repCreators;
+  };
+
 } // namespace neuroscheme
 
 #endif // __NEUROSCHEME__REPRESENTATION_CREATOR__

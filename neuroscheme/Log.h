@@ -15,6 +15,15 @@
 namespace neuroscheme
 {
 
+#define NS_LOG_HEADER                                           \
+  std::string( "NeuroScheme: " +                                \
+               std::string( __FILE__ ) + std::string( "(" ) +   \
+               std::to_string( __LINE__ ) +                     \
+               std::string( ")::" ) +                           \
+               std::string( __FUNCTION__ ) +                    \
+               std::string( ": " ))
+
+
   //! Log levels suported
   typedef enum
   {
@@ -31,12 +40,6 @@ namespace neuroscheme
   class Log
   {
   public:
-
-    #define NS_LOG_HEADER                                           \
-  std::string( "neuroscheme: " +                                \
-               std::string( __FILE__ ) + std::string( "(" ) +   \
-               std::to_string( __LINE__ ) +                     \
-               std::string( "): " ))
 
     /**
      * Set current log level

@@ -5,10 +5,16 @@
 namespace neuroscheme
 {
   NeuronItem::NeuronItem( const NeuronRep& neuronRep,
-                          unsigned int size )
+                          unsigned int size,
+                          bool interactive_ )
   {
-    std::cout << "accept events" << std::endl;
-    this->setAcceptHoverEvents( true );
+    setInteractive( interactive_ );
+    if ( interactive_ )
+    {
+      std::cout << "Hover events" << std::endl;
+      this->setAcceptHoverEvents( true );
+    } else
+      std::cout << "No events" << std::endl;
 
     int size_2 = ceil( float( size ) / 1.3f );
     this->setRect ( -size_2, -size_2,

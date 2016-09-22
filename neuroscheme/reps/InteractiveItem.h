@@ -32,26 +32,23 @@ namespace neuroscheme
   public:
 
     InteractiveItem( void )
+      : _interactive( true )
     {
     }
     virtual ~InteractiveItem( void ) { }
 
-    void init ( void )
+    bool setInteractive( bool interactive_ )
     {
-      std::cout << "-ii-" << this << std::endl;
-      QGraphicsItem* qgi = dynamic_cast< QGraphicsItem* >( this );
-      if ( qgi )
-      {
-        Log::log( "ll" );
-        qgi->setAcceptHoverEvents( true );
-      } else
-        Log::log( "InteractiveItem not QGraphicsItem", LOG_LEVEL_WARNING );
+      return _interactive = interactive_ ;
     }
 
-    void hoverEnterEvent( QGraphicsSceneHoverEvent* /*event*/ )
+    bool interactive( void ) const
     {
-      std::cout << "hoooover" << std::endl;
+      return _interactive;
     }
+
+  protected:
+    bool _interactive;
 
   };
 

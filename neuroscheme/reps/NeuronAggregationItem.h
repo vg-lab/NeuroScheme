@@ -44,7 +44,6 @@ namespace neuroscheme
   class LayerItem
     : public QObject
     , public QGraphicsPathItem
-
   {
     Q_OBJECT
     Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
@@ -84,6 +83,7 @@ namespace neuroscheme
     : public QGraphicsPathItem
     , public Item
     , public CollapsableItem
+    , public SelectableItem
     , public InteractiveItem
   {
 
@@ -91,7 +91,7 @@ namespace neuroscheme
 
     NeuronAggregationItem( void )
     {
-      this->InteractiveItem::init( );
+      this->setAcceptHoverEvents( true );
     }
 
 
@@ -108,6 +108,16 @@ namespace neuroscheme
     {
       InteractionManager::hoverLeaveEvent( this, event );
     }
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+    {
+      InteractionManager::contextMenuEvent( this, event );
+    }
+
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event )
+    {
+      InteractionManager::mousePressEvent( this, event );
+    }
+
 
   protected:
 

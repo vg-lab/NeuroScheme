@@ -16,23 +16,24 @@ MainWindow::MainWindow( QWidget* parent_ )
   this->setCentralWidget( _canvas );
 
 
-  shift::Objects neurons;
+  shift::Objects objects;
   shift::Representations representations;
 
-  for ( unsigned int i = 0; i < 5; i++ )
-  {
-    neurons.push_back( new neuroscheme::Neuron(
-                         neuroscheme::Neuron::INTERNEURON,
-                         neuroscheme::Neuron::EXCITATORY,
-                         10.0f, 30.0f, 30.0f, 50.0f ));
+  
+  // for ( unsigned int i = 0; i < 5; i++ )
+  // {
+  //   objects.push_back( new neuroscheme::Neuron(
+  //                        neuroscheme::Neuron::INTERNEURON,
+  //                        neuroscheme::Neuron::EXCITATORY,
+  //                        10.0f, 30.0f, 30.0f, 50.0f ));
 
-    neurons.push_back( new neuroscheme::Neuron(
-                         neuroscheme::Neuron::PYRAMIDAL,
-                         neuroscheme::Neuron::INHIBITORY,
-                         70.0f, 60.0f, 20.0f, 30.0f ));
-  }
+  //   objects.push_back( new neuroscheme::Neuron(
+  //                        neuroscheme::Neuron::PYRAMIDAL,
+  //                        neuroscheme::Neuron::INHIBITORY,
+  //                        70.0f, 60.0f, 20.0f, 30.0f ));
+  // }
 
-  neurons.push_back( new neuroscheme::Column(
+  objects.push_back( new neuroscheme::Column(
                        100,
                        75, 25,
                        5, 0,
@@ -44,7 +45,7 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
-  neurons.push_back( new neuroscheme::MiniColumn(
+  objects.push_back( new neuroscheme::MiniColumn(
                        100,
                        75, 25,
                        5, 0,
@@ -56,8 +57,9 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
-  neuroscheme::RepresentationCreator repCreator;
-  repCreator.create( neurons, representations );
+  neuroscheme::RepresentationCreatorManager::addCreator(
+    new neuroscheme::RepresentationCreator );
+  neuroscheme::RepresentationCreatorManager::create( objects, representations );
 
   neuroscheme::LayoutManager::displayItems(
     _canvas->scene( ), representations );

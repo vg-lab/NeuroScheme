@@ -113,7 +113,7 @@ namespace neuroscheme
     nrCont->setBrush( QBrush( QColor( 255, 255, 255 )));
     //nrCont->setPos( 0, -int( size ) / 16 );
 
-    auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize );
+    auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize, false );
     // To avoid destruction of parent which is not dynamically allocated
     _meanNeuronItem->parentRep( nullptr );
 

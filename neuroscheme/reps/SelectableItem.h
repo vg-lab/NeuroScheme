@@ -24,8 +24,10 @@
 
 namespace neuroscheme
 {
+
   class SelectableItem
   {
+
   public:
 
     SelectableItem( bool selected_ = false )
@@ -35,12 +37,14 @@ namespace neuroscheme
 
     void select( void ) { _selected = true; }
     void unselect( void ) { _selected = false; }
-    void setSelected( bool selected_  ) { _selected = selected_; }
+    void setSelected( bool selected_ ) { _selected = selected_; }
     void toggleSelected( void ) { _selected = !_selected; }
+    bool selected( void ) const { return _selected; };
 
-    bool selected( void ) { return _selected; };
   protected:
+
     bool _selected;
+
   };
 
 } // namespace neuroscheme
