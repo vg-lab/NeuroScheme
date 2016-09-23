@@ -1,4 +1,27 @@
+/*
+ * Copyright (c) 2016 GMRV/URJC/UPM.
+ *
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
 #include "InteractionManager.h"
+#include "RepresentationCreatorManager.h"
+#include "objs/Neuron.h"
 #include "reps/ColumnItem.h"
 #include "reps/MiniColumnItem.h"
 #include "reps/NeuronItem.h"
@@ -77,12 +100,21 @@ namespace neuroscheme
     auto neuronItem = dynamic_cast< NeuronItem* >( item );
     if ( neuronItem )
     {
-      // QAction* action1 =
-      _contextMenu->addAction( QString( "Show minicolumns" ));
-      // QAction* action2 =
-      _contextMenu->addAction( QString( "Show columns" ));
-      // QAction* selectedAction =
-      _contextMenu->exec( event->screenPos( ));
+      const auto objs =
+        RepresentationCreatorManager::repsToObjects( ).at(
+          neuronItem->parentRep( ));
+      if ( objs.size( ) < 1 )
+        Log::log( NS_LOG_HEADER + "neuron item without object",
+                  LOG_LEVEL_ERROR );
+      std::cout << "--------------"
+                << (int) ( *objs.begin( ))->getProperty( "gid" ).
+        value< unsigned int >( ) << std::endl;
+      // // QAction* action1 =
+      // _contextMenu->addAction( QString( "Show minicolumns" ));
+      // // QAction* action2 =
+      // _contextMenu->addAction( QString( "Show columns" ));
+      // // QAction* selectedAction =
+      // _contextMenu->exec( event->screenPos( ));
       return;
     }
 

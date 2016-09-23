@@ -84,7 +84,7 @@ namespace neuroscheme
   Color DiscreteColorMapper::valueToColor( float value_ ) const
   {
 
-    int numColors = this->size( );
+    int numColors = ( int ) this->size( );
 
     int colorIdx = round (( numColors - 1 ) *
                           ( value_ - _min ) / (_max - _min));

@@ -64,6 +64,7 @@ set( NEUROSCHEME_SOURCES
   mappers/VariableMapper.cpp
   neuroScheme.cpp
   RepresentationCreator.cpp
+  RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
   reps/ColumnItem.cpp
   reps/ColumnRep.cpp
@@ -88,6 +89,7 @@ set( NEUROSCHEME_HEADERS
   mappers/ColorMapper.h
   mappers/VariableMapper.h
   RepresentationCreator.h
+  RepresentationCreatorManager.h
   objs/Neuron.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h
@@ -112,5 +114,16 @@ include_directories(
   ${PROJECT_BINARY_DIR}/neuroscheme
   ${SHIFT_GENERATED_DIR} )
 
+if (MSVC)
+  add_definitions(-DNEUROSCHEME_STATIC)
+  # if (WITH_NO_CONSOLE)
+  #   message(STATUS "No console, WIN32 added to common app args")
+  #   set(COMMON_APP_ARGS WIN32)
+  # else()
+  #   message(STATUS "neuroscheme with console")
+  # endif()
+endif()
+
+
 set( NEUROSCHEME_INCLUDE_NAME neuroscheme )
-common_application( NeuroScheme )
+common_application( NeuroScheme GUI ${COMMON_APP_ARGS})

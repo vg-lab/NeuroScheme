@@ -44,8 +44,9 @@ set( COMMON_PROJECT_DOMAIN gmrv.es )
 
 include( Common )
 
+common_find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 common_find_package( ShiFT REQUIRED )
-common_find_package( Qt5Widgets SYSTEM )
+common_find_package( Qt5Widgets SYSTEM REQUIRED )
 common_find_package_post( )
 
 list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT )

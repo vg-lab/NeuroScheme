@@ -1,9 +1,31 @@
+/*
+ * Copyright (c) 2016 GMRV/URJC/UPM.
+ *
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
 #include "MainWindow.h"
 
 // OJO PRUEBAS
 #include "reps/QGraphicsItemRepresentation.h"
 #include "objs/Neuron.h"
 #include "RepresentationCreator.h"
+#include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
 
 
@@ -19,19 +41,21 @@ MainWindow::MainWindow( QWidget* parent_ )
   shift::Objects objects;
   shift::Representations representations;
 
-  
-  // for ( unsigned int i = 0; i < 5; i++ )
-  // {
-  //   objects.push_back( new neuroscheme::Neuron(
-  //                        neuroscheme::Neuron::INTERNEURON,
-  //                        neuroscheme::Neuron::EXCITATORY,
-  //                        10.0f, 30.0f, 30.0f, 50.0f ));
 
-  //   objects.push_back( new neuroscheme::Neuron(
-  //                        neuroscheme::Neuron::PYRAMIDAL,
-  //                        neuroscheme::Neuron::INHIBITORY,
-  //                        70.0f, 60.0f, 20.0f, 30.0f ));
-  // }
+  for ( unsigned int i = 0; i < 5; i++ )
+  {
+    objects.push_back( new neuroscheme::Neuron(
+                         i * 2,
+                         neuroscheme::Neuron::INTERNEURON,
+                         neuroscheme::Neuron::EXCITATORY,
+                         10.0f, 30.0f, 30.0f, 50.0f ));
+
+    objects.push_back( new neuroscheme::Neuron(
+                         i * 2 + 1,
+                         neuroscheme::Neuron::PYRAMIDAL,
+                         neuroscheme::Neuron::INHIBITORY,
+                         70.0f, 60.0f, 20.0f, 30.0f ));
+  }
 
   objects.push_back( new neuroscheme::Column(
                        100,
@@ -57,12 +81,14 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
-  neuroscheme::RepresentationCreatorManager::addCreator(
+  neuroscheme::
+    RepresentationCreatorManager::addCreator(
     new neuroscheme::RepresentationCreator );
-  neuroscheme::TObjectsToReps objsToReps;
-  neuroscheme::TRepsToObjects repsToObjs;
+  // neuroscheme::TObjectsToReps objsToReps;
+  // neuroscheme::TRepsToObjects repsToObjs;
   neuroscheme::RepresentationCreatorManager::create( objects, representations,
-                                                     objsToReps, repsToObjs );
+                                                     // objsToReps, repsToObjs
+                                                     true, true );
 
   neuroscheme::LayoutManager::displayItems(
     _canvas->scene( ), representations );

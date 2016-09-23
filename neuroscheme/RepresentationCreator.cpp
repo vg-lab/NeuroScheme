@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2016 GMRV/URJC/UPM.
+ *
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
 #include "RepresentationCreator.h"
 #include "objs/Neuron.h"
 #include "reps/NeuronRep.h"
@@ -12,15 +33,17 @@ namespace neuroscheme
   void RepresentationCreator::create(
     const shift::Objects& objects,
     shift::Representations& representations,
-    std::unordered_map< shift::Object*, shift::Representation* >& // objectsToReps
-    ,
-    std::unordered_map< shift::Representation*, shift::Object* >& // repsToObjects
-    ,
-    bool // linkObjectsToReps
-    ,
-    bool // linkRepsToObjs
+    TObjectsToReps& objectsToReps,
+    TRepsToObjects& repsToObjects,
+    bool linkObjectsToReps,
+    bool linkRepsToObjs
     )
   {
+
+    if ( linkObjectsToReps )
+      objectsToReps.clear( );
+    if ( linkRepsToObjs )
+      repsToObjects.clear( );
 
     auto _greenMapper = new DiscreteColorMapper( );
     auto _redMapper = new DiscreteColorMapper( );
@@ -124,6 +147,12 @@ namespace neuroscheme
 
         representations.push_back( neuronRep );
 
+        // Link obj and rep
+        if ( linkObjectsToReps )
+          objectsToReps[ obj ].insert( neuronRep );
+        if ( linkRepsToObjs )
+          
+          repsToObjects[ neuronRep ].insert( obj );
       } // end if its Neuron object
 
       if ( dynamic_cast< Column* >( obj ))
@@ -242,7 +271,5 @@ namespace neuroscheme
 
   }
 
-  std::map< unsigned int, RepresentationCreator* >
-  RepresentationCreatorManager::_repCreators =
-    std::map< unsigned int, RepresentationCreator* >( );
+
 } // namespace neuroscheme

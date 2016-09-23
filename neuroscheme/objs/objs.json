@@ -5,6 +5,10 @@
             "namespace": "neuroscheme::shiftgen",
             "properties": [
                 {
+                    "name": "gid",
+                    "type": "uint"
+                },
+                {
                     "name": "morphoType",
                     "type": "TMorphologicalType"
                 },
