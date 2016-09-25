@@ -21,7 +21,7 @@
  */
 #include "InteractionManager.h"
 #include "RepresentationCreatorManager.h"
-#include "objs/Neuron.h"
+#include "entities/Neuron.h"
 #include "reps/ColumnItem.h"
 #include "reps/MiniColumnItem.h"
 #include "reps/NeuronItem.h"
@@ -86,7 +86,7 @@ namespace neuroscheme
 
 
   void InteractionManager::contextMenuEvent(
-    QAbstractGraphicsShapeItem* item,
+    QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneContextMenuEvent* event )
   {
 
@@ -95,19 +95,43 @@ namespace neuroscheme
     else
       _contextMenu->clear( );
 
-    // std::cout << "InteractionManager::contextMenu" << std::endl;
+    std::cout << "InteractionManager::contextMenu" << std::endl;
+    {
+      auto item = dynamic_cast< Item* >( shapeItem );
+      if ( item )
+      {
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        {
+          const auto entities = repsToEntities.at( item->parentRep( ));
+          std::cout << "-- ShiFT gid: "
+                    << (int) ( *entities.begin( ))->gid( ) << std::endl;
+        }
+        else
+        {
+          Log::log( NS_LOG_HEADER + "item without entity",
+                    LOG_LEVEL_ERROR );
+          return;
+        }
+      }
+      else
+        Log::log( NS_LOG_HEADER + "clicked element is not item",
+                  LOG_LEVEL_ERROR );
+    }
 
-    auto neuronItem = dynamic_cast< NeuronItem* >( item );
+
+    auto neuronItem = dynamic_cast< NeuronItem* >( shapeItem );
     if ( neuronItem )
     {
-      const auto objs =
-        RepresentationCreatorManager::repsToObjects( ).at(
+      const auto entities =
+        RepresentationCreatorManager::repsToEntities( ).at(
           neuronItem->parentRep( ));
-      if ( objs.size( ) < 1 )
-        Log::log( NS_LOG_HEADER + "neuron item without object",
+      if ( entities.size( ) < 1 )
+        Log::log( NS_LOG_HEADER + "neuron item without entity",
                   LOG_LEVEL_ERROR );
       std::cout << "--------------"
-                << (int) ( *objs.begin( ))->getProperty( "gid" ).
+                << (int) ( *entities.begin( ))->getProperty( "gid" ).
         value< unsigned int >( ) << std::endl;
       // // QAction* action1 =
       // _contextMenu->addAction( QString( "Show minicolumns" ));
@@ -118,7 +142,7 @@ namespace neuroscheme
       return;
     }
 
-    auto columnItem = dynamic_cast< ColumnItem* >( item );
+    auto columnItem = dynamic_cast< ColumnItem* >( shapeItem );
     if ( columnItem )
     {
       // QAction* action1 =
@@ -127,7 +151,7 @@ namespace neuroscheme
       return;
     }
 
-    auto miniColumnItem = dynamic_cast< MiniColumnItem* >( item );
+    auto miniColumnItem = dynamic_cast< MiniColumnItem* >( shapeItem );
     if ( miniColumnItem )
     {
       // QAction* action1 =

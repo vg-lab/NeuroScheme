@@ -6,9 +6,9 @@ set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
   shift_generate_cxx(
-    "Object"
+    "Entity"
     ${GENERATED_OBJECT}
-    ${CMAKE_CURRENT_SOURCE_DIR}/objs/objs.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.json
     ${SHIFT_GENERATED_DIR}
     )
   list( APPEND SHIFT_GENERATED_IMPL_FILES
@@ -90,7 +90,7 @@ set( NEUROSCHEME_HEADERS
   mappers/VariableMapper.h
   RepresentationCreator.h
   RepresentationCreatorManager.h
-  objs/Neuron.h
+  entities/Neuron.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h
   reps/ColumnItem.h

@@ -20,7 +20,7 @@
  *
  */
 #include "RepresentationCreator.h"
-#include "objs/Neuron.h"
+#include "entities/Neuron.h"
 #include "reps/NeuronRep.h"
 #include "reps/ColumnRep.h"
 #include "reps/MiniColumnRep.h"
@@ -31,19 +31,19 @@ namespace neuroscheme
 {
 
   void RepresentationCreator::create(
-    const shift::Objects& objects,
+    const shift::Entities& entities,
     shift::Representations& representations,
-    TObjectsToReps& objectsToReps,
-    TRepsToObjects& repsToObjects,
-    bool linkObjectsToReps,
-    bool linkRepsToObjs
+    TEntitiesToReps& entitiesToReps,
+    TRepsToEntities& repsToEntities,
+    bool linkEntitiesToReps,
+    bool linkRepsToEntities
     )
   {
 
-    if ( linkObjectsToReps )
-      objectsToReps.clear( );
-    if ( linkRepsToObjs )
-      repsToObjects.clear( );
+    if ( linkEntitiesToReps )
+      entitiesToReps.clear( );
+    if ( linkRepsToEntities )
+      repsToEntities.clear( );
 
     auto _greenMapper = new DiscreteColorMapper( );
     auto _redMapper = new DiscreteColorMapper( );
@@ -77,11 +77,11 @@ namespace neuroscheme
       new MapperFloatToFloat( 0, maxNeurons, 0.0f, 1.0f );
 
 
-    for ( const auto obj : objects )
+    for ( const auto entity : entities )
     {
-      if ( dynamic_cast< Neuron* >( obj ))
+      if ( dynamic_cast< Neuron* >( entity ))
       {
-        auto neuron = dynamic_cast< Neuron* >( obj );
+        auto neuron = dynamic_cast< Neuron* >( entity );
         auto neuronRep = new NeuronRep( );
 
         switch ( neuron->getProperty( "morphoType" ).
@@ -147,17 +147,16 @@ namespace neuroscheme
 
         representations.push_back( neuronRep );
 
-        // Link obj and rep
-        if ( linkObjectsToReps )
-          objectsToReps[ obj ].insert( neuronRep );
-        if ( linkRepsToObjs )
-          
-          repsToObjects[ neuronRep ].insert( obj );
-      } // end if its Neuron object
+        // Link entity and rep
+        if ( linkEntitiesToReps )
+          entitiesToReps[ entity ].insert( neuronRep );
+        if ( linkRepsToEntities )
+          repsToEntities[ neuronRep ].insert( entity );
+      } // end if its Neuron entity
 
-      if ( dynamic_cast< Column* >( obj ))
+      if ( dynamic_cast< Column* >( entity ))
       {
-        auto column = dynamic_cast< Column* >( obj );
+        auto column = dynamic_cast< Column* >( entity );
         auto columnRep = new ColumnRep( );
         _CreateColumnOrMiniColumn( column, columnRep,
                                    *_somaAreaToAngle,
@@ -166,11 +165,17 @@ namespace neuroscheme
                                    *_redMapper,
                                    *_neuronsToPercentage );
         representations.push_back( columnRep );
-      } // it its MiniColumn object
-      if ( dynamic_cast< MiniColumn* >( obj ))
+
+        if ( linkEntitiesToReps )
+          entitiesToReps[ entity ].insert( columnRep );
+        if ( linkRepsToEntities )
+          repsToEntities[ columnRep ].insert( entity );
+
+      } // it its MiniColumn entity
+      if ( dynamic_cast< MiniColumn* >( entity ))
       {
         std::cout << "creating minicolumn rep" << std::endl;
-        auto miniColumn = dynamic_cast< MiniColumn* >( obj );
+        auto miniColumn = dynamic_cast< MiniColumn* >( entity );
         auto miniColumnRep = new MiniColumnRep( );
         _CreateColumnOrMiniColumn( miniColumn, miniColumnRep,
                                    *_somaAreaToAngle,
@@ -179,12 +184,18 @@ namespace neuroscheme
                                    *_redMapper,
                                    *_neuronsToPercentage );
         representations.push_back( miniColumnRep );
-      } // it its Column object
-    } // for all objects
+
+        if ( linkEntitiesToReps )
+          entitiesToReps[ entity ].insert( miniColumnRep );
+        if ( linkRepsToEntities )
+          repsToEntities[ miniColumnRep ].insert( entity );
+
+      } // it its Column entity
+    } // for all entities
   } // create
 
   void RepresentationCreator::_CreateColumnOrMiniColumn(
-    shift::Object *obj,
+    shift::Entity *entity,
     shift::Representation* rep,
     MapperFloatToFloat& somaAreaToAngle,
     MapperFloatToFloat& dendAreaToAngle,
@@ -205,10 +216,10 @@ namespace neuroscheme
       int(
         roundf(
           somaAreaToAngle.map(
-            obj->getProperty( "meanSomaVolume" ).
+            entity->getProperty( "meanSomaVolume" ).
             value< float >( )))));
     somaVolumeToColor.value( ) =
-      obj->getProperty( "meanSomaArea" ).value< float >( );
+      entity->getProperty( "meanSomaArea" ).value< float >( );
     somaRing.setProperty( "color", dendVolumeToColor.map( ));
     rings.push_back( somaRing );
 
@@ -218,10 +229,10 @@ namespace neuroscheme
       int(
         roundf(
           dendAreaToAngle.map(
-            obj->getProperty( "meanDendVolume" ).
+            entity->getProperty( "meanDendVolume" ).
             value< float >( )))));
     dendVolumeToColor.value( ) =
-      obj->getProperty( "meanDendArea" ).value< float >( );
+      entity->getProperty( "meanDendArea" ).value< float >( );
     dendRing.setProperty( "color", dendVolumeToColor.map( ));
     rings.push_back( dendRing );
 
@@ -237,13 +248,13 @@ namespace neuroscheme
       "leftPerc",
       roundf(
         neuronsToPercentage.map(
-          obj->getProperty( "Num Pyramidals" ).
+          entity->getProperty( "Num Pyramidals" ).
           value< float >( ))));
     layerRep.setProperty(
       "rightPerc",
       roundf(
         neuronsToPercentage.map(
-          obj->getProperty( "Num Interneurons" ).
+          entity->getProperty( "Num Interneurons" ).
           value< float >( ))));
     layersReps.push_back( layerRep );
 
@@ -253,7 +264,7 @@ namespace neuroscheme
         "leftPerc",
         roundf(
           neuronsToPercentage.map(
-            obj->getProperty(
+            entity->getProperty(
               std::string( "Num Pyr Layer " ) +
               std::to_string( layer )).
             value< float >( ))));
@@ -261,7 +272,7 @@ namespace neuroscheme
         "rightPerc",
         roundf(
           neuronsToPercentage.map(
-            obj->getProperty(
+            entity->getProperty(
               std::string( "Num Inter Layer " ) +
               std::to_string( layer )).
             value< float >( ))));

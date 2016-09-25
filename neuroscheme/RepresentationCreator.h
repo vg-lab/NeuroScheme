@@ -31,12 +31,12 @@
 namespace neuroscheme
 {
 
-  typedef std::unordered_map< shift::Object*,
+  typedef std::unordered_map< shift::Entity*,
                               std::set< shift::Representation* >>
-  TObjectsToReps;
+  TEntitiesToReps;
   typedef std::unordered_map< shift::Representation*,
-                              std::set< shift::Object* >>
-  TRepsToObjects;
+                              std::set< shift::Entity* >>
+  TRepsToEntities;
 
   class RepresentationCreator //: shift::RepresentationCreator
   {
@@ -44,17 +44,17 @@ namespace neuroscheme
     virtual ~RepresentationCreator( void ) {};
 
     void create(
-      const shift::Objects& objects,
+      const shift::Entities& entities,
       shift::Representations& representations,
-      TObjectsToReps& objectsToReps,
-      TRepsToObjects& repsToObjects,
-      bool linkObjectsToReps = false,
+      TEntitiesToReps& entitiesToReps,
+      TRepsToEntities& repsToEntities,
+      bool linkEntitiesToReps = false,
       bool linkRepsToObjs = false );
 
 
   protected:
     void _CreateColumnOrMiniColumn(
-      shift::Object *obj,
+      shift::Entity *obj,
       shift::Representation* rep,
       MapperFloatToFloat& somaAreaToAngle,
       MapperFloatToFloat& dendAreaToAngle,
@@ -72,35 +72,35 @@ namespace neuroscheme
   //     //TODO check if exists
   //     _repCreators[ repCreatorId ] = repCreator;
   //   }
-  //   static void create( const shift::Objects& objects,
+  //   static void create( const shift::Entities& entities,
   //                       shift::Representations& representations,
-  //                       // TObjectsToReps& objectsToReps,
-  //                       // TRepsToObjects& repsToObjects,
-  //                       bool linkObjectsToReps = false,
+  //                       // TEntitiesToReps& entitiesToReps,
+  //                       // TRepsToEntities& repsToEntities,
+  //                       bool linkEntitiesToReps = false,
   //                       bool linkRepsToObjs = false,
   //                       unsigned int repCreatorId = 0 )
   //   {
   //     //TODO check if exists
-  //     _repCreators[ repCreatorId ]->create( objects, representations,
-  //                                           _objectsToReps[ repCreatorId ],
-  //                                           _repsToObjects[ repCreatorId ],
-  //                                           linkObjectsToReps,
+  //     _repCreators[ repCreatorId ]->create( entities, representations,
+  //                                           _entitiesToReps[ repCreatorId ],
+  //                                           _repsToEntities[ repCreatorId ],
+  //                                           linkEntitiesToReps,
   //                                           linkRepsToObjs );
   //   }
 
-  //   const TObjectsToReps& objectsToReps( repCreatorId = 0 )
+  //   const TEntitiesToReps& entitiesToReps( repCreatorId = 0 )
   //   {
-  //     return _objectsToReps[ repCreatorId ];
+  //     return _entitiesToReps[ repCreatorId ];
   //   }
-  //   const TRepsToObjects& repsToObjects( repCreatorId = 0 )
+  //   const TRepsToEntities& repsToEntities( repCreatorId = 0 )
   //   {
-  //     return _repsToObjects[ repCreatorId ];
+  //     return _repsToEntities[ repCreatorId ];
   //   }
 
   // protected:
   //   static std::map< unsigned int, RepresentationCreator* > _repCreators;
-  //   static std::map< unsigned int, TObjectsToReps> _objectsToReps;
-  //   static std::map< unsigned int, TRepsToObjects> _repsToObjects;
+  //   static std::map< unsigned int, TEntitiesToReps> _entitiesToReps;
+  //   static std::map< unsigned int, TRepsToEntities> _repsToEntities;
 
   // };
 

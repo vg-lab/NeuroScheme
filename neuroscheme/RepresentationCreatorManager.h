@@ -34,22 +34,24 @@ namespace neuroscheme
     static void addCreator( RepresentationCreator* repCreator,
                             unsigned int repCreatorId = 0 );
 
-    static void create( const shift::Objects& objects,
+    static void create( const shift::Entities& entities,
                         shift::Representations& representations,
-                        // TObjectsToReps& objectsToReps,
-                        // TRepsToObjects& repsToObjects,
-                        bool linkObjectsToReps = false,
+                        // TEntitiesToReps& entitiesToReps,
+                        // TRepsToEntities& repsToEntities,
+                        bool linkEntitiesToReps = false,
                         bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 );
 
-    static const TObjectsToReps& objectsToReps( unsigned int repCreatorId = 0 );
-    static const TRepsToObjects& repsToObjects( unsigned int repCreatorId = 0 );
+    static const TEntitiesToReps& entitiesToReps(
+      unsigned int repCreatorId = 0 );
+    static const TRepsToEntities& repsToEntities(
+      unsigned int repCreatorId = 0 );
 
     // static const shift::Representation& objectToRep(
   protected:
     static std::map< unsigned int, RepresentationCreator* > _repCreators;
-    static std::map< unsigned int, TObjectsToReps > _objectsToReps;
-    static std::map< unsigned int, TRepsToObjects > _repsToObjects;
+    static std::map< unsigned int, TEntitiesToReps > _entitiesToReps;
+    static std::map< unsigned int, TRepsToEntities > _repsToEntities;
 
   };
 

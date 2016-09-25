@@ -23,7 +23,7 @@
 
 // OJO PRUEBAS
 #include "reps/QGraphicsItemRepresentation.h"
-#include "objs/Neuron.h"
+#include "entities/Neuron.h"
 #include "RepresentationCreator.h"
 #include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
@@ -38,26 +38,26 @@ MainWindow::MainWindow( QWidget* parent_ )
   this->setCentralWidget( _canvas );
 
 
-  shift::Objects objects;
+  shift::Entities entities;
   shift::Representations representations;
 
 
   for ( unsigned int i = 0; i < 5; i++ )
   {
-    objects.push_back( new neuroscheme::Neuron(
+    entities.push_back( new neuroscheme::Neuron(
                          i * 2,
                          neuroscheme::Neuron::INTERNEURON,
                          neuroscheme::Neuron::EXCITATORY,
                          10.0f, 30.0f, 30.0f, 50.0f ));
 
-    objects.push_back( new neuroscheme::Neuron(
+    entities.push_back( new neuroscheme::Neuron(
                          i * 2 + 1,
                          neuroscheme::Neuron::PYRAMIDAL,
                          neuroscheme::Neuron::INHIBITORY,
                          70.0f, 60.0f, 20.0f, 30.0f ));
   }
 
-  objects.push_back( new neuroscheme::Column(
+  entities.push_back( new neuroscheme::Column(
                        100,
                        75, 25,
                        5, 0,
@@ -69,7 +69,7 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
-  objects.push_back( new neuroscheme::MiniColumn(
+  entities.push_back( new neuroscheme::MiniColumn(
                        100,
                        75, 25,
                        5, 0,
@@ -81,12 +81,13 @@ MainWindow::MainWindow( QWidget* parent_ )
                        10.0f, 30.0f,
                        30.0f, 50.0f ));
 
+  
   neuroscheme::
     RepresentationCreatorManager::addCreator(
     new neuroscheme::RepresentationCreator );
-  // neuroscheme::TObjectsToReps objsToReps;
-  // neuroscheme::TRepsToObjects repsToObjs;
-  neuroscheme::RepresentationCreatorManager::create( objects, representations,
+  // neuroscheme::TEntitiesToReps objsToReps;
+  // neuroscheme::TRepsToEntities repsToObjs;
+  neuroscheme::RepresentationCreatorManager::create( entities, representations,
                                                      // objsToReps, repsToObjs
                                                      true, true );
 

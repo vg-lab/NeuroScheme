@@ -28,13 +28,13 @@ namespace neuroscheme
   RepresentationCreatorManager::_repCreators =
     std::map< unsigned int, RepresentationCreator* >( );
 
-  std::map< unsigned int, TObjectsToReps >
-  RepresentationCreatorManager::_objectsToReps =
-    std::map< unsigned int, TObjectsToReps >( );
+  std::map< unsigned int, TEntitiesToReps >
+  RepresentationCreatorManager::_entitiesToReps =
+    std::map< unsigned int, TEntitiesToReps >( );
 
-  std::map< unsigned int, TRepsToObjects>
-  RepresentationCreatorManager::_repsToObjects =
-    std::map< unsigned int, TRepsToObjects>( );
+  std::map< unsigned int, TRepsToEntities>
+  RepresentationCreatorManager::_repsToEntities =
+    std::map< unsigned int, TRepsToEntities>( );
 
 
   void RepresentationCreatorManager::addCreator(
@@ -46,31 +46,31 @@ namespace neuroscheme
   }
 
   void RepresentationCreatorManager::create(
-    const shift::Objects& objects,
+    const shift::Entities& entities,
     shift::Representations& representations,
-    // TObjectsToReps& objectsToReps,
-    // TRepsToObjects& repsToObjects,
-    bool linkObjectsToReps,
+    // TEntitiesToReps& entitiesToReps,
+    // TRepsToEntities& repsToEntities,
+    bool linkEntitiesToReps,
     bool linkRepsToObjs,
     unsigned int repCreatorId )
   {
     //TODO check if exists
-    _repCreators[ repCreatorId ]->create( objects, representations,
-                                          _objectsToReps[ repCreatorId ],
-                                          _repsToObjects[ repCreatorId ],
-                                          linkObjectsToReps,
+    _repCreators[ repCreatorId ]->create( entities, representations,
+                                          _entitiesToReps[ repCreatorId ],
+                                          _repsToEntities[ repCreatorId ],
+                                          linkEntitiesToReps,
                                           linkRepsToObjs );
   }
 
-  const TObjectsToReps& RepresentationCreatorManager::objectsToReps(
+  const TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(
     unsigned int repCreatorId )
   {
-    return _objectsToReps[ repCreatorId ];
+    return _entitiesToReps[ repCreatorId ];
   }
-  const TRepsToObjects& RepresentationCreatorManager::repsToObjects(
+  const TRepsToEntities& RepresentationCreatorManager::repsToEntities(
     unsigned int repCreatorId )
   {
-    return _repsToObjects[ repCreatorId ];
+    return _repsToEntities[ repCreatorId ];
   }
 
 }
