@@ -77,8 +77,9 @@ namespace neuroscheme
       new MapperFloatToFloat( 0, maxNeurons, 0.0f, 1.0f );
 
 
-    for ( const auto entity : entities )
+    for ( const auto entityPair : entities )
     {
+      auto& entity = entityPair.second;
       if ( dynamic_cast< Neuron* >( entity ))
       {
         auto neuron = dynamic_cast< Neuron* >( entity );

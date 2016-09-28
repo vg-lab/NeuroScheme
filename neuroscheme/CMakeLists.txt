@@ -55,6 +55,7 @@ set( NEUROSCHEME_SOURCES
   ${PROJECT_BINARY_DIR}/src/version.cpp
   Canvas.cpp
   Color.cpp
+  DataManager.cpp
   InteractionManager.cpp
   LayoutManager.cpp
   Log.cpp
@@ -81,6 +82,7 @@ set( NEUROSCHEME_HEADERS
   ${PROJECT_BINARY_DIR}/include/neuroscheme/version.h
   Canvas.h
   Color.h
+  DataManager.h
   InteractionManager.h
   error.h
   LayoutManager.h

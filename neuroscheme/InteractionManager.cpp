@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "DataManager.h"
 #include "InteractionManager.h"
 #include "RepresentationCreatorManager.h"
 #include "entities/Neuron.h"
@@ -105,9 +106,24 @@ namespace neuroscheme
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
+          auto entityGid = ( *entities.begin( ))->entityGid( );
           std::cout << "-- ShiFT gid: "
-                    << (int) ( *entities.begin( ))->gid( ) << std::endl;
-        }
+                    << int( entityGid ) << std::endl;
+
+          auto& relParentOf = *( DataManager::entities( ).
+                                 relationships( )[ "isParentOf" ]->asOneToN( ));
+          const auto& childs = relParentOf[ entityGid ];
+          std::cout << " -- Parent of: ";
+          for ( auto const& child : childs )
+            std::cout << child << " ";
+          std::cout << std::endl;;
+
+          auto& relChildOf = *( DataManager::entities( ).relationships( )
+                                [ "isChildOf" ]->asOneToOne( ));
+          const auto& parent = relChildOf[ entityGid ];
+          std::cout << " -- Child of: ";
+          std::cout << parent << std::endl;;
+}
         else
         {
           Log::log( NS_LOG_HEADER + "item without entity",

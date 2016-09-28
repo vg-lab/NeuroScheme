@@ -27,6 +27,7 @@
 #include "RepresentationCreator.h"
 #include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
+#include "DataManager.h"
 
 
 MainWindow::MainWindow( QWidget* parent_ )
@@ -38,52 +39,13 @@ MainWindow::MainWindow( QWidget* parent_ )
   this->setCentralWidget( _canvas );
 
 
-  shift::Entities entities;
+  // shift::EntitiesWithRelationships entities;
   shift::Representations representations;
 
+  neuroscheme::DataManager::loadData( );
+  const auto& entities = neuroscheme::DataManager::entities( );
 
-  for ( unsigned int i = 0; i < 5; i++ )
-  {
-    entities.push_back( new neuroscheme::Neuron(
-                         i * 2,
-                         neuroscheme::Neuron::INTERNEURON,
-                         neuroscheme::Neuron::EXCITATORY,
-                         10.0f, 30.0f, 30.0f, 50.0f ));
-
-    entities.push_back( new neuroscheme::Neuron(
-                         i * 2 + 1,
-                         neuroscheme::Neuron::PYRAMIDAL,
-                         neuroscheme::Neuron::INHIBITORY,
-                         70.0f, 60.0f, 20.0f, 30.0f ));
-  }
-
-  entities.push_back( new neuroscheme::Column(
-                       100,
-                       75, 25,
-                       5, 0,
-                       10, 5,
-                       15, 10,
-                       20, 15,
-                       25, 20,
-                       30, 25,
-                       10.0f, 30.0f,
-                       30.0f, 50.0f ));
-
-  entities.push_back( new neuroscheme::MiniColumn(
-                       100,
-                       75, 25,
-                       5, 0,
-                       10, 5,
-                       15, 10,
-                       20, 15,
-                       25, 20,
-                       30, 25,
-                       10.0f, 30.0f,
-                       30.0f, 50.0f ));
-
-  
-  neuroscheme::
-    RepresentationCreatorManager::addCreator(
+  neuroscheme::RepresentationCreatorManager::addCreator(
     new neuroscheme::RepresentationCreator );
   // neuroscheme::TEntitiesToReps objsToReps;
   // neuroscheme::TRepsToEntities repsToObjs;
