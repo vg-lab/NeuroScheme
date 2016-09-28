@@ -8,11 +8,18 @@
 
 namespace neuroscheme
 {
+  QGraphicsScene* LayoutManager::_scene = nullptr;
+  shift::Representations LayoutManager::_representations =
+    shift::Representations( );
+
   void LayoutManager::displayItems(
-    QGraphicsScene& scene,
     const shift::Representations& reps,
     bool clearFirst )
   {
+    if ( !_scene ) return;
+    auto& scene = *_scene;
+
+    _representations = reps;
     if ( reps.empty( ))
       return;
 

@@ -10,9 +10,23 @@ namespace neuroscheme
   {
   public:
 
-    static void displayItems( QGraphicsScene& scene,
-                              const shift::Representations& reps,
+    static void setScene( QGraphicsScene* scene )
+    {
+      _scene = scene;
+    }
+
+    static void update( void )
+    {
+      std::cout << "items" << std::endl;
+      displayItems( _representations );
+    }
+
+    static void displayItems( const shift::Representations& reps,
                               bool clearFirst = true );
+
+    protected:
+      static QGraphicsScene* _scene;
+      static shift::Representations _representations;
 
   };
 } // namespace neuroscheme

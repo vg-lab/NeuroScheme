@@ -34,7 +34,23 @@ namespace neuroscheme
           30.0f, 50.0f );
       _entities.add( entity );
       std::cout << "Added column gid " << entity->entityGid( ) << std::endl;
-      auto colId = entity->entityGid( );
+      auto colId1 = entity->entityGid( );
+
+      entity =
+        new neuroscheme::Column(
+          100,
+          75, 25,
+          5, 0,
+          10, 5,
+          15, 10,
+          20, 15,
+          25, 20,
+          30, 25,
+          10.0f, 30.0f,
+          30.0f, 50.0f );
+      _entities.add( entity );
+      std::cout << "Added column gid " << entity->entityGid( ) << std::endl;
+      auto colId2 = entity->entityGid( );
 
       entity =
         new neuroscheme::MiniColumn(
@@ -68,14 +84,56 @@ namespace neuroscheme
       std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
       auto miniCol1Id = entity->entityGid( );
 
+            entity =
+        new neuroscheme::MiniColumn(
+          100,
+          75, 25,
+          5, 0,
+          10, 5,
+          15, 10,
+          20, 15,
+          25, 20,
+          30, 25,
+          10.0f, 30.0f,
+          30.0f, 50.0f );
+      _entities.add( entity );
+      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
+      auto miniCol2Id = entity->entityGid( );
+
+      entity =
+        new neuroscheme::MiniColumn(
+          100,
+          75, 25,
+          5, 0,
+          10, 5,
+          15, 10,
+          20, 15,
+          25, 20,
+          30, 25,
+          10.0f, 30.0f,
+          30.0f, 50.0f );
+      _entities.add( entity );
+      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
+      auto miniCol3Id = entity->entityGid( );
+
       auto& relParentOf =
         *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
       auto& relChildOf =
         *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
-      relParentOf[ colId ].insert( miniCol0Id );
-      relParentOf[ colId ].insert( miniCol1Id );
-      relChildOf[ miniCol0Id ] = colId;
-      relChildOf[ miniCol1Id ] = colId;
+      relParentOf[ 0 ].insert( colId1 );
+      relParentOf[ 0 ].insert( colId2 );
+      relChildOf[ colId1 ] = 0;
+      relChildOf[ colId2 ] = 0;
+
+      relParentOf[ colId1 ].insert( miniCol0Id );
+      relParentOf[ colId1 ].insert( miniCol1Id );
+      relChildOf[ miniCol0Id ] = colId1;
+      relChildOf[ miniCol1Id ] = colId1;
+
+      relParentOf[ colId2 ].insert( miniCol2Id );
+      relParentOf[ colId2 ].insert( miniCol3Id );
+      relChildOf[ miniCol2Id ] = colId2;
+      relChildOf[ miniCol3Id ] = colId2;
 
       for ( unsigned int i = 0; i < 5; i++ )
       {
@@ -122,6 +180,53 @@ namespace neuroscheme
         entityGid = entity->entityGid( );
         relParentOf[ miniCol1Id ].insert( entityGid );
         relChildOf[ entityGid ] = miniCol1Id;
+
+      }
+      for ( unsigned int i = 0; i < 5; i++ )
+      {
+        entity = new neuroscheme::Neuron(
+          i * 2,
+          neuroscheme::Neuron::INTERNEURON,
+          neuroscheme::Neuron::EXCITATORY,
+          10.0f, 30.0f, 30.0f, 50.0f );
+        _entities.add( entity );
+        auto entityGid = entity->entityGid( );
+        relParentOf[ miniCol2Id ].insert( entityGid );
+        relChildOf[ entityGid ] = miniCol2Id;
+
+        entity = new neuroscheme::Neuron(
+          i * 2 + 1,
+          neuroscheme::Neuron::PYRAMIDAL,
+          neuroscheme::Neuron::INHIBITORY,
+          70.0f, 60.0f, 20.0f, 30.0f );
+        _entities.add( entity );
+        entityGid = entity->entityGid( );
+        relParentOf[ miniCol2Id ].insert( entityGid );
+        relChildOf[ entityGid ] = miniCol2Id;
+
+      }
+
+      for ( unsigned int i = 0; i < 5; i++ )
+      {
+        entity = new neuroscheme::Neuron(
+          i * 2,
+          neuroscheme::Neuron::INTERNEURON,
+          neuroscheme::Neuron::EXCITATORY,
+          10.0f, 30.0f, 30.0f, 50.0f );
+        _entities.add( entity );
+        auto entityGid = entity->entityGid( );
+        relParentOf[ miniCol3Id ].insert( entityGid );
+        relChildOf[ entityGid ] = miniCol3Id;
+
+        entity = new neuroscheme::Neuron(
+          i * 2 + 1,
+          neuroscheme::Neuron::PYRAMIDAL,
+          neuroscheme::Neuron::INHIBITORY,
+          70.0f, 60.0f, 20.0f, 30.0f );
+        _entities.add( entity );
+        entityGid = entity->entityGid( );
+        relParentOf[ miniCol3Id ].insert( entityGid );
+        relChildOf[ entityGid ] = miniCol3Id;
 
       }
     }

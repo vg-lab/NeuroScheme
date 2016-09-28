@@ -43,43 +43,36 @@ MainWindow::MainWindow( QWidget* parent_ )
   shift::Representations representations;
 
   neuroscheme::DataManager::loadData( );
-  const auto& entities = neuroscheme::DataManager::entities( );
+  shift::Entities rootEntities;
 
+  auto& relParentOf = *( neuroscheme::DataManager::entities( ).
+                         relationships( )[ "isParentOf" ]->asOneToN( ));
+
+  const auto& children = relParentOf[ 0 ];
+  std::cout << "-- Root entities " << children.size( ) << std::endl;
+  for ( const auto& child : children )
+    rootEntities[child] =
+      neuroscheme::DataManager::entities( )[child];
+
+  //const auto& entities = neuroscheme::DataManager::entities( );
+  // const auto& rootEntity = neuroscheme::DataManager::entities( )[1];
+  // rootEntities[1] = rootEntity;
   neuroscheme::RepresentationCreatorManager::addCreator(
     new neuroscheme::RepresentationCreator );
   // neuroscheme::TEntitiesToReps objsToReps;
   // neuroscheme::TRepsToEntities repsToObjs;
-  neuroscheme::RepresentationCreatorManager::create( entities, representations,
-                                                     // objsToReps, repsToObjs
-                                                     true, true );
+  neuroscheme::RepresentationCreatorManager::create(
+    rootEntities, representations,
+    // objsToReps, repsToObjs
+    true, true );
 
-  neuroscheme::LayoutManager::displayItems(
-    _canvas->scene( ), representations );
-  neuroscheme::LayoutManager::displayItems(
-    _canvas->scene( ), representations, true );
+  // neuroscheme::LayoutManager::displayItems(
+  //   _canvas->scene( ), representations );
+  neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
+  neuroscheme::LayoutManager::displayItems( representations, true );
 
   _representations = representations;
 
-  // unsigned int x = 0;
-  // for ( const auto representation : representations )
-  // {
-  //   auto graphicsItemRep =
-  //     dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
-  //     representation );
-  //   if ( !graphicsItemRep )
-  //   {
-  //     std::cerr << "Item null" << std::endl;
-  //   } else
-  //   {
-
-  //     _canvas->scene( ).addItem( graphicsItemRep->item( ));
-  //     if ( graphicsItemRep->item( ))
-  //     {
-  //       graphicsItemRep->item( )->setPos( x, 0 ); x+= 120;
-  //       // graphicsItemRep->item( )->setScale( 10 );
-  //     }
-  //   }
-  // }
 }
 
 void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
@@ -99,8 +92,7 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
   std::cout << _canvas->view( ).width( ) << " x "
             << _canvas->view( ).height( ) << std::endl;
 
-  neuroscheme::LayoutManager::displayItems(
-    _canvas->scene( ), _representations );
+  neuroscheme::LayoutManager::update( );
 
 }
 

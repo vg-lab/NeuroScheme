@@ -21,6 +21,7 @@
  */
 #include "DataManager.h"
 #include "InteractionManager.h"
+#include "LayoutManager.h"
 #include "RepresentationCreatorManager.h"
 #include "entities/Neuron.h"
 #include "reps/ColumnItem.h"
@@ -112,9 +113,9 @@ namespace neuroscheme
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
-          const auto& childs = relParentOf[ entityGid ];
+          const auto& children = relParentOf[ entityGid ];
           std::cout << " -- Parent of: ";
-          for ( auto const& child : childs )
+          for ( auto const& child : children )
             std::cout << child << " ";
           std::cout << std::endl;;
 
@@ -123,19 +124,74 @@ namespace neuroscheme
           const auto& parent = relChildOf[ entityGid ];
           std::cout << " -- Child of: ";
           std::cout << parent << std::endl;;
-}
+
+          const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
+          std::cout << " -- GrandChild of: ";
+          std::cout << grandParent << std::endl;;
+
+          const auto& parentSiblings = relParentOf[ grandParent ];
+          std::cout << " -- Parent of: ";
+          for ( auto const& parentSibling : parentSiblings )
+            std::cout << parentSibling << " ";
+          std::cout << std::endl;;
+
+          QAction* levelUp = nullptr;
+          QAction* levelDown = nullptr;
+          if ( parent != 0 )
+            levelUp = _contextMenu->addAction( QString( "Level up" ));
+          if ( children.size( ) > 0 )
+            levelDown = _contextMenu->addAction( QString( "Level down" ));
+          if ( levelUp || levelDown )
+          {
+            shift::Representations representations;
+            shift::Entities targetEntities;
+            QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
+            if ( levelUp && levelUp == selectedAction )
+            {
+              std::cout << "up" << std::endl;
+              if ( parentSiblings.size( ) > 0 )
+              for ( const auto& parentSibling : parentSiblings )
+                targetEntities[parentSibling] =
+                  DataManager::entities( )[parentSibling];
+              else
+                targetEntities[parent] =
+                  DataManager::entities( )[parent];
+
+
+            }
+            if ( levelDown && levelDown == selectedAction )
+            {
+              std::cout << "down" << std::endl;
+              for ( const auto& child : children )
+                targetEntities[child] =
+                  DataManager::entities( )[child];
+            }
+            if ( targetEntities.size( ) > 0 )
+            {
+              neuroscheme::RepresentationCreatorManager::create(
+                targetEntities, representations,
+                true, true );
+
+              neuroscheme::LayoutManager::displayItems(
+                representations, true );
+            }
+          }
+        }
         else
         {
           Log::log( NS_LOG_HEADER + "item without entity",
                     LOG_LEVEL_ERROR );
           return;
         }
+
+
       }
       else
         Log::log( NS_LOG_HEADER + "clicked element is not item",
                   LOG_LEVEL_ERROR );
     }
 
+    return;
 
     auto neuronItem = dynamic_cast< NeuronItem* >( shapeItem );
     if ( neuronItem )
