@@ -23,6 +23,7 @@
 #define __NEUROSCHEME__INTERACTION_MANAGER__
 
 #include "reps/SelectableItem.h"
+#include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
@@ -48,7 +49,21 @@ namespace neuroscheme
 
 
     static const QPen& getSelectedPen( ) { return _selectedPen; }
-    protected:
+
+  protected:
+
+    
+  // void InteractionManager::_PropagateSelectedToChilds(
+  //   shift::Entities& entities,
+  //   shift::RelationshipOneToN& relParentOf,
+  //   unsigned int entityGid,
+  //   SelectedState state
+
+    static void _PropagateSelectedStateToChilds(
+      shift::Entities& entities,
+      shift::RelationshipOneToN& relParentOf,
+      unsigned int entityGid,
+      SelectedState state );
 
     static QPen _selectedPen;
     static QPen _unselectedPen;

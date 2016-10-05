@@ -245,6 +245,7 @@ namespace neuroscheme
     QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneMouseEvent* event )
   {
+    // Selection event
     if ( event->buttons( ) & Qt::LeftButton )
     {
       auto item = dynamic_cast< Item* >( shapeItem );
@@ -278,20 +279,19 @@ namespace neuroscheme
             }
 
             auto parentState = SelectionManager::getSelectedState( entity );
+
+
             auto entityGid = ( *entities.begin( ))->entityGid( );
-            auto& relParentOf =
+
+            _PropagateSelectedStateToChilds(
+              DataManager::entities( ),
               *( DataManager::entities( ).
-                 relationships( )[ "isParentOf" ]->asOneToN( ));
-            const auto& children = relParentOf[ entityGid ];
-            std::cout << " -- Parent of: ";
-            for ( auto const& child : children )
-            {
-              std::cout << child << " ";
-              DataManager::entities( )[child];
-              SelectionManager::setSelectedState(
-                entity, parentState );
-            }
-            std::cout << std::endl;;
+                 relationships( )[ "isParentOf" ]->asOneToN( )),
+              entityGid,
+              parentState );
+
+            std::cout << std::endl;
+
 
           }
         }
@@ -305,5 +305,22 @@ namespace neuroscheme
     }
   }
 
+  void InteractionManager::_PropagateSelectedStateToChilds(
+    shift::Entities& entities,
+    shift::RelationshipOneToN& relParentOf,
+    unsigned int entityGid,
+    SelectedState state )
+  {
+    const auto& children = relParentOf[ entityGid ];
+    std::cout << " -- Parent of: ";
+    for ( auto const& child : children )
+    {
+      std::cout << child << " ";
+      SelectionManager::setSelectedState(
+        entities[child], state );
+      _PropagateSelectedStateToChilds( entities, relParentOf, child, state );
+    }
+
+  }
 
 }

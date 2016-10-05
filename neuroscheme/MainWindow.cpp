@@ -59,9 +59,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   auto& relParentOf = *( neuroscheme::DataManager::entities( ).
                          relationships( )[ "isParentOf" ]->asOneToN( ));
 
-  const auto& children = relParentOf[ 0 ];
-  std::cout << "-- Root entities " << children.size( ) << std::endl;
-  for ( const auto& child : children )
+  const auto& childrenIds = relParentOf[ 0 ];
+  std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
+  for ( const auto& child : childrenIds )
     rootEntities[child] =
       neuroscheme::DataManager::entities( )[child];
 
