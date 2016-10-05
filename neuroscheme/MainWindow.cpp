@@ -28,12 +28,23 @@
 #include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
 #include "DataManager.h"
+#include "reps/SelectableItem.h"
+#include "reps/ColumnItem.h"
 
 
 MainWindow::MainWindow( QWidget* parent_ )
   : QMainWindow( parent_ )
   , _ui( new Ui::MainWindow )
 {
+  // neuroscheme::SelectableItem s;
+  // std::cout << s.selected( ) << std::endl;
+
+
+  // neuroscheme::ColumnRep cr;
+  // neuroscheme::ColumnItem ci( cr );
+  // std::cout << ci.selected( ) << std::endl;
+  // exit( 0);
+
 
   _canvas = new neuroscheme::Canvas( this );
   this->setCentralWidget( _canvas );

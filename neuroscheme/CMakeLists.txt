@@ -75,6 +75,7 @@ set( NEUROSCHEME_SOURCES
   reps/NeuronRep.cpp
   reps/NeuronItem.cpp
   reps/RingItem.cpp
+  SelectionManager.cpp
   )
 
 set( NEUROSCHEME_HEADERS
@@ -103,6 +104,7 @@ set( NEUROSCHEME_HEADERS
   reps/NeuronRep.h
   reps/NeuronItem.h
   reps/RingItem.h
+  SelectionManager.h
   )
 
 set( NEUROSCHEME_LINK_LIBRARIES

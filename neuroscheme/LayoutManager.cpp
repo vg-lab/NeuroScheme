@@ -1,5 +1,8 @@
 #include "error.h"
+#include "InteractionManager.h"
 #include "LayoutManager.h"
+#include "SelectionManager.h"
+#include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
 #include "reps/QGraphicsItemRepresentation.h"
 
@@ -79,6 +82,29 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( );
+
+        // Find out if its entity is selected
+        // and if so set its pen
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+        const auto entities = repsToEntities.at( representation );
+        if ( entities.size( ) < 1 )
+          Log::log( NS_LOG_HEADER +
+                    "No entities associated to representation",
+                    LOG_LEVEL_ERROR );
+
+        auto selectableItem = dynamic_cast< SelectableItem* >( item );
+        if ( selectableItem && SelectionManager::getSelectedState(
+               *entities.begin( )) == SelectedState::SELECTED )
+          selectableItem->setSelected( );
+
+        auto shapeItem = dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+        if ( shapeItem )
+        {
+          if ( SelectionManager::getSelectedState(
+                 *entities.begin( )) == SelectedState::SELECTED )
+            shapeItem->setPen( InteractionManager::getSelectedPen( ));
+        }
         scene.addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 

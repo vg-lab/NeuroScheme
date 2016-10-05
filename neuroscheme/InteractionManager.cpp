@@ -23,6 +23,7 @@
 #include "InteractionManager.h"
 #include "LayoutManager.h"
 #include "RepresentationCreatorManager.h"
+#include "SelectionManager.h"
 #include "entities/Neuron.h"
 #include "reps/ColumnItem.h"
 #include "reps/MiniColumnItem.h"
@@ -56,6 +57,7 @@ namespace neuroscheme
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
+      std::cout << "Selected item" << selectableItem->selected( ) << std::endl;
       if ( selectableItem->selected( ))
         item->setPen( _hoverSelectedPen );
       else
@@ -239,19 +241,66 @@ namespace neuroscheme
   }
 
 
-  void InteractionManager::mousePressEvent( QAbstractGraphicsShapeItem* item,
-                                            QGraphicsSceneMouseEvent* event )
+  void InteractionManager::mousePressEvent(
+    QAbstractGraphicsShapeItem* shapeItem,
+    QGraphicsSceneMouseEvent* event )
   {
     if ( event->buttons( ) & Qt::LeftButton )
     {
+      auto item = dynamic_cast< Item* >( shapeItem );
+
       auto selectableItem = dynamic_cast< SelectableItem* >( item );
       if ( selectableItem )
       {
-        selectableItem->toggleSelected( );
-        if ( selectableItem->selected( ))
-          item->setPen( _selectedPen );
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        {
+          const auto entities = repsToEntities.at( item->parentRep( ));
+          // auto entityGid = ( *entities.begin( ))->entityGid( );
+          for ( const auto& entity : entities )
+          {
+            std::cout << "-- ShiFT gid: "
+                      << int( entity->entityGid( )) << std::endl;
+
+            selectableItem->toggleSelected( );
+            if ( selectableItem->selected( ))
+            {
+              SelectionManager::setSelectedState(
+                entity, SelectedState::SELECTED );
+              shapeItem->setPen( _selectedPen );
+            }
+            else
+            {
+              shapeItem->setPen( _unselectedPen );
+              SelectionManager::setSelectedState(
+                entity, SelectedState::UNSELECTED );
+            }
+
+            auto parentState = SelectionManager::getSelectedState( entity );
+            auto entityGid = ( *entities.begin( ))->entityGid( );
+            auto& relParentOf =
+              *( DataManager::entities( ).
+                 relationships( )[ "isParentOf" ]->asOneToN( ));
+            const auto& children = relParentOf[ entityGid ];
+            std::cout << " -- Parent of: ";
+            for ( auto const& child : children )
+            {
+              std::cout << child << " ";
+              DataManager::entities( )[child];
+              SelectionManager::setSelectedState(
+                entity, parentState );
+            }
+            std::cout << std::endl;;
+
+          }
+        }
         else
-          item->setPen( _unselectedPen );
+        {
+          Log::log( NS_LOG_HEADER + "item without entity",
+                    LOG_LEVEL_ERROR );
+          return;
+        }
       }
     }
   }

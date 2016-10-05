@@ -46,6 +46,8 @@ namespace neuroscheme
     static void mousePressEvent( QAbstractGraphicsShapeItem* item,
                                  QGraphicsSceneMouseEvent* event );
 
+
+    static const QPen& getSelectedPen( ) { return _selectedPen; }
     protected:
 
     static QPen _selectedPen;
