@@ -94,16 +94,26 @@ namespace neuroscheme
                     LOG_LEVEL_ERROR );
 
         auto selectableItem = dynamic_cast< SelectableItem* >( item );
-        if ( selectableItem && SelectionManager::getSelectedState(
-               *entities.begin( )) == SelectedState::SELECTED )
-          selectableItem->setSelected( );
-
-        auto shapeItem = dynamic_cast< QAbstractGraphicsShapeItem* >( item );
-        if ( shapeItem )
+        if ( selectableItem )
         {
-          if ( SelectionManager::getSelectedState(
-                 *entities.begin( )) == SelectedState::SELECTED )
-            shapeItem->setPen( InteractionManager::getSelectedPen( ));
+          auto selectedState = SelectionManager::getSelectedState(
+            *entities.begin( ));
+
+            // if ( selectedState == selectedStateSelectedState::SELECTED )
+              selectableItem->setSelected( selectedState );
+
+
+              auto shapeItem =
+                dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+              if ( shapeItem )
+              {
+                if ( selectedState == SelectedState::SELECTED )
+                  shapeItem->setPen( InteractionManager::getSelectedPen( ));
+                else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
+                shapeItem->setPen(
+                  InteractionManager::getPartiallySelectedPen( ));
+
+              }
         }
         scene.addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );

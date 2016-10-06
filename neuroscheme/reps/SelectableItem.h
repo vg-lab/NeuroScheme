@@ -56,6 +56,11 @@ namespace neuroscheme
       return _selected == SelectedState::SELECTED;
     };
 
+    bool partiallySelected( void ) const
+    {
+      return _selected == SelectedState::PARTIALLY_SELECTED;
+    };
+
   protected:
 
     SelectedState _selected;

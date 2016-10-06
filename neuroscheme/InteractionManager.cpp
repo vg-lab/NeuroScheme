@@ -36,16 +36,23 @@ namespace neuroscheme
     QPen( Qt::red, 3, Qt::SolidLine,
           Qt::RoundCap, Qt::RoundJoin );
 
-  QPen InteractionManager::_unselectedPen = QPen( Qt::NoPen );
-
   QPen InteractionManager::_hoverSelectedPen =
     QPen( Qt::red, 3, Qt::DotLine,
           Qt::RoundCap, Qt::RoundJoin );
 
+  QPen InteractionManager::_partiallySelectedPen =
+    QPen( Qt::yellow, 3, Qt::SolidLine,
+          Qt::RoundCap, Qt::RoundJoin );
+
+  QPen InteractionManager::_hoverPartiallySelectedPen =
+    QPen( Qt::yellow, 3, Qt::DotLine,
+          Qt::RoundCap, Qt::RoundJoin );
+
+  QPen InteractionManager::_unselectedPen = QPen( Qt::NoPen );
+
   QPen InteractionManager::_hoverUnselectedPen =
     QPen( QColor( 200, 200, 200, 255 ), 3, Qt::DotLine,
           Qt::RoundCap, Qt::RoundJoin );
-
 
   QMenu* InteractionManager::_contextMenu = nullptr;
 
@@ -60,6 +67,8 @@ namespace neuroscheme
       std::cout << "Selected item" << selectableItem->selected( ) << std::endl;
       if ( selectableItem->selected( ))
         item->setPen( _hoverSelectedPen );
+      else if ( selectableItem->partiallySelected( ))
+        item->setPen( _hoverPartiallySelectedPen );
       else
         item->setPen( _hoverUnselectedPen );
     }
@@ -79,6 +88,8 @@ namespace neuroscheme
     {
       if ( selectableItem->selected( ))
         item->setPen( _selectedPen );
+      else if ( selectableItem->partiallySelected( ))
+        item->setPen( _partiallySelectedPen );
       else
         item->setPen( _unselectedPen );
     }
@@ -264,7 +275,10 @@ namespace neuroscheme
             std::cout << "-- ShiFT gid: "
                       << int( entity->entityGid( )) << std::endl;
 
-            selectableItem->toggleSelected( );
+            if ( selectableItem->partiallySelected( ))
+              selectableItem->setSelected( );
+            else
+              selectableItem->toggleSelected( );
             if ( selectableItem->selected( ))
             {
               SelectionManager::setSelectedState(
@@ -283,8 +297,17 @@ namespace neuroscheme
 
             auto entityGid = ( *entities.begin( ))->entityGid( );
 
-            _PropagateSelectedStateToChilds(
+            _propagateSelectedStateToChilds(
               DataManager::entities( ),
+              *( DataManager::entities( ).
+                 relationships( )[ "isParentOf" ]->asOneToN( )),
+              entityGid,
+              parentState );
+
+            _propagateSelectedStateToParent(
+              DataManager::entities( ),
+              *( DataManager::entities( ).
+                 relationships( )[ "isChildOf" ]->asOneToOne( )),
               *( DataManager::entities( ).
                  relationships( )[ "isParentOf" ]->asOneToN( )),
               entityGid,
@@ -305,22 +328,82 @@ namespace neuroscheme
     }
   }
 
-  void InteractionManager::_PropagateSelectedStateToChilds(
+  void InteractionManager::_propagateSelectedStateToChilds(
     shift::Entities& entities,
     shift::RelationshipOneToN& relParentOf,
     unsigned int entityGid,
     SelectedState state )
   {
-    const auto& children = relParentOf[ entityGid ];
+    const auto& childrenIds = relParentOf[ entityGid ];
     std::cout << " -- Parent of: ";
-    for ( auto const& child : children )
+    for ( auto const& childId : childrenIds )
     {
-      std::cout << child << " ";
+      std::cout << childId << " ";
       SelectionManager::setSelectedState(
-        entities[child], state );
-      _PropagateSelectedStateToChilds( entities, relParentOf, child, state );
+        entities[childId], state );
+      _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
     }
 
   }
 
+  void InteractionManager::_propagateSelectedStateToParent(
+    shift::Entities& entities,
+    shift::RelationshipOneToOne& relChildOf,
+    shift::RelationshipOneToN& relParentOf,
+    unsigned int entityGid,
+    SelectedState childState )
+  {
+    const auto& parentId = relChildOf[ entityGid ];
+
+    if ( parentId == 0 ) return;
+
+    if ( childState == SelectedState::PARTIALLY_SELECTED )
+    {
+      std::cout << "<>Partially selected" << std::endl;
+      SelectionManager::setSelectedState(
+        entities[parentId], childState );
+      _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
+                                       parentId, childState );
+      return;
+    }
+
+    bool allChildrenSelected, noChildrenSelected;
+    _queryChildrenSelectedState( entities, relParentOf, parentId,
+                                 allChildrenSelected, noChildrenSelected );
+    std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
+    SelectedState state;
+    if ( noChildrenSelected )
+      state = SelectedState::UNSELECTED;
+    else if ( allChildrenSelected )
+      state = SelectedState::SELECTED;
+    else
+      state = SelectedState::PARTIALLY_SELECTED;
+
+    SelectionManager::setSelectedState(
+      entities[parentId], state );
+    _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
+                                     parentId, state );
+  }
+
+  void InteractionManager::_queryChildrenSelectedState(
+    shift::Entities& entities,
+    shift::RelationshipOneToN& relParentOf,
+    unsigned int entityGid,
+    bool& allChildrenSelected,
+    bool& noChildrenSelected )
+  {
+    allChildrenSelected = true;
+    noChildrenSelected = true;
+    const auto& childrenIds = relParentOf[ entityGid ];
+    for ( auto const& childId : childrenIds )
+    {
+      if ( SelectionManager::getSelectedState( entities[childId] ) !=
+           SelectedState::SELECTED )
+        allChildrenSelected = false;
+      if ( SelectionManager::getSelectedState( entities[childId] ) ==
+           SelectedState::SELECTED )
+        noChildrenSelected = false;
+    }
+    return;
+  }
 }

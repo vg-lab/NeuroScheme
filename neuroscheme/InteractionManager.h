@@ -49,25 +49,45 @@ namespace neuroscheme
 
 
     static const QPen& getSelectedPen( ) { return _selectedPen; }
+    static const QPen& getPartiallySelectedPen( )
+    {
+      return _partiallySelectedPen;
+    }
 
   protected:
 
-    
+
   // void InteractionManager::_PropagateSelectedToChilds(
   //   shift::Entities& entities,
   //   shift::RelationshipOneToN& relParentOf,
   //   unsigned int entityGid,
   //   SelectedState state
 
-    static void _PropagateSelectedStateToChilds(
+    static void _propagateSelectedStateToChilds(
       shift::Entities& entities,
       shift::RelationshipOneToN& relParentOf,
       unsigned int entityGid,
       SelectedState state );
 
+    static void _propagateSelectedStateToParent(
+    shift::Entities& entities,
+    shift::RelationshipOneToOne& relChildOf,
+    shift::RelationshipOneToN& relParentOf,
+    unsigned int entityGid,
+    SelectedState state = SelectedState::SELECTED );
+
+    static void _queryChildrenSelectedState(
+      shift::Entities& entities,
+      shift::RelationshipOneToN& relParentOf,
+      unsigned int entityGid,
+      bool& allChildrenSelected,
+      bool& noChildrenSelected );
+
     static QPen _selectedPen;
+    static QPen _partiallySelectedPen;
     static QPen _unselectedPen;
     static QPen _hoverSelectedPen;
+    static QPen _hoverPartiallySelectedPen;
     static QPen _hoverUnselectedPen;
 
     static QMenu* _contextMenu;
