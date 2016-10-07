@@ -1,7 +1,7 @@
 #include "ColumnRep.h"
 #include "ColumnItem.h"
 #include "NeuronRep.h"
-#include "../Color.h"
+#include "../../Color.h"
 #include <stdint.h>
 
 

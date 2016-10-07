@@ -1,5 +1,5 @@
 #include "NeuronItem.h"
-#include "RingItem.h"
+#include "../../reps/RingItem.h"
 #include <QPen>
 
 namespace neuroscheme

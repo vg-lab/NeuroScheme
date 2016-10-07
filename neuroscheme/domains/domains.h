@@ -11,7 +11,7 @@
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -19,25 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__DATA_MANAGER__
-#define __NEUROSCHEME__DATA_MANAGER__
-
-#include <shift/shift.h>
-#include "domains/domains.h"
-
-namespace neuroscheme
-{
-  class DataManager
-  {
-  public:
-
-    static shift::EntitiesWithRelationships& entities( void );
-    static void loadData( void );
-
-  protected:
-    static shift::EntitiesWithRelationships _entities;
-
-  };
-}
-
+#ifndef __NEUROSCHEME__DOMAINS__
+#define __NEUROSCHEME__DOMAINS__
+#include "cortex/cortex.h"
 #endif

@@ -22,12 +22,12 @@
 #ifndef __NEUROSCHEME__NEURON_ITEM__
 #define __NEUROSCHEME__NEURON_ITEM__
 
-#include "../Color.h"
-#include "../InteractionManager.h"
-#include "InteractiveItem.h"
-#include "Item.h"
+#include "../../Color.h"
+#include "../../InteractionManager.h"
+#include "../../reps/InteractiveItem.h"
+#include "../../reps/Item.h"
+#include "../../reps/SelectableItem.h"
 #include "NeuronRep.h"
-#include "SelectableItem.h"
 #include <QGraphicsEllipseItem>
 
 namespace neuroscheme

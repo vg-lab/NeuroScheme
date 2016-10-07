@@ -24,21 +24,21 @@
 namespace neuroscheme
 {
 
-  std::map< unsigned int, RepresentationCreator* >
+  std::map< unsigned int, shift::RepresentationCreator* >
   RepresentationCreatorManager::_repCreators =
-    std::map< unsigned int, RepresentationCreator* >( );
+    std::map< unsigned int, shift::RepresentationCreator* >( );
 
-  std::map< unsigned int, TEntitiesToReps >
+  std::map< unsigned int, shift::TEntitiesToReps >
   RepresentationCreatorManager::_entitiesToReps =
-    std::map< unsigned int, TEntitiesToReps >( );
+    std::map< unsigned int, shift::TEntitiesToReps >( );
 
-  std::map< unsigned int, TRepsToEntities>
+  std::map< unsigned int, shift::TRepsToEntities>
   RepresentationCreatorManager::_repsToEntities =
-    std::map< unsigned int, TRepsToEntities>( );
+    std::map< unsigned int, shift::TRepsToEntities>( );
 
 
   void RepresentationCreatorManager::addCreator(
-    RepresentationCreator* repCreator,
+    shift::RepresentationCreator* repCreator,
     unsigned int repCreatorId )
   {
     //TODO check if exists
@@ -62,12 +62,12 @@ namespace neuroscheme
                                           linkRepsToObjs );
   }
 
-  const TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(
+  const shift::TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(
     unsigned int repCreatorId )
   {
     return _entitiesToReps[ repCreatorId ];
   }
-  const TRepsToEntities& RepresentationCreatorManager::repsToEntities(
+  const shift::TRepsToEntities& RepresentationCreatorManager::repsToEntities(
     unsigned int repCreatorId )
   {
     return _repsToEntities[ repCreatorId ];

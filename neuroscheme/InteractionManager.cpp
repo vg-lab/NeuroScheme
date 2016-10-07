@@ -24,10 +24,7 @@
 #include "LayoutManager.h"
 #include "RepresentationCreatorManager.h"
 #include "SelectionManager.h"
-#include "entities/Neuron.h"
-#include "reps/ColumnItem.h"
-#include "reps/MiniColumnItem.h"
-#include "reps/NeuronItem.h"
+#include "domains/domains.h"
 
 namespace neuroscheme
 {

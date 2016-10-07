@@ -22,12 +22,12 @@
 #ifndef __NEUROSCHEME__NEURON_AGGREGATION_ITEM__
 #define __NEUROSCHEME__NEURON_AGGREGATION_ITEM__
 
-#include "../Color.h"
-#include "../InteractionManager.h"
-#include "CollapsableItem.h"
+#include "../../Color.h"
+#include "../../InteractionManager.h"
+#include "../../reps/CollapsableItem.h"
+#include "../../reps/Item.h"
+#include "../../reps/InteractiveItem.h"
 #include "ColumnRep.h"
-#include "Item.h"
-#include "InteractiveItem.h"
 #include "NeuronRep.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>

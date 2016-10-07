@@ -22,7 +22,7 @@
 #ifndef __NEUROSCHEME__MINICOLUMN_REP__
 #define __NEUROSCHEME__MINICOLUMN_REP__
 
-#include "QGraphicsItemRepresentation.h"
+#include "../../reps/QGraphicsItemRepresentation.h"
 #include <shift/shift.h>
 #include <shift_NeuronAggregationRep.h>
 #include <shift_LayerRep.h>

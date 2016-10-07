@@ -22,7 +22,7 @@
 #ifndef __NEUROSCHEME__REPRESENTATION_CREATOR_MANAGER__
 #define __NEUROSCHEME__REPRESENTATION_CREATOR_MANAGER__
 
-#include "RepresentationCreator.h"
+#include "domains/domains.h"
 
 namespace neuroscheme
 {
@@ -31,7 +31,7 @@ namespace neuroscheme
   class RepresentationCreatorManager
   {
   public:
-    static void addCreator( RepresentationCreator* repCreator,
+    static void addCreator( shift::RepresentationCreator* repCreator,
                             unsigned int repCreatorId = 0 );
 
     static void create( const shift::Entities& entities,
@@ -42,16 +42,16 @@ namespace neuroscheme
                         bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 );
 
-    static const TEntitiesToReps& entitiesToReps(
+    static const shift::TEntitiesToReps& entitiesToReps(
       unsigned int repCreatorId = 0 );
-    static const TRepsToEntities& repsToEntities(
+    static const shift::TRepsToEntities& repsToEntities(
       unsigned int repCreatorId = 0 );
 
     // static const shift::Representation& objectToRep(
   protected:
-    static std::map< unsigned int, RepresentationCreator* > _repCreators;
-    static std::map< unsigned int, TEntitiesToReps > _entitiesToReps;
-    static std::map< unsigned int, TRepsToEntities > _repsToEntities;
+    static std::map< unsigned int, shift::RepresentationCreator* > _repCreators;
+    static std::map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
+    static std::map< unsigned int, shift::TRepsToEntities > _repsToEntities;
 
   };
 

@@ -1,6 +1,6 @@
 #include "NeuronRep.h"
 #include "NeuronItem.h"
-#include "../Color.h"
+#include "../../Color.h"
 #include <stdint.h>
 
 

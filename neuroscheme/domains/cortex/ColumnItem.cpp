@@ -1,7 +1,7 @@
-#include "../error.h"
+#include "../../error.h"
 #include "ColumnItem.h"
 #include "NeuronItem.h"
-#include "CollapseButtonItem.h"
+#include "../../reps/CollapseButtonItem.h"
 #include <QPen>
 
 namespace neuroscheme

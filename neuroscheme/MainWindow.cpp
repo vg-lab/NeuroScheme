@@ -23,13 +23,11 @@
 
 // OJO PRUEBAS
 #include "reps/QGraphicsItemRepresentation.h"
-#include "entities/Neuron.h"
-#include "RepresentationCreator.h"
 #include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
 #include "DataManager.h"
 #include "reps/SelectableItem.h"
-#include "reps/ColumnItem.h"
+#include "domains/domains.h"
 
 
 MainWindow::MainWindow( QWidget* parent_ )
@@ -69,7 +67,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   // const auto& rootEntity = neuroscheme::DataManager::entities( )[1];
   // rootEntities[1] = rootEntity;
   neuroscheme::RepresentationCreatorManager::addCreator(
-    new neuroscheme::RepresentationCreator );
+    new neuroscheme::cortex::RepresentationCreator );
   // neuroscheme::TEntitiesToReps objsToReps;
   // neuroscheme::TRepsToEntities repsToObjs;
   neuroscheme::RepresentationCreatorManager::create(

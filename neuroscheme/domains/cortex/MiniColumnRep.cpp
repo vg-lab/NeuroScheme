@@ -1,7 +1,7 @@
 #include "MiniColumnRep.h"
 #include "MiniColumnItem.h"
 #include "NeuronRep.h"
-#include "../Color.h"
+#include "../../Color.h"
 #include <stdint.h>
 
 

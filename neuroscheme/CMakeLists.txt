@@ -1,39 +1,5 @@
 include( shift_generate_cxx )
 
-# Generate objects
-set( SHIFT_GENERATED_OBJECTS Neuron Column MiniColumn )
-set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
-file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
-foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
-  shift_generate_cxx(
-    "Entity"
-    ${GENERATED_OBJECT}
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.json
-    ${SHIFT_GENERATED_DIR}
-    )
-  list( APPEND SHIFT_GENERATED_IMPL_FILES
-    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.cpp )
-  list( APPEND SHIFT_GENERATED_HEADER_FILES
-    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
-endforeach( )
-
-# Generate representations
-set( SHIFT_GENERATED_OBJECTS NeuronRep Ring LayerRep NeuronAggregationRep )
-set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
-file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
-foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
-  shift_generate_cxx(
-    "Representation"
-    ${GENERATED_OBJECT}
-    ${CMAKE_CURRENT_SOURCE_DIR}/reps/reps.json
-    ${SHIFT_GENERATED_DIR}
-    )
-  list( APPEND SHIFT_GENERATED_IMPL_FILES
-    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.cpp )
-  list( APPEND SHIFT_GENERATED_HEADER_FILES
-    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
-endforeach( )
-
 set( Name NeuroScheme )
 set( NAME NEUROSCHEME )
 set( namespace neuroscheme )
@@ -51,7 +17,6 @@ configure_file(
   ${PROJECT_BINARY_DIR}/src/version.cpp @ONLY )
 
 set( NEUROSCHEME_SOURCES
-  ${SHIFT_GENERATED_IMPL_FILES}
   ${PROJECT_BINARY_DIR}/src/version.cpp
   Canvas.cpp
   Color.cpp
@@ -60,52 +25,40 @@ set( NEUROSCHEME_SOURCES
   LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
-  MainWindow.ui
   mappers/ColorMapper.cpp
   mappers/VariableMapper.cpp
   neuroScheme.cpp
-  RepresentationCreator.cpp
   RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
-  reps/ColumnItem.cpp
-  reps/ColumnRep.cpp
-  reps/MiniColumnItem.cpp
-  reps/MiniColumnRep.cpp
-  reps/NeuronAggregationItem.cpp
-  reps/NeuronRep.cpp
-  reps/NeuronItem.cpp
   reps/RingItem.cpp
   SelectionManager.cpp
   )
 
 set( NEUROSCHEME_HEADERS
-  ${SHIFT_GENERATED_HEADERS_FILES}
   ${PROJECT_BINARY_DIR}/include/neuroscheme/version.h
   Canvas.h
   Color.h
   DataManager.h
-  InteractionManager.h
   error.h
+  InteractionManager.h
   LayoutManager.h
   Log.h
   MainWindow.h
   mappers/ColorMapper.h
   mappers/VariableMapper.h
-  RepresentationCreator.h
   RepresentationCreatorManager.h
-  entities/Neuron.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h
-  reps/ColumnItem.h
-  reps/ColumnRep.h
-  reps/MiniColumnItem.h
-  reps/MiniColumnRep.h
-  reps/NeuronAggregationItem.h
-  reps/NeuronRep.h
-  reps/NeuronItem.h
+  reps/InteractiveItem.h
+  reps/Item.h
+  reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
+  reps/SelectableItem.h
+  SelectedState.h
   SelectionManager.h
   )
+
+include ( domains/cortex/CMakeLists.txt )
 
 set( NEUROSCHEME_LINK_LIBRARIES
   ShiFT
