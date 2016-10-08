@@ -18,13 +18,14 @@ namespace neuroscheme
   }
 
 
-  QGraphicsItem* NeuronRep::item( bool create )
+  QGraphicsItem* NeuronRep::item( QGraphicsScene* scene, bool create )
   {
-    if ( create && !_item )
+    if ( create && ( _items.find( scene ) == _items.end( )) &&
+      !_items[ scene ] )
     {
-      _item = new NeuronItem( *this );
+      _items[ scene ] = new NeuronItem( *this );
     }
-    return _item;
-    }
+    return _items.at( scene );
+  }
 
 } // namespace neuroscheme

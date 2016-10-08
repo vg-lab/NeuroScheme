@@ -25,6 +25,7 @@
 #ifdef NEUROSCHEME_USE_QT5WIDGETS
 
 #include <QGraphicsItem>
+#include "../Canvas.h"
 
 namespace neuroscheme
 {
@@ -35,18 +36,27 @@ namespace neuroscheme
   public:
 
     QGraphicsItemRepresentation( void )
-      : _item( nullptr )
-    {}
-    virtual ~QGraphicsItemRepresentation( void ) {}
-    virtual QGraphicsItem* item( bool create = true ) = 0;
-    virtual void item( QGraphicsItem* item_ )
+    //: _item( nullptr )
     {
-      _item = item_;
+      _items[ nullptr ] = nullptr;
+    }
+    virtual ~QGraphicsItemRepresentation( void ) {}
+    //virtual QGraphicsItem* item( bool create = true ) = 0;
+    virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                         bool create = true ) = 0;
+    virtual void setItem( QGraphicsItem* item_,
+                          GraphicsScene* scene )
+    {
+      _items[ scene ] = item_;
+    }
+    virtual void clearItems( void )
+    {
+      _items.clear( );
     }
 
   protected:
 
-    QGraphicsItem* _item;
+    std::map< QGraphicsScene*, QGraphicsItem* > _items;
 
   };
 

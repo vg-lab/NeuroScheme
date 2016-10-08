@@ -1,13 +1,22 @@
 #include "DataManager.h"
+#include "RepresentationCreatorManager.h"
 
 namespace neuroscheme
 {
   shift::EntitiesWithRelationships DataManager::_entities =
     shift::EntitiesWithRelationships( );
 
+  shift::Representations DataManager::_representations =
+    shift::Representations( );;
+
   shift::EntitiesWithRelationships& DataManager::entities( void )
   {
     return _entities;
+  }
+
+  shift::Representations& DataManager::representations( void )
+  {
+    return _representations;
   }
 
   void DataManager::loadData( void )
@@ -229,5 +238,25 @@ namespace neuroscheme
         relChildOf[ entityGid ] = miniCol3Id;
 
       }
-    }
+
+      // Display root reps
+      shift::Entities rootEntities;
+      // auto& relParentOf =
+      //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+      // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
+      //                        relationships( )[ "isParentOf" ]->asOneToN( ));
+
+      const auto& childrenIds = relParentOf[ 0 ];
+      std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
+      for ( const auto& child : childrenIds )
+        rootEntities[child] =
+          neuroscheme::DataManager::entities( )[child];
+
+      neuroscheme::RepresentationCreatorManager::addCreator(
+        new neuroscheme::cortex::RepresentationCreator );
+      neuroscheme::RepresentationCreatorManager::create(
+        rootEntities, _representations,
+        true, true );
+
+    } // loadData
 } // namespace neuroscheme

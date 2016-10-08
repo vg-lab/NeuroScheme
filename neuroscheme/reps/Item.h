@@ -40,7 +40,7 @@ namespace neuroscheme
       auto parentRep_ =
         dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
       if ( parentRep_ )
-        parentRep_->item( nullptr );
+        parentRep_->clearItems( );
     }
     virtual shift::Representation* parentRep( void ) const
     {

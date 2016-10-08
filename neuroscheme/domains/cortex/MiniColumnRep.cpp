@@ -19,13 +19,14 @@ namespace neuroscheme
   }
 
 
-  QGraphicsItem* MiniColumnRep::item( bool create )
-  {
-    if ( create && !_item )
+  QGraphicsItem* MiniColumnRep::item( QGraphicsScene* scene, bool create )
     {
-      _item = new MiniColumnItem( *this );
-    }
-    return _item;
+      if ( create && ( _items.find( scene ) == _items.end( )) &&
+           !_items[ scene ] )
+      {
+        _items[ scene ] = new MiniColumnItem( *this );
+      }
+      return _items.at( scene );
     }
 
 } // namespace neuroscheme

@@ -39,7 +39,8 @@ namespace neuroscheme
     NeuronRep( void );
     NeuronRep( const NeuronRep& );
     virtual ~NeuronRep( void ) {}
-    QGraphicsItem* item( bool create = true );
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                         bool create = true );
 
   };
 

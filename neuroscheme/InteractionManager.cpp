@@ -112,6 +112,7 @@ namespace neuroscheme
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
       {
+        assert( item->parentRep( ));
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
@@ -182,6 +183,7 @@ namespace neuroscheme
                 targetEntities, representations,
                 true, true );
 
+              neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
               neuroscheme::LayoutManager::displayItems(
                 representations, true );
             }
@@ -267,24 +269,25 @@ namespace neuroscheme
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
           // auto entityGid = ( *entities.begin( ))->entityGid( );
+          if ( selectableItem->partiallySelected( ))
+            selectableItem->setSelected( );
+          else
+            selectableItem->toggleSelected( );
+
           for ( const auto& entity : entities )
           {
             std::cout << "-- ShiFT gid: "
                       << int( entity->entityGid( )) << std::endl;
 
-            if ( selectableItem->partiallySelected( ))
-              selectableItem->setSelected( );
-            else
-              selectableItem->toggleSelected( );
             if ( selectableItem->selected( ))
             {
               SelectionManager::setSelectedState(
                 entity, SelectedState::SELECTED );
-              shapeItem->setPen( _selectedPen );
+//              shapeItem->setPen( _selectedPen );
             }
             else
             {
-              shapeItem->setPen( _unselectedPen );
+//              shapeItem->setPen( _unselectedPen );
               SelectionManager::setSelectedState(
                 entity, SelectedState::UNSELECTED );
             }
@@ -312,6 +315,7 @@ namespace neuroscheme
 
             std::cout << std::endl;
 
+            LayoutManager::updateAllScenesSelection( );
 
           }
         }

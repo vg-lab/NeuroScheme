@@ -32,10 +32,12 @@ namespace neuroscheme
   public:
 
     static shift::EntitiesWithRelationships& entities( void );
+    static shift::Representations& representations( void );
     static void loadData( void );
 
   protected:
     static shift::EntitiesWithRelationships _entities;
+    static shift::Representations _representations;
 
   };
 }

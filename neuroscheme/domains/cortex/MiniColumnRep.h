@@ -46,7 +46,7 @@ namespace neuroscheme
     MiniColumnRep( void );
     MiniColumnRep( const MiniColumnRep& );
     virtual ~MiniColumnRep( void ) {}
-    QGraphicsItem* item( bool create = true );
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
 
   };
 

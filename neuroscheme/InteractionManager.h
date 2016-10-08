@@ -53,6 +53,10 @@ namespace neuroscheme
     {
       return _partiallySelectedPen;
     }
+    static const QPen& getUnselectedPen( )
+    {
+      return _unselectedPen;
+    }
 
   protected:
 

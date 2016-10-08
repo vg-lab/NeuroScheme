@@ -39,10 +39,10 @@ namespace neuroscheme
       )
     {
 
-      if ( linkEntitiesToReps )
-        entitiesToReps.clear( );
-      if ( linkRepsToEntities )
-        repsToEntities.clear( );
+      // if ( linkEntitiesToReps )
+      //   entitiesToReps.clear( );
+      // if ( linkRepsToEntities )
+      //   repsToEntities.clear( );
 
       auto _greenMapper = new DiscreteColorMapper( );
       auto _redMapper = new DiscreteColorMapper( );

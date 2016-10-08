@@ -20,88 +20,63 @@
  *
  */
 #include "MainWindow.h"
-
-// OJO PRUEBAS
-#include "reps/QGraphicsItemRepresentation.h"
-#include "RepresentationCreatorManager.h"
 #include "LayoutManager.h"
 #include "DataManager.h"
-#include "reps/SelectableItem.h"
-#include "domains/domains.h"
 
+#include <QGridLayout>
 
 MainWindow::MainWindow( QWidget* parent_ )
   : QMainWindow( parent_ )
   , _ui( new Ui::MainWindow )
 {
-  // neuroscheme::SelectableItem s;
-  // std::cout << s.selected( ) << std::endl;
 
-
-  // neuroscheme::ColumnRep cr;
-  // neuroscheme::ColumnItem ci( cr );
-  // std::cout << ci.selected( ) << std::endl;
-  // exit( 0);
-
-
-  _canvas = new neuroscheme::Canvas( this );
-  this->setCentralWidget( _canvas );
-
-
-  // shift::EntitiesWithRelationships entities;
-  shift::Representations representations;
+  auto gl = new QGridLayout;
+  gl->setContentsMargins( 0, 0, 0, 0 );
+  gl->setSpacing( 0 );
+  QWidget* widget = new QWidget( this );
+  widget->setLayout( gl );
+  this->setCentralWidget( widget );
 
   neuroscheme::DataManager::loadData( );
-  shift::Entities rootEntities;
 
-  auto& relParentOf = *( neuroscheme::DataManager::entities( ).
-                         relationships( )[ "isParentOf" ]->asOneToN( ));
 
-  const auto& childrenIds = relParentOf[ 0 ];
-  std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
-  for ( const auto& child : childrenIds )
-    rootEntities[child] =
-      neuroscheme::DataManager::entities( )[child];
+  _canvasses.push_back( new neuroscheme::Canvas( this ));
+  gl->addWidget( _canvasses[0], 1, 1 );
+  neuroscheme::LayoutManager::setScene( &_canvasses[0]->scene( ));
+  neuroscheme::LayoutManager::displayItems(
+    neuroscheme::DataManager::representations( ), true );
+  neuroscheme::LayoutManager::scenes( ).insert( &_canvasses[0]->scene( ));
 
-  //const auto& entities = neuroscheme::DataManager::entities( );
-  // const auto& rootEntity = neuroscheme::DataManager::entities( )[1];
-  // rootEntities[1] = rootEntity;
-  neuroscheme::RepresentationCreatorManager::addCreator(
-    new neuroscheme::cortex::RepresentationCreator );
-  // neuroscheme::TEntitiesToReps objsToReps;
-  // neuroscheme::TRepsToEntities repsToObjs;
-  neuroscheme::RepresentationCreatorManager::create(
-    rootEntities, representations,
-    // objsToReps, repsToObjs
-    true, true );
-
-  // neuroscheme::LayoutManager::displayItems(
-  //   _canvas->scene( ), representations );
-  neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
-  neuroscheme::LayoutManager::displayItems( representations, true );
-
-  _representations = representations;
-
+  _canvasses.push_back( new neuroscheme::Canvas( this ));
+  gl->addWidget( _canvasses[1], 1, 2 );
+  neuroscheme::LayoutManager::setScene( &_canvasses[1]->scene( ));
+  neuroscheme::LayoutManager::displayItems(
+    neuroscheme::DataManager::representations( ), true );
+  neuroscheme::LayoutManager::scenes( ).insert( &_canvasses[1]->scene( ));
 }
 
 void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
 {
   std::cout << "MainWindow::resizeEvent" << std::endl;
-  const QSize viewerSize = _canvas->view( ).size( );
-  const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
-                               - viewerSize.height( ) / 2,
-                               viewerSize.width( ) -2,
-                               viewerSize.height( ) -2);
+  for ( const auto& _canvas : _canvasses )
+  {
+    const QSize viewerSize = _canvas->view( ).size( );
+    const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
+                                 - viewerSize.height( ) / 2,
+                                 viewerSize.width( ) -2,
+                                 viewerSize.height( ) -2);
 
-  QTransform transf = _canvas->view( ).transform( );
-  _canvas->view( ).fitInView( rectf, Qt::KeepAspectRatio );
-  _canvas->view( ).setSceneRect( rectf );
-  _canvas->view( ).setTransform( transf );
+    QTransform transf = _canvas->view( ).transform( );
+    _canvas->view( ).fitInView( rectf, Qt::KeepAspectRatio );
+    _canvas->view( ).setSceneRect( rectf );
+    _canvas->view( ).setTransform( transf );
 
-  std::cout << _canvas->view( ).width( ) << " x "
-            << _canvas->view( ).height( ) << std::endl;
+    // std::cout << _canvas->view( ).width( ) << " x "
+    //           << _canvas->view( ).height( ) << std::endl;
 
-  neuroscheme::LayoutManager::update( );
+    neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
+    neuroscheme::LayoutManager::update( );
+  }
 
 }
 
@@ -110,5 +85,6 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
 MainWindow::~MainWindow( void )
 {
   delete _ui;
-  delete _canvas;
+  for ( const auto& _canvas : _canvasses )
+    delete _canvas;
 }

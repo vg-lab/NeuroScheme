@@ -47,7 +47,8 @@ namespace neuroscheme
     ColumnRep( void );
     ColumnRep( const ColumnRep& );
     virtual ~ColumnRep( void ) {}
-    QGraphicsItem* item( bool create = true );
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                         bool create = true );
 
   };
 
