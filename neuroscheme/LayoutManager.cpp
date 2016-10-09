@@ -301,6 +301,7 @@ namespace neuroscheme
               dynamic_cast< QAbstractGraphicsShapeItem* >( item );
 
             const auto state = SelectionManager::getSelectedState( entity );
+            selectableItem_->setSelected( state );
             if ( state == SelectedState::UNSELECTED )
               shapeItem->setPen( InteractionManager::getUnselectedPen( ));
             else if ( state == SelectedState::SELECTED )

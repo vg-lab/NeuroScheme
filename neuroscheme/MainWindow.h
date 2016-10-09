@@ -24,6 +24,9 @@
 
 #include <ui_MainWindow.h>
 #include <QMainWindow>
+#include <QTableWidget>
+#include <QDockWidget>
+#include <unordered_map>
 #include "Canvas.h"
 
 namespace Ui
@@ -31,18 +34,48 @@ namespace Ui
     class MainWindow;
 }
 
+class StoredSelections
+{
+public:
+  // Stored selections
+  QDockWidget* dock;
+  QTableWidget* table;
+  unsigned int counter;
+  std::unordered_map< std::string, QTableWidgetItem* >
+  tableWidgets;
+};
+
 class MainWindow : public QMainWindow
 {
   Q_OBJECT;
 
 public:
 
+  enum TTableColumns
+  {
+    COLUMN_LABEL = 0,
+    COLUMN_COUNT,
+    COLUMN_DATETIME,
+    COLUMN_MAX_COLUMS
+  };
+
   explicit MainWindow( QWidget *parent = 0 );
   ~MainWindow( void );
+
+public slots:
+
+  void updateStoredSelectionsDock( void );
+  void sortStoredSelectionsTable( int column );
+  void storeSelection( void );
+  void deleteStoredSelection( void );
+  void restoreSelection( void );
 
 protected:
 
   void resizeEvent( QResizeEvent* );
+  QString _tableColumnToString( TTableColumns column );
+
+  StoredSelections _storedSelections;
 
 private:
 

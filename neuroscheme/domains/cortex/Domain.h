@@ -19,16 +19,28 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__DOMAINS_CORTEX__
-#define __NEUROSCHEME__DOMAINS_CORTEX__
-#include "ColumnItem.h"
-#include "ColumnRep.h"
-#include "Domain.h"
-#include "MiniColumnItem.h"
-#include "MiniColumnRep.h"
-#include "NeuronAggregationItem.h"
+#ifndef __NEUROSCHEME__CORTEX_DOMAIN_MANAGER__
+#define __NEUROSCHEME__CORTEX_DOMAIN_MANAGER__
+
+#include "../../DomainManager.h"
 #include "Neuron.h"
-#include "NeuronItem.h"
-#include "NeuronRep.h"
-#include "RepresentationCreator.h"
+
+namespace neuroscheme
+{
+
+  namespace cortex
+  {
+    class Domain
+      : public ::neuroscheme::Domain
+    {
+
+    public:
+      bool isSelectableEntity( shift::Entity* entity ) const
+      {
+        return dynamic_cast< Neuron* >( entity );
+      }
+    };
+  }
+}
+
 #endif

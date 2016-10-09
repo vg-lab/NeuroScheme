@@ -19,16 +19,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__DOMAINS_CORTEX__
-#define __NEUROSCHEME__DOMAINS_CORTEX__
-#include "ColumnItem.h"
-#include "ColumnRep.h"
-#include "Domain.h"
-#include "MiniColumnItem.h"
-#include "MiniColumnRep.h"
-#include "NeuronAggregationItem.h"
-#include "Neuron.h"
-#include "NeuronItem.h"
-#include "NeuronRep.h"
-#include "RepresentationCreator.h"
-#endif
+#include "DomainManager.h"
+
+namespace neuroscheme
+{
+  
+  Domain* DomainManager::_domain = nullptr;
+
+  // unsigned int _activeDomain = 0;
+  // DomainManager::TDomains _domains = TDomains( );
+
+  // const TDomain& getActiveDomain( void ) const
+  // {
+  //   return _domains[ _activeDomain ];
+  // }
+
+}

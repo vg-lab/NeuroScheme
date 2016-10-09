@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "DomainManager.h"
 #include "SelectionManager.h"
 
 namespace neuroscheme
@@ -26,10 +27,10 @@ namespace neuroscheme
 
   SelectionManager::TSelection SelectionManager::_activeSelection =
     TSelection( );
-  SelectionManager::TSelections SelectionManager::_savedSelections =
+  SelectionManager::TSelections SelectionManager::_storedSelections =
     TSelections( );
 
-  unsigned int SelectionManager::_savedSelectionNextId = 0;
+  // unsigned int SelectionManager::_storedSelectionNextId = 0;
 
   void SelectionManager::setSelectedState( shift::Entity* entity,
                                            SelectedState state )
@@ -52,58 +53,57 @@ namespace neuroscheme
     _activeSelection.clear( );
   }
 
-  void SelectionManager::clearSavedSelections( void )
+  void SelectionManager::clearStoredSelections( void )
   {
-    _savedSelections.clear( );
+    _storedSelections.clear( );
   }
 
-  unsigned int SelectionManager::saveActiveSelection( void )
+  void SelectionManager::storeActiveSelection( const std::string& selectionName )
   {
-    _savedSelections[_savedSelectionNextId] = _activeSelection;
-    return _savedSelectionNextId++;
+    _storedSelections[ selectionName ] = _activeSelection;
+//    return _storedSelectionNextId++;
   }
 
-  void SelectionManager::restoreSavedSelection( unsigned int savedSelectionId )
+  void SelectionManager::restoreStoredSelection( const std::string& selectionName )
   {
-    _activeSelection = _savedSelections[savedSelectionId];
+    _activeSelection = _storedSelections[ selectionName ];
   }
 
-  //   static void setSelectedState( shift::Entity* entity,
-  //                                 SelectedState state );
-  //   static SelectedState getSelectedState( shift::Entity* entity );
-  //   static void clearActiveSelection( unsigned int selectionId = 0 );
-  //   static void clearSavedSelections( void );
-  //   static void saveActiveSelection( void );
-  //   static void restoreSavedSelection( void );
 
+  unsigned int selectionSize( const SelectionManager::TSelection& selection )
+  {
+    assert( DomainManager::getActiveDomain( ) != nullptr );
+    return std::count_if(
+      selection.begin( ), selection.end( ),
+      []( const std::pair< shift::Entity*, SelectedState>& statePair )
+      { return DomainManager::getActiveDomain( )->isSelectableEntity( statePair.first ) &&
+          statePair.second == SelectedState::SELECTED ;} );
 
-  // void SelectionManager::setSelectedState( shift::Entity* entity,
-  //                                          SelectedState state,
-  //                                          unsigned int selectionId )
-  // {
-  //   _selectedState[ selectionId][ entity ] = state;
-  // }
+  }
+  unsigned int SelectionManager::activeSelectionSize( void )
+  {
+    return selectionSize( _activeSelection );
+  }
 
-  // SelectedState SelectionManager::getSelectedState( shift::Entity* entity,
-  //                                                   unsigned int selectionId )
-  // {
-  //   const auto&  selection =
-  //     _selectedState[ selectionId ];
-  //   if ( selection.find( entity ) == selection.end( ))
-  //     return SelectedState::UNSELECTED;
-  //   else
-  //     return selection.at( entity );
-  // }
+  unsigned int SelectionManager::storedSelectionSize( const std::string& selectionName )
+  {
+    return selectionSize( _storedSelections[ selectionName ] );
+  }
 
-  // void SelectionManager::clearSelection( unsigned int selectionId )
-  // {
-  //   _selectedState[ selectionId ].clear( );
-  // }
+  bool SelectionManager::existsStoredSelection( const std::string& selectionName )
+  {
+    return _storedSelections.find( selectionName ) != _storedSelections.end( );
+  }
 
-  // void SelectionManager::clearAllSelections( void )
-  // {
-  //   _selectedState.clear( );
-  // }
-
+  bool SelectionManager::deleteStoredSelection(
+    const std::string& selectionName )
+  {
+    auto selectionToDelete = _storedSelections.find( selectionName );
+    if ( selectionToDelete == _storedSelections.end( ))
+      return false;
+    _storedSelections.erase( selectionToDelete );
+    
+    return true;
+  }
 
 } // namespace neuroscheme

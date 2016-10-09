@@ -19,16 +19,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__DOMAINS_CORTEX__
-#define __NEUROSCHEME__DOMAINS_CORTEX__
-#include "ColumnItem.h"
-#include "ColumnRep.h"
-#include "Domain.h"
-#include "MiniColumnItem.h"
-#include "MiniColumnRep.h"
-#include "NeuronAggregationItem.h"
-#include "Neuron.h"
-#include "NeuronItem.h"
-#include "NeuronRep.h"
-#include "RepresentationCreator.h"
+#ifndef __NEUROSCHEME__DOMAIN_MANAGER__
+#define __NEUROSCHEME__DOMAIN_MANAGER__
+
+#include <shift/shift.h>
+
+namespace neuroscheme
+{
+
+  class Domain
+  {
+
+  public:
+    virtual ~Domain( void ) {}
+    virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
+  };
+
+  class DomainManager
+  {
+  public:
+    // typedef std::unordered_map< unsigned int, Domain* > TDomains;
+    // const TDomain& getActiveDomain( void ) const
+
+    static Domain* getActiveDomain( void )
+    {
+      return _domain;
+    }
+
+    static Domain* setActiveDomain( Domain* domain_ )
+    {
+      return _domain = domain_;
+    }
+
+  protected:
+    // static unsigned int _activeDomain;
+    static Domain* _domain;
+    //static unsigned int _storedDomainNextId;
+  };
+}
+
 #endif

@@ -28,25 +28,36 @@
 namespace neuroscheme
 {
 
+  class SelectableEntity
+  {
+  public:
+    virtual ~SelectableEntity( void ) {}
+  };
+
   class SelectionManager
   {
   public:
     typedef std::unordered_map< shift::Entity*, SelectedState > TSelection;
-    typedef std::unordered_map< unsigned int, TSelection > TSelections;
+    typedef std::unordered_map< std::string, TSelection > TSelections;
 
     static void setSelectedState( shift::Entity* entity,
                                   SelectedState state );
     static SelectedState getSelectedState( shift::Entity* entity );
     static void clearActiveSelection( void );
-    static void clearSavedSelections( void );
-    static unsigned int saveActiveSelection( void );
-    static void restoreSavedSelection( unsigned int );
+    static void clearStoredSelections( void );
+    static unsigned int activeSelectionSize( void );
+    
+    static void storeActiveSelection( const std::string& selectionName );
+    static void restoreStoredSelection( const std::string& selectionName );
+    static unsigned int storedSelectionSize( const std::string& selectionName );
+    static bool existsStoredSelection( const std::string& selectionName );
+    static bool deleteStoredSelection( const std::string& selectionName );
 
   protected:
 
     static TSelection _activeSelection;
-    static TSelections _savedSelections;
-    static unsigned int _savedSelectionNextId;
+    static TSelections _storedSelections;
+    //static unsigned int _storedSelectionNextId;
   };
 }
 

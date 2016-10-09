@@ -25,11 +25,17 @@
 #include <shift_Neuron.h>
 #include <shift_Column.h>
 #include <shift_MiniColumn.h>
+#include "../../SelectionManager.h"
 
 namespace neuroscheme
 {
 
   using Neuron = shiftgen::Neuron;
+  // class Neuron
+  //   : public shiftgen::Neuron
+  //   , public SelectableEntity
+  // {
+  // };
   using Column = shiftgen::Column;
   using MiniColumn = shiftgen::MiniColumn;
 
