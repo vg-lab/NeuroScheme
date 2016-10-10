@@ -33,13 +33,12 @@ namespace neuroscheme
   public:
     virtual ~Domain( void ) {}
     virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
+    virtual unsigned int selectableEntityId( shift::Entity* entity ) const = 0;
   };
 
   class DomainManager
   {
   public:
-    // typedef std::unordered_map< unsigned int, Domain* > TDomains;
-    // const TDomain& getActiveDomain( void ) const
 
     static Domain* getActiveDomain( void )
     {

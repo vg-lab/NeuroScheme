@@ -58,6 +58,13 @@ namespace neuroscheme
       return _unselectedPen;
     }
 
+    static void queryChildrenSelectedState(
+      const shift::Entities& entities,
+      shift::RelationshipOneToN& relParentOf,
+      unsigned int entityGid,
+      bool& allChildrenSelected,
+      bool& noChildrenSelected );
+
   protected:
 
 
@@ -79,13 +86,6 @@ namespace neuroscheme
     shift::RelationshipOneToN& relParentOf,
     unsigned int entityGid,
     SelectedState state = SelectedState::SELECTED );
-
-    static void _queryChildrenSelectedState(
-      shift::Entities& entities,
-      shift::RelationshipOneToN& relParentOf,
-      unsigned int entityGid,
-      bool& allChildrenSelected,
-      bool& noChildrenSelected );
 
     static QPen _selectedPen;
     static QPen _partiallySelectedPen;

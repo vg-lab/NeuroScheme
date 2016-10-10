@@ -46,12 +46,17 @@ namespace neuroscheme
     static void clearActiveSelection( void );
     static void clearStoredSelections( void );
     static unsigned int activeSelectionSize( void );
-    
+
     static void storeActiveSelection( const std::string& selectionName );
     static void restoreStoredSelection( const std::string& selectionName );
     static unsigned int storedSelectionSize( const std::string& selectionName );
     static bool existsStoredSelection( const std::string& selectionName );
     static bool deleteStoredSelection( const std::string& selectionName );
+
+    static void selectableEntitiesIds(
+      std::vector< unsigned int >& selectableEntitiesIds );
+    static void setSelectionFromSelectableEntitiesIds(
+      const std::vector< unsigned int >& selectableEntitiesIds );
 
   protected:
 

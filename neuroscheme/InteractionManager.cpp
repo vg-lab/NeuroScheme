@@ -24,6 +24,7 @@
 #include "LayoutManager.h"
 #include "RepresentationCreatorManager.h"
 #include "SelectionManager.h"
+#include "ZeroEQManager.h"
 #include "domains/domains.h"
 
 namespace neuroscheme
@@ -326,7 +327,13 @@ namespace neuroscheme
           return;
         }
       }
-    }
+
+      // Publish selection
+      std::vector< unsigned int > ids;
+      SelectionManager::selectableEntitiesIds( ids );
+      ZeroEQManager::publishSelection( ids );
+
+    } // selection event
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
@@ -369,8 +376,8 @@ namespace neuroscheme
     }
 
     bool allChildrenSelected, noChildrenSelected;
-    _queryChildrenSelectedState( entities, relParentOf, parentId,
-                                 allChildrenSelected, noChildrenSelected );
+    queryChildrenSelectedState( entities, relParentOf, parentId,
+                                allChildrenSelected, noChildrenSelected );
     std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
     SelectedState state;
     if ( noChildrenSelected )
@@ -386,8 +393,8 @@ namespace neuroscheme
                                      parentId, state );
   }
 
-  void InteractionManager::_queryChildrenSelectedState(
-    shift::Entities& entities,
+  void InteractionManager::queryChildrenSelectedState(
+    const shift::Entities& entities,
     shift::RelationshipOneToN& relParentOf,
     unsigned int entityGid,
     bool& allChildrenSelected,
@@ -398,10 +405,10 @@ namespace neuroscheme
     const auto& childrenIds = relParentOf[ entityGid ];
     for ( auto const& childId : childrenIds )
     {
-      if ( SelectionManager::getSelectedState( entities[childId] ) !=
+      if ( SelectionManager::getSelectedState( entities.at( childId )) !=
            SelectedState::SELECTED )
         allChildrenSelected = false;
-      if ( SelectionManager::getSelectedState( entities[childId] ) ==
+      if ( SelectionManager::getSelectedState( entities.at( childId )) ==
            SelectedState::SELECTED )
         noChildrenSelected = false;
     }

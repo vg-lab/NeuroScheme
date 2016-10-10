@@ -39,6 +39,14 @@ namespace neuroscheme
       {
         return dynamic_cast< Neuron* >( entity );
       }
+
+      unsigned int selectableEntityId( shift::Entity* entity ) const
+      {
+        assert( dynamic_cast< Neuron* >( entity ));
+        return dynamic_cast< Neuron* >( entity )->
+          getProperty( "gid" ).value< uint >( );
+      }
+
     };
   }
 }

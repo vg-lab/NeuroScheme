@@ -35,6 +35,7 @@ set( NEUROSCHEME_SOURCES
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
   SelectionManager.cpp
+  ZeroEQManager.cpp
   )
 
 set( NEUROSCHEME_HEADERS
@@ -60,6 +61,7 @@ set( NEUROSCHEME_HEADERS
   reps/SelectableItem.h
   SelectedState.h
   SelectionManager.h
+  ZeroEQManager.cpp
   )
 
 include ( domains/cortex/CMakeLists.txt )
@@ -75,6 +77,16 @@ include_directories(
   ${PROJECT_BINARY_DIR}/neuroscheme
   ${SHIFT_GENERATED_DIR} )
 
+
+if ( TARGET ZeroEQ AND TARGET Lexis AND TARGET Servus )
+  list( APPEND NEUROSCHEME_LINK_LIBRARIES Lexis ZeroEQ Servus )
+endif( )
+
+if ( TARGET gmrvlex )
+  list( APPEND NEUROSCHEME_LINK_LIBRARIES gmrvlex )
+endif( )
+
+
 if (MSVC)
   add_definitions(-DNEUROSCHEME_STATIC)
   # if (WITH_NO_CONSOLE)
@@ -83,7 +95,7 @@ if (MSVC)
   # else()
   #   message(STATUS "neuroscheme with console")
   # endif()
-endif()
+endif( )
 
 
 set( NEUROSCHEME_INCLUDE_NAME neuroscheme )

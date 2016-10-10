@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2016 GMRV/URJC/UPM.
+ *
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
 #include "error.h"
 #include "InteractionManager.h"
 #include "LayoutManager.h"
@@ -107,21 +128,21 @@ namespace neuroscheme
           auto selectedState = SelectionManager::getSelectedState(
             *entities.begin( ));
 
-            // if ( selectedState == selectedStateSelectedState::SELECTED )
-              selectableItem->setSelected( selectedState );
+          // if ( selectedState == selectedStateSelectedState::SELECTED )
+          selectableItem->setSelected( selectedState );
 
 
-              auto shapeItem =
-                dynamic_cast< QAbstractGraphicsShapeItem* >( item );
-              if ( shapeItem )
-              {
-                if ( selectedState == SelectedState::SELECTED )
-                  shapeItem->setPen( InteractionManager::getSelectedPen( ));
-                else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
-                shapeItem->setPen(
-                  InteractionManager::getPartiallySelectedPen( ));
+          auto shapeItem =
+            dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+          if ( shapeItem )
+          {
+            if ( selectedState == SelectedState::SELECTED )
+              shapeItem->setPen( InteractionManager::getSelectedPen( ));
+            else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
+              shapeItem->setPen(
+                InteractionManager::getPartiallySelectedPen( ));
 
-              }
+          }
         }
         std::cout << &scene << " add item " << std::endl;
         scene.addItem( item );
@@ -170,8 +191,8 @@ namespace neuroscheme
     if ( numRows < 1 && reps.size( ) > 0 )
       numRows = 1;
 
-        unsigned int numColumns =
-          ceil( float( reps.size( )) / float( numRows ));
+    unsigned int numColumns =
+      ceil( float( reps.size( )) / float( numRows ));
 
     if ( numColumns < 1 && reps.size( ) > 0 )
       numColumns = 1;

@@ -144,10 +144,12 @@ namespace neuroscheme
       relChildOf[ miniCol2Id ] = colId2;
       relChildOf[ miniCol3Id ] = colId2;
 
+      unsigned int neuronGid = 0;
+
       for ( unsigned int i = 0; i < 5; i++ )
       {
         entity = new neuroscheme::Neuron(
-          i * 2,
+          neuronGid++,
           neuroscheme::Neuron::INTERNEURON,
           neuroscheme::Neuron::EXCITATORY,
           10.0f, 30.0f, 30.0f, 50.0f );
@@ -157,7 +159,7 @@ namespace neuroscheme
         relChildOf[ entityGid ] = miniCol0Id;
 
         entity = new neuroscheme::Neuron(
-          i * 2 + 1,
+          neuronGid++,
           neuroscheme::Neuron::PYRAMIDAL,
           neuroscheme::Neuron::INHIBITORY,
           70.0f, 60.0f, 20.0f, 30.0f );
@@ -171,7 +173,7 @@ namespace neuroscheme
       for ( unsigned int i = 0; i < 5; i++ )
       {
         entity = new neuroscheme::Neuron(
-          i * 2,
+          neuronGid++,
           neuroscheme::Neuron::INTERNEURON,
           neuroscheme::Neuron::EXCITATORY,
           10.0f, 30.0f, 30.0f, 50.0f );
@@ -181,7 +183,7 @@ namespace neuroscheme
         relChildOf[ entityGid ] = miniCol1Id;
 
         entity = new neuroscheme::Neuron(
-          i * 2 + 1,
+          neuronGid++,
           neuroscheme::Neuron::PYRAMIDAL,
           neuroscheme::Neuron::INHIBITORY,
           70.0f, 60.0f, 20.0f, 30.0f );
@@ -194,7 +196,7 @@ namespace neuroscheme
       for ( unsigned int i = 0; i < 5; i++ )
       {
         entity = new neuroscheme::Neuron(
-          i * 2,
+          neuronGid++,
           neuroscheme::Neuron::INTERNEURON,
           neuroscheme::Neuron::EXCITATORY,
           10.0f, 30.0f, 30.0f, 50.0f );
@@ -204,7 +206,7 @@ namespace neuroscheme
         relChildOf[ entityGid ] = miniCol2Id;
 
         entity = new neuroscheme::Neuron(
-          i * 2 + 1,
+          neuronGid++,
           neuroscheme::Neuron::PYRAMIDAL,
           neuroscheme::Neuron::INHIBITORY,
           70.0f, 60.0f, 20.0f, 30.0f );
@@ -218,7 +220,7 @@ namespace neuroscheme
       for ( unsigned int i = 0; i < 5; i++ )
       {
         entity = new neuroscheme::Neuron(
-          i * 2,
+          neuronGid++,
           neuroscheme::Neuron::INTERNEURON,
           neuroscheme::Neuron::EXCITATORY,
           10.0f, 30.0f, 30.0f, 50.0f );
@@ -228,7 +230,7 @@ namespace neuroscheme
         relChildOf[ entityGid ] = miniCol3Id;
 
         entity = new neuroscheme::Neuron(
-          i * 2 + 1,
+          neuronGid++,
           neuroscheme::Neuron::PYRAMIDAL,
           neuroscheme::Neuron::INHIBITORY,
           70.0f, 60.0f, 20.0f, 30.0f );
