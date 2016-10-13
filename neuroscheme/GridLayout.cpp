@@ -19,54 +19,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_LAYOUT__
-#define __NEUROSCHEME_LAYOUT__
-
-#include <QFrame>
-#include <QGridLayout>
-#include <QPushButton>
-#include <map>
-#include <iostream>
+#include "GridLayout.h"
 
 namespace neuroscheme
 {
 
-  class LayoutOptionsWidget : public QFrame
+  GridLayout::GridLayout( void )
+    : Layout( "Grid" )
   {
-  public:
-    LayoutOptionsWidget( void );
-    QGridLayout* layout( void );
-
-  protected:
-    QGridLayout* _layout;
-  };
-
-  class Layout
-  {
-  public:
-    Layout( const std::string& name_ = "unnamed" );
-    ~Layout( void );
-    const std::string& name( void );
-    LayoutOptionsWidget* optionsWidget( void );
-
-  protected:
-    LayoutOptionsWidget* _optionsWidget;
-    std::string _name;
-  };
-
-
-  class CameraBasedLayout : public Layout
-  {
-  public:
-    CameraBasedLayout( void );
-  };
-
-  class ScatterplotLayout : public Layout
-  {
-  public:
-    ScatterplotLayout( void );
-  };
+    //std::cout << "grid options widget" << _optionsWidget << std::endl;
+    _optionsWidget->layout( )->addWidget(
+      new QPushButton( "hola grid" ), 0, 0 );
+    _optionsWidget->layout( )->addWidget(
+      new QPushButton( "hola grid2" ), 1, 0 );
+  }
 
 }
-
-#endif

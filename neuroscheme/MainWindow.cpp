@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "DataManager.h"
 #include "DomainManager.h"
+#include "GridLayout.h"
 #include "LayoutManager.h"
 #include "PaneManager.h"
 #include "SelectionManager.h"
@@ -63,16 +64,18 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   auto canvas = new neuroscheme::Canvas( this );
   canvas->name = std::string( "canvas1");
+  canvas->activeLayoutIndex( 0 );
   canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
-  canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
+  // canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
   connect( canvas->layouts( ).layoutSelector( ),
            SIGNAL( currentIndexChanged( int )),
            canvas,
-           SLOT( layoutChanged( )));
+           SLOT( layoutChanged( int )));
+
 
   //_canvasses.push_back( canvas );
-  mainGridLayout->addWidget( canvas, 1, 1 );
+  mainGridLayout->addWidget( canvas, 0, 0 );
   neuroscheme::LayoutManager::setScene( &canvas->scene( ));
   neuroscheme::LayoutManager::displayItems(
     neuroscheme::DataManager::representations( ), true );
@@ -83,9 +86,15 @@ MainWindow::MainWindow( QWidget* parent_ )
   //_canvasses.push_back( new neuroscheme::Canvas( this ));
   canvas = new neuroscheme::Canvas( this );
   canvas->name = std::string( "canvas2");
-  canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
+  // canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
+  connect( canvas->layouts( ).layoutSelector( ),
+           SIGNAL( currentIndexChanged( int )),
+           canvas,
+           SLOT( layoutChanged( int )));
+  canvas->activeLayoutIndex( 0 );
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
-  mainGridLayout->addWidget( canvas, 1, 2 );
+  canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
+  mainGridLayout->addWidget( canvas, 0, 1 );
   neuroscheme::LayoutManager::setScene( &canvas->scene( ));
   neuroscheme::LayoutManager::displayItems(
     neuroscheme::DataManager::representations( ), true );
@@ -224,7 +233,7 @@ MainWindow::MainWindow( QWidget* parent_ )
 
 void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
 {
-  std::cout << "MainWindow::resizeEvent" << std::endl;
+  //std::cout << "MainWindow::resizeEvent" << std::endl;
   for ( const auto& _canvas : neuroscheme::PaneManager::panes( ))
   {
     const QSize viewerSize = _canvas->view( ).size( );
@@ -238,8 +247,8 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
     _canvas->view( ).setSceneRect( rectf );
     _canvas->view( ).setTransform( transf );
 
-    std::cout << _canvas->view( ).width( ) << " x "
-              << _canvas->view( ).height( ) << std::endl;
+    // std::cout << _canvas->view( ).width( ) << " x "
+    //           << _canvas->view( ).height( ) << std::endl;
 
     neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
     neuroscheme::LayoutManager::update( );

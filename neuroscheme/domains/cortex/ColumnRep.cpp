@@ -21,7 +21,7 @@ namespace neuroscheme
 
   QGraphicsItem* ColumnRep::item( QGraphicsScene* scene, bool create )
   {
-    std::cout << "--------------- Calling columnRep::item( )" << std::endl;
+//    std::cout << "--------------- Calling columnRep::item( )" << std::endl;
     if ( create && ( _items.find( scene ) == _items.end( )) &&
          !_items[ scene ] )
     {

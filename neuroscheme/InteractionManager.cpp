@@ -62,7 +62,7 @@ namespace neuroscheme
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
-      std::cout << "Selected item" << selectableItem->selected( ) << std::endl;
+      //std::cout << "Selected item" << selectableItem->selected( ) << std::endl;
       if ( selectableItem->selected( ))
         item->setPen( _hoverSelectedPen );
       else if ( selectableItem->partiallySelected( ))
@@ -108,7 +108,7 @@ namespace neuroscheme
     else
       _contextMenu->clear( );
 
-    std::cout << "InteractionManager::contextMenu" << std::endl;
+    //std::cout << "InteractionManager::contextMenu" << std::endl;
     {
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
@@ -120,32 +120,32 @@ namespace neuroscheme
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
           auto entityGid = ( *entities.begin( ))->entityGid( );
-          std::cout << "-- ShiFT gid: "
-                    << int( entityGid ) << std::endl;
+          // std::cout << "-- ShiFT gid: "
+          //           << int( entityGid ) << std::endl;
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
-          std::cout << " -- Parent of: ";
-          for ( auto const& child : children )
-            std::cout << child << " ";
-          std::cout << std::endl;;
+          // std::cout << " -- Parent of: ";
+          // for ( auto const& child : children )
+          //   std::cout << child << " ";
+          // std::cout << std::endl;;
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
                                 [ "isChildOf" ]->asOneToOne( ));
           const auto& parent = relChildOf[ entityGid ];
-          std::cout << " -- Child of: ";
-          std::cout << parent << std::endl;;
+          // std::cout << " -- Child of: ";
+          // std::cout << parent << std::endl;;
 
           const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
-          std::cout << " -- GrandChild of: ";
-          std::cout << grandParent << std::endl;;
+          // std::cout << " -- GrandChild of: ";
+          // std::cout << grandParent << std::endl;;
 
           const auto& parentSiblings = relParentOf[ grandParent ];
-          std::cout << " -- Parent of: ";
-          for ( auto const& parentSibling : parentSiblings )
-            std::cout << parentSibling << " ";
-          std::cout << std::endl;;
+          // std::cout << " -- Parent of: ";
+          // for ( auto const& parentSibling : parentSiblings )
+          //   std::cout << parentSibling << " ";
+          // std::cout << std::endl;;
 
           QAction* levelUp = nullptr;
           QAction* levelDown = nullptr;
@@ -160,7 +160,7 @@ namespace neuroscheme
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
             if ( levelUp && levelUp == selectedAction )
             {
-              std::cout << "up" << std::endl;
+              // std::cout << "up" << std::endl;
               if ( parentSiblings.size( ) > 0 )
               for ( const auto& parentSibling : parentSiblings )
                 targetEntities[parentSibling] =
@@ -173,7 +173,7 @@ namespace neuroscheme
             }
             if ( levelDown && levelDown == selectedAction )
             {
-              std::cout << "down" << std::endl;
+              //std::cout << "down" << std::endl;
               for ( const auto& child : children )
                 targetEntities[child] =
                   DataManager::entities( )[child];
@@ -215,9 +215,9 @@ namespace neuroscheme
       if ( entities.size( ) < 1 )
         Log::log( NS_LOG_HEADER + "neuron item without entity",
                   LOG_LEVEL_ERROR );
-      std::cout << "--------------"
-                << (int) ( *entities.begin( ))->getProperty( "gid" ).
-        value< unsigned int >( ) << std::endl;
+      //std::cout << "--------------"
+        //         << (int) ( *entities.begin( ))->getProperty( "gid" ).
+        // value< unsigned int >( ) << std::endl;
       // // QAction* action1 =
       // _contextMenu->addAction( QString( "Show minicolumns" ));
       // // QAction* action2 =
@@ -277,8 +277,8 @@ namespace neuroscheme
 
           for ( const auto& entity : entities )
           {
-            std::cout << "-- ShiFT gid: "
-                      << int( entity->entityGid( )) << std::endl;
+            // std::cout << "-- ShiFT gid: "
+            //           << int( entity->entityGid( )) << std::endl;
 
             if ( selectableItem->selected( ))
             {
@@ -343,10 +343,10 @@ namespace neuroscheme
     SelectedState state )
   {
     const auto& childrenIds = relParentOf[ entityGid ];
-    std::cout << " -- Parent of: ";
+    //std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
-      std::cout << childId << " ";
+      //  std::cout << childId << " ";
       SelectionManager::setSelectedState(
         entities[childId], state );
       _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
@@ -367,7 +367,7 @@ namespace neuroscheme
 
     if ( childState == SelectedState::PARTIALLY_SELECTED )
     {
-      std::cout << "<>Partially selected" << std::endl;
+      //std::cout << "<>Partially selected" << std::endl;
       SelectionManager::setSelectedState(
         entities[parentId], childState );
       _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
@@ -378,7 +378,7 @@ namespace neuroscheme
     bool allChildrenSelected, noChildrenSelected;
     queryChildrenSelectedState( entities, relParentOf, parentId,
                                 allChildrenSelected, noChildrenSelected );
-    std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
+    //std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
     SelectedState state;
     if ( noChildrenSelected )
       state = SelectedState::UNSELECTED;

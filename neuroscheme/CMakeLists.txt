@@ -24,7 +24,9 @@ set( NEUROSCHEME_SOURCES
   Color.cpp
   DataManager.cpp
   DomainManager.cpp
+  GridLayout.cpp
   InteractionManager.cpp
+  Layout.cpp
   LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
@@ -46,7 +48,9 @@ set( NEUROSCHEME_HEADERS
   DataManager.h
   DomainManager.cpp
   error.h
+  GridLayout.h
   InteractionManager.h
+  Layout.h
   LayoutManager.h
   Log.h
   MainWindow.h

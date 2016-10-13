@@ -22,6 +22,8 @@
 #include "PaneManager.h"
 #include <assert.h>
 #include <QLabel>
+#include <QPushButton>
+#include <QComboBox>
 
 namespace neuroscheme
 {
@@ -37,38 +39,87 @@ namespace neuroscheme
   void PaneManager::activePane( Canvas* pane )
   {
     _activePane = pane;
-    std::cout << "Active pane" << pane << std::endl;
     assert( _activePane->layouts( ).layoutSelector( ));
+
     if ( _layout )
     {
-      std::cout << "Adding selector" << std::endl;
-      auto item = _layout->itemAtPosition( 1, 1 );
-      if ( item )
-      {
-        _layout->removeWidget( item->widget( ));
-        //_layout->replaceWidget( item->widget( ), _activePane->layouts( ).layoutSelector( ));
-      }
-//      else
-        _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 1 );
 
-      item = _layout->itemAtPosition( 2, 1 );
+      auto item = _layout->itemAtPosition( 0, 0 );
       if ( item )
       {
-        std::cout << "---------------removing" << std::endl;
-        //_layout->removeWidget( item->widget( ));
-        _layout->replaceWidget( item->widget( ), new QLabel( _activePane->name.c_str( )));
-        delete item->widget( );
+        auto widget = item->widget( );
+        if ( widget )
+        {
+          auto index = _layout->indexOf( widget );
+          if ( index != -1 )
+          {
+            _layout->takeAt( index );
+            widget->hide( );
+          }
+        }
       }
-      else
-        _layout->addWidget( new QLabel( _activePane->name.c_str( )), 2, 1 );
+      _layout->addWidget( new QLabel( _activePane->name.c_str( )), 0, 0 );
+
+
+      item = _layout->itemAtPosition( 1, 0 );
+      if ( item )
+      {
+        auto widget = item->widget( );
+        if ( widget )
+        {
+          auto index = _layout->indexOf( widget );
+          if ( index != -1 )
+          {
+            _layout->takeAt( index );
+            widget->hide( );
+          }
+        }
+      }
+      _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 0 );
+      _activePane->layouts( ).layoutSelector( )->show( );
+
+
+      _activePane->layoutChanged( _activePane->activeLayoutIndex( ));
+
+      //std::cout << _activePane->layouts( ).layoutSelector( ) << " " << _activePane << std::endl;
     }
+    // if ( _layout )
+    // {
+    //   auto item = _layout->itemAtPosition( 0, 0 );
+    //   if ( item )
+    //   {
+    //     std::cout << "Replacing and deleting" << item->widget( ) << std::endl;
+    //     //_layout->removeWidget( item->widget( ));
+    //     _layout->replaceWidget( item->widget( ),
+    //                             new QLabel( _activePane->name.c_str( )));
+    //     assert( dynamic_cast< QPushButton* >( item->widget( )));
+    //     delete item->widget( );
+    //   }
+    //   else
+    //     _layout->addWidget( new QLabel( _activePane->name.c_str( )), 1, 0 );
+
+    //   std::cout << "Adding selector" << std::endl;
+    //   item = _layout->itemAtPosition( 1, 0 );
+    //   if ( item )
+    //   {
+    //     //_layout->removeWidget( item->widget( ));
+    //     assert( dynamic_cast< QComboBox* >( item->widget( )));
+    //     _layout->replaceWidget( item->widget( ),
+    //                             _activePane->layouts( ).layoutSelector( ));
+    //     std::cout << "Replacing" << item->widget( ) << " with"
+    //               << _activePane->layouts( ).layoutSelector( ) << std::endl;
+    //   }
+    //   else
+    //     _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 0 );
+
+    // }
   }
 
   PaneManager::TPanes& PaneManager::panes( void )
   {
     return _panes;
   }
-  
+
   QGridLayout* PaneManager::layout( void )
   {
     return _layout;

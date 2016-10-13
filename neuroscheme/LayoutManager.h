@@ -39,13 +39,13 @@ namespace neuroscheme
 
     static void update( void )
     {
-      std::cout << "----> update items in scene " << _scene << std::endl;
+//      std::cout << "----> update items in scene " << _scene << std::endl;
       displayItems( _representations[ _scene ] );
     }
 
     static void updateAllScenes( void )
     {
-      std::cout << "----> update items in scene " << _scene << std::endl;
+      //    std::cout << "----> update items in scene " << _scene << std::endl;
       for ( const auto& scene : _scenes )
       {
         _scene = scene;
@@ -62,7 +62,7 @@ namespace neuroscheme
 
     static void updateAllScenesSelection( void )
     {
-      std::cout << "----> update items in scene " << _scene << std::endl;
+      //std::cout << "----> update items in scene " << _scene << std::endl;
       for ( const auto& scene : _scenes )
       {
         _scene = scene;

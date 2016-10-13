@@ -1,4 +1,5 @@
 #include "Canvas.h"
+#include "Log.h"
 #include "PaneManager.h"
 #include <QHBoxLayout>
 
@@ -35,8 +36,9 @@ namespace neuroscheme
   }
 
   Canvas::Canvas( QWidget * parent_ )
-    : _graphicsView( new GraphicsView( parent_ )),
-      _graphicsScene( new GraphicsScene )
+    : _graphicsView( new GraphicsView( parent_ ))
+    , _graphicsScene( new GraphicsScene )
+    , _activeLayoutIndex( -1 )
   {
     _graphicsView->setScene(_graphicsScene);
     _graphicsView->setInteractive( true );
@@ -102,6 +104,59 @@ namespace neuroscheme
   Layouts& Canvas::layouts( void )
   {
     return _layouts;
+  }
+
+  int Canvas::activeLayoutIndex( void )
+  {
+    return _activeLayoutIndex;
+  }
+  void Canvas::activeLayoutIndex( int activeLayoutIndex_ )
+  {
+    _activeLayoutIndex = activeLayoutIndex_;
+  }
+
+  void Canvas::layoutChanged( int index )
+  {
+    if ( index == -1 )
+    {
+      Log::log( NS_LOG_HEADER +
+                " trying to change to a layout with -1 index",
+                LOG_LEVEL_WARNING );
+
+      return;
+    }
+    // std::cout << "layout changed in " << this
+    //           << " to index " << index << std::endl;
+    if ( _layouts.getLayout( index ))
+    {
+      _activeLayoutIndex = index;
+      // std::cout << _layouts.getLayout( index )->name( ) << std::endl;
+      _layouts.getLayout( index )->optionsWidget( );
+      auto layout_ = PaneManager::layout( );
+      if ( layout_ )
+      {
+        auto item = layout_->itemAtPosition( 2, 0 );
+        if ( item )
+        {
+          auto widget = item->widget( );
+          if ( widget )
+          {
+            auto index_ = layout_->indexOf( widget );
+            if ( index_ != -1 )
+            {
+              layout_->takeAt( index_ );
+              widget->hide( );
+            }
+          }
+        }
+
+        layout_->addWidget(
+          _layouts.getLayout( index )->optionsWidget( ),
+          2, 0 );
+        _layouts.getLayout( index )->optionsWidget( )->show( );
+        // std::cout << "Adding options" << std::endl;
+      }
+    }
   }
 
 } // namespace neuroscheme

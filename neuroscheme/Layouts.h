@@ -19,53 +19,50 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_LAYOUT__
-#define __NEUROSCHEME_LAYOUT__
+#ifndef __NEUROSCHEME_LAYOUTS__
+#define __NEUROSCHEME_LAYOUTS__
 
-#include <QFrame>
-#include <QGridLayout>
-#include <QPushButton>
+#include "Layout.h"
+#include <QComboBox>
 #include <map>
-#include <iostream>
 
 namespace neuroscheme
 {
 
-  class LayoutOptionsWidget : public QFrame
+  class Layouts
   {
   public:
-    LayoutOptionsWidget( void );
-    QGridLayout* layout( void );
+    Layouts( )
+      : _nextLayoutIdx( 0 )
+      , _layoutSelector( new QComboBox )
+    {
+    }
+    void addLayout( Layout* layout )
+    {
+      _layouts[ _nextLayoutIdx ] = layout;
+      _layoutSelector->insertItem( _nextLayoutIdx,
+                                   QString( layout->name( ).c_str( )));
+      ++_nextLayoutIdx;
+    }
+
+    QComboBox* layoutSelector( void )
+    {
+      return _layoutSelector;
+    }
+
+    Layout* getLayout( unsigned int index )
+    {
+      if ( _layouts.find( index ) == _layouts.end( ))
+        return nullptr;
+      return _layouts[ index ];
+    }
 
   protected:
-    QGridLayout* _layout;
+    unsigned int _nextLayoutIdx;
+    std::map< unsigned int, Layout* > _layouts;
+    QComboBox* _layoutSelector;
   };
 
-  class Layout
-  {
-  public:
-    Layout( const std::string& name_ = "unnamed" );
-    ~Layout( void );
-    const std::string& name( void );
-    LayoutOptionsWidget* optionsWidget( void );
-
-  protected:
-    LayoutOptionsWidget* _optionsWidget;
-    std::string _name;
-  };
-
-
-  class CameraBasedLayout : public Layout
-  {
-  public:
-    CameraBasedLayout( void );
-  };
-
-  class ScatterplotLayout : public Layout
-  {
-  public:
-    ScatterplotLayout( void );
-  };
 
 }
 
