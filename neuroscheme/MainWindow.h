@@ -64,11 +64,15 @@ public:
 
 public slots:
 
+  // Stored selections solts
   void updateStoredSelectionsDock( void );
   void sortStoredSelectionsTable( int column );
   void storeSelection( void );
   void deleteStoredSelection( void );
   void restoreSelection( void );
+
+  // Layouts slots
+  void updateLayoutsDock( void );
 
 protected:
 
@@ -76,10 +80,11 @@ protected:
   QString _tableColumnToString( TTableColumns column );
 
   StoredSelections _storedSelections;
+  QDockWidget* _layoutsDock;
 
 private:
 
-  std::vector< neuroscheme::Canvas* > _canvasses;
+  //std::vector< neuroscheme::Canvas* > _canvasses;
   Ui::MainWindow* _ui;
 
 }; // class MainWindow

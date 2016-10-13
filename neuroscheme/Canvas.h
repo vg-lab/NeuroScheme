@@ -1,9 +1,11 @@
 #ifndef __NEUROSCHEME__CANVAS__
 #define __NEUROSCHEME__CANVAS__
 
+#include "Layout.h"
 #include <QWidget>
 #include <QGraphicsView>
 #include <QMouseEvent>
+#include <iostream>
 
 namespace neuroscheme
 {
@@ -26,8 +28,9 @@ namespace neuroscheme
   }; // class GraphicsScene
 
 
-  class Canvas : public QWidget
+  class Canvas : public QFrame
   {
+    Q_OBJECT
   public:
     Canvas( QWidget* parent = 0 );
     ~Canvas( void );
@@ -38,10 +41,24 @@ namespace neuroscheme
     const GraphicsView& view( void ) const;
     GraphicsView& view( void );
 
-  protected:
+    void enterEvent( QEvent* /* event */ );
+    void leaveEvent( QEvent* /* event */ );
+
+    const Layouts& layouts( void ) const;
+    Layouts& layouts( void );
+
+    std::string name;
+protected:
     GraphicsView* _graphicsView;
     GraphicsScene* _graphicsScene;
 
+    Layouts _layouts;
+
+  public slots:
+    void layoutChanged( void )
+    {
+      std::cout << "layout changed in " << this << std::endl;
+    }
   }; // class Canvas
 
 

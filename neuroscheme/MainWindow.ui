@@ -54,7 +54,7 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionSearchAndFilter"/>
+    <addaction name="actionLayouts"/>
     <addaction name="actionStoredSelections"/>
     <addaction name="separator"/>
     <addaction name="actionLoadMorphologies"/>
@@ -108,7 +108,7 @@
    <addaction name="separator"/>
    <addaction name="actionStreamDisplayCluster"/>
    <addaction name="separator"/>
-   <addaction name="actionSearchAndFilter"/>
+   <addaction name="actionLayouts"/>
    <addaction name="actionStoredSelections"/>
   </widget>
   <action name="actionClearSelection">
@@ -272,7 +272,7 @@
     <string>Display Cluster host address</string>
    </property>
   </action>
-  <action name="actionSearchAndFilter">
+  <action name="actionLayouts">
    <property name="checkable">
     <bool>true</bool>
    </property>

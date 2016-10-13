@@ -23,6 +23,7 @@
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "LayoutManager.h"
+#include "PaneManager.h"
 #include "SelectionManager.h"
 #include "Log.h"
 
@@ -31,6 +32,7 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QDateTime>
+#include <QLabel>
 
 MainWindow::MainWindow( QWidget* parent_ )
   : QMainWindow( parent_ )
@@ -59,19 +61,36 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   neuroscheme::DataManager::loadData( );
 
-  _canvasses.push_back( new neuroscheme::Canvas( this ));
-  mainGridLayout->addWidget( _canvasses[0], 1, 1 );
-  neuroscheme::LayoutManager::setScene( &_canvasses[0]->scene( ));
-  neuroscheme::LayoutManager::displayItems(
-    neuroscheme::DataManager::representations( ), true );
-  neuroscheme::LayoutManager::scenes( ).insert( &_canvasses[0]->scene( ));
+  auto canvas = new neuroscheme::Canvas( this );
+  canvas->name = std::string( "canvas1");
+  canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
+  canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
+  canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
+  connect( canvas->layouts( ).layoutSelector( ),
+           SIGNAL( currentIndexChanged( int )),
+           canvas,
+           SLOT( layoutChanged( )));
 
-  _canvasses.push_back( new neuroscheme::Canvas( this ));
-  mainGridLayout->addWidget( _canvasses[1], 1, 2 );
-  neuroscheme::LayoutManager::setScene( &_canvasses[1]->scene( ));
+  //_canvasses.push_back( canvas );
+  mainGridLayout->addWidget( canvas, 1, 1 );
+  neuroscheme::LayoutManager::setScene( &canvas->scene( ));
   neuroscheme::LayoutManager::displayItems(
     neuroscheme::DataManager::representations( ), true );
-  neuroscheme::LayoutManager::scenes( ).insert( &_canvasses[1]->scene( ));
+  neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
+  neuroscheme::PaneManager::panes( ).insert( canvas );
+  neuroscheme::PaneManager::activePane( canvas );
+
+  //_canvasses.push_back( new neuroscheme::Canvas( this ));
+  canvas = new neuroscheme::Canvas( this );
+  canvas->name = std::string( "canvas2");
+  canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
+  canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
+  mainGridLayout->addWidget( canvas, 1, 2 );
+  neuroscheme::LayoutManager::setScene( &canvas->scene( ));
+  neuroscheme::LayoutManager::displayItems(
+    neuroscheme::DataManager::representations( ), true );
+  neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
+  neuroscheme::PaneManager::panes( ).insert( canvas );
 
   neuroscheme::DomainManager::setActiveDomain(
     new neuroscheme::cortex::Domain );
@@ -82,6 +101,39 @@ MainWindow::MainWindow( QWidget* parent_ )
   unsigned int halfSceneHeight =
     ( this->centralWidget( )->height( ) - tabMargin) / 3;
 
+
+  // Layouts dock
+  {
+    _layoutsDock = new QDockWidget( );
+    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
+                         _layoutsDock, Qt::Vertical);
+    _layoutsDock->setMinimumSize( tabWidth,
+                                  halfSceneHeight - tabMargin / 3);
+    _layoutsDock->setSizePolicy( QSizePolicy::MinimumExpanding,
+                                 QSizePolicy::Expanding );
+
+    _layoutsDock->setFeatures( QDockWidget::DockWidgetClosable |
+                               QDockWidget::DockWidgetMovable |
+                               QDockWidget::DockWidgetFloatable );
+
+    _layoutsDock->setWindowTitle( QString( "Layouts" ));
+    _layoutsDock->close( );
+    _ui->actionLayouts->setChecked( false );
+    connect( _layoutsDock->toggleViewAction( ), SIGNAL( toggled( bool )),
+             _ui->actionLayouts, SLOT( setChecked( bool )));
+    connect( _ui->actionLayouts, SIGNAL( triggered( )),
+             this, SLOT( updateLayoutsDock( )));
+
+    QGridLayout* layoutsConfigLayout = new QGridLayout( );
+    layoutsConfigLayout->setAlignment( Qt::AlignTop );
+    _layoutsDock->setLayout( layoutsConfigLayout );
+    neuroscheme::PaneManager::layout( layoutsConfigLayout );
+    //layoutsConfigLayout->addWidget( new QLabel( "hola" ), 0, 0 );
+
+    QWidget* dockWidget = new QWidget( );
+    dockWidget->setLayout( layoutsConfigLayout );
+    _layoutsDock->setWidget( dockWidget );
+  }
 
   // Stored selections dock
   {
@@ -173,7 +225,7 @@ MainWindow::MainWindow( QWidget* parent_ )
 void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
 {
   std::cout << "MainWindow::resizeEvent" << std::endl;
-  for ( const auto& _canvas : _canvasses )
+  for ( const auto& _canvas : neuroscheme::PaneManager::panes( ))
   {
     const QSize viewerSize = _canvas->view( ).size( );
     const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
@@ -200,7 +252,7 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
 MainWindow::~MainWindow( void )
 {
   delete _ui;
-  for ( const auto& _canvas : _canvasses )
+  for ( const auto& _canvas :  neuroscheme::PaneManager::panes( ))
     delete _canvas;
 }
 
@@ -225,6 +277,16 @@ void MainWindow::updateStoredSelectionsDock( void )
     _storedSelections.dock->show( );
   else
     _storedSelections.dock->close( );
+
+  resizeEvent( nullptr );
+}
+
+void MainWindow::updateLayoutsDock( void )
+{
+  if ( _ui->actionLayouts->isChecked( ))
+    _layoutsDock->show( );
+  else
+    _layoutsDock->close( );
 
   resizeEvent( nullptr );
 }

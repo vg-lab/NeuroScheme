@@ -31,6 +31,7 @@ set( NEUROSCHEME_SOURCES
   mappers/ColorMapper.cpp
   mappers/VariableMapper.cpp
   neuroScheme.cpp
+  PaneManager.cpp
   RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
@@ -51,6 +52,7 @@ set( NEUROSCHEME_HEADERS
   MainWindow.h
   mappers/ColorMapper.h
   mappers/VariableMapper.h
+  PaneManager.h
   RepresentationCreatorManager.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h

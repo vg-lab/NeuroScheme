@@ -1,4 +1,5 @@
 #include "Canvas.h"
+#include "PaneManager.h"
 #include <QHBoxLayout>
 
 namespace neuroscheme
@@ -51,6 +52,7 @@ namespace neuroscheme
     layout_->addWidget( _graphicsView );
     this->setLayout( layout_ );
 
+    this->leaveEvent( nullptr );
   }
 
   Canvas::~Canvas( void )
@@ -77,6 +79,29 @@ namespace neuroscheme
   GraphicsView& Canvas::view( void )
   {
     return *_graphicsView;
+  }
+
+  void Canvas::enterEvent( QEvent*  )
+  {
+    neuroscheme::PaneManager::activePane( this );
+    this->setObjectName("pane");
+    this->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
+
+  }
+
+  void Canvas::leaveEvent( QEvent*  )
+  {
+    this->setObjectName("pane");
+    this->setStyleSheet("#pane { border: 3px solid rgba( 0,0,0,0%); }");
+  }
+
+  const Layouts& Canvas::layouts( void ) const
+  {
+    return _layouts;
+  }
+  Layouts& Canvas::layouts( void )
+  {
+    return _layouts;
   }
 
 } // namespace neuroscheme
