@@ -44,10 +44,12 @@ namespace neuroscheme
     _graphicsView->setRenderHints( QPainter::Antialiasing |
                                    QPainter::HighQualityAntialiasing );
     _graphicsView->setDragMode( QGraphicsView::ScrollHandDrag );
+    this->setSizePolicy( QSizePolicy::MinimumExpanding,
+                         QSizePolicy::MinimumExpanding );
 
-    QHBoxLayout* layout = new QHBoxLayout;
-    layout->addWidget( _graphicsView );
-    this->setLayout( layout );
+    QHBoxLayout* layout_ = new QHBoxLayout;
+    layout_->addWidget( _graphicsView );
+    this->setLayout( layout_ );
 
   }
 

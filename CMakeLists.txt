@@ -33,6 +33,12 @@ if ( NEUROSCHEME_WITH_LOGGING )
   add_definitions( -DNEUROSCHEME_WITH_LOGGING )
 endif( )
 
+if ( NEUROSCHEME_OPTIONALS_AS_REQUIRED )
+  set( NEUROSCHEME_OPTS_FIND_ARGS "REQUIRED" )
+else()
+  set( NEUROSCHEME_OPTS_FIND_ARGS "" )
+endif()
+
 
 include( GitExternal )
 
@@ -44,11 +50,16 @@ set( COMMON_PROJECT_DOMAIN gmrv.es )
 
 include( Common )
 
+common_find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 common_find_package( ShiFT REQUIRED )
-common_find_package( Qt5Widgets SYSTEM )
+common_find_package( Qt5Widgets SYSTEM REQUIRED )
+common_find_package( Lexis ${NEUROSCHEME_OPTS_FIND_ARGS} )
+common_find_package( ZeroEQ ${NEUROSCHEME_OPTS_FIND_ARGS} )
+common_find_package( Servus ${NEUROSCHEME_OPTS_FIND_ARGS} )
+common_find_package( gmrvlex ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package_post( )
 
-list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT )
+list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT Qt5Widgets )
 
 add_subdirectory( neuroscheme )
 

@@ -22,6 +22,8 @@
 #ifndef __NEUROSCHEME__SELECTABLE_ITEM__
 #define __NEUROSCHEME__SELECTABLE_ITEM__
 
+#include "../SelectedState.h"
+
 namespace neuroscheme
 {
 
@@ -30,20 +32,38 @@ namespace neuroscheme
 
   public:
 
-    SelectableItem( bool selected_ = false )
+    SelectableItem( SelectedState selected_ = SelectedState::UNSELECTED )
       : _selected( selected_ ) { }
 
     virtual ~SelectableItem( void ) { }
 
-    void select( void ) { _selected = true; }
-    void unselect( void ) { _selected = false; }
-    void setSelected( bool selected_ ) { _selected = selected_; }
-    void toggleSelected( void ) { _selected = !_selected; }
-    bool selected( void ) const { return _selected; };
+    void select( void ) { _selected = SelectedState::SELECTED; }
+    void unselect( void ) { _selected = SelectedState::UNSELECTED; }
+    void setSelected( SelectedState selected_ = SelectedState::SELECTED )
+    {
+      _selected = selected_;
+    }
+    void toggleSelected( void )
+    {
+      if ( _selected == SelectedState::SELECTED )
+        _selected = SelectedState::UNSELECTED;
+      else if ( _selected == SelectedState::UNSELECTED )
+        _selected = SelectedState::SELECTED;
+    }
+
+    bool selected( void ) const
+    {
+      return _selected == SelectedState::SELECTED;
+    };
+
+    bool partiallySelected( void ) const
+    {
+      return _selected == SelectedState::PARTIALLY_SELECTED;
+    };
 
   protected:
 
-    bool _selected;
+    SelectedState _selected;
 
   };
 

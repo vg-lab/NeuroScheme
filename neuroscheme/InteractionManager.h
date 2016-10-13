@@ -23,6 +23,7 @@
 #define __NEUROSCHEME__INTERACTION_MANAGER__
 
 #include "reps/SelectableItem.h"
+#include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
@@ -46,11 +47,51 @@ namespace neuroscheme
     static void mousePressEvent( QAbstractGraphicsShapeItem* item,
                                  QGraphicsSceneMouseEvent* event );
 
-    protected:
+
+    static const QPen& getSelectedPen( ) { return _selectedPen; }
+    static const QPen& getPartiallySelectedPen( )
+    {
+      return _partiallySelectedPen;
+    }
+    static const QPen& getUnselectedPen( )
+    {
+      return _unselectedPen;
+    }
+
+    static void queryChildrenSelectedState(
+      const shift::Entities& entities,
+      shift::RelationshipOneToN& relParentOf,
+      unsigned int entityGid,
+      bool& allChildrenSelected,
+      bool& noChildrenSelected );
+
+  protected:
+
+
+  // void InteractionManager::_PropagateSelectedToChilds(
+  //   shift::Entities& entities,
+  //   shift::RelationshipOneToN& relParentOf,
+  //   unsigned int entityGid,
+  //   SelectedState state
+
+    static void _propagateSelectedStateToChilds(
+      shift::Entities& entities,
+      shift::RelationshipOneToN& relParentOf,
+      unsigned int entityGid,
+      SelectedState state );
+
+    static void _propagateSelectedStateToParent(
+    shift::Entities& entities,
+    shift::RelationshipOneToOne& relChildOf,
+    shift::RelationshipOneToN& relParentOf,
+    unsigned int entityGid,
+    SelectedState state = SelectedState::SELECTED );
 
     static QPen _selectedPen;
+    static QPen _partiallySelectedPen;
     static QPen _unselectedPen;
     static QPen _hoverSelectedPen;
+    static QPen _hoverPartiallySelectedPen;
     static QPen _hoverUnselectedPen;
 
     static QMenu* _contextMenu;
