@@ -24,6 +24,8 @@
 
 #include <shift/shift.h>
 #include "QGraphicsItemRepresentation.h"
+#include <QPropertyAnimation>
+
 namespace neuroscheme
 {
 
@@ -51,9 +53,13 @@ namespace neuroscheme
       _parentRep = parentRep_;
     }
 
+    QPropertyAnimation& posAnim( ) { return _posAnim; }
+    QPropertyAnimation& scaleAnim( ) { return _scaleAnim; }
   protected:
 
     shift::Representation* _parentRep;
+    QPropertyAnimation _posAnim;
+    QPropertyAnimation _scaleAnim;
 
   };
 

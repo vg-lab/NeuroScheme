@@ -21,6 +21,7 @@
  */
 #include "GridLayout.h"
 #include "reps/Item.h"
+#include "reps/QGraphicsItemRepresentation.h"
 #include "error.h"
 #include "RepresentationCreatorManager.h"
 
@@ -37,61 +38,25 @@ namespace neuroscheme
       new QPushButton( "hola grid2" ), 1, 0 );
   }
 
-  void GridLayout::displayItems( QGraphicsScene* _scene,
-                                 const shift::Representations& reps )
+  void GridLayout::_arrangeItems( QGraphicsScene* scene_,
+                                  const shift::Representations& reps,
+                                  bool animate )
   {
-    if ( !_scene ) return;
-    auto& scene = *_scene;
+    // Layout::displayItems( scene_, reps );
 
-    _representations = reps;
-    if ( reps.empty( ))
-      return;
+    // if ( !scene_ ) return;
+    // auto& scene = *scene_;
 
-    auto clearFirst = true;
-    if ( clearFirst )
-    {
-      // Remove top items without destroying them
-      QList< QGraphicsItem* > items_ = scene.items( );
-      for ( auto item = items_.begin( ); item != items_.end( ); ++item )
-      {
-        auto item_ = dynamic_cast< Item* >( *item );
-        if ( item_ && item_->parentRep( ))
-          scene.removeItem( *item );
-      }
+    // _representations = reps;
+    // if ( reps.empty( ))
+    //   return;
 
-      // Remove the rest
-      scene.clear( );
-    }
+    // _clearScene( scene_ );
+    // _drawCorners( scene_ );
+    // _addRepresentations( scene_, reps );
 
-
-    NEUROSCHEME_DEBUG_CHECK( scene.views( ).size( ) != 0,
-                             "Scene with no view" );
-    QGraphicsView* gv = scene.views( )[0];
-
-#define SHOW_SCENE_CORNERS
-#ifdef SHOW_SCENE_CORNERS
-    {
-      // std::cout << gv->width( ) << " x " << gv->height( ) << std::endl;
-      QGraphicsEllipseItem* center =
-        new QGraphicsEllipseItem( -10, -10, 20, 20 );
-      scene.addItem( center );
-      QGraphicsEllipseItem* tl =
-        new QGraphicsEllipseItem( -gv->width( ) / 2 - 10,
-                                  -gv->height( ) / 2 - 10,
-                                  20, 20 );
-
-      scene.addItem( tl );
-      QGraphicsEllipseItem* br =
-        new QGraphicsEllipseItem( gv->width( ) / 2 - 10,
-                                  gv->height( ) / 2 - 10,
-                                  20, 20 );
-
-      scene.addItem( br );
-    }
-#endif
-
+    
     unsigned int maxItemWidth = 0, maxItemHeight = 0;
-
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -103,43 +68,8 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( &scene );
-        // std::cout << "new item " << item << std::endl;
-
-        // Find out if its entity is selected
-        // and if so set its pen
-        const auto& repsToEntities =
-          RepresentationCreatorManager::repsToEntities( );
-        const auto entities = repsToEntities.at( representation );
-        if ( entities.size( ) < 1 )
-          Log::log( NS_LOG_HEADER +
-                    "No entities associated to representation",
-                    LOG_LEVEL_ERROR );
-
-        auto selectableItem = dynamic_cast< SelectableItem* >( item );
-        if ( selectableItem )
-        {
-          auto selectedState = SelectionManager::getSelectedState(
-            *entities.begin( ));
-
-          // if ( selectedState == selectedStateSelectedState::SELECTED )
-          selectableItem->setSelected( selectedState );
-
-
-          auto shapeItem =
-            dynamic_cast< QAbstractGraphicsShapeItem* >( item );
-          if ( shapeItem )
-          {
-            if ( selectedState == SelectedState::SELECTED )
-              shapeItem->setPen( InteractionManager::getSelectedPen( ));
-            else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
-              shapeItem->setPen(
-                InteractionManager::getPartiallySelectedPen( ));
-
-          }
-        }
-        //std::cout << &scene << " add item " << std::endl;
-        scene.addItem( item );
+        auto item = graphicsItemRep->item( scene_ );
+        scene_->addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
         if ( rect.width( ) > maxItemWidth )
@@ -149,7 +79,7 @@ namespace neuroscheme
           maxItemHeight = rect.height( );
       }
     }
-
+    
     bool forceScale = false;
     float forcedScale = 1.0f;
     const unsigned int marginX = 20;
@@ -162,16 +92,13 @@ namespace neuroscheme
     unsigned int deltaX = scalePaddingX * maxItemWidth + fixedPaddingX;
     unsigned int deltaY = scalePaddingY * maxItemHeight + fixedPaddingY;
 
-    // std::cout << "maxItemWidth = " << maxItemWidth << std::endl;
-    // std::cout << "maxItemHeight = " << maxItemHeight << std::endl;
-    // std::cout << "deltaX = " << deltaX << std::endl;
-    // std::cout << "deltaY = " << deltaY << std::endl;
     int _x = 0;
     int _y = 0;
 
     float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
     float canvasAspectRatio;
 
+    QGraphicsView* gv = scene_->views( )[0];
     if ( gv->width( ) > gv->height( ))
       canvasAspectRatio = float( gv->width( )) / float( gv->height( ));
     else
@@ -221,18 +148,40 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( &scene );
+        auto graphicsItem = graphicsItemRep->item( scene_ );
+        auto item = dynamic_cast< Item* >( graphicsItem );
+        auto obj = dynamic_cast< QObject* >( graphicsItem );
         if ( item )
         {
-          QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
+          QRectF rect = graphicsItem->childrenBoundingRect( ) |
+            graphicsItem->boundingRect( );
           qreal posX = _x * deltaX * scale - gv->width( ) / 2 +
             leftMargin - scale * rect.center( ).x( );
           qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
             topMargin - scale * rect.center( ).y( );
           qreal scale_ = forceScale ? forcedScale : scale;
 
-          item->setPos( posX, posY );
-          item->setScale( scale_ );
+          if ( obj && animate )
+          {
+            #define ANIM_DURATION 1200
+            item->posAnim( ).setTargetObject( obj );
+            item->posAnim( ).setPropertyName( "pos" );
+            item->scaleAnim( ).setTargetObject( obj );
+            item->scaleAnim( ).setPropertyName( "scale" );
+            item->posAnim( ).setDuration( ANIM_DURATION );
+            item->scaleAnim( ).setDuration( ANIM_DURATION );
+            item->posAnim( ).setStartValue( graphicsItem->pos( ));
+            item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
+            item->posAnim( ).setEndValue( QPoint( posX, posY ));
+            item->scaleAnim( ).setEndValue( scale_ );
+            item->posAnim( ).start( );
+            item->scaleAnim( ).start( );
+          }
+          else
+          {
+            graphicsItem->setPos( posX, posY );
+            graphicsItem->setScale( scale_ );
+          }
           // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }

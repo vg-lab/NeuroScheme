@@ -23,6 +23,7 @@
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "GridLayout.h"
+#include "CameraBasedLayout.h"
 #include "LayoutManager.h"
 #include "PaneManager.h"
 #include "SelectionManager.h"
@@ -73,7 +74,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   canvas->activeLayoutIndex( 0 );
   canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
-  canvas->displayReps( neuroscheme::DataManager::representations( ));
+  canvas->displayReps( neuroscheme::DataManager::representations( ), false );
   neuroscheme::PaneManager::panes( ).insert( canvas );
   neuroscheme::PaneManager::activePane( canvas );
 

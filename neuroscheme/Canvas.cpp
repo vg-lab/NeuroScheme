@@ -102,9 +102,9 @@ namespace neuroscheme
     this->setStyleSheet("#pane { border: 3px solid rgba( 0,0,0,0%); }");
   }
 
-  void Canvas::keyPressEvent( QKeyEvent *event )
+  void Canvas::keyPressEvent( QKeyEvent *event_ )
   {
-    switch( event->key( ))
+    switch( event_->key( ))
     {
     case Qt::Key_H:
       PaneManager::newPane( this, PaneManager::HORIZONTAL );
@@ -179,27 +179,27 @@ namespace neuroscheme
 
         std::cout << "Refresh layout for scene " << &this->scene( ) << std::endl;
 //        _layouts.getLayout( index )->refresh( &this->scene( ));
-        displayReps( _reps );
+        displayReps( _reps, true );
       }
     }
   }
 
-  void Canvas::displayReps( shift::Representations& reps )
+  void Canvas::displayReps( shift::Representations& reps_, bool animate )
   {
-    _reps = reps;
+    _reps = reps_;
     assert( _layouts.getLayout( _activeLayoutIndex ));
     _layouts.getLayout( _activeLayoutIndex )->displayItems(
-      _graphicsScene, reps );
+      _graphicsScene, reps_, animate );
   }
 
 
   Canvas* Canvas::clone( void ) const
   {
     auto canvas = new Canvas( );
-    for ( auto layout : _layouts.map( ))
+    for ( auto layout_ : _layouts.map( ))
     {
-      canvas->layouts( ).addLayout( layout.second->clone( ));
-      std::cout << "clone layout" << layout.second << std::endl;
+      canvas->layouts( ).addLayout( layout_.second->clone( ));
+      std::cout << "clone layout" << layout_.second << std::endl;
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
     return canvas;

@@ -20,6 +20,7 @@ set( NEUROSCHEME_SOURCES
   ${PROJECT_BINARY_DIR}/src/version.cpp
   MainWindow.ui
   resources.qrc
+  CameraBasedLayout.cpp
   Canvas.cpp
   Color.cpp
   DataManager.cpp
@@ -43,6 +44,7 @@ set( NEUROSCHEME_SOURCES
 
 set( NEUROSCHEME_HEADERS
   ${PROJECT_BINARY_DIR}/include/neuroscheme/version.h
+  CameraBasedLayout.h
   Canvas.h
   Color.h
   DataManager.h

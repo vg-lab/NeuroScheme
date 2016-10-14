@@ -3,6 +3,7 @@
         {
             "name": "Neuron",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
             "properties": [
                 {
                     "name": "gid",
@@ -31,6 +32,10 @@
                 {
                     "name": "dendArea",
                     "type": "float"
+                },
+                {
+                    "name": "Matrix3D",
+                    "type": "Eigen::Matrix4f"
                 }
             ],
             "types": [
@@ -57,6 +62,7 @@
         {
             "name": "Column",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
             "properties": [
                 {
                     "name": "Num Neurons",
@@ -133,7 +139,12 @@
                 {
                     "name": "meanDendArea",
                     "type": "float"
+                },
+                {
+                    "name": "Matrix3D",
+                    "type": "Eigen::Matrix4f"
                 }
+
             ],
             "types":
             [
@@ -142,6 +153,7 @@
                 {
             "name": "MiniColumn",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
             "properties": [
                 {
                     "name": "Num Neurons",
@@ -218,7 +230,12 @@
                 {
                     "name": "meanDendArea",
                     "type": "float"
+                },
+                {
+                    "name": "Matrix3D",
+                    "type": "Eigen::Matrix4f"
                 }
+
             ],
             "types":
             [

@@ -89,40 +89,11 @@ namespace neuroscheme
       _activePane->layouts( ).layoutSelector( )->show( );
 
 
-      _activePane->layoutChanged( _activePane->activeLayoutIndex( ));
+      // std::cout << "Active pane" << std::endl;
+      // _activePane->layoutChanged( _activePane->activeLayoutIndex( ));
 
       //std::cout << _activePane->layouts( ).layoutSelector( ) << " " << _activePane << std::endl;
     }
-    // if ( _layout )
-    // {
-    //   auto item = _layout->itemAtPosition( 0, 0 );
-    //   if ( item )
-    //   {
-    //     std::cout << "Replacing and deleting" << item->widget( ) << std::endl;
-    //     //_layout->removeWidget( item->widget( ));
-    //     _layout->replaceWidget( item->widget( ),
-    //                             new QLabel( _activePane->name.c_str( )));
-    //     assert( dynamic_cast< QPushButton* >( item->widget( )));
-    //     delete item->widget( );
-    //   }
-    //   else
-    //     _layout->addWidget( new QLabel( _activePane->name.c_str( )), 1, 0 );
-
-    //   std::cout << "Adding selector" << std::endl;
-    //   item = _layout->itemAtPosition( 1, 0 );
-    //   if ( item )
-    //   {
-    //     //_layout->removeWidget( item->widget( ));
-    //     assert( dynamic_cast< QComboBox* >( item->widget( )));
-    //     _layout->replaceWidget( item->widget( ),
-    //                             _activePane->layouts( ).layoutSelector( ));
-    //     std::cout << "Replacing" << item->widget( ) << " with"
-    //               << _activePane->layouts( ).layoutSelector( ) << std::endl;
-    //   }
-    //   else
-    //     _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 0 );
-
-    // }
   }
 
   PaneManager::TPanes& PaneManager::panes( void )
@@ -156,7 +127,7 @@ namespace neuroscheme
         _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
       else if ( division == VERTICAL )
         _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
-      canvas->displayReps( orig->reps( ));
+      canvas->displayReps( orig->reps( ), false );
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );

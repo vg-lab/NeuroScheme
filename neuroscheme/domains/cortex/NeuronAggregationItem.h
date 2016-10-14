@@ -80,12 +80,16 @@ namespace neuroscheme
 
 
   class NeuronAggregationItem
-    : public QGraphicsPathItem
+    : public QObject
+    , public QGraphicsPathItem
     , public Item
     , public CollapsableItem
     , public SelectableItem
     , public InteractiveItem
   {
+    Q_OBJECT
+    Q_PROPERTY( QPointF pos READ pos WRITE setPos )
+    Q_PROPERTY( qreal scale READ scale WRITE setScale )
 
   public:
 
@@ -100,22 +104,22 @@ namespace neuroscheme
     void collapse( bool anim = true );
     void uncollapse( bool anim = true );
 
-    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
-      InteractionManager::hoverEnterEvent( this, event );
+      InteractionManager::hoverEnterEvent( this, event_ );
     }
-    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
-      InteractionManager::hoverLeaveEvent( this, event );
+      InteractionManager::hoverLeaveEvent( this, event_ );
     }
-    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
     {
-      InteractionManager::contextMenuEvent( this, event );
+      InteractionManager::contextMenuEvent( this, event_ );
     }
 
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event )
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
     {
-      InteractionManager::mousePressEvent( this, event );
+      InteractionManager::mousePressEvent( this, event_ );
     }
 
 

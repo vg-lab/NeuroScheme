@@ -53,8 +53,7 @@ namespace neuroscheme
 
     std::string name;
 
-    void displayReps( shift::Representations& );
-
+    void displayReps( shift::Representations&, bool animate );
     Canvas* clone( void ) const;
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );

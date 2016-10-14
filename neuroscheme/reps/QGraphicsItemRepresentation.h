@@ -22,6 +22,8 @@
 #ifndef __NEUROSCHEME_QGRAPHICSITEM_REPRESENTATION__
 #define __NEUROSCHEME_QGRAPHICSITEM_REPRESENTATION__
 
+#include <neuroscheme/api.h>
+
 #ifdef NEUROSCHEME_USE_QT5WIDGETS
 
 #include <QGraphicsItem>

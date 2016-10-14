@@ -188,7 +188,7 @@ namespace neuroscheme
               auto canvas = dynamic_cast< Canvas* >(
                 shapeItem->scene( )->parent( ));
               assert( canvas );
-              canvas->displayReps( representations );
+              canvas->displayReps( representations, false );
               // neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
               // neuroscheme::LayoutManager::displayItems(
               //   representations, true );

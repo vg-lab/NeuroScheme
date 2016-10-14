@@ -53,34 +53,31 @@ namespace neuroscheme
 
     void refresh( QGraphicsScene* scene )
     {
-      displayItems( scene, _representations );
+      std::cout << "Layout::refresh" << std::endl;
+      displayItems( scene, _representations, false );
     }
     virtual void displayItems( QGraphicsScene* scene,
-                               const shift::Representations& reps ) = 0;
+                               const shift::Representations& reps,
+                               bool animate );
 
     void updateSelection( QGraphicsScene* scene );
 
     virtual Layout* clone( void ) const = 0;
 
   protected:
+    void _drawCorners( QGraphicsScene* scene );
+    void _clearScene( QGraphicsScene* scene );
+    void _addRepresentations( QGraphicsScene* scene,
+                              const shift::Representations& reps );
+    virtual void _arrangeItems( QGraphicsScene* /* scene */,
+                                const shift::Representations& /* reps */,
+                                bool /* animate */ ) {}
+
+
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
     shift::Representations _representations;
 
-  };
-
-
-  class CameraBasedLayout : public Layout
-  {
-  public:
-    CameraBasedLayout( void );
-    void displayItems( QGraphicsScene* scene,
-                       const shift::Representations& reps );
-
-    Layout* clone( void ) const
-    {
-      return new CameraBasedLayout;
-    }
   };
 
   class ScatterplotLayout : public Layout
@@ -88,7 +85,8 @@ namespace neuroscheme
   public:
     ScatterplotLayout( void );
     void displayItems( QGraphicsScene* scene,
-                       const shift::Representations& reps );
+                       const shift::Representations& reps,
+                       bool animate );
     Layout* clone( void ) const
     {
       return new ScatterplotLayout;
