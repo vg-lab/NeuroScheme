@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "DataManager.h"
 #include "PaneManager.h"
 #include <assert.h>
 #include <QLabel>
@@ -27,9 +28,18 @@
 
 namespace neuroscheme
 {
+  QGridLayout* PaneManager::_mainGridLayout = nullptr;
   Canvas* PaneManager::_activePane = nullptr;
   PaneManager::TPanes PaneManager::_panes = PaneManager::TPanes( );
   QGridLayout* PaneManager::_layout = nullptr;
+  unsigned int PaneManager::_paneNextNumber = 0;
+  unsigned int PaneManager::_nextRow = 0;
+  unsigned int PaneManager::_nextColumn = 0;
+
+  void PaneManager::mainLayout( QGridLayout* mainGridLayout )
+  {
+    _mainGridLayout = mainGridLayout;
+  }
 
   Canvas* PaneManager::activePane( void )
   {
@@ -128,6 +138,30 @@ namespace neuroscheme
   void PaneManager::layout( QGridLayout* layout_ )
   {
     _layout = layout_;
+  }
+
+  Canvas* PaneManager::newPane( Canvas* orig, TPaneDivision division )
+  {
+    assert( _mainGridLayout );
+    Canvas* canvas;
+    if ( !orig )
+    {
+      canvas = new Canvas( );
+      _mainGridLayout->addWidget( canvas, _nextRow, _nextColumn );
+    }
+    else
+    {
+      canvas = orig->clone( );
+      if ( division == HORIZONTAL )
+        _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
+      else if ( division == VERTICAL )
+        _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
+      canvas->displayReps( orig->reps( ));
+    }
+
+    canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );
+    _panes.insert( canvas );
+    return canvas;
   }
 
 }

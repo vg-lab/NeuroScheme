@@ -27,7 +27,7 @@ set( NEUROSCHEME_SOURCES
   GridLayout.cpp
   InteractionManager.cpp
   Layout.cpp
-  LayoutManager.cpp
+  #LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
   mappers/ColorMapper.cpp

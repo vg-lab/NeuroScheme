@@ -21,7 +21,7 @@
  */
 #include "DataManager.h"
 #include "DomainManager.h"
-#include "LayoutManager.h"
+#include "PaneManager.h"
 #include "SelectionManager.h"
 
 namespace neuroscheme
@@ -234,10 +234,10 @@ namespace neuroscheme
     //             << int( getSelectedState( entity.second )) << std::endl;
     // }
     std::cout << _activeSelection.size( ) << std::endl;
-    LayoutManager::updateAllScenesSelection( );
-
+    // LayoutManager::updateAllScenesSelection( );
+    PaneManager::updateSelection( );
   }
 
-
+  
 
 } // namespace neuroscheme

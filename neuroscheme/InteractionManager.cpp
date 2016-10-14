@@ -22,6 +22,7 @@
 #include "DataManager.h"
 #include "InteractionManager.h"
 #include "LayoutManager.h"
+#include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "SelectionManager.h"
 #include "ZeroEQManager.h"
@@ -184,9 +185,13 @@ namespace neuroscheme
                 targetEntities, representations,
                 true, true );
 
-              neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
-              neuroscheme::LayoutManager::displayItems(
-                representations, true );
+              auto canvas = dynamic_cast< Canvas* >(
+                shapeItem->scene( )->parent( ));
+              assert( canvas );
+              canvas->displayReps( representations );
+              // neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
+              // neuroscheme::LayoutManager::displayItems(
+              //   representations, true );
             }
           }
         }
@@ -316,8 +321,8 @@ namespace neuroscheme
 
             std::cout << std::endl;
 
-            LayoutManager::updateAllScenesSelection( );
-
+            //LayoutManager::updateAllScenesSelection( );
+            PaneManager::updateSelection( );
           }
         }
         else

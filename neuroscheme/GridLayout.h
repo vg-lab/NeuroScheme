@@ -33,6 +33,7 @@ namespace neuroscheme
     GridLayout( void );
     void displayItems( QGraphicsScene* _scene,
                        const shift::Representations& reps );
+    Layout* clone( void ) const;
 
   };
 

@@ -52,7 +52,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   _ui->actionOpenXmlScene->setEnabled( true );
 #endif
 
-  // Set up main canvas
+  // Set up main central layout for pane placing
   auto mainGridLayout = new QGridLayout;
   mainGridLayout->setContentsMargins( 0, 0, 0, 0 );
   mainGridLayout->setSpacing( 0 );
@@ -60,49 +60,22 @@ MainWindow::MainWindow( QWidget* parent_ )
   widget->setLayout( mainGridLayout );
   this->setCentralWidget( widget );
 
-  neuroscheme::DataManager::loadData( );
+  // Active domain
+  neuroscheme::DomainManager::setActiveDomain(
+    new neuroscheme::cortex::Domain );
 
-  auto canvas = new neuroscheme::Canvas( this );
-  canvas->name = std::string( "canvas1");
+  neuroscheme::DataManager::loadData( );
+  neuroscheme::PaneManager::mainLayout( mainGridLayout );
+
+
+  // First pane
+  auto canvas = neuroscheme::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
-  // canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
-  connect( canvas->layouts( ).layoutSelector( ),
-           SIGNAL( currentIndexChanged( int )),
-           canvas,
-           SLOT( layoutChanged( int )));
-
-
-  //_canvasses.push_back( canvas );
-  mainGridLayout->addWidget( canvas, 0, 0 );
-  // neuroscheme::LayoutManager::setScene( &canvas->scene( ));
-  // neuroscheme::LayoutManager::displayItems(
-    neuroscheme::DataManager::representations( ), true );
-//neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
+  canvas->displayReps( neuroscheme::DataManager::representations( ));
   neuroscheme::PaneManager::panes( ).insert( canvas );
   neuroscheme::PaneManager::activePane( canvas );
-
-  //_canvasses.push_back( new neuroscheme::Canvas( this ));
-  canvas = new neuroscheme::Canvas( this );
-  canvas->name = std::string( "canvas2");
-  // canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
-  connect( canvas->layouts( ).layoutSelector( ),
-           SIGNAL( currentIndexChanged( int )),
-           canvas,
-           SLOT( layoutChanged( int )));
-  canvas->activeLayoutIndex( 0 );
-  canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
-  canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
-  mainGridLayout->addWidget( canvas, 0, 1 );
-//neuroscheme::LayoutManager::setScene( &canvas->scene( ));
-//neuroscheme::LayoutManager::displayItems(
-//   neuroscheme::DataManager::representations( ), true );
-  neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
-  neuroscheme::PaneManager::panes( ).insert( canvas );
-
-  neuroscheme::DomainManager::setActiveDomain(
-    new neuroscheme::cortex::Domain );
 
   // Common sizes for docks
   unsigned int tabWidth = 300;
@@ -250,8 +223,11 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
     // std::cout << _canvas->view( ).width( ) << " x "
     //           << _canvas->view( ).height( ) << std::endl;
 
-    neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
-    neuroscheme::LayoutManager::update( );
+    _canvas->layouts( ).getLayout( _canvas->activeLayoutIndex( ))->refresh(
+      &( _canvas->scene( )));
+
+    // neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
+    // neuroscheme::LayoutManager::update( );
   }
 
 }

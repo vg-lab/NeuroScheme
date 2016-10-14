@@ -32,17 +32,38 @@ namespace neuroscheme
   {
   public:
     typedef std::set< Canvas* > TPanes;
+    static void mainLayout( QGridLayout* );
     static Canvas* activePane( void );
     static void activePane( Canvas* );
     static TPanes& panes( void );
     static QGridLayout* layout( void );
     static void layout( QGridLayout* );
+    static void updateSelection( void )
+    {
+      for ( auto canvas : _panes )
+      {
+        canvas->layouts( ).getLayout( canvas->activeLayoutIndex( ))->updateSelection(
+          &( canvas->scene( )));
+      }
+    }
+
+    typedef enum
+    {
+      HORIZONTAL,
+      VERTICAL
+    } TPaneDivision;
+    
+    static Canvas* newPane( Canvas* orig = nullptr,
+                            TPaneDivision division = HORIZONTAL );
 
   protected:
+    static QGridLayout* _mainGridLayout;
     static Canvas* _activePane;
     static TPanes _panes;
     static QGridLayout* _layout;
-
+    static unsigned int _paneNextNumber;
+    //TODO this is just a PoC, not final
+    static unsigned int _nextRow, _nextColumn;
   };
 } // namespace neuroscheme
 

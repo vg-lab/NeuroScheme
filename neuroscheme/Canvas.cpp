@@ -40,7 +40,8 @@ namespace neuroscheme
     , _graphicsScene( new GraphicsScene )
     , _activeLayoutIndex( -1 )
   {
-    _graphicsView->setScene(_graphicsScene);
+    _graphicsScene->setParent( this );
+    _graphicsView->setScene( _graphicsScene );
     _graphicsView->setInteractive( true );
     _graphicsView->setMouseTracking( true );
     _graphicsView->viewport( )->setMouseTracking( true );
@@ -53,8 +54,12 @@ namespace neuroscheme
     QHBoxLayout* layout_ = new QHBoxLayout;
     layout_->addWidget( _graphicsView );
     this->setLayout( layout_ );
-
     this->leaveEvent( nullptr );
+    connect( this->layouts( ).layoutSelector( ),
+             SIGNAL( currentIndexChanged( int )),
+             this,
+             SLOT( layoutChanged( int )));
+
   }
 
   Canvas::~Canvas( void )
@@ -96,6 +101,22 @@ namespace neuroscheme
     this->setObjectName("pane");
     this->setStyleSheet("#pane { border: 3px solid rgba( 0,0,0,0%); }");
   }
+
+  void Canvas::keyPressEvent( QKeyEvent *event )
+  {
+    switch( event->key( ))
+    {
+    case Qt::Key_H:
+      PaneManager::newPane( this, PaneManager::HORIZONTAL );
+      break;
+    case Qt::Key_V:
+      PaneManager::newPane( this, PaneManager::VERTICAL );
+      break;
+    default:
+      break;
+    }
+  }
+
 
   const Layouts& Canvas::layouts( void ) const
   {
@@ -156,9 +177,42 @@ namespace neuroscheme
         _layouts.getLayout( index )->optionsWidget( )->show( );
         // std::cout << "Adding options" << std::endl;
 
-        _layouts.getLayout( index )->refresh( &this->scene( ));
+        std::cout << "Refresh layout for scene " << &this->scene( ) << std::endl;
+//        _layouts.getLayout( index )->refresh( &this->scene( ));
+        displayReps( _reps );
       }
     }
   }
+
+  void Canvas::displayReps( shift::Representations& reps )
+  {
+    _reps = reps;
+    assert( _layouts.getLayout( _activeLayoutIndex ));
+    _layouts.getLayout( _activeLayoutIndex )->displayItems(
+      _graphicsScene, reps );
+  }
+
+
+  Canvas* Canvas::clone( void ) const
+  {
+    auto canvas = new Canvas( );
+    for ( auto layout : _layouts.map( ))
+    {
+      canvas->layouts( ).addLayout( layout.second->clone( ));
+      std::cout << "clone layout" << layout.second << std::endl;
+    }
+    canvas->activeLayoutIndex( this->_activeLayoutIndex );
+    return canvas;
+  }
+
+  const shift::Representations& Canvas::reps( void ) const
+  {
+    return _reps;
+  }
+  shift::Representations& Canvas::reps( void )
+  {
+    return _reps;
+  }
+
 
 } // namespace neuroscheme

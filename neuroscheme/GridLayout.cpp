@@ -248,5 +248,9 @@ namespace neuroscheme
 
   }
 
+  Layout* GridLayout::clone( void ) const
+  {
+    return new GridLayout;
+  }
 
 }

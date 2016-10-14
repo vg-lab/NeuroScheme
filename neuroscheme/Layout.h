@@ -58,6 +58,10 @@ namespace neuroscheme
     virtual void displayItems( QGraphicsScene* scene,
                                const shift::Representations& reps ) = 0;
 
+    void updateSelection( QGraphicsScene* scene );
+
+    virtual Layout* clone( void ) const = 0;
+
   protected:
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
@@ -73,6 +77,10 @@ namespace neuroscheme
     void displayItems( QGraphicsScene* scene,
                        const shift::Representations& reps );
 
+    Layout* clone( void ) const
+    {
+      return new CameraBasedLayout;
+    }
   };
 
   class ScatterplotLayout : public Layout
@@ -81,6 +89,10 @@ namespace neuroscheme
     ScatterplotLayout( void );
     void displayItems( QGraphicsScene* scene,
                        const shift::Representations& reps );
+    Layout* clone( void ) const
+    {
+      return new ScatterplotLayout;
+    }
   };
 
 }

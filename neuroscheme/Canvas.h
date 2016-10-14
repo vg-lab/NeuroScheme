@@ -43,6 +43,7 @@ namespace neuroscheme
 
     void enterEvent( QEvent* /* event */ );
     void leaveEvent( QEvent* /* event */ );
+    void keyPressEvent( QKeyEvent *event );
 
     const Layouts& layouts( void ) const;
     Layouts& layouts( void );
@@ -51,13 +52,18 @@ namespace neuroscheme
     void activeLayoutIndex( int );
 
     std::string name;
+
+    void displayReps( shift::Representations& );
+
+    Canvas* clone( void ) const;
+    const shift::Representations& reps( void ) const;
+    shift::Representations& reps( void );
 protected:
     GraphicsView* _graphicsView;
     GraphicsScene* _graphicsScene;
-
     Layouts _layouts;
     int _activeLayoutIndex;
-
+    shift::Representations _reps;
   public slots:
     void layoutChanged( int );
   }; // class Canvas

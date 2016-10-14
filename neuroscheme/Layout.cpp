@@ -21,6 +21,8 @@
  */
 #include "Layout.h"
 #include "reps/Item.h"
+#include "reps/SelectableItem.h"
+#include "RepresentationCreatorManager.h"
 namespace neuroscheme
 {
 
@@ -56,6 +58,45 @@ namespace neuroscheme
     return _optionsWidget;
   }
 
+  void Layout::updateSelection( QGraphicsScene* scene )
+  {
+    QList< QGraphicsItem* > items_ = scene->items( );
+    for ( auto qitem = items_.begin( ); qitem != items_.end( ); ++qitem )
+    {
+      auto selectableItem_ = dynamic_cast< SelectableItem* >( *qitem );
+      if ( selectableItem_ )
+      {
+        auto item = dynamic_cast< Item* >( *qitem );
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        {
+          const auto entities = repsToEntities.at( item->parentRep( ));
+          // Check only the first entity, this might not be ok
+          // TODO check this
+          if ( entities.size( ) > 0 )
+          {
+            const auto& entity = *entities.begin( );
+            auto shapeItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+
+            const auto state = SelectionManager::getSelectedState( entity );
+            selectableItem_->setSelected( state );
+            if ( state == SelectedState::UNSELECTED )
+              shapeItem->setPen( InteractionManager::getUnselectedPen( ));
+            else if ( state == SelectedState::SELECTED )
+              shapeItem->setPen( InteractionManager::getSelectedPen( ));
+            else if ( state == SelectedState::PARTIALLY_SELECTED )
+              shapeItem->setPen(
+                InteractionManager::getPartiallySelectedPen( ));
+
+          }
+        }
+      }
+    }
+  }
+
   CameraBasedLayout::CameraBasedLayout( void )
     : Layout( "3D" )
   {
@@ -67,9 +108,12 @@ namespace neuroscheme
   void CameraBasedLayout::displayItems( QGraphicsScene* scene_,
                                         const shift::Representations& reps )
   {
-    ( void ) reps;
-    ( void ) scene_;
+    std::cout << "ScatterplotLayout:: Display items" << std::endl;
+    // ( void ) reps;
+    // ( void ) scene_;
+    std::cout << "1" << std::endl;
     if ( !scene_ ) return;
+    std::cout << "2" << std::endl;
     auto& scene = *scene_;
 
     _representations = reps;
@@ -79,6 +123,7 @@ namespace neuroscheme
     auto clearFirst = true;
     if ( clearFirst )
     {
+      std::cout << "Clearing" << std::endl;
       // Remove top items without destroying them
       QList< QGraphicsItem* > items_ = scene.items( );
       for ( auto item = items_.begin( ); item != items_.end( ); ++item )
@@ -105,9 +150,10 @@ namespace neuroscheme
   void ScatterplotLayout::displayItems( QGraphicsScene* scene_,
                                         const shift::Representations& reps )
   {
-    ( void ) reps;
-    ( void ) scene_;
-    if ( scene_ ) return;
+    std::cout << "ScatterplotLayout:: Display items" << std::endl;
+    std::cout << "1" << std::endl;
+    if ( !scene_ ) return;
+    std::cout << "2" << std::endl;
     auto& scene = *scene_;
 
     _representations = reps;
@@ -117,6 +163,7 @@ namespace neuroscheme
     auto clearFirst = true;
     if ( clearFirst )
     {
+      std::cout << "Clearing" << std::endl;
       // Remove top items without destroying them
       QList< QGraphicsItem* > items_ = scene.items( );
       for ( auto item = items_.begin( ); item != items_.end( ); ++item )

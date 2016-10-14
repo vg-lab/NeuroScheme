@@ -57,6 +57,10 @@ namespace neuroscheme
       return _layouts[ index ];
     }
 
+    std::map< unsigned int, Layout* >& map( void )
+    { return _layouts; };
+    const std::map< unsigned int, Layout* >& map( void ) const
+    { return _layouts; };
   protected:
     unsigned int _nextLayoutIdx;
     std::map< unsigned int, Layout* > _layouts;
