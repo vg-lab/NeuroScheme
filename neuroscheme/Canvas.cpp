@@ -155,6 +155,8 @@ namespace neuroscheme
           2, 0 );
         _layouts.getLayout( index )->optionsWidget( )->show( );
         // std::cout << "Adding options" << std::endl;
+
+        _layouts.getLayout( index )->refresh( &this->scene( ));
       }
     }
   }

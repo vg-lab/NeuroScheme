@@ -25,8 +25,10 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QGraphicsScene>
 #include <map>
 #include <iostream>
+#include <shift/shift.h>
 
 namespace neuroscheme
 {
@@ -45,13 +47,22 @@ namespace neuroscheme
   {
   public:
     Layout( const std::string& name_ = "unnamed" );
-    ~Layout( void );
+    virtual ~Layout( void );
     const std::string& name( void );
     LayoutOptionsWidget* optionsWidget( void );
+
+    void refresh( QGraphicsScene* scene )
+    {
+      displayItems( scene, _representations );
+    }
+    virtual void displayItems( QGraphicsScene* scene,
+                               const shift::Representations& reps ) = 0;
 
   protected:
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
+    shift::Representations _representations;
+
   };
 
 
@@ -59,12 +70,17 @@ namespace neuroscheme
   {
   public:
     CameraBasedLayout( void );
+    void displayItems( QGraphicsScene* scene,
+                       const shift::Representations& reps );
+
   };
 
   class ScatterplotLayout : public Layout
   {
   public:
     ScatterplotLayout( void );
+    void displayItems( QGraphicsScene* scene,
+                       const shift::Representations& reps );
   };
 
 }

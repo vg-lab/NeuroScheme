@@ -76,10 +76,10 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   //_canvasses.push_back( canvas );
   mainGridLayout->addWidget( canvas, 0, 0 );
-  neuroscheme::LayoutManager::setScene( &canvas->scene( ));
-  neuroscheme::LayoutManager::displayItems(
+  // neuroscheme::LayoutManager::setScene( &canvas->scene( ));
+  // neuroscheme::LayoutManager::displayItems(
     neuroscheme::DataManager::representations( ), true );
-  neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
+//neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
   neuroscheme::PaneManager::panes( ).insert( canvas );
   neuroscheme::PaneManager::activePane( canvas );
 
@@ -95,9 +95,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
   canvas->layouts( ).addLayout( new neuroscheme::ScatterplotLayout( ));
   mainGridLayout->addWidget( canvas, 0, 1 );
-  neuroscheme::LayoutManager::setScene( &canvas->scene( ));
-  neuroscheme::LayoutManager::displayItems(
-    neuroscheme::DataManager::representations( ), true );
+//neuroscheme::LayoutManager::setScene( &canvas->scene( ));
+//neuroscheme::LayoutManager::displayItems(
+//   neuroscheme::DataManager::representations( ), true );
   neuroscheme::LayoutManager::scenes( ).insert( &canvas->scene( ));
   neuroscheme::PaneManager::panes( ).insert( canvas );
 

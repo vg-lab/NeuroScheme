@@ -20,6 +20,7 @@
  *
  */
 #include "Layout.h"
+#include "reps/Item.h"
 namespace neuroscheme
 {
 
@@ -60,6 +61,37 @@ namespace neuroscheme
   {
     _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
     _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
+
+  }
+
+  void CameraBasedLayout::displayItems( QGraphicsScene* scene_,
+                                        const shift::Representations& reps )
+  {
+    ( void ) reps;
+    ( void ) scene_;
+    if ( !scene_ ) return;
+    auto& scene = *scene_;
+
+    _representations = reps;
+    if ( reps.empty( ))
+      return;
+
+    auto clearFirst = true;
+    if ( clearFirst )
+    {
+      // Remove top items without destroying them
+      QList< QGraphicsItem* > items_ = scene.items( );
+      for ( auto item = items_.begin( ); item != items_.end( ); ++item )
+      {
+        auto item_ = dynamic_cast< Item* >( *item );
+        if ( item_ && item_->parentRep( ))
+          scene.removeItem( *item );
+      }
+
+      // Remove the rest
+      scene.clear( );
+    }
+
   }
 
   ScatterplotLayout::ScatterplotLayout( void )
@@ -69,5 +101,35 @@ namespace neuroscheme
                                             "hola scatterplot" ));
   }
 
+
+  void ScatterplotLayout::displayItems( QGraphicsScene* scene_,
+                                        const shift::Representations& reps )
+  {
+    ( void ) reps;
+    ( void ) scene_;
+    if ( scene_ ) return;
+    auto& scene = *scene_;
+
+    _representations = reps;
+    if ( reps.empty( ))
+      return;
+
+    auto clearFirst = true;
+    if ( clearFirst )
+    {
+      // Remove top items without destroying them
+      QList< QGraphicsItem* > items_ = scene.items( );
+      for ( auto item = items_.begin( ); item != items_.end( ); ++item )
+      {
+        auto item_ = dynamic_cast< Item* >( *item );
+        if ( item_ && item_->parentRep( ))
+          scene.removeItem( *item );
+      }
+
+      // Remove the rest
+      scene.clear( );
+    }
+
+  }
 
 }

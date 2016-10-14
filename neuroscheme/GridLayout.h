@@ -31,6 +31,9 @@ namespace neuroscheme
   {
   public:
     GridLayout( void );
+    void displayItems( QGraphicsScene* _scene,
+                       const shift::Representations& reps );
+
   };
 
 }
