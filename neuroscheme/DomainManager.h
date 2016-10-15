@@ -27,7 +27,8 @@
 
 namespace neuroscheme
 {
-  typedef ::Eigen::Matrix4f Matrix4f;
+  using Matrix4f = ::Eigen::Matrix4f;
+  using Vector4f = ::Eigen::Vector4f;
 
   class Domain
   {
@@ -36,7 +37,7 @@ namespace neuroscheme
     virtual ~Domain( void ) {}
     virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
     virtual unsigned int selectableEntityId( shift::Entity* entity ) const = 0;
-    virtual const Matrix4f entity3DMatrix ( shift::Entity* entity ) const = 0;
+    virtual const Vector4f entity3DPosition ( shift::Entity* entity ) const = 0;
   };
 
   class DomainManager

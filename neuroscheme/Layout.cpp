@@ -115,6 +115,9 @@ namespace neuroscheme
   void Layout::_addRepresentations( QGraphicsScene* scene,
                                     const shift::Representations& reps )
   {
+    const auto& repsToEntities =
+      RepresentationCreatorManager::repsToEntities( );
+
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -130,8 +133,8 @@ namespace neuroscheme
 
         // Find out if its entity is selected
         // and if so set its pen
-        const auto& repsToEntities =
-          RepresentationCreatorManager::repsToEntities( );
+        // const auto& repsToEntities =
+        //   RepresentationCreatorManager::repsToEntities( );
         const auto entities = repsToEntities.at( representation );
         if ( entities.size( ) < 1 )
           Log::log( NS_LOG_HEADER +

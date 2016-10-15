@@ -47,9 +47,10 @@ namespace neuroscheme
           getProperty( "gid" ).value< uint >( );
       }
 
-      const Matrix4f entity3DMatrix ( shift::Entity* entity ) const
+      const Vector4f entity3DPosition ( shift::Entity* entity ) const
       {
-        return entity->getProperty( "Matrix3D" ).value< Matrix4f >( );
+        // std::cout << entity->getProperty( "Position3D" ).type( ) << std::endl;
+        return entity->getProperty( "Position3D" ).value< Vector4f >( );
       }
 
     };

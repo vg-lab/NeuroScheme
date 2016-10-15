@@ -34,8 +34,8 @@
                     "type": "float"
                 },
                 {
-                    "name": "Matrix3D",
-                    "type": "Eigen::Matrix4f"
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
                 }
             ],
             "types": [
@@ -141,8 +141,8 @@
                     "type": "float"
                 },
                 {
-                    "name": "Matrix3D",
-                    "type": "Eigen::Matrix4f"
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
                 }
 
             ],
@@ -232,8 +232,8 @@
                     "type": "float"
                 },
                 {
-                    "name": "Matrix3D",
-                    "type": "Eigen::Matrix4f"
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
                 }
 
             ],

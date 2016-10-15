@@ -23,6 +23,7 @@
 #define __NEUROSCHEME_CAMERA_BASED_LAYOUT__
 
 #include "Layout.h"
+#include "DomainManager.h"
 
 namespace neuroscheme
 {
@@ -43,6 +44,10 @@ namespace neuroscheme
     {
       return new CameraBasedLayout;
     }
+
+    Matrix4f _viewMatrix;
+    Matrix4f _projectionMatrix;
+
   };
 
 
