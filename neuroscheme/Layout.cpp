@@ -67,10 +67,92 @@ namespace neuroscheme
     if ( reps.empty( ))
       return;
 
+    refreshProperties( );
     _clearScene( scene );
     _drawCorners( scene );
     _addRepresentations( scene, reps );
     _arrangeItems( scene, reps, animate );
+  }
+
+  void Layout::refreshProperties( void )
+  {
+    fires::Objects objs;
+    fires::Objects filteredObjs;
+    const auto& repsToEntities =
+      RepresentationCreatorManager::repsToEntities( );
+
+    TProperties _properties;
+
+    for ( const auto representation : _representations )
+    {
+      const auto entities = repsToEntities.at( representation );
+      if ( entities.size( ) < 1 )
+        Log::log( NS_LOG_HEADER +
+                  "No entities associated to representation",
+                  LOG_LEVEL_ERROR );
+      const auto& entity = *( entities.begin( ));
+
+      objs.push_back( entity );
+
+      for ( auto property_ : entity->properties( ))
+      {
+        // Check if property is scalar
+        if ( fires::PropertyManager::getAggregator( property_.first ))
+        {
+          if ( _properties.find( property_.first ) == _properties.end( ))
+            _properties[ property_.first  ] = TPropertyData{ 0, 0 };
+        }
+      }
+    }
+
+    // for ( const auto p : _properties )
+    // {
+    //   //if ( !std::is_scalar< p.first >( ))
+    //   if ( !fires::PropertyManager::getAggregator( p.first ))
+    //     std::cout << p.first << " NOT SCALAR" << fires::PropertyManager::getAggregator( p.first ) << std::endl;
+    //   else
+    //     std::cout << p.first << std::endl;
+    // }
+
+    fires::AggregateConfig aggregateConfigMax;
+    fires::AggregateConfig aggregateConfigMin;
+
+    for ( auto p : _properties )
+    {
+      aggregateConfigMax.addProperty(
+        p.first,
+        fires::PropertyManager::getAggregator( p.first ),
+        fires::PropertyAggregator::MAX );
+      aggregateConfigMin.addProperty(
+        p.first,
+        fires::PropertyManager::getAggregator( p.first ),
+        fires::PropertyAggregator::MIN );
+
+      }
+
+      fires::Aggregate aggregate;
+      fires::Objects aggregatedMinObjects = objs;
+      aggregate.eval( aggregatedMinObjects, aggregateConfigMin );
+      fires::Object* aggregatedMinObj = aggregatedMinObjects[ 0 ];
+
+      fires::Objects aggregatedMaxObjects = objs;
+      aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
+      fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
+
+    for ( auto p : _properties )
+    {
+      std::string label = p.first;
+
+      p.second = TPropertyData
+        {
+          fires::PropertyManager::getPropertyCaster( label )->toInt(
+            aggregatedMinObj->getProperty( label ),
+            fires::PropertyCaster::FLOOR ),
+          fires::PropertyManager::getPropertyCaster( label )->toInt(
+            aggregatedMaxObj->getProperty( label ),
+            fires::PropertyCaster::CEIL )
+        };
+    }
   }
 
   void Layout::_drawCorners( QGraphicsScene* scene )

@@ -32,6 +32,12 @@
 
 namespace neuroscheme
 {
+  typedef struct
+  {
+    int rangeMin;
+    int rangeMax;
+  } TPropertyData;
+  typedef std::map< std::string, TPropertyData > TProperties;
 
   class LayoutOptionsWidget : public QFrame
   {
@@ -63,7 +69,7 @@ namespace neuroscheme
     void updateSelection( QGraphicsScene* scene );
 
     virtual Layout* clone( void ) const = 0;
-
+    void refreshProperties( );
   protected:
     void _drawCorners( QGraphicsScene* scene );
     void _clearScene( QGraphicsScene* scene );
