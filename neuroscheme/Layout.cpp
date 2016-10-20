@@ -38,10 +38,32 @@ namespace neuroscheme
     return _layout;
   }
 
-  Layout::Layout( const std::string& name_ )
-    : _optionsWidget( new LayoutOptionsWidget )
+  Layout::Layout( const std::string& name_,
+                  unsigned int flags_ )
+    : _flags( flags_ )
+    , _optionsWidget( new LayoutOptionsWidget )
     , _name( name_ )
+    , _toolbox( new QToolBox( _optionsWidget ))
   {
+    _optionsWidget->layout( )->addWidget( _toolbox, 0, 0 );
+
+    _sortWidget = 0;
+
+    if ( _flags & SORT_ENABLED )
+    {
+      _sortWidget = new SortWidget;
+      QIcon sortIcon( QString::fromUtf8( ":/icons/sort.png"));
+      _toolbox->addItem( _sortWidget, sortIcon, QString( "Sort" ));
+    }
+    if ( _flags & FILTER_ENABLED )
+    {
+      auto filterWidget = new QFrame;
+      QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
+      _toolbox->addItem( filterWidget, filterIcon, QString( "Filter" ));
+    }
+
+    // _toolbox->show( );
+    // _optionsWidget->show( );
   }
 
   Layout::~Layout( void )
@@ -67,21 +89,21 @@ namespace neuroscheme
     if ( reps.empty( ))
       return;
 
-    refreshProperties( );
+    _refreshProperties( );
     _clearScene( scene );
     _drawCorners( scene );
     _addRepresentations( scene, reps );
     _arrangeItems( scene, reps, animate );
   }
 
-  void Layout::refreshProperties( void )
+  void Layout::_refreshProperties( void )
   {
     fires::Objects objs;
     fires::Objects filteredObjs;
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    TProperties _properties;
+    _properties.clear( );
 
     for ( const auto representation : _representations )
     {
@@ -105,15 +127,21 @@ namespace neuroscheme
       }
     }
 
-    // for ( const auto p : _properties )
-    // {
-    //   //if ( !std::is_scalar< p.first >( ))
-    //   if ( !fires::PropertyManager::getAggregator( p.first ))
-    //     std::cout << p.first << " NOT SCALAR" << fires::PropertyManager::getAggregator( p.first ) << std::endl;
-    //   else
-    //     std::cout << p.first << std::endl;
-    // }
-
+    if ( _sortWidget &&
+         _sortWidget->propertiesSelector( ))
+    {
+      auto selector = _sortWidget->propertiesSelector( );
+      int i = -1;
+      selector->clear( );
+      for ( const auto prop : _properties )
+      {
+        //if ( !std::is_scalar< p.first >( ))
+        // if ( !fires::PropertyManager::getAggregator( p.first ))
+        std::cout << prop.first << std::endl;
+        selector->insertItem( ++i, QString( prop.first.c_str( )));
+        std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
+      }
+    }
     fires::AggregateConfig aggregateConfigMax;
     fires::AggregateConfig aggregateConfigMin;
 
@@ -290,6 +318,10 @@ namespace neuroscheme
     }
   }
 
+  void Layout::_updateOptionsWidget( void )
+  {
+    
+  }
 
   ScatterplotLayout::ScatterplotLayout( void )
     : Layout( "Scatterplot" )

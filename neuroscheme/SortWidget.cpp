@@ -19,30 +19,33 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_GRID_LAYOUT__
-#define __NEUROSCHEME_GRID_LAYOUT__
-
-#include "Layout.h"
+#include "SortWidget.h"
+#include <QGridLayout>
 
 namespace neuroscheme
 {
 
-  class GridLayout : public Layout
+  SortWidget::SortWidget( QWidget* parent_ )
+    : QFrame( parent_ )
   {
-  public:
-    GridLayout( void );
-    // void displayItems( QGraphicsScene* _scene,
-    //                    const shift::Representations& reps );
-  protected:
-    void _arrangeItems( QGraphicsScene* scene,
-                        const shift::Representations& reps,
-                        bool animate = true );
-    void _updateOptionsWidget( void );
+    auto layout_ = new QGridLayout;
+    layout_->setAlignment( Qt::AlignTop );
+    this->setLayout( layout_ );
 
-    Layout* clone( void ) const;
+    _propertiesSelector = new QComboBox( );
+    _propertiesSelector->setSizePolicy( QSizePolicy::Expanding,
+                                       QSizePolicy::Expanding );
+    _propertiesSelector->setMinimumSize( 200, 20 );
 
-  };
+    QIcon addIcon( QString::fromUtf8(":/icons/add.png"));
+    _sortButton = new QToolButton( );
+    _sortButton->setIcon( addIcon );
+
+    layout_->addWidget( _propertiesSelector, 0, 0, 1, 2,
+                        Qt::AlignCenter | Qt::AlignLeft);
+    layout_->addWidget( _sortButton, 0, 3, 1, 1,
+                        Qt::AlignCenter | Qt::AlignHCenter);
+
+  }
 
 }
-
-#endif

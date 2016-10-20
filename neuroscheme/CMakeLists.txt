@@ -39,6 +39,7 @@ set( NEUROSCHEME_SOURCES
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
   SelectionManager.cpp
+  SortWidget.cpp
   ZeroEQManager.cpp
   )
 
@@ -69,7 +70,8 @@ set( NEUROSCHEME_HEADERS
   reps/SelectableItem.h
   SelectedState.h
   SelectionManager.h
-  ZeroEQManager.cpp
+  SortWidget.h
+  ZeroEQManager.h
   )
 
 include ( domains/cortex/CMakeLists.txt )

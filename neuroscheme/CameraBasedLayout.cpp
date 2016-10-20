@@ -98,6 +98,8 @@ namespace neuroscheme
           auto scale = 250.0 / distance;
           auto zValue = -distance;
 
+          // Temporarily use fake values
+          x = 0; y = 0; scale = 1;
 
 #define ANIM_DURATION 1200
           if ( obj && animate )

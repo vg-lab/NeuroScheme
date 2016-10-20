@@ -24,38 +24,23 @@
 #include "reps/QGraphicsItemRepresentation.h"
 #include "error.h"
 #include "RepresentationCreatorManager.h"
+#include <QToolBox>
 
 namespace neuroscheme
 {
 
   GridLayout::GridLayout( void )
-    : Layout( "Grid" )
+    : Layout( "Grid",
+              Layout::SORT_ENABLED |
+              Layout::FILTER_ENABLED )
   {
-    //std::cout << "grid options widget" << _optionsWidget << std::endl;
-    _optionsWidget->layout( )->addWidget(
-      new QPushButton( "hola grid" ), 0, 0 );
-    _optionsWidget->layout( )->addWidget(
-      new QPushButton( "hola grid2" ), 1, 0 );
-  }
+}
 
   void GridLayout::_arrangeItems( QGraphicsScene* scene_,
                                   const shift::Representations& reps,
                                   bool animate )
   {
-    // Layout::displayItems( scene_, reps );
 
-    // if ( !scene_ ) return;
-    // auto& scene = *scene_;
-
-    // _representations = reps;
-    // if ( reps.empty( ))
-    //   return;
-
-    // _clearScene( scene_ );
-    // _drawCorners( scene_ );
-    // _addRepresentations( scene_, reps );
-
-    
     unsigned int maxItemWidth = 0, maxItemHeight = 0;
     for ( const auto representation : reps )
     {
@@ -197,9 +182,14 @@ namespace neuroscheme
 
   }
 
+  void GridLayout::_updateOptionsWidget( void )
+  {
+    
+  }
+
   Layout* GridLayout::clone( void ) const
   {
-    return new GridLayout;
+    return new GridLayout( );
   }
 
 }

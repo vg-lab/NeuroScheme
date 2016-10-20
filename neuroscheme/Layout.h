@@ -26,9 +26,11 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QGraphicsScene>
+#include <QToolBox>
 #include <map>
 #include <iostream>
 #include <shift/shift.h>
+#include "SortWidget.h"
 
 namespace neuroscheme
 {
@@ -52,7 +54,15 @@ namespace neuroscheme
   class Layout
   {
   public:
-    Layout( const std::string& name_ = "unnamed" );
+    enum
+    {
+      SORT_ENABLED = 0x01,
+      FILTER_ENABLED = 0x02,
+    };
+
+
+    Layout( const std::string& name_ = "unnamed",
+            unsigned int flags_ = 0 );
     virtual ~Layout( void );
     const std::string& name( void );
     LayoutOptionsWidget* optionsWidget( void );
@@ -69,8 +79,8 @@ namespace neuroscheme
     void updateSelection( QGraphicsScene* scene );
 
     virtual Layout* clone( void ) const = 0;
-    void refreshProperties( );
   protected:
+    void _refreshProperties( void );
     void _drawCorners( QGraphicsScene* scene );
     void _clearScene( QGraphicsScene* scene );
     void _addRepresentations( QGraphicsScene* scene,
@@ -78,12 +88,16 @@ namespace neuroscheme
     virtual void _arrangeItems( QGraphicsScene* /* scene */,
                                 const shift::Representations& /* reps */,
                                 bool /* animate */ ) {}
+    virtual void _updateOptionsWidget( void );
 
 
+    unsigned int _flags;
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
     shift::Representations _representations;
-
+    TProperties _properties;
+    QToolBox* _toolbox;
+    SortWidget* _sortWidget; 
   };
 
   class ScatterplotLayout : public Layout

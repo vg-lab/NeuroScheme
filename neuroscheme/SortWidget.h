@@ -19,30 +19,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_GRID_LAYOUT__
-#define __NEUROSCHEME_GRID_LAYOUT__
-
-#include "Layout.h"
+#include <QFrame>
+#include <QComboBox>
+#include <QToolButton>
 
 namespace neuroscheme
 {
 
-  class GridLayout : public Layout
+  class SortWidget : public QFrame
   {
   public:
-    GridLayout( void );
-    // void displayItems( QGraphicsScene* _scene,
-    //                    const shift::Representations& reps );
+    SortWidget( QWidget* parent_ = 0 );
+
+    QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
+    //QToolButton* sortButton( void );
   protected:
-    void _arrangeItems( QGraphicsScene* scene,
-                        const shift::Representations& reps,
-                        bool animate = true );
-    void _updateOptionsWidget( void );
-
-    Layout* clone( void ) const;
-
+    QComboBox*_propertiesSelector;
+    QToolButton* _sortButton;
   };
 
 }
-
-#endif

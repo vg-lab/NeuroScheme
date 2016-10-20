@@ -72,6 +72,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   // First pane
   auto canvas = neuroscheme::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
+  // auto gridLayout = new neuroscheme::GridLayout( );
+  // gridLayout->optionsWidget( )->setParent( );
+  //  canvas->layouts( ).addLayout( gridLayout );
   canvas->layouts( ).addLayout( new neuroscheme::GridLayout( ));
   canvas->layouts( ).addLayout( new neuroscheme::CameraBasedLayout( ));
   canvas->displayReps( neuroscheme::DataManager::representations( ), false );

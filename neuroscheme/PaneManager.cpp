@@ -54,6 +54,7 @@ namespace neuroscheme
     if ( _layout )
     {
 
+      // Replace pane name
       auto item = _layout->itemAtPosition( 0, 0 );
       if ( item )
       {
@@ -71,6 +72,7 @@ namespace neuroscheme
       _layout->addWidget( new QLabel( _activePane->name.c_str( )), 0, 0 );
 
 
+      // Replace layout selector
       item = _layout->itemAtPosition( 1, 0 );
       if ( item )
       {
@@ -88,6 +90,26 @@ namespace neuroscheme
       _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 0 );
       _activePane->layouts( ).layoutSelector( )->show( );
 
+
+      // Replace layout options
+      item = _layout->itemAtPosition( 2, 0 );
+      if ( item )
+      {
+        auto widget = item->widget( );
+        if ( widget )
+        {
+          auto index = _layout->indexOf( widget );
+          if ( index != -1 )
+          {
+            _layout->takeAt( index );
+            widget->hide( );
+          }
+        }
+      }
+      auto layoutIdx = _activePane->activeLayoutIndex( );
+      auto activeLayout = _activePane->layouts( ).getLayout( layoutIdx );
+      _layout->addWidget( activeLayout->optionsWidget( ) , 2, 0 );
+      activeLayout->optionsWidget( )->show( );
 
       // std::cout << "Active pane" << std::endl;
       // _activePane->layoutChanged( _activePane->activeLayoutIndex( ));
