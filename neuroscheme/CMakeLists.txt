@@ -96,6 +96,10 @@ if ( TARGET gmrvlex )
   list( APPEND NEUROSCHEME_LINK_LIBRARIES gmrvlex )
 endif( )
 
+if ( TARGET nsol )
+  list( APPEND NEUROSCHEME_LINK_LIBRARIES nsol )
+endif( )
+
 
 if (MSVC)
   add_definitions(-DNEUROSCHEME_STATIC)

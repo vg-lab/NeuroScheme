@@ -24,6 +24,11 @@
 
 #include <shift/shift.h>
 #include "domains/domains.h"
+#include <QErrorMessage>
+
+#ifdef NEUROSCHEME_USE_NSOL
+#include <nsol/nsol.h>
+#endif
 
 namespace neuroscheme
 {
@@ -35,10 +40,25 @@ namespace neuroscheme
     static shift::Representations& representations( void );
     static void loadData( void );
 
+    static void loadBlueConfig( const std::string& blueConfig,
+                                const std::string& targetLabel,
+                                const bool loadMorphologies,
+                                const std::string& csvNeuronStatsFileName );
+
+#ifdef NEUROSCHEME_USE_NSOL
+    static void CreateEntitiesFromNsolColumn(
+      const nsol::Columns& columns,
+      bool withMorphologies,
+      const std::string& csvNeuronStatsFileName );
+#endif
+
   protected:
     static shift::EntitiesWithRelationships _entities;
     static shift::Representations _representations;
 
+#ifdef NEUROSCHEME_USE_NSOL
+    static nsol::DataSet _nsolDataSet;
+#endif
   };
 }
 
