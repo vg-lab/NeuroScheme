@@ -65,11 +65,15 @@ namespace neuroscheme
       redMapper.push_back( ColorF( 0.51f, 0.31f, 0.37f ));
       redMapper.push_back( ColorF( 0.38f, 0.22f, 0.27f ));
 
-      greenMapper.max( ) = _maxNeuronSomaVolume;
-      redMapper.max( ) = _maxNeuronDendsVolume;
+      greenMapper.max( ) =
+        _maxNeuronSomaVolume == 0 ? 0.1f : _maxNeuronSomaVolume;
+      redMapper.max( ) =
+        _maxNeuronDendsVolume == 0 ? 0.1f : _maxNeuronDendsVolume;
 
-      MapperFloatToFloat somaAreaToAngle( 0, _maxNeuronSomaArea, 0, -360 );
-      MapperFloatToFloat dendAreaToAngle( 0, _maxNeuronDendsArea, 0, -360 );
+      MapperFloatToFloat somaAreaToAngle(
+        0, _maxNeuronSomaArea == 0 ? 0.1f : _maxNeuronSomaArea, 0, -360 );
+      MapperFloatToFloat dendAreaToAngle(
+        0, _maxNeuronDendsArea == 0 ? 0.1f : _maxNeuronDendsArea, 0, -360 );
 
       std::cout << "--------------------" << _maxNeurons << std::endl;
       MapperFloatToFloat neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
@@ -128,9 +132,9 @@ namespace neuroscheme
             int(
               roundf(
                 somaAreaToAngle.map(
-                  neuron->getProperty( "somaVolume" ).value< float >( )))));
+                  neuron->getProperty( "somaArea" ).value< float >( )))));
           greenMapper.value( ) =
-            neuron->getProperty( "somaArea" ).value< float >( );
+            neuron->getProperty( "somaVolume" ).value< float >( );
           somaRing.setProperty( "color", greenMapper.map( ));
           rings.push_back( somaRing );
 
@@ -140,9 +144,9 @@ namespace neuroscheme
             int(
               roundf(
                 dendAreaToAngle.map(
-                  neuron->getProperty( "dendVolume" ).value< float >( )))));
+                  neuron->getProperty( "dendArea" ).value< float >( )))));
           redMapper.value( ) =
-            neuron->getProperty( "dendArea" ).value< float >( );
+            neuron->getProperty( "dendVolume" ).value< float >( );
           dendRing.setProperty( "color", redMapper.map( ));
           rings.push_back( dendRing );
 
@@ -214,18 +218,6 @@ namespace neuroscheme
 
       shiftgen::NeuronAggregationRep::Rings rings;
 
-      // std::cout << "!!!!"
-      //           << neuron->getProperty( "somaVolume" ).value< float >( )
-      //           << "-->"
-      //           << somaAreaToAngle.map(
-      //             neuron->getProperty( "somaVolume" ).value< float >( ))
-      //           << std::endl;
-      std::cout << "!!!!"
-                << entity->getProperty( "meanSomaArea" ).value< float >( )
-                << "-->"
-                << somaAreaToAngle.map(
-                  entity->getProperty( "meanSomaArea" ).value< float >( ))
-                << std::endl;
 
       somaVolumeToColor.value( ) =
         entity->getProperty( "meanSomaVolume" ).value< float >( );

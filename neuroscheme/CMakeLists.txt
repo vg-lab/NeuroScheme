@@ -23,6 +23,7 @@ set( NEUROSCHEME_SOURCES
   CameraBasedLayout.cpp
   Canvas.cpp
   Color.cpp
+  Config.cpp
   DataManager.cpp
   DomainManager.cpp
   GridLayout.cpp
@@ -48,6 +49,7 @@ set( NEUROSCHEME_HEADERS
   CameraBasedLayout.h
   Canvas.h
   Color.h
+  Config.h
   DataManager.h
   DomainManager.cpp
   error.h

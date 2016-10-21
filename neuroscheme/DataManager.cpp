@@ -902,8 +902,8 @@ auto greenMapper = new DiscreteColorMapper( );
             neuronEntity =
               new shiftgen::Neuron(
                 neuron->gid( ),
-                shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE,
-                shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE,
+                nsolToShiftMorphologicalType( neuron->morphologicalType( )),
+                nsolToShiftFunctionalType( neuron->functionalType( )),
                 .0f, .0f, .0f, .0f,
                 neuron->transform( ).col( 3 ).transpose( ));
           }
@@ -930,8 +930,8 @@ auto greenMapper = new DiscreteColorMapper( );
     std::cout << "\n";
 
     // Display root reps
-    shift::Entities rootEntities;
-    // auto& relParentOf =
+    shift::Entities rootEntities; 
+   // auto& relParentOf =
     //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
     // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
     //                        relationships( )[ "isParentOf" ]->asOneToN( ));

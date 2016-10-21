@@ -24,6 +24,7 @@
 #include "DomainManager.h"
 #include "GridLayout.h"
 #include "CameraBasedLayout.h"
+#include "Config.h"
 #include "LayoutManager.h"
 #include "PaneManager.h"
 #include "SelectionManager.h"
@@ -66,9 +67,15 @@ MainWindow::MainWindow( QWidget* parent_ )
     new neuroscheme::cortex::Domain );
 
 //  neuroscheme::DataManager::loadData( );
-  neuroscheme::DataManager::loadBlueConfig(
-    "/home/ptoharia/data/BlueConfig.bbptestdata",
-    "Column", true, std::string( ));
+  if ( neuroscheme::Config::cliDataSource ==
+       neuroscheme::Config::CLI_BLUECONFIG )
+  {
+    neuroscheme::DataManager::loadBlueConfig(
+      neuroscheme::Config::cliInputFile,
+      neuroscheme::Config::targetLabel,
+      neuroscheme::Config::loadMorphologies,
+      neuroscheme::Config::csvNeuronStatsFileName );
+  }
   neuroscheme::PaneManager::mainLayout( mainGridLayout );
 
 
