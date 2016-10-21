@@ -46,7 +46,7 @@ namespace neuroscheme
                                 const std::string& csvNeuronStatsFileName );
 
 #ifdef NEUROSCHEME_USE_NSOL
-    static void CreateEntitiesFromNsolColumn(
+    static void CreateEntitiesFromNsolColumns(
       const nsol::Columns& columns,
       bool withMorphologies,
       const std::string& csvNeuronStatsFileName );

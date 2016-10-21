@@ -1,5 +1,6 @@
 #include "DataManager.h"
 #include "RepresentationCreatorManager.h"
+#include "domains/domains.h"
 
 
 namespace neuroscheme
@@ -296,7 +297,7 @@ namespace neuroscheme
                              targetLabel );
 
       if ( loadMorphologies )
-        _dataSet.loadAllMorphologies<
+        _nsolDataSet.loadAllMorphologies<
           nsol::Node,
           nsol::SectionStats,
           nsol::DendriteStats,
@@ -310,19 +311,69 @@ namespace neuroscheme
     } catch ( ... )
     {
       std::cerr << "Error loading BlueConfig" << std::endl;
-      _errorMessage.showMessage( "Error loading BlueConfig" );
+      errorMessage.showMessage( "Error loading BlueConfig" );
       return;
     }
+    CreateEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,
+                                   csvNeuronStatsFileName );
+
 #endif
   }
 
 #ifdef NEUROSCHEME_USE_NSOL
-  void DataManager::CreateEntitiesFromNsolColumn(
+
+  shiftgen::Neuron::TMorphologicalType
+  nsolToShiftMorphologicalType( nsol::Neuron::TMorphologicalType nsolType )
+  {
+    switch ( nsolType )
+    {
+    case nsol::Neuron::TMorphologicalType::UNDEFINED:
+    return shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE;
+      break;
+    case nsol::Neuron::TMorphologicalType::PYRAMIDAL:
+    return shiftgen::Neuron::PYRAMIDAL;
+      break;
+    case nsol::Neuron::TMorphologicalType::INTERNEURON:
+    return shiftgen::Neuron::INTERNEURON;
+      break;
+    default:
+      break;
+    }
+    return shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE;
+  }
+
+  shiftgen::Neuron::TFunctionalType
+  nsolToShiftFunctionalType( nsol::Neuron::TFunctionalType nsolType )
+  {
+    switch ( nsolType )
+    {
+    case nsol::Neuron::TFunctionalType::UNDEFINED_FUNCTIONAL_TYPE:
+    return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
+      break;
+    case nsol::Neuron::TFunctionalType::INHIBITORY:
+    return shiftgen::Neuron::INHIBITORY;
+      break;
+    case nsol::Neuron::TFunctionalType::EXCITATORY:
+      return shiftgen::Neuron::EXCITATORY;
+      break;
+    default:
+      break;
+    }
+    return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
+  }
+
+  void DataManager::CreateEntitiesFromNsolColumns(
     const nsol::Columns& columns,
     bool withMorphologies,
     const std::string& csvNeuronStatsFileName )
   {
     fires::PropertyManager::clear( );
+    _entities.clear( );
+
+    _entities.relationships( )[ "isParentOf" ] =
+      new shift::RelationshipOneToN;
+    _entities.relationships( )[ "isChildOf" ] =
+      new shift::RelationshipOneToOne;
 
     auto& relParentOf =
       *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
@@ -331,8 +382,8 @@ namespace neuroscheme
 
     std::set< unsigned int > gids;
     for ( const auto& col : columns )
-      for ( const auto mc& : col->miniColumns( ))
-        for ( const auto neuron& : mc->neurons( ))
+      for ( const auto& mc : col->miniColumns( ))
+        for ( const auto& neuron : mc->neurons( ))
           gids.insert( neuron->gid( ));
 
     float maxNeuronSomaVolume = 0.0f;
@@ -343,6 +394,7 @@ namespace neuroscheme
     float maxNeuronAxonArea = 0.0f;
 
     unsigned int  meanBifurcations = 0;
+    ( void ) meanBifurcations; // remove
     float meanSomaArea = .0f;
     float meanSomaVolume = .0f;
     float meanDendsArea = .0f;
@@ -493,7 +545,7 @@ namespace neuroscheme
     if ( withMorphologies && csvNeuronStatsFileName.empty( ))
     {
 
-      for ( const auto col : columns )
+      for ( const auto& col : columns )
       {
         NSOL_DEBUG_CHECK( col->stats( ), "no stats in column" );
 
@@ -549,7 +601,9 @@ namespace neuroscheme
   //
     if ( withMorphologies || !csvNeuronStatsFileName.empty( ))
     {
-      auto greenMapper = new DiscreteColorMapper( );
+
+#ifdef fdfdf
+auto greenMapper = new DiscreteColorMapper( );
       auto redMapper = new DiscreteColorMapper( );
 
 #define ColorF( r, g, b )                       \
@@ -577,6 +631,7 @@ namespace neuroscheme
         new MapperFloatToFloat( 0, maxNeuronSomaArea, 0, -360 );
       auto dendAreaToAngle =
         new MapperFloatToFloat( 0, maxNeuronDendArea, 0, -360 );
+#endif
     } // if morphologies || !csvNeuronStatsFileName.empty( )
 
     // Compute maximums per layer for minicol and col reps
@@ -620,8 +675,7 @@ namespace neuroscheme
       }
     }
 
-    _entities.clear( );
-
+    int columnsCounter = 0;
     for ( const auto& col : columns )
     {
 
@@ -646,6 +700,7 @@ namespace neuroscheme
       if ( !csvNeuronStatsFileName.empty( ))
       {
         for ( const auto& mc : col->miniColumns( ))
+        {
           for ( const auto& neuron : mc->neurons( ))
           {
             auto gid = neuron->gid( );
@@ -661,6 +716,7 @@ namespace neuroscheme
             totalDendsArea +=
               neuronsStats[gid].morphologyStats[NNMS::DENDRITIC_SURFACE];
           }
+        }
         if ( neuronsStats.size( ) > 0 )
         {
           float size_1 =  1.0f / float( numNeurons );
@@ -670,8 +726,36 @@ namespace neuroscheme
           meanDendsVolume = totalDendsVolume * size_1;
           meanBifurcations = totalBifurcations * size_1;
         }
+      } // if stats loaded from file
+      else if ( withMorphologies )
+      {
+        // column_->stats( )->getStat(
+        // nsol::ColumnStats::DENDRITIC_BIFURCATIONS,
+        // nsol::TAggregation::MEAN,
+        // nsol::TAggregation::MEAN ),
+        meanSomaArea = col->stats( )->getStat(
+          nsol::ColumnStats::SOMA_SURFACE,
+          nsol::TAggregation::MEAN,
+          nsol::TAggregation::MEAN );
+        meanSomaVolume = col->stats( )->getStat(
+          nsol::ColumnStats::SOMA_VOLUME,
+          nsol::TAggregation::MEAN,
+          nsol::TAggregation::MEAN );
+        meanDendsArea = col->stats( )->getStat(
+          nsol::ColumnStats::DENDRITIC_SURFACE,
+          nsol::TAggregation::MEAN,
+          nsol::TAggregation::MEAN );
+        meanDendsVolume = col->stats( )->getStat(
+          nsol::ColumnStats::DENDRITIC_VOLUME,
+          nsol::TAggregation::MEAN,
+          nsol::TAggregation::MEAN );
       }
-
+      std::cout << "Creating col with"
+                << meanSomaVolume << " "
+                << meanSomaArea << " "
+                << meanDendsVolume << " "
+                << meanDendsArea <<  " "
+                << meanCenter << std::endl;
       shift::Entity* colEntity =
         new neuroscheme::Column(
           col->numberOfNeurons( false ),
@@ -696,6 +780,7 @@ namespace neuroscheme
           meanCenter );
 
       _entities.add( colEntity );
+      relParentOf[ 0 ].insert( colEntity->entityGid( ));
       relChildOf[ colEntity->entityGid( ) ] = 0;
 
       nsol::MiniColumns& miniCols = col->miniColumns( );
@@ -773,11 +858,100 @@ namespace neuroscheme
             meanCenter );
 
         _entities.add( mcEntity );
-
         relChildOf[ mcEntity->entityGid( ) ] = colEntity->entityGid( );
         relParentOf[ colEntity->entityGid( ) ].insert( mcEntity->entityGid( ));
-      }
-    }
+
+        ///////////////////////////////////////////
+        // Neurons ////////////////////////////////
+        nsol::Neurons& neurons = mc->neurons( );
+        for ( const auto& neuron : neurons )
+        {
+          shift::Entity* neuronEntity;
+          if ( !csvNeuronStatsFileName.empty( ))
+          {
+            auto neuronGid = neuron->gid( );
+            #define MORPHO_STATS neuronsStats[neuronGid].morphologyStats
+            neuronEntity =
+              new shiftgen::Neuron(
+                neuronGid,
+                nsolToShiftMorphologicalType( neuron->morphologicalType( )),
+                nsolToShiftFunctionalType( neuron->functionalType( )),
+                MORPHO_STATS[NNMS::SOMA_VOLUME],
+                MORPHO_STATS[NNMS::SOMA_SURFACE],
+                MORPHO_STATS[NNMS::DENDRITIC_VOLUME],
+                MORPHO_STATS[NNMS::DENDRITIC_SURFACE],
+                neuron->transform( ).col( 3 ).transpose( ));
+          }
+          else if ( withMorphologies )
+          {
+            assert( neuron->morphology( ) && neuron->morphology( )->stats( ) );
+            nsol::NeuronMorphologyStats* nms = neuron->morphology( )->stats( );
+            neuronEntity =
+              new shiftgen::Neuron(
+                neuron->gid( ),
+                nsolToShiftMorphologicalType( neuron->morphologicalType( )),
+                nsolToShiftFunctionalType( neuron->functionalType( )),
+                nms->getStat( nsol::NeuronMorphologyStats::SOMA_VOLUME ),
+                nms->getStat( nsol::NeuronMorphologyStats::SOMA_SURFACE ),
+                nms->getStat( nsol::NeuronMorphologyStats::DENDRITIC_VOLUME ),
+                nms->getStat( nsol::NeuronMorphologyStats::DENDRITIC_SURFACE ),
+                neuron->transform( ).col( 3 ).transpose( ));
+          }
+          else
+          {
+            neuronEntity =
+              new shiftgen::Neuron(
+                neuron->gid( ),
+                shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE,
+                shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE,
+                .0f, .0f, .0f, .0f,
+                neuron->transform( ).col( 3 ).transpose( ));
+          }
+          _entities.add( neuronEntity );
+          relChildOf[ neuronEntity->entityGid( ) ] =
+            mcEntity->entityGid( );
+          relParentOf[ mcEntity->entityGid( ) ].insert(
+            neuronEntity->entityGid( ));
+
+             } // for all neurons
+
+        std::cout << "\r("
+                  << 100 * ( columnsCounter + 1 ) / columns.size( )
+                  << "%) \tColumn:\t " << columnsCounter
+                  << "\tMiniColumn:\t " << miniColumnsCounter;
+
+        ++miniColumnsCounter;
+
+      } // for all minicols
+
+      ++columnsCounter;
+    } // for all colums
+
+    std::cout << "\n";
+
+    // Display root reps
+    shift::Entities rootEntities;
+    // auto& relParentOf =
+    //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+    // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
+    //                        relationships( )[ "isParentOf" ]->asOneToN( ));
+
+    const auto& childrenIds = relParentOf[ 0 ];
+    std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
+    for ( const auto& child : childrenIds )
+      rootEntities[child] =
+        neuroscheme::DataManager::entities( )[child];
+
+    auto repCretor = new neuroscheme::cortex::RepresentationCreator( );
+    repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
+                            maxNeuronDendVolume, maxNeuronDendArea,
+                            gids.size( ));
+    std::cout << "    repCretor->setMaximums( " <<  maxNeuronSomaVolume << " ," <<  maxNeuronSomaArea << "," << maxNeuronDendVolume << " ," <<  maxNeuronDendArea << "," << gids.size( ) << std::endl;
+    neuroscheme::RepresentationCreatorManager::addCreator( repCretor );
+    neuroscheme::RepresentationCreatorManager::create(
+      rootEntities, _representations,
+      true, true );
+
   }
 #endif
 

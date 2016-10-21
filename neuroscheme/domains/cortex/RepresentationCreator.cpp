@@ -44,36 +44,35 @@ namespace neuroscheme
       // if ( linkRepsToEntities )
       //   repsToEntities.clear( );
 
-      auto _greenMapper = new DiscreteColorMapper( );
-      auto _redMapper = new DiscreteColorMapper( );
+      DiscreteColorMapper greenMapper;
+      DiscreteColorMapper redMapper;
 
-      _greenMapper->push_back( Color( 0.62 * 255, 1.00 * 255, 0.75 * 255 ));
-      _greenMapper->push_back( Color( 0.55 * 255, 0.88 * 255, 0.65 * 255 ));
-      _greenMapper->push_back( Color( 0.46 * 255, 0.75 * 255, 0.56 * 255 ));
-      _greenMapper->push_back( Color( 0.40 * 255, 0.63 * 255, 0.47 * 255 ));
-      _greenMapper->push_back( Color( 0.31 * 255, 0.51 * 255, 0.37 * 255 ));
-      _greenMapper->push_back( Color( 0.22 * 255, 0.38 * 255, 0.27 * 255 ));
+#define ColorF( r, g, b )                             \
+      Color( uint8_t( roundf( r * 255 )),             \
+             uint8_t( roundf( g * 255 )),             \
+             uint8_t( roundf( b * 255 )))
+      greenMapper.push_back( ColorF( 0.62f, 1.00f, 0.75f ));
+      greenMapper.push_back( ColorF( 0.55f, 0.88f, 0.65f ));
+      greenMapper.push_back( ColorF( 0.46f, 0.75f, 0.56f ));
+      greenMapper.push_back( ColorF( 0.40f, 0.63f, 0.47f ));
+      greenMapper.push_back( ColorF( 0.31f, 0.51f, 0.37f ));
+      greenMapper.push_back( ColorF( 0.22f, 0.38f, 0.27f ));
 
-      _redMapper->push_back( Color( 1.00 * 255, 0.62 * 255, 0.75 * 255 ));
-      _redMapper->push_back( Color( 0.88 * 255, 0.55 * 255, 0.65 * 255 ));
-      _redMapper->push_back( Color( 0.75 * 255, 0.46 * 255, 0.56 * 255 ));
-      _redMapper->push_back( Color( 0.63 * 255, 0.40 * 255, 0.47 * 255 ));
-      _redMapper->push_back( Color( 0.51 * 255, 0.31 * 255, 0.37 * 255 ));
-      _redMapper->push_back( Color( 0.38 * 255, 0.22 * 255, 0.27 * 255 ));
+      redMapper.push_back( ColorF( 1.00f, 0.62f, 0.75f ));
+      redMapper.push_back( ColorF( 0.88f, 0.55f, 0.65f ));
+      redMapper.push_back( ColorF( 0.75f, 0.46f, 0.56f ));
+      redMapper.push_back( ColorF( 0.63f, 0.40f, 0.47f ));
+      redMapper.push_back( ColorF( 0.51f, 0.31f, 0.37f ));
+      redMapper.push_back( ColorF( 0.38f, 0.22f, 0.27f ));
 
-      _greenMapper->max( ) = 100.0f;
-      _redMapper->max( ) = 100.0f;
+      greenMapper.max( ) = _maxNeuronSomaVolume;
+      redMapper.max( ) = _maxNeuronDendsVolume;
 
-      const float maxNeuronSomaArea = 100.0f;
-      const float maxNeuronDendArea = 100.0f;
-      auto _somaAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronSomaArea, 0.0f, -360.0f);
-      auto _dendAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronDendArea, 0.0f, -360.0f );
+      MapperFloatToFloat somaAreaToAngle( 0, _maxNeuronSomaArea, 0, -360 );
+      MapperFloatToFloat dendAreaToAngle( 0, _maxNeuronDendsArea, 0, -360 );
 
-      const float maxNeurons = 100.0f;
-      auto _neuronsToPercentage =
-        new MapperFloatToFloat( 0, maxNeurons, 0.0f, 1.0f );
+      std::cout << "--------------------" << _maxNeurons << std::endl;
+      MapperFloatToFloat neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
 
 
       for ( const auto entityPair : entities )
@@ -84,6 +83,10 @@ namespace neuroscheme
           auto neuron = dynamic_cast< Neuron* >( entity );
           auto neuronRep = new NeuronRep( );
 
+          std::cout
+            << fires::PropertyManager::getPropertyCaster(
+              "morphoType" )->toString(
+              neuron->getProperty( "morphoType" )) << std::endl;
           switch ( neuron->getProperty( "morphoType" ).
                    value< Neuron::TMorphologicalType >( ))
           {
@@ -101,7 +104,8 @@ namespace neuroscheme
           }
 
           switch (
-            neuron->getProperty( "funcType" ).value< Neuron::TFunctionalType >( ))
+            neuron->getProperty(
+              "funcType" ).value< Neuron::TFunctionalType >( ))
           {
           case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
             neuronRep->setProperty( "bg", Color( 100, 100, 100 ));
@@ -123,11 +127,11 @@ namespace neuroscheme
             "angle",
             int(
               roundf(
-                _somaAreaToAngle->map(
+                somaAreaToAngle.map(
                   neuron->getProperty( "somaVolume" ).value< float >( )))));
-          _greenMapper->value( ) =
+          greenMapper.value( ) =
             neuron->getProperty( "somaArea" ).value< float >( );
-          somaRing.setProperty( "color", _greenMapper->map( ));
+          somaRing.setProperty( "color", greenMapper.map( ));
           rings.push_back( somaRing );
 
           shiftgen::Ring dendRing;
@@ -135,11 +139,11 @@ namespace neuroscheme
             "angle",
             int(
               roundf(
-                _dendAreaToAngle->map(
+                dendAreaToAngle.map(
                   neuron->getProperty( "dendVolume" ).value< float >( )))));
-          _redMapper->value( ) =
+          redMapper.value( ) =
             neuron->getProperty( "dendArea" ).value< float >( );
-          dendRing.setProperty( "color", _redMapper->map( ));
+          dendRing.setProperty( "color", redMapper.map( ));
           rings.push_back( dendRing );
 
 
@@ -159,11 +163,11 @@ namespace neuroscheme
           auto column = dynamic_cast< Column* >( entity );
           auto columnRep = new ColumnRep( );
           _CreateColumnOrMiniColumn( column, columnRep,
-                                     *_somaAreaToAngle,
-                                     *_dendAreaToAngle,
-                                     *_greenMapper,
-                                     *_redMapper,
-                                     *_neuronsToPercentage );
+                                     somaAreaToAngle,
+                                     dendAreaToAngle,
+                                     greenMapper,
+                                     redMapper,
+                                     neuronsToPercentage );
           representations.push_back( columnRep );
 
           if ( linkEntitiesToReps )
@@ -178,11 +182,11 @@ namespace neuroscheme
           auto miniColumn = dynamic_cast< MiniColumn* >( entity );
           auto miniColumnRep = new MiniColumnRep( );
           _CreateColumnOrMiniColumn( miniColumn, miniColumnRep,
-                                     *_somaAreaToAngle,
-                                     *_dendAreaToAngle,
-                                     *_greenMapper,
-                                     *_redMapper,
-                                     *_neuronsToPercentage );
+                                     somaAreaToAngle,
+                                     dendAreaToAngle,
+                                     greenMapper,
+                                     redMapper,
+                                     neuronsToPercentage );
           representations.push_back( miniColumnRep );
 
           if ( linkEntitiesToReps )
@@ -190,7 +194,7 @@ namespace neuroscheme
           if ( linkRepsToEntities )
             repsToEntities[ miniColumnRep ].insert( entity );
 
-        } // it its Column entity
+        } // if its Column entity
       } // for all entities
     } // create
 
@@ -210,17 +214,38 @@ namespace neuroscheme
 
       shiftgen::NeuronAggregationRep::Rings rings;
 
+      // std::cout << "!!!!"
+      //           << neuron->getProperty( "somaVolume" ).value< float >( )
+      //           << "-->"
+      //           << somaAreaToAngle.map(
+      //             neuron->getProperty( "somaVolume" ).value< float >( ))
+      //           << std::endl;
+      std::cout << "!!!!"
+                << entity->getProperty( "meanSomaArea" ).value< float >( )
+                << "-->"
+                << somaAreaToAngle.map(
+                  entity->getProperty( "meanSomaArea" ).value< float >( ))
+                << std::endl;
+
+      somaVolumeToColor.value( ) =
+        entity->getProperty( "meanSomaVolume" ).value< float >( );
+      std::cout << "!!!!"
+                << entity->getProperty( "meanSomaVolume" ).value< float >( )
+                << "-->"
+                << somaVolumeToColor.map( )
+                << std::endl;
+
       shiftgen::Ring somaRing;
       somaRing.setProperty(
         "angle",
         int(
           roundf(
             somaAreaToAngle.map(
-              entity->getProperty( "meanSomaVolume" ).
+              entity->getProperty( "meanSomaArea" ).
               value< float >( )))));
       somaVolumeToColor.value( ) =
-        entity->getProperty( "meanSomaArea" ).value< float >( );
-      somaRing.setProperty( "color", dendVolumeToColor.map( ));
+        entity->getProperty( "meanSomaVolume" ).value< float >( );
+      somaRing.setProperty( "color", somaVolumeToColor.map( ));
       rings.push_back( somaRing );
 
       shiftgen::Ring dendRing;
@@ -229,10 +254,10 @@ namespace neuroscheme
         int(
           roundf(
             dendAreaToAngle.map(
-              entity->getProperty( "meanDendVolume" ).
+              entity->getProperty( "meanDendArea" ).
               value< float >( )))));
       dendVolumeToColor.value( ) =
-        entity->getProperty( "meanDendArea" ).value< float >( );
+        entity->getProperty( "meanDendVolume" ).value< float >( );
       dendRing.setProperty( "color", dendVolumeToColor.map( ));
       rings.push_back( dendRing );
 

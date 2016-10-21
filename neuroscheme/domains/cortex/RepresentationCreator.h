@@ -48,6 +48,19 @@ namespace neuroscheme
         bool linkRepsToObjs = false );
 
 
+      void setMaximums( float maxNeuronSomaVolume_,
+                        float maxNeuronSomaArea_,
+                        float maxNeuronDendsVolume_,
+                        float maxNeuronDendsArea_,
+                        unsigned int maxNeurons_ )
+      {
+        _maxNeuronSomaVolume = maxNeuronSomaVolume_;
+        _maxNeuronSomaArea = maxNeuronSomaArea_;
+        _maxNeuronDendsVolume = maxNeuronDendsVolume_;
+        _maxNeuronDendsArea = maxNeuronDendsArea_;
+        _maxNeurons = maxNeurons_;
+      }
+
     protected:
       void _CreateColumnOrMiniColumn(
         shift::Entity *obj,
@@ -57,6 +70,12 @@ namespace neuroscheme
         ColorMapper& somaVolumeToColor,
         ColorMapper& dendVolumeToColor,
         MapperFloatToFloat& neuronsToPercentage );
+
+      float _maxNeuronSomaVolume;
+      float _maxNeuronSomaArea;
+      float _maxNeuronDendsVolume;
+      float _maxNeuronDendsArea;
+      unsigned int _maxNeurons;
     };
 
     // class RepresentationCreatorManager

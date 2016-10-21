@@ -65,7 +65,10 @@ MainWindow::MainWindow( QWidget* parent_ )
   neuroscheme::DomainManager::setActiveDomain(
     new neuroscheme::cortex::Domain );
 
-  neuroscheme::DataManager::loadData( );
+//  neuroscheme::DataManager::loadData( );
+  neuroscheme::DataManager::loadBlueConfig(
+    "/home/ptoharia/data/BlueConfig.bbptestdata",
+    "Column", true, std::string( ));
   neuroscheme::PaneManager::mainLayout( mainGridLayout );
 
 
