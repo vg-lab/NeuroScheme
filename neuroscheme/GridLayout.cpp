@@ -34,7 +34,7 @@ namespace neuroscheme
               Layout::SORT_ENABLED |
               Layout::FILTER_ENABLED )
   {
-}
+  }
 
   void GridLayout::_arrangeItems( QGraphicsScene* scene_,
                                   const shift::Representations& reps,

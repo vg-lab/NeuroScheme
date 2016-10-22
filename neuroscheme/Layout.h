@@ -23,9 +23,10 @@
 #define __NEUROSCHEME_LAYOUT__
 
 #include <QFrame>
-#include <QGridLayout>
-#include <QPushButton>
 #include <QGraphicsScene>
+#include <QGridLayout>
+#include <QObject>
+#include <QPushButton>
 #include <QToolBox>
 #include <map>
 #include <iostream>
@@ -51,8 +52,9 @@ namespace neuroscheme
     QGridLayout* _layout;
   };
 
-  class Layout
+  class Layout : public QObject
   {
+    Q_OBJECT;
   public:
     enum
     {
@@ -79,6 +81,12 @@ namespace neuroscheme
     void updateSelection( QGraphicsScene* scene );
 
     virtual Layout* clone( void ) const = 0;
+
+  public slots:
+    void addedSortProperty( void )
+    {
+      std::cout << "<><><><> Added sorted propery" << std::endl;
+    }
   protected:
     void _refreshProperties( void );
     void _drawCorners( QGraphicsScene* scene );
@@ -97,7 +105,7 @@ namespace neuroscheme
     shift::Representations _representations;
     TProperties _properties;
     QToolBox* _toolbox;
-    SortWidget* _sortWidget; 
+    SortWidget* _sortWidget;
   };
 
   class ScatterplotLayout : public Layout

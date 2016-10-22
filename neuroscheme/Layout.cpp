@@ -51,7 +51,7 @@ namespace neuroscheme
 
     if ( _flags & SORT_ENABLED )
     {
-      _sortWidget = new SortWidget;
+      _sortWidget = new SortWidget( this );
       QIcon sortIcon( QString::fromUtf8( ":/icons/sort.png"));
       _toolbox->addItem( _sortWidget, sortIcon, QString( "Sort" ));
     }

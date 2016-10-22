@@ -19,23 +19,44 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include <QFrame>
+#ifndef __NEUROSCHEME__SORT_WIDGET__
+#define __NEUROSCHEME__SORT_WIDGET__
+
 #include <QComboBox>
+#include <QFrame>
+#include <QObject>
+#include <QSignalMapper>
 #include <QToolButton>
+#include <fires/fires.h>
 
 namespace neuroscheme
 {
+  class Layout;
 
   class SortWidget : public QFrame
   {
+    Q_OBJECT;
   public:
-    SortWidget( QWidget* parent_ = 0 );
-
+    SortWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
+    ~SortWidget( void );
     QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
-    //QToolButton* sortButton( void );
+
+  public slots:
+    void addedSortProperty( void );
+    void removeSortProperty( const QString& propertyLabel );
+    void changeSortPropertyDir( const QString& propertyLabel );
+
   protected:
+    Layout* _parentLayout;
     QComboBox*_propertiesSelector;
     QToolButton* _sortButton;
+    unsigned int _numSortProperties;
+    fires::SortConfig _sortConfig;
+    QSignalMapper* _removeSignalMapper;
+    QSignalMapper* _changeDirSignalMapper;
+    std::map< std::string, unsigned int > _layoutRowsMap;
   };
 
 }
+
+#endif
