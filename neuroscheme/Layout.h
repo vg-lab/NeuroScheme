@@ -32,6 +32,7 @@
 #include <iostream>
 #include <shift/shift.h>
 #include "SortWidget.h"
+#include "FilterWidget.h"
 
 namespace neuroscheme
 {
@@ -56,6 +57,9 @@ namespace neuroscheme
   {
     Q_OBJECT;
   public:
+
+    friend class FilterWidget;
+
     enum
     {
       SORT_ENABLED = 0x01,
@@ -69,17 +73,19 @@ namespace neuroscheme
     const std::string& name( void );
     LayoutOptionsWidget* optionsWidget( void );
 
-    void refresh( QGraphicsScene* scene )
+    void refresh( )
     {
       std::cout << "Layout::refresh" << std::endl;
-      displayItems( scene, _representations, false );
+      displayItems( _representations, false );
     }
-    virtual void displayItems( QGraphicsScene* scene,
-                               const shift::Representations& reps,
+    virtual void displayItems( const shift::Representations& reps,
                                bool animate );
 
-    void updateSelection( QGraphicsScene* scene );
-
+    void updateSelection( );
+    void scene( QGraphicsScene* scene_ )
+    {
+      _scene = scene_;
+    }
     virtual Layout* clone( void ) const = 0;
 
   public slots:
@@ -89,16 +95,14 @@ namespace neuroscheme
     }
   protected:
     void _refreshProperties( void );
-    void _drawCorners( QGraphicsScene* scene );
-    void _clearScene( QGraphicsScene* scene );
-    void _addRepresentations( QGraphicsScene* scene,
-                              const shift::Representations& reps );
-    virtual void _arrangeItems( QGraphicsScene* /* scene */,
-                                const shift::Representations& /* reps */,
+    void _drawCorners( );
+    void _clearScene( );
+    void _addRepresentations( const shift::Representations& reps );
+    virtual void _arrangeItems( const shift::Representations& /* reps */,
                                 bool /* animate */ ) {}
     virtual void _updateOptionsWidget( void );
 
-
+    QGraphicsScene* _scene;
     unsigned int _flags;
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
@@ -106,14 +110,14 @@ namespace neuroscheme
     TProperties _properties;
     QToolBox* _toolbox;
     SortWidget* _sortWidget;
+    FilterWidget* _filterWidget;
   };
 
   class ScatterplotLayout : public Layout
   {
   public:
     ScatterplotLayout( void );
-    void displayItems( QGraphicsScene* scene,
-                       const shift::Representations& reps,
+    void displayItems( const shift::Representations& reps,
                        bool animate );
     Layout* clone( void ) const
     {

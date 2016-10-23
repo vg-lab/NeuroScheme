@@ -34,8 +34,7 @@ namespace neuroscheme
     // void displayItems( QGraphicsScene* _scene,
     //                    const shift::Representations& reps );
   protected:
-    void _arrangeItems( QGraphicsScene* scene,
-                        const shift::Representations& reps,
+    void _arrangeItems( const shift::Representations& reps,
                         bool animate = true );
     void _updateOptionsWidget( void );
 

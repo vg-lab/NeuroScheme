@@ -26,6 +26,7 @@ set( NEUROSCHEME_SOURCES
   Config.cpp
   DataManager.cpp
   DomainManager.cpp
+  FilterWidget.cpp
   GridLayout.cpp
   InteractionManager.cpp
   Layout.cpp
@@ -39,6 +40,7 @@ set( NEUROSCHEME_SOURCES
   RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
+  qxt/qxtspanslider.cpp
   SelectionManager.cpp
   SortWidget.cpp
   ZeroEQManager.cpp
@@ -53,6 +55,7 @@ set( NEUROSCHEME_HEADERS
   DataManager.h
   DomainManager.cpp
   error.h
+  FilterWidget.h
   GridLayout.h
   InteractionManager.h
   Layout.h
@@ -62,6 +65,8 @@ set( NEUROSCHEME_HEADERS
   mappers/ColorMapper.h
   mappers/VariableMapper.h
   PaneManager.h
+  qxt/qxtspanslider.h
+  qxt/qxtspanslider_p.h
   RepresentationCreatorManager.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h

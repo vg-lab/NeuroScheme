@@ -134,6 +134,38 @@ namespace neuroscheme
     std::cout <<  std::endl;
 
   }
+  void SortWidget::clear( )
+  {
+    _propertiesSelector->clear( );
+    auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
+    for ( const auto& row : _layoutRowsMap )
+    {
+      auto idx = row.second;
+      auto item = qGridLayout->itemAtPosition(
+        idx, LABEL_COLUMN );
+      assert( item );
+      delete item->widget( );
+
+      item = qGridLayout->itemAtPosition(
+        idx, DIRBUTTON_COLUMN );
+      assert( item );
+      delete item->widget( );
+
+      item = qGridLayout->itemAtPosition(
+        idx, REMOVE_COLUMN );
+      assert( item );
+      delete item->widget( );
+
+    }
+    _layoutRowsMap.clear( );
+    _numSortProperties = 0;
+    _sortConfig.properties( ).clear( );
+    delete _removeSignalMapper;
+    _removeSignalMapper = new QSignalMapper;
+    delete _changeDirSignalMapper;
+    _changeDirSignalMapper = new QSignalMapper;
+
+  }
 
   void SortWidget::removeSortProperty( const QString& propertyLabel_ )
   {
@@ -152,9 +184,8 @@ namespace neuroscheme
     // If property already inserted just return
     if ( sortProperty == sortProperties.end( )) return;
 
-    sortProperties.erase( sortProperty );
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
-
+    
     auto item = qGridLayout->itemAtPosition(
       _layoutRowsMap[ propertyLabel ], LABEL_COLUMN );
     assert( item );

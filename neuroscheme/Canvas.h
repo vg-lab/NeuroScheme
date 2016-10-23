@@ -47,6 +47,7 @@ namespace neuroscheme
 
     const Layouts& layouts( void ) const;
     Layouts& layouts( void );
+    void addLayout( Layout* );
 
     int activeLayoutIndex( void );
     void activeLayoutIndex( int );

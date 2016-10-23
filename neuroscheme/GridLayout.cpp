@@ -36,8 +36,7 @@ namespace neuroscheme
   {
   }
 
-  void GridLayout::_arrangeItems( QGraphicsScene* scene_,
-                                  const shift::Representations& reps,
+  void GridLayout::_arrangeItems( const shift::Representations& reps,
                                   bool animate )
   {
 
@@ -53,8 +52,8 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( scene_ );
-        scene_->addItem( item );
+        auto item = graphicsItemRep->item( _scene );
+        _scene->addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
         if ( rect.width( ) > maxItemWidth )
@@ -83,7 +82,7 @@ namespace neuroscheme
     float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
     float canvasAspectRatio;
 
-    QGraphicsView* gv = scene_->views( )[0];
+    QGraphicsView* gv = _scene->views( )[0];
     if ( gv->width( ) > gv->height( ))
       canvasAspectRatio = float( gv->width( )) / float( gv->height( ));
     else
@@ -133,7 +132,7 @@ namespace neuroscheme
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( scene_ );
+        auto graphicsItem = graphicsItemRep->item( _scene );
         auto item = dynamic_cast< Item* >( graphicsItem );
         auto obj = dynamic_cast< QObject* >( graphicsItem );
         if ( item )

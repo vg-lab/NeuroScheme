@@ -175,10 +175,6 @@ namespace neuroscheme
           _layouts.getLayout( index )->optionsWidget( ),
           2, 0 );
         _layouts.getLayout( index )->optionsWidget( )->show( );
-        // std::cout << "Adding options" << std::endl;
-
-        std::cout << "Refresh layout for scene " << &this->scene( ) << std::endl;
-//        _layouts.getLayout( index )->refresh( &this->scene( ));
         displayReps( _reps, true );
       }
     }
@@ -189,16 +185,21 @@ namespace neuroscheme
     _reps = reps_;
     assert( _layouts.getLayout( _activeLayoutIndex ));
     _layouts.getLayout( _activeLayoutIndex )->displayItems(
-      _graphicsScene, reps_, animate );
+      reps_, animate );
   }
 
+  void Canvas::addLayout( Layout* layout_ )
+  {
+    _layouts.addLayout( layout_ );
+    layout_->scene( _graphicsScene );
+  }
 
   Canvas* Canvas::clone( void ) const
   {
     auto canvas = new Canvas( );
     for ( auto layout_ : _layouts.map( ))
     {
-      canvas->layouts( ).addLayout( layout_.second->clone( ));
+      canvas->addLayout( layout_.second->clone( ));
       std::cout << "clone layout" << layout_.second << std::endl;
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );

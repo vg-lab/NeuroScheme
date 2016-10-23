@@ -40,11 +40,10 @@ namespace neuroscheme
     _viewMatrix = Matrix4f::Identity( );
   }
 
-  void CameraBasedLayout::_arrangeItems( QGraphicsScene* scene,
-                                         const shift::Representations& reps,
+  void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
                                          bool animate )
   {
-    float ratio = float( scene->width( )) / float( scene->height( ));;
+    float ratio = float( _scene->width( )) / float( _scene->height( ));;
 
     double S = 1.0 / ( tan( FOV * 0.5 * M_PI / 180.0 ));
 
@@ -69,7 +68,7 @@ namespace neuroscheme
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( scene );
+        auto graphicsItem = graphicsItemRep->item( _scene );
         auto item = dynamic_cast< Item* >( graphicsItem );
         auto obj = dynamic_cast< QObject* >( graphicsItem );
         if ( graphicsItem && item )
@@ -89,8 +88,8 @@ namespace neuroscheme
           const bool behindCamera = pos.z( ) > 0;
           pos = _projectionMatrix * pos;
           pos /= pos.w( );
-          pos[0] = pos[0] * float( scene->width( )) * 0.5f;
-          pos[1] = pos[1] * float( scene->height( )) * 0.5f;
+          pos[0] = pos[0] * float( _scene->width( )) * 0.5f;
+          pos[1] = pos[1] * float( _scene->height( )) * 0.5f;
 
           auto x = pos[0];
           auto y = pos[1];

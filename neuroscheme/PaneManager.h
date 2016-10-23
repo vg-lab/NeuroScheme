@@ -42,8 +42,8 @@ namespace neuroscheme
     {
       for ( auto canvas : _panes )
       {
-        canvas->layouts( ).getLayout( canvas->activeLayoutIndex( ))->updateSelection(
-          &( canvas->scene( )));
+        canvas->layouts( ).getLayout(
+          canvas->activeLayoutIndex( ))->updateSelection( );
       }
     }
 

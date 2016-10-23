@@ -19,9 +19,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__SORT_WIDGET__
-#define __NEUROSCHEME__SORT_WIDGET__
+#ifndef __NEUROSCHEME__FILTER_WIDGET__
+#define __NEUROSCHEME__FILTER_WIDGET__
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QFrame>
 #include <QObject>
@@ -33,29 +34,30 @@ namespace neuroscheme
 {
   class Layout;
 
-  class SortWidget : public QFrame
+  class FilterWidget : public QFrame
   {
     Q_OBJECT;
   public:
-    SortWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
-    ~SortWidget( void );
+    FilterWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
+    ~FilterWidget( void );
     QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
-    void clear( );
+    void clear( void );
 
   public slots:
-    void addedSortProperty( void );
-    void removeSortProperty( const QString& propertyLabel );
-    void changeSortPropertyDir( const QString& propertyLabel );
+    void addedFilterProperty( void );
+    void removeFilterProperty( const QString& propertyLabel );
+    void sliderChanged( const QString& propertyLabel );
 
   protected:
     Layout* _parentLayout;
     QComboBox*_propertiesSelector;
-    QToolButton* _sortButton;
-    unsigned int _numSortProperties;
-    fires::SortConfig _sortConfig;
+    QToolButton* _addFilterButton;
+    unsigned int _numFilterProperties;
+    fires::FilterSetConfig _filterSetConfig;
     QSignalMapper* _removeSignalMapper;
-    QSignalMapper* _changeDirSignalMapper;
+    QSignalMapper* _changeSliderSignalMapper;
     std::map< std::string, unsigned int > _layoutRowsMap;
+    QCheckBox* _autoFilterCheckBox;
   };
 
 }

@@ -57,9 +57,9 @@ namespace neuroscheme
     }
     if ( _flags & FILTER_ENABLED )
     {
-      auto filterWidget = new QFrame;
+      _filterWidget = new FilterWidget( this );
       QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
-      _toolbox->addItem( filterWidget, filterIcon, QString( "Filter" ));
+      _toolbox->addItem( _filterWidget, filterIcon, QString( "Filter" ));
     }
 
     // _toolbox->show( );
@@ -81,8 +81,7 @@ namespace neuroscheme
     return _optionsWidget;
   }
 
-  void Layout::displayItems( QGraphicsScene* scene,
-                             const shift::Representations& reps,
+  void Layout::displayItems( const shift::Representations& reps,
                              bool animate )
   {
     _representations = reps;
@@ -90,10 +89,10 @@ namespace neuroscheme
       return;
 
     _refreshProperties( );
-    _clearScene( scene );
-    _drawCorners( scene );
-    _addRepresentations( scene, reps );
-    _arrangeItems( scene, reps, animate );
+    _clearScene( );
+    _drawCorners( );
+    _addRepresentations( reps );
+    _arrangeItems( reps, animate );
   }
 
   void Layout::_refreshProperties( void )
@@ -105,7 +104,7 @@ namespace neuroscheme
 
     _properties.clear( );
 
-    for ( const auto representation : _representations )
+    for ( const auto& representation : _representations )
     {
       const auto entities = repsToEntities.at( representation );
       if ( entities.size( ) < 1 )
@@ -130,10 +129,11 @@ namespace neuroscheme
     if ( _sortWidget &&
          _sortWidget->propertiesSelector( ))
     {
+      _sortWidget->clear( );
       auto selector = _sortWidget->propertiesSelector( );
+      std::cout << selector << std::endl;
       int i = -1;
-      selector->clear( );
-      for ( const auto prop : _properties )
+      for ( const auto& prop : _properties )
       {
         //if ( !std::is_scalar< p.first >( ))
         // if ( !fires::PropertyManager::getAggregator( p.first ))
@@ -142,10 +142,27 @@ namespace neuroscheme
         std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
       }
     }
+    if ( _filterWidget &&
+         _filterWidget->propertiesSelector( ))
+    {
+      _filterWidget->clear( );
+      auto selector = _filterWidget->propertiesSelector( );
+      std::cout << selector << std::endl;
+      int i = -1;
+      for ( const auto& prop : _properties )
+      {
+        //if ( !std::is_scalar< p.first >( ))
+        // if ( !fires::PropertyManager::getAggregator( p.first ))
+        std::cout << prop.first << std::endl;
+        selector->insertItem( ++i, QString( prop.first.c_str( )));
+        std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
+      }
+    }
+
     fires::AggregateConfig aggregateConfigMax;
     fires::AggregateConfig aggregateConfigMin;
 
-    for ( auto p : _properties )
+    for ( const auto& p : _properties )
     {
       aggregateConfigMax.addProperty(
         p.first,
@@ -167,7 +184,7 @@ namespace neuroscheme
       aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
       fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
 
-    for ( auto p : _properties )
+    for ( auto& p : _properties )
     {
       std::string label = p.first;
 
@@ -183,47 +200,46 @@ namespace neuroscheme
     }
   }
 
-  void Layout::_drawCorners( QGraphicsScene* scene )
+  void Layout::_drawCorners( )
   {
-    NEUROSCHEME_DEBUG_CHECK( scene->views( ).size( ) != 0,
+    NEUROSCHEME_DEBUG_CHECK( _scene->views( ).size( ) != 0,
                              "Scene with no view" );
-    QGraphicsView* gv = scene->views( )[0];
+    QGraphicsView* gv = _scene->views( )[0];
 
     // std::cout << gv->width( ) << " x " << gv->height( ) << std::endl;
     QGraphicsEllipseItem* center =
       new QGraphicsEllipseItem( -10, -10, 20, 20 );
-    scene->addItem( center );
+    _scene->addItem( center );
     QGraphicsEllipseItem* tl =
       new QGraphicsEllipseItem( -gv->width( ) / 2 - 10,
                                 -gv->height( ) / 2 - 10,
                                 20, 20 );
 
-    scene->addItem( tl );
+    _scene->addItem( tl );
     QGraphicsEllipseItem* br =
       new QGraphicsEllipseItem( gv->width( ) / 2 - 10,
                                 gv->height( ) / 2 - 10,
                                 20, 20 );
 
-    scene->addItem( br );
+    _scene->addItem( br );
   }
 
-  void Layout::_clearScene( QGraphicsScene* scene )
+  void Layout::_clearScene( void )
   {
     // Remove top items without destroying them
-    QList< QGraphicsItem* > items_ = scene->items( );
+    QList< QGraphicsItem* > items_ = _scene->items( );
     for ( auto item = items_.begin( ); item != items_.end( ); ++item )
     {
       auto item_ = dynamic_cast< Item* >( *item );
       if ( item_ && item_->parentRep( ))
-        scene->removeItem( *item );
+        _scene->removeItem( *item );
     }
 
     // Remove the rest
-    scene->clear( );
+    _scene->clear( );
   }
 
-  void Layout::_addRepresentations( QGraphicsScene* scene,
-                                    const shift::Representations& reps )
+  void Layout::_addRepresentations( const shift::Representations& reps )
   {
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -239,7 +255,7 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( scene );
+        auto item = graphicsItemRep->item( _scene );
 
         // Find out if its entity is selected
         // and if so set its pen
@@ -274,14 +290,14 @@ namespace neuroscheme
           }
         }
         //std::cout << &scene << " add item " << std::endl;
-        scene->addItem( item );
+        _scene->addItem( item );
       }
     }
   } // _addRepresentations
 
-  void Layout::updateSelection( QGraphicsScene* scene )
+  void Layout::updateSelection( void )
   {
-    QList< QGraphicsItem* > items_ = scene->items( );
+    QList< QGraphicsItem* > items_ = _scene->items( );
     for ( auto qitem = items_.begin( ); qitem != items_.end( ); ++qitem )
     {
       auto selectableItem_ = dynamic_cast< SelectableItem* >( *qitem );
@@ -331,15 +347,13 @@ namespace neuroscheme
   }
 
 
-  void ScatterplotLayout::displayItems( QGraphicsScene* scene_,
-                                        const shift::Representations& reps,
+  void ScatterplotLayout::displayItems( const shift::Representations& reps,
                                         bool /* animate */ )
   {
     std::cout << "ScatterplotLayout:: Display items" << std::endl;
     std::cout << "1" << std::endl;
-    if ( !scene_ ) return;
+    if ( !_scene ) return;
     std::cout << "2" << std::endl;
-    auto& scene = *scene_;
 
     _representations = reps;
     if ( reps.empty( ))
@@ -350,16 +364,16 @@ namespace neuroscheme
     {
       std::cout << "Clearing" << std::endl;
       // Remove top items without destroying them
-      QList< QGraphicsItem* > items_ = scene.items( );
+      QList< QGraphicsItem* > items_ = _scene->items( );
       for ( auto item = items_.begin( ); item != items_.end( ); ++item )
       {
         auto item_ = dynamic_cast< Item* >( *item );
         if ( item_ && item_->parentRep( ))
-          scene.removeItem( *item );
+          _scene->removeItem( *item );
       }
 
       // Remove the rest
-      scene.clear( );
+      _scene->clear( );
     }
 
   }
