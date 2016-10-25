@@ -53,7 +53,7 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
-        _scene->addItem( item );
+        //_scene->addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
         if ( rect.width( ) > maxItemWidth )
@@ -63,7 +63,7 @@ namespace neuroscheme
           maxItemHeight = rect.height( );
       }
     }
-    
+
     bool forceScale = false;
     float forcedScale = 1.0f;
     const unsigned int marginX = 20;
@@ -147,19 +147,54 @@ namespace neuroscheme
 
           if ( obj && animate )
           {
-            #define ANIM_DURATION 1200
-            item->posAnim( ).setTargetObject( obj );
-            item->posAnim( ).setPropertyName( "pos" );
-            item->scaleAnim( ).setTargetObject( obj );
-            item->scaleAnim( ).setPropertyName( "scale" );
-            item->posAnim( ).setDuration( ANIM_DURATION );
-            item->scaleAnim( ).setDuration( ANIM_DURATION );
-            item->posAnim( ).setStartValue( graphicsItem->pos( ));
-            item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
-            item->posAnim( ).setEndValue( QPoint( posX, posY ));
-            item->scaleAnim( ).setEndValue( scale_ );
-            item->posAnim( ).start( );
-            item->scaleAnim( ).start( );
+            animateItem( graphicsItem, scale_, QPoint( posX, posY ));
+            // #define ANIM_DURATION 3200
+
+            // auto& scaleAnim = item->scaleAnim( );
+            // if ( scaleAnim.state( ) == QAbstractAnimation::Running )
+            // {
+            //   scaleAnim.stop( );
+            //   assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
+            //   scaleAnim.setCurrentTime( 0 );
+            //   scaleAnim.setStartValue( scaleAnim.currentValue( ));
+            //   std::cout << "Stopping at " << scaleAnim.currentValue( ).toInt( ) << std::endl;
+            // }
+            // else
+            // {
+            //   assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
+            //   scaleAnim.setTargetObject( obj );
+            //   //scaleAnim.setPropertyName( "scale" );
+            //   scaleAnim.setDuration( ANIM_DURATION );
+            //   scaleAnim.setStartValue( graphicsItem->scale( ));
+            // }
+            // scaleAnim.setEndValue( scale_ );
+
+            // // auto& posAnim = item->posAnim( );
+            // // if ( posAnim.state( ) == QAbstractAnimation::Running )
+            // // {
+            // //   posAnim.stop( );
+            // //   posAnim.setCurrentTime( 0 );
+            // //   posAnim.setStartValue( posAnim.currentValue( ));
+            // // }
+            // // else
+            // //   posAnim.setStartValue( graphicsItem->pos( ));
+
+            // // posAnim.setTargetObject( obj );
+            // // posAnim.setPropertyName( "pos" );
+            // // posAnim.setDuration( ANIM_DURATION );
+            // // posAnim.setEndValue( QPoint( posX, posY ));
+
+            // // item->posAnim( ).setTargetObject( obj );
+            // // item->posAnim( ).setPropertyName( "pos" );
+            // // // item->scaleAnim( ).setTargetObject( obj );
+            // // // item->scaleAnim( ).setPropertyName( "scale" );
+            // // item->posAnim( ).setDuration( ANIM_DURATION );
+            // // item->scaleAnim( ).setDuration( ANIM_DURATION );
+            // // item->posAnim( ).setStartValue( graphicsItem->pos( ));
+            // // item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
+            // // item->posAnim( ).setEndValue( QPoint( posX, posY ));
+            // // posAnim.start( );
+            // scaleAnim.start( );
           }
           else
           {
@@ -183,7 +218,7 @@ namespace neuroscheme
 
   void GridLayout::_updateOptionsWidget( void )
   {
-    
+
   }
 
   Layout* GridLayout::clone( void ) const

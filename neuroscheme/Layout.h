@@ -26,6 +26,7 @@
 #include <QGraphicsScene>
 #include <QGridLayout>
 #include <QObject>
+#include <QPoint>
 #include <QPushButton>
 #include <QToolBox>
 #include <map>
@@ -73,13 +74,20 @@ namespace neuroscheme
     const std::string& name( void );
     LayoutOptionsWidget* optionsWidget( void );
 
-    void refresh( )
+    void refresh( bool animate = true,
+                  bool refreshProperties = true )
     {
       std::cout << "Layout::refresh" << std::endl;
-      displayItems( _representations, false );
+      // displayItems( _representations, false );
+      displayEntities( _entities, animate, refreshProperties );
     }
-    virtual void displayItems( const shift::Representations& reps,
-                               bool animate );
+
+    virtual void displayEntities( const shift::Entities& entities,
+                                  bool animate = true,
+                                  bool refreshProperties = true );
+
+    // virtual void displayItems( const shift::Representations& reps,
+    //                            bool animate );
 
     void updateSelection( );
     void scene( QGraphicsScene* scene_ )
@@ -87,6 +95,9 @@ namespace neuroscheme
       _scene = scene_;
     }
     virtual Layout* clone( void ) const = 0;
+
+    void animateItem( QGraphicsItem* graphicsItem,
+                      float toScale, const QPoint& toPos );
 
   public slots:
     void addedSortProperty( void )
@@ -107,6 +118,7 @@ namespace neuroscheme
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
     shift::Representations _representations;
+    shift::Entities _entities;
     TProperties _properties;
     QToolBox* _toolbox;
     SortWidget* _sortWidget;

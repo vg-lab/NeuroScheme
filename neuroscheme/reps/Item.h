@@ -36,7 +36,10 @@ namespace neuroscheme
 
     Item( void )
       : _parentRep( nullptr )
-    {}
+    {
+      _scaleAnim.setPropertyName( "scale" );
+      _posAnim.setPropertyName( "pos" );
+    }
     virtual ~Item( void )
     {
       auto parentRep_ =

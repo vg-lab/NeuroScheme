@@ -37,7 +37,8 @@ namespace neuroscheme
   public:
 
     static shift::EntitiesWithRelationships& entities( void );
-    static shift::Representations& representations( void );
+    static shift::Entities& rootEntities( void ) { return _rootEntities; }
+//    static shift::Representations& representations( void );
     static void loadData( void );
 
     static void loadBlueConfig( const std::string& blueConfig,
@@ -54,7 +55,9 @@ namespace neuroscheme
 
   protected:
     static shift::EntitiesWithRelationships _entities;
-    static shift::Representations _representations;
+    static shift::Entities _rootEntities;
+
+//    static shift::Representations _representations;
 
 #ifdef NEUROSCHEME_USE_NSOL
     static nsol::DataSet _nsolDataSet;

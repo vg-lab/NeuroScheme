@@ -87,7 +87,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   //  canvas->layouts( ).addLayout( gridLayout );
   canvas->addLayout( new neuroscheme::GridLayout( ));
   canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
-  canvas->displayReps( neuroscheme::DataManager::representations( ), false );
+  canvas->displayEntities(
+    neuroscheme::DataManager::rootEntities( ), false, true );
+//  canvas->displayReps( neuroscheme::DataManager::representations( ), false );
   neuroscheme::PaneManager::panes( ).insert( canvas );
   neuroscheme::PaneManager::activePane( canvas );
 
@@ -237,7 +239,8 @@ void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
     // std::cout << _canvas->view( ).width( ) << " x "
     //           << _canvas->view( ).height( ) << std::endl;
 
-    _canvas->layouts( ).getLayout( _canvas->activeLayoutIndex( ))->refresh( );
+    _canvas->layouts( ).getLayout(
+      _canvas->activeLayoutIndex( ))->refresh( false, false );
 
     // neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
     // neuroscheme::LayoutManager::update( );

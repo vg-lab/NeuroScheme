@@ -41,6 +41,7 @@ namespace neuroscheme
     ~SortWidget( void );
     QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
     void clear( );
+    fires::SortConfig& sortConfig( ) { return _sortConfig; }
 
   public slots:
     void addedSortProperty( void );

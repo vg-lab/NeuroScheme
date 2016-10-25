@@ -79,9 +79,16 @@ namespace neuroscheme
       MapperFloatToFloat neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
 
 
-      for ( const auto entityPair : entities )
+      for ( const auto entity : entities.vector( ))
       {
-        auto& entity = entityPair.second;
+        // if the entity has already a rep(s) don't create it
+        if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
+        {
+          for ( const auto rep : entitiesToReps[ entity ] )
+            representations.push_back( rep );
+          continue;
+        }
+//        auto& entity = entityPair.second;
         if ( dynamic_cast< Neuron* >( entity ))
         {
           auto neuron = dynamic_cast< Neuron* >( entity );

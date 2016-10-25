@@ -63,7 +63,6 @@ namespace neuroscheme
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
-      //std::cout << "Selected item" << selectableItem->selected( ) << std::endl;
       if ( selectableItem->selected( ))
         item->setPen( _hoverSelectedPen );
       else if ( selectableItem->partiallySelected( ))
@@ -163,12 +162,11 @@ namespace neuroscheme
             {
               // std::cout << "up" << std::endl;
               if ( parentSiblings.size( ) > 0 )
-              for ( const auto& parentSibling : parentSiblings )
-                targetEntities[parentSibling] =
-                  DataManager::entities( )[parentSibling];
+                for ( const auto& parentSibling : parentSiblings )
+                  targetEntities.add(
+                    DataManager::entities( ).at( parentSibling ));
               else
-                targetEntities[parent] =
-                  DataManager::entities( )[parent];
+                targetEntities.add( DataManager::entities( ).at( parent ));
 
 
             }
@@ -176,20 +174,22 @@ namespace neuroscheme
             {
               //std::cout << "down" << std::endl;
               for ( const auto& child : children )
-                targetEntities[child] =
-                  DataManager::entities( )[child];
+                targetEntities.add( DataManager::entities( ).at( child ));
             }
             if ( targetEntities.size( ) > 0 )
             {
-              neuroscheme::RepresentationCreatorManager::create(
-                targetEntities, representations,
-                true, true );
+              // neuroscheme::RepresentationCreatorManager::create(
+              //   targetEntities, representations,
+              //   true, true );
 
               auto canvas = dynamic_cast< Canvas* >(
                 shapeItem->scene( )->parent( ));
               assert( canvas );
-              canvas->displayReps( representations, false );
+              canvas->displayEntities( targetEntities, false, true );
+              //canvas->displayReps( representations, false );
               // neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
+              // neuroscheme::LayoutManager::displayItems(
+              //   representations, true );
               // neuroscheme::LayoutManager::displayItems(
               //   representations, true );
             }
@@ -353,7 +353,7 @@ namespace neuroscheme
     {
       //  std::cout << childId << " ";
       SelectionManager::setSelectedState(
-        entities[childId], state );
+        entities.at( childId ), state );
       _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
     }
 
@@ -374,7 +374,7 @@ namespace neuroscheme
     {
       //std::cout << "<>Partially selected" << std::endl;
       SelectionManager::setSelectedState(
-        entities[parentId], childState );
+        entities.at( parentId ), childState );
       _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
                                        parentId, childState );
       return;
@@ -393,7 +393,7 @@ namespace neuroscheme
       state = SelectedState::PARTIALLY_SELECTED;
 
     SelectionManager::setSelectedState(
-      entities[parentId], state );
+      entities.at( parentId ), state );
     _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
                                      parentId, state );
   }

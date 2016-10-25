@@ -48,6 +48,7 @@ namespace neuroscheme
     _optionsWidget->layout( )->addWidget( _toolbox, 0, 0 );
 
     _sortWidget = 0;
+    _filterWidget = 0;
 
     if ( _flags & SORT_ENABLED )
     {
@@ -81,19 +82,84 @@ namespace neuroscheme
     return _optionsWidget;
   }
 
-  void Layout::displayItems( const shift::Representations& reps,
-                             bool animate )
+  void Layout::displayEntities( const shift::Entities& entities,
+                                bool animate,
+                                bool refreshProperties )
   {
-    _representations = reps;
-    if ( reps.empty( ))
-      return;
+    _entities = entities;
+    _representations.clear( );
 
-    _refreshProperties( );
-    _clearScene( );
+    if ( _sortWidget &&
+         _sortWidget->sortConfig( ).properties( ).size( ) > 0 &&
+         !refreshProperties )
+    {
+      std::cout << "//Sorting using fires " << std::endl;
+      std::cout << "//Num properties "
+                << _sortWidget->sortConfig( ).properties( ).size( )
+                << std::endl;
+      fires::Sort firesSort;
+      fires::Objects objects;
+      //fires::FilterSet _firesFilterSet;
+
+      for ( const auto& entity : _entities.vector( ))
+        objects.add( entity );
+      firesSort.eval( objects, _sortWidget->sortConfig( ));
+
+      shift::Entities sortedEntities;
+      for ( const auto& entity : objects )
+        sortedEntities.add( static_cast< shift::Entity* >( entity ));
+
+      neuroscheme::RepresentationCreatorManager::create(
+        sortedEntities, _representations,
+        true, true );
+    }
+    else
+    {
+      std::cout << "Sorting by entitygid " << std::endl;
+      auto& vector = _entities.vector( );
+      std::sort( vector.begin( ), vector.end( ),
+                 []( shift::Entity*& a, shift::Entity*& b )
+                 { return b->entityGid( ) < a->entityGid( ); } );
+      neuroscheme::RepresentationCreatorManager::create(
+        _entities, _representations,
+        true, true );
+    }
+    // _representations = reps;
+    // if ( reps.empty( ))
+    //   return;
+
+    if ( refreshProperties )
+    {
+      std::cout << "Refresh properties" << std::endl;
+      _refreshProperties( );
+    }
+    if ( !animate )
+    {
+      std::cout << "Clear scene" << std::endl;
+      _clearScene( );
+    }
     _drawCorners( );
-    _addRepresentations( reps );
-    _arrangeItems( reps, animate );
+    if ( !animate )
+    {
+      std::cout << "Adding reps" << std::endl;
+      _addRepresentations( _representations );
+    }
+    _arrangeItems( _representations, animate );
   }
+
+  // void Layout::displayItems( const shift::Representations& reps,
+  //                            bool animate )
+  // {
+  //   _representations = reps;
+  //   if ( reps.empty( ))
+  //     return;
+
+  //   _refreshProperties( );
+  //   _clearScene( );
+  //   _drawCorners( );
+  //   _addRepresentations( reps );
+  //   _arrangeItems( reps, animate );
+  // }
 
   void Layout::_refreshProperties( void )
   {
@@ -137,9 +203,9 @@ namespace neuroscheme
       {
         //if ( !std::is_scalar< p.first >( ))
         // if ( !fires::PropertyManager::getAggregator( p.first ))
-        std::cout << prop.first << std::endl;
+        // std::cout << prop.first << std::endl;
         selector->insertItem( ++i, QString( prop.first.c_str( )));
-        std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
+        // std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
       }
     }
     if ( _filterWidget &&
@@ -153,9 +219,9 @@ namespace neuroscheme
       {
         //if ( !std::is_scalar< p.first >( ))
         // if ( !fires::PropertyManager::getAggregator( p.first ))
-        std::cout << prop.first << std::endl;
+        // std::cout << prop.first << std::endl;
         selector->insertItem( ++i, QString( prop.first.c_str( )));
-        std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
+        // std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
       }
     }
 
@@ -336,8 +402,57 @@ namespace neuroscheme
 
   void Layout::_updateOptionsWidget( void )
   {
-    
   }
+
+  void Layout::animateItem( QGraphicsItem* graphicsItem,
+                            float toScale, const QPoint& toPos )
+  {
+    auto obj = dynamic_cast< QObject* >( graphicsItem );
+    auto item = dynamic_cast< Item* >( graphicsItem );
+
+#define ANIM_DURATION 500
+
+    auto& scaleAnim = item->scaleAnim( );
+    if ( scaleAnim.state( ) == QAbstractAnimation::Running )
+    {
+      scaleAnim.stop( );
+      assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
+      scaleAnim.setStartValue( scaleAnim.currentValue( ));
+      scaleAnim.setDuration( scaleAnim.currentTime( ));
+      scaleAnim.setCurrentTime( 0 );
+    }
+    else
+    {
+      assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
+      scaleAnim.setTargetObject( obj );
+      scaleAnim.setDuration( ANIM_DURATION );
+      scaleAnim.setStartValue( graphicsItem->scale( ));
+    }
+    scaleAnim.setEndValue( toScale );
+
+    auto& posAnim = item->posAnim( );
+    if ( posAnim.state( ) == QAbstractAnimation::Running )
+    {
+      posAnim.stop( );
+      assert( posAnim.state( ) == QAbstractAnimation::Stopped );
+      posAnim.setStartValue( posAnim.currentValue( ));
+      posAnim.setDuration( posAnim.currentTime( ));
+      posAnim.setCurrentTime( 0 );
+    }
+    else
+    {
+      assert( posAnim.state( ) == QAbstractAnimation::Stopped );
+      posAnim.setTargetObject( obj );
+      posAnim.setDuration( ANIM_DURATION );
+      posAnim.setStartValue( graphicsItem->pos( ));
+    }
+    posAnim.setEndValue( toPos );
+
+    posAnim.start( );
+    scaleAnim.start( );
+
+  }
+
 
   ScatterplotLayout::ScatterplotLayout( void )
     : Layout( "Scatterplot" )
@@ -377,5 +492,6 @@ namespace neuroscheme
     }
 
   }
+
 
 }

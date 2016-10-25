@@ -34,11 +34,16 @@ namespace neuroscheme
 {
 
   class NeuronItem
-    : public QGraphicsEllipseItem
+    : public QObject
+    , public QGraphicsEllipseItem
     , public Item
     , public SelectableItem
     , public InteractiveItem
   {
+    Q_OBJECT
+    Q_PROPERTY( QPointF pos READ pos WRITE setPos )
+    Q_PROPERTY( qreal scale READ scale WRITE setScale )
+    // Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
   public:
 

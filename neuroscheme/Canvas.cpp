@@ -55,17 +55,21 @@ namespace neuroscheme
     layout_->addWidget( _graphicsView );
     this->setLayout( layout_ );
     this->leaveEvent( nullptr );
-    connect( this->layouts( ).layoutSelector( ),
-             SIGNAL( currentIndexChanged( int )),
-             this,
-             SLOT( layoutChanged( int )));
-
   }
 
   Canvas::~Canvas( void )
   {
     if ( _graphicsView ) delete _graphicsView;
     if ( _graphicsScene ) delete _graphicsScene;
+  }
+
+  void Canvas::connectLayoutSelector( void )
+  {
+    connect( this->layouts( ).layoutSelector( ),
+             SIGNAL( currentIndexChanged( int )),
+             this,
+             SLOT( layoutChanged( int )));
+
   }
 
   const GraphicsScene& Canvas::scene( void ) const
@@ -175,18 +179,27 @@ namespace neuroscheme
           _layouts.getLayout( index )->optionsWidget( ),
           2, 0 );
         _layouts.getLayout( index )->optionsWidget( )->show( );
-        displayReps( _reps, true );
+        //displayReps( _reps, true );
+        displayEntities( _entities, true, false );
       }
     }
   }
 
-  void Canvas::displayReps( shift::Representations& reps_, bool animate )
+  void Canvas::displayEntities( const shift::Entities& entities_,
+                                bool animate, bool refreshProperties )
   {
-    _reps = reps_;
+    _entities = entities_;
     assert( _layouts.getLayout( _activeLayoutIndex ));
-    _layouts.getLayout( _activeLayoutIndex )->displayItems(
-      reps_, animate );
+    _layouts.getLayout( _activeLayoutIndex )->displayEntities(
+      entities_, animate, refreshProperties );
   }
+  // void Canvas::displayReps( shift::Representations& reps_, bool animate )
+  // {
+  //   _reps = reps_;
+  //   assert( _layouts.getLayout( _activeLayoutIndex ));
+  //   _layouts.getLayout( _activeLayoutIndex )->displayItems(
+  //     reps_, animate );
+  // }
 
   void Canvas::addLayout( Layout* layout_ )
   {
@@ -197,12 +210,18 @@ namespace neuroscheme
   Canvas* Canvas::clone( void ) const
   {
     auto canvas = new Canvas( );
+    assert( canvas->scene( ).views( ).size( ) != 0 );
     for ( auto layout_ : _layouts.map( ))
     {
       canvas->addLayout( layout_.second->clone( ));
-      std::cout << "clone layout" << layout_.second << std::endl;
+      std::cout << "clone layout" << layout_.second->name( ) << std::endl;
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
+    std::cout << "setting active layout " << this->_activeLayoutIndex << std::endl;
+    canvas->displayEntities( _entities, false, true );
+    canvas->layouts( ).layoutSelector( )->setCurrentIndex(
+      this->_activeLayoutIndex );
+    canvas->connectLayoutSelector( );
     return canvas;
   }
 

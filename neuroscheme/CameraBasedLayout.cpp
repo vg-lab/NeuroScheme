@@ -43,6 +43,7 @@ namespace neuroscheme
   void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
                                          bool animate )
   {
+    std::cout << "CameraBasedLayout::_arrangeItems animate?" << animate << std::endl;
     float ratio = float( _scene->width( )) / float( _scene->height( ));;
 
     double S = 1.0 / ( tan( FOV * 0.5 * M_PI / 180.0 ));
@@ -85,7 +86,7 @@ namespace neuroscheme
 
           Vector4f pos = _viewMatrix * center;
           const float distance = pos.norm( );
-          const bool behindCamera = pos.z( ) > 0;
+          bool behindCamera = pos.z( ) > 0;
           pos = _projectionMatrix * pos;
           pos /= pos.w( );
           pos[0] = pos[0] * float( _scene->width( )) * 0.5f;
@@ -98,7 +99,7 @@ namespace neuroscheme
           auto zValue = -distance;
 
           // Temporarily use fake values
-          x = 0; y = 0; scale = 1;
+          x = 0; y = 0; scale = 1; behindCamera = false;
 
 #define ANIM_DURATION 1200
           if ( obj && animate )
@@ -106,24 +107,26 @@ namespace neuroscheme
             if ( behindCamera )
             {
               graphicsItem->setScale( 0.000001 );
-            } else
+            }
+            else
             {
               graphicsItem->setZValue( zValue );
-              item->posAnim( ).setTargetObject( obj );
-              item->posAnim( ).setPropertyName( "pos" );
-              item->scaleAnim( ).setTargetObject( obj );
-              item->scaleAnim( ).setPropertyName( "scale" );
-              item->posAnim( ).setDuration( ANIM_DURATION );
-              item->scaleAnim( ).setDuration( ANIM_DURATION );
-              item->posAnim( ).setStartValue( graphicsItem->pos( ));
-              item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
-              item->posAnim( ).setEndValue( QPoint( x, y ));
-              item->scaleAnim( ).setEndValue( scale );
-              item->posAnim( ).start( );
-              item->scaleAnim( ).start( );
+              animateItem( graphicsItem, scale, QPoint( x, y ));
+              // item->posAnim( ).setTargetObject( obj );
+              // item->posAnim( ).setPropertyName( "pos" );
+              // item->scaleAnim( ).setTargetObject( obj );
+              // item->scaleAnim( ).setPropertyName( "scale" );
+              // item->posAnim( ).setDuration( ANIM_DURATION );
+              // item->scaleAnim( ).setDuration( ANIM_DURATION );
+              // item->posAnim( ).setStartValue( graphicsItem->pos( ));
+              // item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
+              // item->posAnim( ).setEndValue( QPoint( x, y ));
+              // item->scaleAnim( ).setEndValue( scale );
+              // item->posAnim( ).start( );
+              // item->scaleAnim( ).start( );
             }
           }
-          else
+          else // not animation
           {
             if ( behindCamera )
             {

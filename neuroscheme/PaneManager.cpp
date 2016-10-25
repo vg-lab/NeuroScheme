@@ -141,15 +141,19 @@ namespace neuroscheme
     {
       canvas = new Canvas( );
       _mainGridLayout->addWidget( canvas, _nextRow, _nextColumn );
+      canvas->connectLayoutSelector( );
     }
     else
     {
+      std::cout << "---1" << std::endl;
       canvas = orig->clone( );
+      std::cout << "---2" << std::endl;
       if ( division == HORIZONTAL )
         _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
       else if ( division == VERTICAL )
         _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
-      canvas->displayReps( orig->reps( ), false );
+      std::cout << "---3" << std::endl;
+      // canvas->displayEntities( orig->entities( ), false, true );
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );

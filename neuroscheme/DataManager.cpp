@@ -8,8 +8,11 @@ namespace neuroscheme
   shift::EntitiesWithRelationships DataManager::_entities =
     shift::EntitiesWithRelationships( );
 
-  shift::Representations DataManager::_representations =
-    shift::Representations( );;
+  shift::Entities DataManager::_rootEntities =
+    shift::Entities( );
+
+  // shift::Representations DataManager::_representations =
+  //   shift::Representations( );;
 
   nsol::DataSet DataManager::_nsolDataSet = nsol::DataSet( );
 
@@ -18,10 +21,10 @@ namespace neuroscheme
     return _entities;
   }
 
-  shift::Representations& DataManager::representations( void )
-  {
-    return _representations;
-  }
+  // shift::Representations& DataManager::representations( void )
+  // {
+  //   return _representations;
+  // }
 
   void DataManager::loadData( void )
     {
@@ -246,7 +249,7 @@ namespace neuroscheme
       }
 
       // Display root reps
-      shift::Entities rootEntities;
+//      shift::Entities rootEntities;
       // auto& relParentOf =
       //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
       // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
@@ -254,15 +257,15 @@ namespace neuroscheme
 
       const auto& childrenIds = relParentOf[ 0 ];
       std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
+      _rootEntities.clear( );
       for ( const auto& child : childrenIds )
-        rootEntities[child] =
-          neuroscheme::DataManager::entities( )[child];
+        _rootEntities.add( neuroscheme::DataManager::entities( ).at( child ));
 
       neuroscheme::RepresentationCreatorManager::addCreator(
         new neuroscheme::cortex::RepresentationCreator );
-      neuroscheme::RepresentationCreatorManager::create(
-        rootEntities, _representations,
-        true, true );
+      // neuroscheme::RepresentationCreatorManager::create(
+      //   rootEntities, _representations,
+      //   true, true );
 
     } // loadData
 
@@ -930,7 +933,7 @@ auto greenMapper = new DiscreteColorMapper( );
     std::cout << "\n";
 
     // Display root reps
-    shift::Entities rootEntities; 
+//    shift::Entities _rootEntities;
    // auto& relParentOf =
     //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
     // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
@@ -938,19 +941,20 @@ auto greenMapper = new DiscreteColorMapper( );
 
     const auto& childrenIds = relParentOf[ 0 ];
     std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
+    _rootEntities.clear( );
     for ( const auto& child : childrenIds )
-      rootEntities[child] =
-        neuroscheme::DataManager::entities( )[child];
+      _rootEntities.add( neuroscheme::DataManager::entities( ).at( child ));
 
     auto repCretor = new neuroscheme::cortex::RepresentationCreator( );
     repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
                             maxNeuronDendVolume, maxNeuronDendArea,
                             gids.size( ));
     std::cout << "    repCretor->setMaximums( " <<  maxNeuronSomaVolume << " ," <<  maxNeuronSomaArea << "," << maxNeuronDendVolume << " ," <<  maxNeuronDendArea << "," << gids.size( ) << std::endl;
+
     neuroscheme::RepresentationCreatorManager::addCreator( repCretor );
-    neuroscheme::RepresentationCreatorManager::create(
-      rootEntities, _representations,
-      true, true );
+    // neuroscheme::RepresentationCreatorManager::create(
+    //   rootEntities, _representations,
+    //   true, true );
 
   }
 #endif

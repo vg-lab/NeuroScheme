@@ -117,12 +117,12 @@ namespace neuroscheme
     connect( _removeSignalMapper, SIGNAL( mapped( const QString& )),
              this, SLOT( removeSortProperty( const QString&  )));
 
-    connect( changeSortDirButton, SIGNAL( pressed( )),
+    connect( changeSortDirButton, SIGNAL( clicked( )),
              _changeDirSignalMapper, SLOT( map( )));
     _changeDirSignalMapper->setMapping( changeSortDirButton,
                                         QString( propertyLabel.c_str( )));
-    // connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
-    //          this, SLOT( changeSortPropertyDir( const QString&  )));
+    connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
+             this, SLOT( changeSortPropertyDir( const QString&  )));
 
     std::cout << "["
               << _sortConfig.properties( ).size( ) << "]: ";
@@ -133,6 +133,7 @@ namespace neuroscheme
     }
     std::cout <<  std::endl;
 
+    _parentLayout->refresh( true, false );
   }
   void SortWidget::clear( )
   {
@@ -184,8 +185,10 @@ namespace neuroscheme
     // If property already inserted just return
     if ( sortProperty == sortProperties.end( )) return;
 
+    sortProperties.erase( sortProperty );
+
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
-    
+
     auto item = qGridLayout->itemAtPosition(
       _layoutRowsMap[ propertyLabel ], LABEL_COLUMN );
     assert( item );
@@ -210,12 +213,15 @@ namespace neuroscheme
     }
     std::cout <<  std::endl;
 
+    _parentLayout->refresh( true, false );
   }
 
   void SortWidget::changeSortPropertyDir( const QString& propertyLabel_ )
   {
     auto& sortProperties = _sortConfig.properties( );
     auto propertyLabel = propertyLabel_.toStdString( );
+
+    std::cout << "//changind sort dir of " << propertyLabel << std::endl;
 
     fires::SortConfig::TSortProperties::iterator sortProperty = std::find_if(
       sortProperties.begin( ), sortProperties.end( ),
@@ -231,7 +237,7 @@ namespace neuroscheme
       sortProperty->order =fires::SortConfig::DESCENDING :
       sortProperty->order = fires::SortConfig::ASCENDING;
 
-    std::cout << "Change sort dir "
+    std::cout << "//Change sort dir "
               << propertyLabel << " to "
               << (int) sortProperty->order << std::endl;
 
@@ -244,6 +250,7 @@ namespace neuroscheme
     }
     std::cout <<  std::endl;
 
+    _parentLayout->refresh( true, false );
   }
 
   SortWidget::~SortWidget( void )

@@ -163,7 +163,8 @@ namespace neuroscheme
 
   void FilterWidget::clear( void )
   {
-    _propertiesSelector->clear( );
+    if ( _propertiesSelector )
+      _propertiesSelector->clear( );
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
     for ( const auto& row : _layoutRowsMap )
     {
