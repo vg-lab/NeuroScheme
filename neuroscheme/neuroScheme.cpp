@@ -43,10 +43,14 @@ void usageMessage( void )
             << std::endl
             << "\t[ --no-morphologies | -nm ] "
             << std::endl
+#ifdef NEUROSCHEME_USE_ZEROEQ
             << "\t[ -zeroeq [ session ] ]"
             << std::endl
+#endif
+#ifdef NEUROSCHEME_USE_DEFLECT
             << "\t[ [ -dh | --deflect-host ] host ]"
             << std::endl
+#endif
             << "\t[ [ -fs | --fullscreen ] "
             << std::endl
             << "\t[ -ws | --window-size ] width height ]"

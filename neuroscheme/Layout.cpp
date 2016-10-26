@@ -84,19 +84,19 @@ namespace neuroscheme
 
   void Layout::displayEntities( const shift::Entities& entities,
                                 bool animate,
-                                bool refreshProperties )
+                                bool refreshProperties_ )
   {
     _entities = entities;
     _representations.clear( );
 
     if ( _sortWidget &&
          _sortWidget->sortConfig( ).properties( ).size( ) > 0 &&
-         !refreshProperties )
+         !refreshProperties_ )
     {
-      std::cout << "//Sorting using fires " << std::endl;
-      std::cout << "//Num properties "
-                << _sortWidget->sortConfig( ).properties( ).size( )
-                << std::endl;
+      // std::cout << "//Sorting using fires " << std::endl;
+      // std::cout << "//Num properties "
+                // << _sortWidget->sortConfig( ).properties( ).size( )
+                // << std::endl;
       fires::Sort firesSort;
       fires::Objects objects;
       //fires::FilterSet _firesFilterSet;
@@ -115,7 +115,7 @@ namespace neuroscheme
     }
     else
     {
-      std::cout << "Sorting by entitygid " << std::endl;
+      // std::cout << "Sorting by entitygid " << std::endl;
       auto& vector = _entities.vector( );
       std::sort( vector.begin( ), vector.end( ),
                  []( shift::Entity*& a, shift::Entity*& b )
@@ -128,20 +128,20 @@ namespace neuroscheme
     // if ( reps.empty( ))
     //   return;
 
-    if ( refreshProperties )
+    if ( refreshProperties_ )
     {
-      std::cout << "Refresh properties" << std::endl;
-      _refreshProperties( );
+//      std::cout << "Refresh properties" << std::endl;
+      refreshProperties( );
     }
     if ( !animate )
     {
-      std::cout << "Clear scene" << std::endl;
+      //    std::cout << "Clear scene" << std::endl;
       _clearScene( );
     }
     _drawCorners( );
     if ( !animate )
     {
-      std::cout << "Adding reps" << std::endl;
+      // std::cout << "Adding reps" << std::endl;
       _addRepresentations( _representations );
     }
     _arrangeItems( _representations, animate );
@@ -161,7 +161,7 @@ namespace neuroscheme
   //   _arrangeItems( reps, animate );
   // }
 
-  void Layout::_refreshProperties( void )
+  void Layout::refreshProperties( void )
   {
     fires::Objects objs;
     fires::Objects filteredObjs;
@@ -170,6 +170,7 @@ namespace neuroscheme
 
     _properties.clear( );
 
+    //std::cout << "Refreshing properties for " << _representations.size( ) << " entities" << std::endl;
     for ( const auto& representation : _representations )
     {
       const auto entities = repsToEntities.at( representation );
@@ -197,7 +198,7 @@ namespace neuroscheme
     {
       _sortWidget->clear( );
       auto selector = _sortWidget->propertiesSelector( );
-      std::cout << selector << std::endl;
+      //std::cout << selector << std::endl;
       int i = -1;
       for ( const auto& prop : _properties )
       {
@@ -213,7 +214,7 @@ namespace neuroscheme
     {
       _filterWidget->clear( );
       auto selector = _filterWidget->propertiesSelector( );
-      std::cout << selector << std::endl;
+      //std::cout << selector << std::endl;
       int i = -1;
       for ( const auto& prop : _properties )
       {

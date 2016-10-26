@@ -319,7 +319,7 @@ namespace neuroscheme
               entityGid,
               parentState );
 
-            std::cout << std::endl;
+            //std::cout << std::endl;
 
             //LayoutManager::updateAllScenesSelection( );
             PaneManager::updateSelection( );

@@ -22,6 +22,7 @@
 #include "CameraBasedLayout.h"
 #include "reps/Item.h"
 #include "error.h"
+#include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 
 namespace neuroscheme
@@ -32,22 +33,23 @@ namespace neuroscheme
 #define FOV 53.1301f
 
   CameraBasedLayout::CameraBasedLayout( void )
-    : Layout( "3D" )
+    : Layout( "3D", Layout::CAMERA_ENABLED )
   {
     _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
     _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
-
-    _viewMatrix = Matrix4f::Identity( );
   }
 
   void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
                                          bool animate )
   {
-    std::cout << "CameraBasedLayout::_arrangeItems animate?" << animate << std::endl;
-    float ratio = float( _scene->width( )) / float( _scene->height( ));;
+    const auto sceneWidth = 1000; //_scene->width( );
+    const auto sceneHeight = 1000; //_scene->height( );
+
+    float ratio = float( sceneWidth ) / float( sceneHeight );
 
     double S = 1.0 / ( tan( FOV * 0.5 * M_PI / 180.0 ));
 
+    Matrix4f _projectionMatrix;
     _projectionMatrix.row( 0 ) = Vector4f( -S / ratio, 0, 0, 0);
     _projectionMatrix.row( 1 ) = Vector4f( 0, S, 0, 0 );
     _projectionMatrix.row( 2 ) =
@@ -58,7 +60,8 @@ namespace neuroscheme
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    for ( const auto representation : reps )
+    const auto& viewMatrix = PaneManager::viewMatrix( );
+    for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
         dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
@@ -84,55 +87,42 @@ namespace neuroscheme
             DomainManager::getActiveDomain( )->entity3DPosition(
               *entities.begin( ));
 
-          Vector4f pos = _viewMatrix * center;
+          Vector4f pos = viewMatrix * center;
           const float distance = pos.norm( );
           bool behindCamera = pos.z( ) > 0;
           pos = _projectionMatrix * pos;
           pos /= pos.w( );
-          pos[0] = pos[0] * float( _scene->width( )) * 0.5f;
-          pos[1] = pos[1] * float( _scene->height( )) * 0.5f;
+          pos[0] = pos[0] * float( sceneWidth ) * 0.5f;
+          pos[1] = pos[1] * float( sceneHeight ) * 0.5f;
 
           auto x = pos[0];
           auto y = pos[1];
 
-          auto scale = 250.0 / distance;
+          auto scale = 250.0f / distance;
           auto zValue = -distance;
 
-          // Temporarily use fake values
-          x = 0; y = 0; scale = 1; behindCamera = false;
 
 #define ANIM_DURATION 1200
           if ( obj && animate )
           {
             if ( behindCamera )
             {
-              graphicsItem->setScale( 0.000001 );
+              graphicsItem->setScale( 0.000001f );
             }
             else
             {
               graphicsItem->setZValue( zValue );
               animateItem( graphicsItem, scale, QPoint( x, y ));
-              // item->posAnim( ).setTargetObject( obj );
-              // item->posAnim( ).setPropertyName( "pos" );
-              // item->scaleAnim( ).setTargetObject( obj );
-              // item->scaleAnim( ).setPropertyName( "scale" );
-              // item->posAnim( ).setDuration( ANIM_DURATION );
-              // item->scaleAnim( ).setDuration( ANIM_DURATION );
-              // item->posAnim( ).setStartValue( graphicsItem->pos( ));
-              // item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
-              // item->posAnim( ).setEndValue( QPoint( x, y ));
-              // item->scaleAnim( ).setEndValue( scale );
-              // item->posAnim( ).start( );
-              // item->scaleAnim( ).start( );
             }
           }
           else // not animation
           {
             if ( behindCamera )
             {
-              graphicsItem->setScale( 0.000001 );
+              graphicsItem->setScale( 0.000001f );
             } else
             {
+              graphicsItem->setZValue( zValue );
               graphicsItem->setPos( x, y );
               graphicsItem->setScale( scale );
             }

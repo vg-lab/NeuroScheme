@@ -75,7 +75,7 @@ namespace neuroscheme
       MapperFloatToFloat dendAreaToAngle(
         0, _maxNeuronDendsArea == 0 ? 0.1f : _maxNeuronDendsArea, 0, -360 );
 
-      std::cout << "--------------------" << _maxNeurons << std::endl;
+      //std::cout << "--------------------" << _maxNeurons << std::endl;
       MapperFloatToFloat neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
 
 
@@ -228,11 +228,11 @@ namespace neuroscheme
 
       somaVolumeToColor.value( ) =
         entity->getProperty( "meanSomaVolume" ).value< float >( );
-      std::cout << "!!!!"
-                << entity->getProperty( "meanSomaVolume" ).value< float >( )
-                << "-->"
-                << somaVolumeToColor.map( )
-                << std::endl;
+      // std::cout << "!!!!"
+      //           << entity->getProperty( "meanSomaVolume" ).value< float >( )
+      //           << "-->"
+      //           << somaVolumeToColor.map( )
+      //           << std::endl;
 
       shiftgen::Ring somaRing;
       somaRing.setProperty(

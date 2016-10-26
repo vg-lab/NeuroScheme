@@ -753,12 +753,12 @@ auto greenMapper = new DiscreteColorMapper( );
           nsol::TAggregation::MEAN,
           nsol::TAggregation::MEAN );
       }
-      std::cout << "Creating col with"
-                << meanSomaVolume << " "
-                << meanSomaArea << " "
-                << meanDendsVolume << " "
-                << meanDendsArea <<  " "
-                << meanCenter << std::endl;
+      // std::cout << "Creating col with"
+      //           << meanSomaVolume << " "
+      //           << meanSomaArea << " "
+      //           << meanDendsVolume << " "
+      //           << meanDendsArea <<  " "
+      //           << meanCenter << std::endl;
       shift::Entity* colEntity =
         new neuroscheme::Column(
           col->numberOfNeurons( false ),
@@ -949,7 +949,6 @@ auto greenMapper = new DiscreteColorMapper( );
     repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
                             maxNeuronDendVolume, maxNeuronDendArea,
                             gids.size( ));
-    std::cout << "    repCretor->setMaximums( " <<  maxNeuronSomaVolume << " ," <<  maxNeuronSomaArea << "," << maxNeuronDendVolume << " ," <<  maxNeuronDendArea << "," << gids.size( ) << std::endl;
 
     neuroscheme::RepresentationCreatorManager::addCreator( repCretor );
     // neuroscheme::RepresentationCreatorManager::create(

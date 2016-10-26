@@ -213,11 +213,14 @@ namespace neuroscheme
     assert( canvas->scene( ).views( ).size( ) != 0 );
     for ( auto layout_ : _layouts.map( ))
     {
-      canvas->addLayout( layout_.second->clone( ));
-      std::cout << "clone layout" << layout_.second->name( ) << std::endl;
+      auto newLayout = layout_.second->clone( );
+      newLayout->setRepresentations( layout_.second->representations( ));
+      newLayout->refreshProperties( );
+      canvas->addLayout( newLayout );
+      // std::cout << "clone layout" << layout_.second->name( ) << std::endl;
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
-    std::cout << "setting active layout " << this->_activeLayoutIndex << std::endl;
+//    std::cout << "setting active layout " << this->_activeLayoutIndex << std::endl;
     canvas->displayEntities( _entities, false, true );
     canvas->layouts( ).layoutSelector( )->setCurrentIndex(
       this->_activeLayoutIndex );

@@ -25,6 +25,8 @@
 #include "Canvas.h"
 #include <set>
 #include <QGridLayout>
+#include <Eigen/Dense>
+#include <chrono>
 
 namespace neuroscheme
 {
@@ -52,9 +54,14 @@ namespace neuroscheme
       HORIZONTAL,
       VERTICAL
     } TPaneDivision;
-    
+
     static Canvas* newPane( Canvas* orig = nullptr,
                             TPaneDivision division = HORIZONTAL );
+
+    static void setViewMatrix( const double* values );
+
+    using Matrix4f = Eigen::Matrix4f;
+    static const Matrix4f& viewMatrix( void ) { return _modelViewMatrix; }
 
   protected:
     static QGridLayout* _mainGridLayout;
@@ -64,6 +71,10 @@ namespace neuroscheme
     static unsigned int _paneNextNumber;
     //TODO this is just a PoC, not final
     static unsigned int _nextRow, _nextColumn;
+
+    static Matrix4f _modelViewMatrix;
+    static std::chrono::time_point< std::chrono::system_clock > lastMatrixClock;
+
   };
 } // namespace neuroscheme
 

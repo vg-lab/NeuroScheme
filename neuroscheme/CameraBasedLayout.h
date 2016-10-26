@@ -44,8 +44,8 @@ namespace neuroscheme
       return new CameraBasedLayout;
     }
 
-    Matrix4f _viewMatrix;
-    Matrix4f _projectionMatrix;
+    // Matrix4f _viewMatrix;
+    //Matrix4f _projectionMatrix;
 
   };
 

@@ -65,6 +65,7 @@ namespace neuroscheme
     {
       SORT_ENABLED = 0x01,
       FILTER_ENABLED = 0x02,
+      CAMERA_ENABLED = 0x04,
     };
 
 
@@ -72,14 +73,15 @@ namespace neuroscheme
             unsigned int flags_ = 0 );
     virtual ~Layout( void );
     const std::string& name( void );
+    const unsigned int& flags( void ) { return _flags; }
     LayoutOptionsWidget* optionsWidget( void );
 
     void refresh( bool animate = true,
-                  bool refreshProperties = true )
+                  bool refreshProperties_ = true )
     {
-      std::cout << "Layout::refresh" << std::endl;
+      //std::cout << "Layout::refresh" << std::endl;
       // displayItems( _representations, false );
-      displayEntities( _entities, animate, refreshProperties );
+      displayEntities( _entities, animate, refreshProperties_ );
     }
 
     virtual void displayEntities( const shift::Entities& entities,
@@ -99,13 +101,19 @@ namespace neuroscheme
     void animateItem( QGraphicsItem* graphicsItem,
                       float toScale, const QPoint& toPos );
 
+    void refreshProperties( void );
+
+    const shift::Representations& representations( void )
+    { return _representations; }
+    void setRepresentations( const shift::Representations& representations_ )
+    { _representations = representations_; }
+
   public slots:
     void addedSortProperty( void )
     {
-      std::cout << "<><><><> Added sorted propery" << std::endl;
+      //std::cout << "<><><><> Added sorted propery" << std::endl;
     }
   protected:
-    void _refreshProperties( void );
     void _drawCorners( );
     void _clearScene( );
     void _addRepresentations( const shift::Representations& reps );
