@@ -1,273 +1,22 @@
 #include "DataManager.h"
+#include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "domains/domains.h"
+#include <Eigen/Geometry>
 
 
 namespace neuroscheme
 {
   shift::EntitiesWithRelationships DataManager::_entities =
     shift::EntitiesWithRelationships( );
-
   shift::Entities DataManager::_rootEntities =
     shift::Entities( );
-
-  // shift::Representations DataManager::_representations =
-  //   shift::Representations( );;
-
   nsol::DataSet DataManager::_nsolDataSet = nsol::DataSet( );
 
   shift::EntitiesWithRelationships& DataManager::entities( void )
   {
     return _entities;
   }
-
-  // shift::Representations& DataManager::representations( void )
-  // {
-  //   return _representations;
-  // }
-
-  void DataManager::loadData( void )
-    {
-      //Temp function for testing
-      // auto relHierarchyChild = ;
-      _entities.relationships( )[ "isParentOf" ] =
-        new shift::RelationshipOneToN;
-
-      _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne;
-
-      shift::Entity* entity =
-        new neuroscheme::Column(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added column gid " << entity->entityGid( ) << std::endl;
-      auto colId1 = entity->entityGid( );
-
-      entity =
-        new neuroscheme::Column(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added column gid " << entity->entityGid( ) << std::endl;
-      auto colId2 = entity->entityGid( );
-
-      entity =
-        new neuroscheme::MiniColumn(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
-      auto miniCol0Id = entity->entityGid( );
-
-      entity =
-        new neuroscheme::MiniColumn(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
-      auto miniCol1Id = entity->entityGid( );
-
-            entity =
-        new neuroscheme::MiniColumn(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
-      auto miniCol2Id = entity->entityGid( );
-
-      entity =
-        new neuroscheme::MiniColumn(
-          100,
-          75, 25,
-          5, 0,
-          10, 5,
-          15, 10,
-          20, 15,
-          25, 20,
-          30, 25,
-          10.0f, 30.0f,
-          30.0f, 50.0f );
-      _entities.add( entity );
-      std::cout << "Added minicolumn gid " << entity->entityGid( ) << std::endl;
-      auto miniCol3Id = entity->entityGid( );
-
-      auto& relParentOf =
-        *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-      auto& relChildOf =
-        *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
-      relParentOf[ 0 ].insert( colId1 );
-      relParentOf[ 0 ].insert( colId2 );
-      relChildOf[ colId1 ] = 0;
-      relChildOf[ colId2 ] = 0;
-
-      relParentOf[ colId1 ].insert( miniCol0Id );
-      relParentOf[ colId1 ].insert( miniCol1Id );
-      relChildOf[ miniCol0Id ] = colId1;
-      relChildOf[ miniCol1Id ] = colId1;
-
-      relParentOf[ colId2 ].insert( miniCol2Id );
-      relParentOf[ colId2 ].insert( miniCol3Id );
-      relChildOf[ miniCol2Id ] = colId2;
-      relChildOf[ miniCol3Id ] = colId2;
-
-      unsigned int neuronGid = 0;
-
-      for ( unsigned int i = 0; i < 5; i++ )
-      {
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::INTERNEURON,
-          neuroscheme::Neuron::EXCITATORY,
-          10.0f, 30.0f, 30.0f, 50.0f );
-        _entities.add( entity );
-        auto entityGid = entity->entityGid( );
-        relParentOf[ miniCol0Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol0Id;
-
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::PYRAMIDAL,
-          neuroscheme::Neuron::INHIBITORY,
-          70.0f, 60.0f, 20.0f, 30.0f );
-        _entities.add( entity );
-        entityGid = entity->entityGid( );
-        relParentOf[ miniCol0Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol0Id;
-
-      }
-
-      for ( unsigned int i = 0; i < 5; i++ )
-      {
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::INTERNEURON,
-          neuroscheme::Neuron::EXCITATORY,
-          10.0f, 30.0f, 30.0f, 50.0f );
-        _entities.add( entity );
-        auto entityGid = entity->entityGid( );
-        relParentOf[ miniCol1Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol1Id;
-
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::PYRAMIDAL,
-          neuroscheme::Neuron::INHIBITORY,
-          70.0f, 60.0f, 20.0f, 30.0f );
-        _entities.add( entity );
-        entityGid = entity->entityGid( );
-        relParentOf[ miniCol1Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol1Id;
-
-      }
-      for ( unsigned int i = 0; i < 5; i++ )
-      {
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::INTERNEURON,
-          neuroscheme::Neuron::EXCITATORY,
-          10.0f, 30.0f, 30.0f, 50.0f );
-        _entities.add( entity );
-        auto entityGid = entity->entityGid( );
-        relParentOf[ miniCol2Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol2Id;
-
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::PYRAMIDAL,
-          neuroscheme::Neuron::INHIBITORY,
-          70.0f, 60.0f, 20.0f, 30.0f );
-        _entities.add( entity );
-        entityGid = entity->entityGid( );
-        relParentOf[ miniCol2Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol2Id;
-
-      }
-
-      for ( unsigned int i = 0; i < 5; i++ )
-      {
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::INTERNEURON,
-          neuroscheme::Neuron::EXCITATORY,
-          10.0f, 30.0f, 30.0f, 50.0f );
-        _entities.add( entity );
-        auto entityGid = entity->entityGid( );
-        relParentOf[ miniCol3Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol3Id;
-
-        entity = new neuroscheme::Neuron(
-          neuronGid++,
-          neuroscheme::Neuron::PYRAMIDAL,
-          neuroscheme::Neuron::INHIBITORY,
-          70.0f, 60.0f, 20.0f, 30.0f );
-        _entities.add( entity );
-        entityGid = entity->entityGid( );
-        relParentOf[ miniCol3Id ].insert( entityGid );
-        relChildOf[ entityGid ] = miniCol3Id;
-
-      }
-
-      // Display root reps
-//      shift::Entities rootEntities;
-      // auto& relParentOf =
-      //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-      // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
-      //                        relationships( )[ "isParentOf" ]->asOneToN( ));
-
-      const auto& childrenIds = relParentOf[ 0 ];
-      std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
-      _rootEntities.clear( );
-      for ( const auto& child : childrenIds )
-        _rootEntities.add( neuroscheme::DataManager::entities( ).at( child ));
-
-      neuroscheme::RepresentationCreatorManager::addCreator(
-        new neuroscheme::cortex::RepresentationCreator );
-      // neuroscheme::RepresentationCreatorManager::create(
-      //   rootEntities, _representations,
-      //   true, true );
-
-    } // loadData
 
   void DataManager::loadBlueConfig( const std::string& blueConfig,
                                     const std::string& targetLabel,
@@ -434,6 +183,8 @@ namespace neuroscheme
 
       std::string line;
       int lineCount = 0;
+      // skip first line
+      std::getline( csvNeuronStatsFile, line );
       while ( std::getline( csvNeuronStatsFile, line ))
       {
         lineCount++;
@@ -690,15 +441,29 @@ auto greenMapper = new DiscreteColorMapper( );
       unsigned int numNeurons = 0;
       Eigen::Vector4f meanCenter( 0.f, 0.f, 0.f, 0.f );
 
+
+      Eigen::AlignedBox4f boundingBox;
       unsigned int counter = 0;
       for ( const auto& mc : col->miniColumns( ))
         for ( const auto& neuron : mc->neurons( ))
         {
           meanCenter += neuron->transform( ).col( 3 ).transpose( );
           ++counter;
+          boundingBox.extend( neuron->transform( ).col( 3 ));
         }
       if ( counter > 0 )
         meanCenter /= counter;
+
+      // std::cout << boundingBox.max( ) << std::endl;
+      // std::cout << boundingBox.min( ) << std::endl;
+      auto maxMin = boundingBox.max( ) - boundingBox.min( );
+      double matrix[ 16 ]  = { 1, 0, 0, 0,
+                               0, 1, 0, 0,
+                               0, 0, 1, 0,
+                               - maxMin.x( ) / 2,
+                               - maxMin.y( ) / 2,
+                               - maxMin.y( ) * 1.5, 1 };
+      PaneManager::setViewMatrix( matrix );
 
       if ( !csvNeuronStatsFileName.empty( ))
       {
@@ -802,6 +567,7 @@ auto greenMapper = new DiscreteColorMapper( );
         if ( counter > 0 )
           mcMeanCenter /= mcNeuronCounter;
 
+        // std::cout << "mc " << miniColumnsCounter << " center: " << mcMeanCenter << std::endl;
         unsigned long totalMiniColBifurcations = 0;
         double totalMiniColSomaArea = .0f;
         double totalMiniColSomaVolume = .0f;
@@ -835,6 +601,20 @@ auto greenMapper = new DiscreteColorMapper( );
             meanDendsVolume = totalMiniColDendsVolume * size_1;
             meanBifurcations = totalMiniColBifurcations * size_1;
           }
+        } else if ( withMorphologies )
+        {
+          meanSomaArea = mc->stats( )->getStat(
+            nsol::MiniColumnStats::SOMA_SURFACE,
+            nsol::TAggregation::MEAN );
+          meanSomaVolume = mc->stats( )->getStat(
+            nsol::MiniColumnStats::SOMA_VOLUME,
+            nsol::TAggregation::MEAN );
+          meanDendsArea = mc->stats( )->getStat(
+            nsol::MiniColumnStats::DENDRITIC_SURFACE,
+            nsol::TAggregation::MEAN );
+          meanDendsVolume = mc->stats( )->getStat(
+            nsol::MiniColumnStats::DENDRITIC_VOLUME,
+            nsol::TAggregation::MEAN );
         }
 
         shift::Entity* mcEntity =
@@ -858,7 +638,7 @@ auto greenMapper = new DiscreteColorMapper( );
             meanSomaArea,
             meanDendsVolume,
             meanDendsArea,
-            meanCenter );
+            mcMeanCenter );
 
         _entities.add( mcEntity );
         relChildOf[ mcEntity->entityGid( ) ] = colEntity->entityGid( );
@@ -932,15 +712,7 @@ auto greenMapper = new DiscreteColorMapper( );
 
     std::cout << "\n";
 
-    // Display root reps
-//    shift::Entities _rootEntities;
-   // auto& relParentOf =
-    //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-    // auto& relParentOf = *( neuroscheme::DataManager::entities( ).
-    //                        relationships( )[ "isParentOf" ]->asOneToN( ));
-
     const auto& childrenIds = relParentOf[ 0 ];
-    std::cout << "-- Root entities " << childrenIds.size( ) << std::endl;
     _rootEntities.clear( );
     for ( const auto& child : childrenIds )
       _rootEntities.add( neuroscheme::DataManager::entities( ).at( child ));

@@ -22,7 +22,6 @@
 #include "Layout.h"
 #include "FilterWidget.h"
 #include <QGridLayout>
-#include <QLabel>
 #include <QToolButton>
 #include <algorithm>
 #include "qxt/qxtspanslider.h"
@@ -50,24 +49,50 @@ namespace neuroscheme
     _addFilterButton = new QToolButton( );
     _addFilterButton->setIcon( addIcon );
 
-    auto autoFilterLabel = new QLabel( "Auto refresh" );
+    _useOpacityLabel = new QLabel( "Use opacity" );
+    _useOpacityCheckBox = new QCheckBox( );
+    _useOpacityCheckBox->setChecked( true );
+    _opacitySlider = new QSlider( Qt::Horizontal );
+    _opacitySlider->setMinimum( 0);
+    _opacitySlider->setMaximum( 100 );
+    _opacitySlider->setValue( 20 );
+
+    _autoFilterLabel = new QLabel( "Auto refresh" );
     _autoFilterCheckBox = new QCheckBox( );
-    auto filterButton = new QPushButton( "Filter" );
+    _autoFilterCheckBox->setChecked( true );
+    _filterButton = new QPushButton( "Refresh" );
+    _filterButton->setEnabled( false );
 
-    layout_->addWidget( _propertiesSelector, 0, 0, 1, 1,
+    auto row = 0;
+    layout_->addWidget( _propertiesSelector, row, 0, 1, 1,
                         Qt::AlignCenter | Qt::AlignLeft );
-    layout_->addWidget( _addFilterButton, 0, 1, 1, 2,
+    layout_->addWidget( _addFilterButton, row, 1, 1, 2,
                         Qt::AlignLeft );
 
-    layout_->addWidget( autoFilterLabel, 1, 0, 1, 2,
+    layout_->addWidget( _useOpacityLabel, ++row, 0, 1, 2,
                         Qt::AlignLeft );
-    layout_->addWidget( _autoFilterCheckBox, 1, 1, 1, 2,
+    layout_->addWidget( _useOpacityCheckBox, row, 1, 1, 2,
                         Qt::AlignLeft );
-    layout_->addWidget( filterButton, 2, 0, 1, 2,
+    layout_->addWidget( _opacitySlider, ++row, 0, 1, 2 );
+
+    layout_->addWidget( _autoFilterLabel, ++row, 0, 1, 2,
+                        Qt::AlignLeft );
+    layout_->addWidget( _autoFilterCheckBox, row, 1, 1, 2,
+                        Qt::AlignLeft );
+    layout_->addWidget( _filterButton, ++row, 0, 1, 2,
                         Qt::AlignLeft );
 
     connect( _addFilterButton, SIGNAL( pressed( )),
              this, SLOT( addedFilterProperty( )));
+
+    connect( _autoFilterCheckBox, SIGNAL( pressed( )),
+             this, SLOT( _autoFilterCheckBoxChanged( )));
+
+    connect( _useOpacityCheckBox, SIGNAL( clicked( )),
+             this, SLOT( _useOpacityCheckBoxChanged( )));
+
+    connect( _filterButton, SIGNAL( pressed( )),
+             this, SLOT( refreshParentLayout( )));
 
   }
 
@@ -112,17 +137,18 @@ namespace neuroscheme
       QString( "," ) + QString::number( spanSlider->upperValue( )) +
       QString( "]" ) );
 
-    auto layout = dynamic_cast< QGridLayout* >( this->layout( ));
+    auto layout_ = dynamic_cast< QGridLayout* >( this->layout( ));
 
-#define LABEL_POS   3 + idx * 3, 0
-#define REMOVE_POS  3 + idx * 3, 1
-#define SLIDER_POS  4 + idx * 3, 0
-#define RANGE_POS   5 + idx * 3, 0
+#define LABEL_POS   5 + idx * 3, 0
+#define REMOVE_POS  5 + idx * 3, 1
+#define SLIDER_POS  6 + idx * 3, 0
+#define RANGE_POS   7 + idx * 3, 0
     auto idx = _numFilterProperties;
-    layout->addWidget( propertyQLabel, LABEL_POS, 1, 1, Qt::AlignLeft );
-    layout->addWidget( removePropertyButton, REMOVE_POS, 1, 1, Qt::AlignRight );
-    layout->addWidget( spanSlider, SLIDER_POS, 1, 2 ); //, Qt::AlignLeft );
-    layout->addWidget( rangeLabel, RANGE_POS, 1, 2, Qt::AlignLeft );
+    layout_->addWidget( propertyQLabel, LABEL_POS, 1, 1, Qt::AlignLeft );
+    layout_->addWidget( removePropertyButton, REMOVE_POS,
+                        1, 1, Qt::AlignRight );
+    layout_->addWidget( spanSlider, SLIDER_POS, 1, 2 ); //, Qt::AlignLeft );
+    layout_->addWidget( rangeLabel, RANGE_POS, 1, 2, Qt::AlignLeft );
 
     auto filter = fires::PropertyManager::getFilter( propertyLabel );
     fires::PropertyManager::setFilterRange( filter,
@@ -262,8 +288,8 @@ namespace neuroscheme
     if ( filter == filters.end( ))
       return;
 
-    std::cout << "Changed slider of property "
-              << propertyLabel_.toStdString( ) << std::endl;
+    // std::cout << "Changed slider of property "
+    //           << propertyLabel_.toStdString( ) << std::endl;
 
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
 
@@ -279,7 +305,30 @@ namespace neuroscheme
                                             spanSlider->lowerPosition( ),
                                             spanSlider->upperPosition( ));
 
+    if ( _autoFilterCheckBox->isChecked( ))
+      refreshParentLayout( ); //_parentLayout->refresh( false, false );
+
+  } // sliderChanged
+
+  void FilterWidget::refreshParentLayout( void )
+  {
+    _parentLayout->refresh( false, false );
   }
+
+  void FilterWidget::_autoFilterCheckBoxChanged( void )
+  {
+    _filterButton->setEnabled( _autoFilterCheckBox->isChecked( ));
+    if ( !_autoFilterCheckBox->isChecked( ))
+      refreshParentLayout( );
+  }
+
+  void FilterWidget::_useOpacityCheckBoxChanged( void )
+  {
+    _opacitySlider->setEnabled( !_useOpacityCheckBox->isChecked( ));
+    std::cout << "Refresh " << useOpacityForFiltering( ) << std::endl;
+    refreshParentLayout( );
+  }
+
 
   FilterWidget::~FilterWidget( void )
   {
@@ -287,6 +336,9 @@ namespace neuroscheme
     delete _addFilterButton;
     delete _removeSignalMapper;
     delete _changeSliderSignalMapper;
+    delete _autoFilterCheckBox;
+    delete _useOpacityLabel;
+    delete _opacitySlider;
   }
 
 }

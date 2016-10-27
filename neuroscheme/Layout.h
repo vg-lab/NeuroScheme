@@ -118,7 +118,11 @@ namespace neuroscheme
     void _clearScene( );
     void _addRepresentations( const shift::Representations& reps );
     virtual void _arrangeItems( const shift::Representations& /* reps */,
-                                bool /* animate */ ) {}
+                                bool /* animate */,
+                                const shift::Representations&
+                                preFilterReps =
+                                shift::Representations( ))
+    { ( void ) preFilterReps; }
     virtual void _updateOptionsWidget( void );
 
     QGraphicsScene* _scene;

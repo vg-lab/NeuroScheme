@@ -40,7 +40,8 @@ namespace neuroscheme
   }
 
   void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
-                                         bool animate )
+                                         bool animate,
+                                         const shift::Representations& )
   {
     const auto sceneWidth = 1000; //_scene->width( );
     const auto sceneHeight = 1000; //_scene->height( );

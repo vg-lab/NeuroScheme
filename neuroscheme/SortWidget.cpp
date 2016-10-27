@@ -33,8 +33,8 @@ namespace neuroscheme
     : QFrame( parent_ )
     , _parentLayout( parentLayout_ )
     , _numSortProperties( 0 )
-    , _removeSignalMapper( new QSignalMapper )
-    , _changeDirSignalMapper( new QSignalMapper )
+    // , _removeSignalMapper( new QSignalMapper )
+    // , _changeDirSignalMapper( new QSignalMapper )
   {
     auto layout_ = new QGridLayout;
     layout_->setAlignment( Qt::AlignTop );
@@ -57,8 +57,8 @@ namespace neuroscheme
     connect( _sortButton, SIGNAL( pressed( )),
              this, SLOT( addedSortProperty( )));
 
-    connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
-             this, SLOT( changeSortPropertyDir( const QString&  )));
+    // connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
+    //          this, SLOT( changeSortPropertyDir( const QString&  )));
 
   }
 
@@ -76,9 +76,9 @@ namespace neuroscheme
            }) != sortProperties.end( ))
       return;
 
-    std::cout << "<><><><> Added sorted propery "
-              << _propertiesSelector->currentText( ).toStdString( )
-              << std::endl;
+    // std::cout << "<><><><> Added sorted propery "
+    //           << _propertiesSelector->currentText( ).toStdString( )
+    //           << std::endl;
 
     QLabel* propertyQLabel = new QLabel( _propertiesSelector->currentText( ));
 
@@ -109,29 +109,41 @@ namespace neuroscheme
                              fires::SortConfig::ASCENDING );
 
     _layoutRowsMap[ propertyLabel ] = _numSortProperties;
-    // QSignalMapper* signalMapper = new QSignalMapper( this );
+
+    if ( _changeDirSignalMappers.find( propertyLabel ) !=
+         _changeDirSignalMappers.end( ))
+      delete _changeDirSignalMappers[ propertyLabel ];
+    _changeDirSignalMappers[ propertyLabel ] = new QSignalMapper;
+
+    if ( _removeSignalMappers.find( propertyLabel ) !=
+         _removeSignalMappers.end( ))
+      delete _removeSignalMappers[ propertyLabel ];
+    _removeSignalMappers[ propertyLabel ] = new QSignalMapper;
+
     connect( removePropertyButton, SIGNAL( pressed( )),
-             _removeSignalMapper, SLOT( map( )));
-    _removeSignalMapper->setMapping( removePropertyButton,
-                                     QString( propertyLabel.c_str( )));
-    connect( _removeSignalMapper, SIGNAL( mapped( const QString& )),
+             _removeSignalMappers[ propertyLabel ], SLOT( map( )));
+    _removeSignalMappers[ propertyLabel ]->setMapping(
+      removePropertyButton, QString( propertyLabel.c_str( )));
+    connect( _removeSignalMappers[ propertyLabel ],
+             SIGNAL( mapped( const QString& )),
              this, SLOT( removeSortProperty( const QString&  )));
 
     connect( changeSortDirButton, SIGNAL( clicked( )),
-             _changeDirSignalMapper, SLOT( map( )));
-    _changeDirSignalMapper->setMapping( changeSortDirButton,
+             _changeDirSignalMappers[ propertyLabel ], SLOT( map( )));
+    _changeDirSignalMappers[ propertyLabel ]->setMapping( changeSortDirButton,
                                         QString( propertyLabel.c_str( )));
-    connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
+    connect( _changeDirSignalMappers[ propertyLabel ],
+             SIGNAL( mapped( const QString& )),
              this, SLOT( changeSortPropertyDir( const QString&  )));
 
-    std::cout << "["
-              << _sortConfig.properties( ).size( ) << "]: ";
-    for ( const auto& p : _sortConfig.properties( ))
-    {
-      std::cout << "{" << p.label << "," << (int) p.order << "}";
-      assert( p.sorter );
-    }
-    std::cout <<  std::endl;
+    // std::cout << "["
+    //           << _sortConfig.properties( ).size( ) << "]: ";
+    // for ( const auto& p : _sortConfig.properties( ))
+    // {
+    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
+    //   assert( p.sorter );
+    // }
+    // std::cout <<  std::endl;
 
     _parentLayout->refresh( true, false );
   }
@@ -159,19 +171,21 @@ namespace neuroscheme
 
     }
     _layoutRowsMap.clear( );
+    _changeDirSignalMappers.clear( );
+    _removeSignalMappers.clear( );
     _numSortProperties = 0;
     _sortConfig.properties( ).clear( );
-    delete _removeSignalMapper;
-    _removeSignalMapper = new QSignalMapper;
-    delete _changeDirSignalMapper;
-    _changeDirSignalMapper = new QSignalMapper;
+    // delete _removeSignalMapper;
+    // _removeSignalMapper = new QSignalMapper;
+    // delete _changeDirSignalMapper;
+    // _changeDirSignalMapper = new QSignalMapper;
 
   }
 
   void SortWidget::removeSortProperty( const QString& propertyLabel_ )
   {
-    std::cout << "Remove property "
-              << propertyLabel_.toStdString( ) << std::endl;
+    // std::cout << "Remove property "
+    //           << propertyLabel_.toStdString( ) << std::endl;
 
     auto& sortProperties = _sortConfig.properties( );
     auto propertyLabel = propertyLabel_.toStdString( );
@@ -204,14 +218,18 @@ namespace neuroscheme
     assert( item );
     delete item->widget( );
 
-    std::cout << "["
-              << _sortConfig.properties( ).size( ) << "]: ";
-    for ( const auto& p : _sortConfig.properties( ))
-    {
-      std::cout << "{" << p.label << "," << (int) p.order << "}";
-      assert( p.sorter );
-    }
-    std::cout <<  std::endl;
+    // std::cout << "["
+    //           << _sortConfig.properties( ).size( ) << "]: ";
+    // for ( const auto& p : _sortConfig.properties( ))
+    // {
+    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
+    //   assert( p.sorter );
+    // }
+    // std::cout <<  std::endl;
+
+    // _layoutRowsMap.erase( propertyLabel );
+    // _removeSignalMappers.erase( propertyLabel );
+    // _changeDirSignalMappers.erase( propertyLabel );
 
     _parentLayout->refresh( true, false );
   }
@@ -221,7 +239,7 @@ namespace neuroscheme
     auto& sortProperties = _sortConfig.properties( );
     auto propertyLabel = propertyLabel_.toStdString( );
 
-    std::cout << "//changind sort dir of " << propertyLabel << std::endl;
+    // std::cout << "//changind sort dir of " << propertyLabel << std::endl;
 
     fires::SortConfig::TSortProperties::iterator sortProperty = std::find_if(
       sortProperties.begin( ), sortProperties.end( ),
@@ -237,18 +255,18 @@ namespace neuroscheme
       sortProperty->order =fires::SortConfig::DESCENDING :
       sortProperty->order = fires::SortConfig::ASCENDING;
 
-    std::cout << "//Change sort dir "
-              << propertyLabel << " to "
-              << (int) sortProperty->order << std::endl;
+    // std::cout << "//Change sort dir "
+    //           << propertyLabel << " to "
+    //           << (int) sortProperty->order << std::endl;
 
-    std::cout << "["
-              << _sortConfig.properties( ).size( ) << "]: ";
-    for ( const auto& p : _sortConfig.properties( ))
-    {
-      std::cout << "{" << p.label << "," << (int) p.order << "}";
-      assert( p.sorter );
-    }
-    std::cout <<  std::endl;
+    // std::cout << "["
+    //           << _sortConfig.properties( ).size( ) << "]: ";
+    // for ( const auto& p : _sortConfig.properties( ))
+    // {
+    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
+    //   assert( p.sorter );
+    // }
+    // std::cout <<  std::endl;
 
     _parentLayout->refresh( true, false );
   }
@@ -257,8 +275,8 @@ namespace neuroscheme
   {
     delete _propertiesSelector;
     delete _sortButton;
-    delete _removeSignalMapper;
-    delete _changeDirSignalMapper;
+    // delete _removeSignalMapper;
+    // delete _changeDirSignalMapper;
   }
 
 }

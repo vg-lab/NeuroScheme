@@ -28,6 +28,7 @@
 #include <QSignalMapper>
 #include <QToolButton>
 #include <fires/fires.h>
+#include <memory>
 
 namespace neuroscheme
 {
@@ -54,8 +55,10 @@ namespace neuroscheme
     QToolButton* _sortButton;
     unsigned int _numSortProperties;
     fires::SortConfig _sortConfig;
-    QSignalMapper* _removeSignalMapper;
-    QSignalMapper* _changeDirSignalMapper;
+    std::map< std::string, QSignalMapper* >
+              _removeSignalMappers;
+    std::map< std::string, QSignalMapper* >
+              _changeDirSignalMappers;
     std::map< std::string, unsigned int > _layoutRowsMap;
   };
 

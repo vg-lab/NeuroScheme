@@ -109,12 +109,12 @@ namespace neuroscheme
         neuroscheme::LOG_LEVEL_VERBOSE );
       _publisher->publish( lexis::data::SelectedIDs( gids ) );
     }
-    std::cout << "Publish GIDS: ";
-    for ( auto gid : gids )
-    {
-      std::cout << gid << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Publish GIDS: ";
+    // for ( auto gid : gids )
+    // {
+    //   std::cout << gid << " ";
+    // }
+    // std::cout << std::endl;
 
   }
 

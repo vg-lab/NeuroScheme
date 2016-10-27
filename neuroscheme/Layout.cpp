@@ -89,30 +89,73 @@ namespace neuroscheme
     _entities = entities;
     _representations.clear( );
 
-    if ( _sortWidget &&
-         _sortWidget->sortConfig( ).properties( ).size( ) > 0 &&
-         !refreshProperties_ )
-    {
-      // std::cout << "//Sorting using fires " << std::endl;
-      // std::cout << "//Num properties "
-                // << _sortWidget->sortConfig( ).properties( ).size( )
-                // << std::endl;
-      fires::Sort firesSort;
-      fires::Objects objects;
-      //fires::FilterSet _firesFilterSet;
+    bool doFiltering =
+      _filterWidget &&
+      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0 &&
+      !refreshProperties_;
 
+    bool doSorting =
+      _sortWidget &&
+      _sortWidget->sortConfig( ).properties( ).size( ) > 0 &&
+      !refreshProperties_;
+
+    fires::Objects objects;
+    shift::Representations preFilterRepresentations;
+
+    if ( doFiltering || doSorting )
+    {
       for ( const auto& entity : _entities.vector( ))
         objects.add( entity );
-      firesSort.eval( objects, _sortWidget->sortConfig( ));
 
-      shift::Entities sortedEntities;
+      if ( doSorting )
+      {
+        fires::Sort firesSort;
+        firesSort.eval( objects, _sortWidget->sortConfig( ));
+      }
+
+      fires::Objects objectsPreFilter = objects;
+//      std::cout << "objects pre filter " << objectsPreFilter.size( ) << std::endl;
+      if ( doFiltering )
+      {
+        fires::FilterSet firesFilterSet;
+        firesFilterSet.eval( objects, _filterWidget->filterSetConfig( ));
+      }
+
+      shift::Entities filteredAndSortedEntities;
       for ( const auto& entity : objects )
-        sortedEntities.add( static_cast< shift::Entity* >( entity ));
+        filteredAndSortedEntities.add( static_cast< shift::Entity* >( entity ));
 
       neuroscheme::RepresentationCreatorManager::create(
-        sortedEntities, _representations,
+        filteredAndSortedEntities, _representations,
         true, true );
+
+      shift::Entities entitiesPreFilter;
+      for ( const auto& entity : objectsPreFilter )
+        entitiesPreFilter.add( static_cast< shift::Entity* >( entity ));
+
+      neuroscheme::RepresentationCreatorManager::create(
+        entitiesPreFilter, preFilterRepresentations,
+        true, true );
+
     }
+    // if ( doSorting )
+    // {
+    //   fires::Sort firesSort;
+    //   fires::Objects objects;
+    //   //fires::FilterSet _firesFilterSet;
+
+    //   for ( const auto& entity : _entities.vector( ))
+    //     objects.add( entity );
+    //   firesSort.eval( objects, _sortWidget->sortConfig( ));
+
+    //   shift::Entities sortedEntities;
+    //   for ( const auto& entity : objects )
+    //     sortedEntities.add( static_cast< shift::Entity* >( entity ));
+
+    //   neuroscheme::RepresentationCreatorManager::create(
+    //     sortedEntities, _representations,
+    //     true, true );
+    // }
     else
     {
       // std::cout << "Sorting by entitygid " << std::endl;
@@ -142,9 +185,22 @@ namespace neuroscheme
     if ( !animate )
     {
       // std::cout << "Adding reps" << std::endl;
-      _addRepresentations( _representations );
+      if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
+        _addRepresentations( preFilterRepresentations );
+      else
+        _addRepresentations( _representations );
     }
-    _arrangeItems( _representations, animate );
+
+    if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
+    {
+      // std::cout << "Arranging "
+      //           << preFilterRepresentations.size( ) << " reps " << std::endl;
+      _arrangeItems( preFilterRepresentations, animate, _representations );
+    }
+    else
+    {
+      _arrangeItems( _representations, animate );
+    }
   }
 
   // void Layout::displayItems( const shift::Representations& reps,

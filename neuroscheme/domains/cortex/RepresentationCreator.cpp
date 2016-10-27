@@ -94,10 +94,10 @@ namespace neuroscheme
           auto neuron = dynamic_cast< Neuron* >( entity );
           auto neuronRep = new NeuronRep( );
 
-          std::cout
-            << fires::PropertyManager::getPropertyCaster(
-              "morphoType" )->toString(
-              neuron->getProperty( "morphoType" )) << std::endl;
+          // std::cout
+          //   << fires::PropertyManager::getPropertyCaster(
+          //     "morphoType" )->toString(
+          //     neuron->getProperty( "morphoType" )) << std::endl;
           switch ( neuron->getProperty( "morphoType" ).
                    value< Neuron::TMorphologicalType >( ))
           {
@@ -189,7 +189,7 @@ namespace neuroscheme
         } // it its MiniColumn entity
         if ( dynamic_cast< MiniColumn* >( entity ))
         {
-          std::cout << "creating minicolumn rep" << std::endl;
+          // std::cout << "creating minicolumn rep" << std::endl;
           auto miniColumn = dynamic_cast< MiniColumn* >( entity );
           auto miniColumnRep = new MiniColumnRep( );
           _CreateColumnOrMiniColumn( miniColumn, miniColumnRep,

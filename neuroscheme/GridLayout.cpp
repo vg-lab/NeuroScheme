@@ -37,11 +37,18 @@ namespace neuroscheme
   }
 
   void GridLayout::_arrangeItems( const shift::Representations& reps,
-                                  bool animate )
+                                  bool animate,
+                                  const shift::Representations& postFilterReps )
   {
-
+    // std::cout << "pre filter: " << reps.size( ) << std::endl;
+    // std::cout << "post filter: " << postFilterReps.size( ) << std::endl;
+    std::unordered_set< QGraphicsItem* > filteredOutItems;
+    auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
+    bool doFiltering =
+      _filterWidget &&
+      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
     unsigned int maxItemWidth = 0, maxItemHeight = 0;
-    for ( const auto representation : reps )
+    for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
         dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
@@ -53,6 +60,14 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
+        if ( doFiltering && useOpacityForFilter )
+        {
+          if ( std::find( postFilterReps.begin( ), postFilterReps.end( ),
+                          representation ) == postFilterReps.end( ))
+          {
+            filteredOutItems.insert( item );
+          }
+        }
         //_scene->addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
@@ -63,6 +78,7 @@ namespace neuroscheme
           maxItemHeight = rect.height( );
       }
     }
+    //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
 
     bool forceScale = false;
     float forcedScale = 1.0f;
@@ -145,56 +161,17 @@ namespace neuroscheme
             topMargin - scale * rect.center( ).y( );
           qreal scale_ = forceScale ? forcedScale : scale;
 
+          if ( useOpacityForFilter &&
+               filteredOutItems.count( graphicsItem ) == 1 )
+          {
+            graphicsItem->setOpacity( 0.5f );
+          }
+          else
+            graphicsItem->setOpacity( 1.0f );
+
           if ( obj && animate )
           {
             animateItem( graphicsItem, scale_, QPoint( posX, posY ));
-            // #define ANIM_DURATION 3200
-
-            // auto& scaleAnim = item->scaleAnim( );
-            // if ( scaleAnim.state( ) == QAbstractAnimation::Running )
-            // {
-            //   scaleAnim.stop( );
-            //   assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
-            //   scaleAnim.setCurrentTime( 0 );
-            //   scaleAnim.setStartValue( scaleAnim.currentValue( ));
-            //   std::cout << "Stopping at " << scaleAnim.currentValue( ).toInt( ) << std::endl;
-            // }
-            // else
-            // {
-            //   assert( scaleAnim.state( ) == QAbstractAnimation::Stopped );
-            //   scaleAnim.setTargetObject( obj );
-            //   //scaleAnim.setPropertyName( "scale" );
-            //   scaleAnim.setDuration( ANIM_DURATION );
-            //   scaleAnim.setStartValue( graphicsItem->scale( ));
-            // }
-            // scaleAnim.setEndValue( scale_ );
-
-            // // auto& posAnim = item->posAnim( );
-            // // if ( posAnim.state( ) == QAbstractAnimation::Running )
-            // // {
-            // //   posAnim.stop( );
-            // //   posAnim.setCurrentTime( 0 );
-            // //   posAnim.setStartValue( posAnim.currentValue( ));
-            // // }
-            // // else
-            // //   posAnim.setStartValue( graphicsItem->pos( ));
-
-            // // posAnim.setTargetObject( obj );
-            // // posAnim.setPropertyName( "pos" );
-            // // posAnim.setDuration( ANIM_DURATION );
-            // // posAnim.setEndValue( QPoint( posX, posY ));
-
-            // // item->posAnim( ).setTargetObject( obj );
-            // // item->posAnim( ).setPropertyName( "pos" );
-            // // // item->scaleAnim( ).setTargetObject( obj );
-            // // // item->scaleAnim( ).setPropertyName( "scale" );
-            // // item->posAnim( ).setDuration( ANIM_DURATION );
-            // // item->scaleAnim( ).setDuration( ANIM_DURATION );
-            // // item->posAnim( ).setStartValue( graphicsItem->pos( ));
-            // // item->scaleAnim( ).setStartValue( graphicsItem->scale( ));
-            // // item->posAnim( ).setEndValue( QPoint( posX, posY ));
-            // // posAnim.start( );
-            // scaleAnim.start( );
           }
           else
           {

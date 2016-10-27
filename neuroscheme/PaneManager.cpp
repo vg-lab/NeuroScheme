@@ -173,6 +173,17 @@ namespace neuroscheme
     _modelViewMatrix.row( 3 ) =
       Vector4f( values[3], values[7], values[11], values[15] );
 
+    // _modelViewMatrix.row( 0 ) =
+    //   Vector4f( 1,0,0, values[12] );
+    // _modelViewMatrix.row( 1 ) =
+    //   Vector4f( 0,1,0, values[13] );
+    // _modelViewMatrix.row( 2 ) =
+    //   Vector4f( 0,0,1, values[14] );
+    // _modelViewMatrix.row( 3 ) =
+    //   Vector4f( 0,0,0,1 );
+
+    // std::cout << "----------------" << std::endl;
+    // std::cout << _modelViewMatrix << std::endl;
     int elapsedMs = std::chrono::duration_cast< std::chrono::milliseconds >
       ( std::chrono::system_clock::now( ) - lastMatrixClock ).count( );
 

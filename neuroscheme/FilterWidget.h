@@ -25,6 +25,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFrame>
+#include <QLabel>
 #include <QObject>
 #include <QSignalMapper>
 #include <QToolButton>
@@ -42,11 +43,23 @@ namespace neuroscheme
     ~FilterWidget( void );
     QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
     void clear( void );
+    const fires::FilterSetConfig& filterSetConfig( void ) const
+    { return _filterSetConfig; }
+    fires::FilterSetConfig& filterSetConfig( void )
+    { return _filterSetConfig; }
 
-  public slots:
+    bool useOpacityForFiltering( void )
+    { return _useOpacityCheckBox->isChecked( ); }
+
+public slots:
     void addedFilterProperty( void );
     void removeFilterProperty( const QString& propertyLabel );
     void sliderChanged( const QString& propertyLabel );
+    void refreshParentLayout( void );
+
+  protected slots:
+    void _autoFilterCheckBoxChanged( void );
+    void _useOpacityCheckBoxChanged( void );
 
   protected:
     Layout* _parentLayout;
@@ -57,7 +70,12 @@ namespace neuroscheme
     QSignalMapper* _removeSignalMapper;
     QSignalMapper* _changeSliderSignalMapper;
     std::map< std::string, unsigned int > _layoutRowsMap;
+    QPushButton* _filterButton;
+    QLabel* _autoFilterLabel;
     QCheckBox* _autoFilterCheckBox;
+    QLabel* _useOpacityLabel;
+    QSlider* _opacitySlider;
+    QCheckBox* _useOpacityCheckBox;
   };
 
 }

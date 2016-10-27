@@ -35,7 +35,9 @@ namespace neuroscheme
     //                    const shift::Representations& reps );
   protected:
     void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true );
+                        bool animate = true,
+                        const shift::Representations& postFilterReps =
+                        shift::Representations( ));
     void _updateOptionsWidget( void );
 
     Layout* clone( void ) const;
