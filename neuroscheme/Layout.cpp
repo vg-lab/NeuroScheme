@@ -171,7 +171,7 @@ namespace neuroscheme
       // std::cout << "Sorting by entitygid " << std::endl;
       auto& vector = _entities.vector( );
       std::sort( vector.begin( ), vector.end( ),
-                 []( shift::Entity*& a, shift::Entity*& b )
+                 []( const shift::Entity* a, const shift::Entity* b )
                  { return b->entityGid( ) < a->entityGid( ); } );
       neuroscheme::RepresentationCreatorManager::create(
         _entities, _representations,

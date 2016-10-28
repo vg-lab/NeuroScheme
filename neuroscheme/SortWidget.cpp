@@ -92,16 +92,16 @@ namespace neuroscheme
     QToolButton* removePropertyButton = new QToolButton( this );
     removePropertyButton->setIcon( removePropertyIcon );
 
-    auto layout = dynamic_cast< QGridLayout* >( this->layout( ));
+    auto layout_ = dynamic_cast< QGridLayout* >( this->layout( ));
 #define LABEL_COLUMN 0
 #define DIRBUTTON_COLUMN 1
 #define REMOVE_COLUMN 2
     ++_numSortProperties;
-    layout->addWidget( propertyQLabel, _numSortProperties,
+    layout_->addWidget( propertyQLabel, _numSortProperties,
                        LABEL_COLUMN, 1, 1, Qt::AlignLeft );
-    layout->addWidget( changeSortDirButton, _numSortProperties,
+    layout_->addWidget( changeSortDirButton, _numSortProperties,
                        DIRBUTTON_COLUMN, 1, 1, Qt::AlignLeft );
-    layout->addWidget( removePropertyButton, _numSortProperties,
+    layout_->addWidget( removePropertyButton, _numSortProperties,
                        REMOVE_COLUMN, 1, 1, Qt::AlignLeft );
 
     _sortConfig.addProperty( propertyLabel,
