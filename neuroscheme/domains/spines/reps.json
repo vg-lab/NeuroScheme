@@ -1,0 +1,46 @@
+{
+    "reps": [
+        {
+            "name": "Circle",
+            "namespace": "neuroscheme::shiftgen::spines",
+            "properties": [
+                {
+                    "name": "radius",
+                    "type": "int"
+                }
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "Rectangle",
+            "namespace": "neuroscheme::shiftgen::spines",
+            "properties": [
+                {
+                    "name": "height",
+                    "type": "int"
+                },
+                {
+                    "name": "width",
+                    "type": "int"
+                }
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "SpineRep",
+            "namespace": "neuroscheme::shiftgen::spines",
+            "properties": [
+                {
+                    "name": "rectangle",
+                    "type": "Rectangle"
+                },
+                {
+                    "name": "circle",
+                    "type": "Circle"
+                }
+            ],
+            "types": [ ]
+        }
+
+    ]
+}

@@ -11,7 +11,9 @@ namespace neuroscheme
     shift::EntitiesWithRelationships( );
   shift::Entities DataManager::_rootEntities =
     shift::Entities( );
+#ifdef NEUROSCHEME_USE_NSOL
   nsol::DataSet DataManager::_nsolDataSet = nsol::DataSet( );
+#endif
 
   shift::EntitiesWithRelationships& DataManager::entities( void )
   {

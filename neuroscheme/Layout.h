@@ -32,8 +32,9 @@
 #include <map>
 #include <iostream>
 #include <shift/shift.h>
-#include "SortWidget.h"
 #include "FilterWidget.h"
+#include "ScatterPlotWidget.h"
+#include "SortWidget.h"
 
 namespace neuroscheme
 {
@@ -66,6 +67,7 @@ namespace neuroscheme
       SORT_ENABLED = 0x01,
       FILTER_ENABLED = 0x02,
       CAMERA_ENABLED = 0x04,
+      SCATTERPLOT_ENABLED = 0x08
     };
 
 
@@ -101,7 +103,7 @@ namespace neuroscheme
     void animateItem( QGraphicsItem* graphicsItem,
                       float toScale, const QPoint& toPos );
 
-    void refreshProperties( void );
+    void refreshProperties( const shift::Representations& representations_ );
 
     const shift::Representations& representations( void )
     { return _representations; }
@@ -135,14 +137,18 @@ namespace neuroscheme
     QToolBox* _toolbox;
     SortWidget* _sortWidget;
     FilterWidget* _filterWidget;
+    ScatterPlotWidget* _scatterPlotWidget;
   };
 
   class ScatterplotLayout : public Layout
   {
   public:
     ScatterplotLayout( void );
-    void displayItems( const shift::Representations& reps,
-                       bool animate );
+    virtual void _arrangeItems( const shift::Representations& /* reps */,
+                                bool /* animate */,
+                                const shift::Representations&
+                                preFilterReps =
+                                shift::Representations( )) final;
     Layout* clone( void ) const
     {
       return new ScatterplotLayout;

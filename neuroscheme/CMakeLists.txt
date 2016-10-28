@@ -41,6 +41,7 @@ set( NEUROSCHEME_SOURCES
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
   qxt/qxtspanslider.cpp
+  ScatterPlotWidget.cpp
   SelectionManager.cpp
   SortWidget.cpp
   ZeroEQManager.cpp
@@ -75,6 +76,7 @@ set( NEUROSCHEME_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
+  ScatterPlotWidget.h
   SelectedState.h
   SelectionManager.h
   SortWidget.h
@@ -82,6 +84,7 @@ set( NEUROSCHEME_HEADERS
   )
 
 include ( domains/cortex/CMakeLists.txt )
+include ( domains/spines/CMakeLists.txt )
 
 set( NEUROSCHEME_LINK_LIBRARIES
   ShiFT

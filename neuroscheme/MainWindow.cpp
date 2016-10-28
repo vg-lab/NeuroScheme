@@ -87,9 +87,14 @@ MainWindow::MainWindow( QWidget* parent_ )
   //  canvas->layouts( ).addLayout( gridLayout );
   canvas->addLayout( new neuroscheme::GridLayout( ));
   canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
+  canvas->addLayout( new neuroscheme::ScatterplotLayout( ));
   canvas->displayEntities(
     neuroscheme::DataManager::rootEntities( ), false, true );
 //  canvas->displayReps( neuroscheme::DataManager::representations( ), false );
+  // for ( auto& layout_ : canvas->layouts( ).map( ))
+  //   layout_.second->refreshProperties(
+  //     canvas->layouts( ).getLayout(
+  //       canvas->activeLayoutIndex( ))->representations( ));
   neuroscheme::PaneManager::panes( ).insert( canvas );
   neuroscheme::PaneManager::activePane( canvas );
 

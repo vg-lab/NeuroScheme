@@ -192,7 +192,20 @@ namespace neuroscheme
     assert( _layouts.getLayout( _activeLayoutIndex ));
     _layouts.getLayout( _activeLayoutIndex )->displayEntities(
       entities_, animate, refreshProperties );
+
+    if ( refreshProperties )
+    {
+      for ( auto& layout_ : layouts( ).map( ))
+      {
+        if ( layout_.second == layouts( ).getLayout( activeLayoutIndex( )))
+          continue;
+        layout_.second->refreshProperties(
+          layouts( ).getLayout(
+            activeLayoutIndex( ))->representations( ));
+      }
+    }
   }
+
   // void Canvas::displayReps( shift::Representations& reps_, bool animate )
   // {
   //   _reps = reps_;
@@ -215,7 +228,7 @@ namespace neuroscheme
     {
       auto newLayout = layout_.second->clone( );
       newLayout->setRepresentations( layout_.second->representations( ));
-      newLayout->refreshProperties( );
+      newLayout->refreshProperties( layout_.second->representations( ));
       canvas->addLayout( newLayout );
       // std::cout << "clone layout" << layout_.second->name( ) << std::endl;
     }

@@ -35,8 +35,8 @@ namespace neuroscheme
   CameraBasedLayout::CameraBasedLayout( void )
     : Layout( "3D", Layout::CAMERA_ENABLED )
   {
-    _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
-    _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
+    // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
+    // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
   }
 
   void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
