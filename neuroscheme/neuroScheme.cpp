@@ -51,7 +51,7 @@ void usageMessage( void )
             << "\t[ [ -dh | --deflect-host ] host ]"
             << std::endl
 #endif
-            << "\t[ [ -fs | --fullscreen ] "
+            << "\t[ -fs | --fullscreen ] "
             << std::endl
             << "\t[ -ws | --window-size ] width height ]"
             << std::endl
@@ -263,8 +263,8 @@ int main( int argc, char** argv )
   mainWindow.show( );
   if ( initWindowSize )
     mainWindow.resize( initWindowWidth, initWindowHeight );
-  else
-    mainWindow.resize( 800, 600 );
+  // else
+  //   mainWindow.resize( 800, 600 );
   if ( initWindowMaximized )
     mainWindow.showMaximized( );
   if ( fullscreen )

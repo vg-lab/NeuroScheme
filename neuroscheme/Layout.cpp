@@ -65,7 +65,6 @@ namespace neuroscheme
     }
     if ( _flags & SCATTERPLOT_ENABLED )
     {
-      std::cout << "Creating scatterplot widget " << _name << std::endl;
       _scatterPlotWidget = new ScatterPlotWidget( this );
       QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
       _toolbox->addItem( _scatterPlotWidget, filterIcon,

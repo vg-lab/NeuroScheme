@@ -61,7 +61,6 @@ namespace neuroscheme
         otherPane->setStyleSheet(
           "#pane { border: 3px dotted rgba( 0,0,0,0%); }" );
 
-      std::cout << "PaneManager::activePane::" << std::endl;
     if ( _layout )
     {
 
@@ -80,7 +79,6 @@ namespace neuroscheme
           }
         }
       }
-      std::cout << "PaneManager::activePane::add Label" << std::endl;
       _layout->addWidget( new QLabel( _activePane->name.c_str( )), 0, 0 );
 
 
@@ -123,10 +121,6 @@ namespace neuroscheme
       _layout->addWidget( activeLayout->optionsWidget( ) , 2, 0 );
       activeLayout->optionsWidget( )->show( );
 
-      // std::cout << "Active pane" << std::endl;
-      // _activePane->layoutChanged( _activePane->activeLayoutIndex( ));
-
-      //std::cout << _activePane->layouts( ).layoutSelector( ) << " " << _activePane << std::endl;
     }
   }
 

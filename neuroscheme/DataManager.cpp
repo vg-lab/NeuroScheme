@@ -460,45 +460,45 @@ auto greenMapper = new DiscreteColorMapper( );
     } // if morphologies || !csvNeuronStatsFileName.empty( )
 
     // Compute maximums per layer for minicol and col reps
-    // unsigned int maxNeuronsPerColumnLayer =
-    //   std::numeric_limits< unsigned int >::min( );
-    // unsigned int maxNeuronsPerMiniColumnLayer =
-    //   std::numeric_limits< unsigned int >::min( );
-    // for ( const auto& col : columns )
-    // {
-    //   for ( unsigned int layer = 1; layer < 7; layer++ )
-    //   {
-    //     unsigned int numNeuronsPerColumnLayer = col->numberOfNeurons(
-    //       false, nsol::Neuron::PYRAMIDAL, layer );
+    unsigned int maxNeuronsPerColumnLayer =
+      std::numeric_limits< unsigned int >::min( );
+    unsigned int maxNeuronsPerMiniColumnLayer =
+      std::numeric_limits< unsigned int >::min( );
+    for ( const auto& col : columns )
+    {
+      for ( unsigned int layer = 1; layer < 7; layer++ )
+      {
+        unsigned int numNeuronsPerColumnLayer = col->numberOfNeurons(
+          false, nsol::Neuron::PYRAMIDAL, layer );
 
-    //     if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
-    //       maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
+        if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
+          maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
 
-    //     numNeuronsPerColumnLayer = col->numberOfNeurons(
-    //       false, nsol::Neuron::INTERNEURON, layer );
+        numNeuronsPerColumnLayer = col->numberOfNeurons(
+          false, nsol::Neuron::INTERNEURON, layer );
 
-    //     if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
-    //       maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
-    //   }
+        if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
+          maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
+      }
 
-    //   for ( const auto miniCol : col->miniColumns( ))
-    //   {
-    //     for ( unsigned int layer = 1; layer < 7; layer++ )
-    //     {
-    //       unsigned int numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
-    //         false, nsol::Neuron::PYRAMIDAL, layer );
+      for ( const auto miniCol : col->miniColumns( ))
+      {
+        for ( unsigned int layer = 1; layer < 7; layer++ )
+        {
+          unsigned int numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
+            false, nsol::Neuron::PYRAMIDAL, layer );
 
-    //       if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
-    //         maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
+          if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
+            maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
 
-    //       numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
-    //         false, nsol::Neuron::INTERNEURON, layer );
+          numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
+            false, nsol::Neuron::INTERNEURON, layer );
 
-    //       if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
-    //         maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
-    //     }
-    //   }
-    // }
+          if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
+            maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
+        }
+      }
+    }
 
     int columnsCounter = 0;
     for ( const auto& col : columns )
@@ -832,7 +832,9 @@ auto greenMapper = new DiscreteColorMapper( );
     auto repCretor = new neuroscheme::cortex::RepresentationCreator( );
     repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
                             maxNeuronDendVolume, maxNeuronDendArea,
-                            gids.size( ));
+                            gids.size( ),
+                            maxNeuronsPerColumnLayer,
+                            maxNeuronsPerMiniColumnLayer );
 
     neuroscheme::RepresentationCreatorManager::addCreator( repCretor );
     // neuroscheme::RepresentationCreatorManager::create(

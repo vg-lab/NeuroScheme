@@ -52,13 +52,17 @@ namespace neuroscheme
                         float maxNeuronSomaArea_,
                         float maxNeuronDendsVolume_,
                         float maxNeuronDendsArea_,
-                        unsigned int maxNeurons_ )
+                        unsigned int maxNeurons_,
+                        unsigned int maxNeuronsPerColumn_,
+                        unsigned int maxNeuronsPerMiniColumn_ )
       {
         _maxNeuronSomaVolume = maxNeuronSomaVolume_;
         _maxNeuronSomaArea = maxNeuronSomaArea_;
         _maxNeuronDendsVolume = maxNeuronDendsVolume_;
         _maxNeuronDendsArea = maxNeuronDendsArea_;
         _maxNeurons = maxNeurons_;
+        _maxNeuronsPerColumn = maxNeuronsPerColumn_;
+        _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
       }
 
     protected:
@@ -69,13 +73,16 @@ namespace neuroscheme
         MapperFloatToFloat& dendAreaToAngle,
         ColorMapper& somaVolumeToColor,
         ColorMapper& dendVolumeToColor,
-        MapperFloatToFloat& neuronsToPercentage );
+        MapperFloatToFloat& neuronsToPercentage,
+        MapperFloatToFloat& layerNeuronsToPercentage);
 
       float _maxNeuronSomaVolume;
       float _maxNeuronSomaArea;
       float _maxNeuronDendsVolume;
       float _maxNeuronDendsArea;
       unsigned int _maxNeurons;
+      unsigned int _maxNeuronsPerColumn;
+      unsigned int _maxNeuronsPerMiniColumn;
     };
 
     // class RepresentationCreatorManager

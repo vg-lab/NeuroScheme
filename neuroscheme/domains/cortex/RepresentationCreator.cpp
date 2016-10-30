@@ -76,8 +76,15 @@ namespace neuroscheme
         0, _maxNeuronDendsArea == 0 ? 0.1f : _maxNeuronDendsArea, 0, -360 );
 
       // std::cout << "--------------------" << _maxNeurons << std::endl;
- 
-      MapperFloatToFloat neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
+      // std::cout << "max neurons per layer " <<  " " << _maxNeuronsPerColumn
+      //           << " " << _maxNeuronsPerMiniColumn << std::endl;
+      MapperFloatToFloat
+        neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
+      MapperFloatToFloat
+        columnNeuronsToPercentage( 0, _maxNeuronsPerColumn, 0.0f, 1.0f );
+      MapperFloatToFloat
+        miniColumnNeuronsToPercentage(
+          0, _maxNeuronsPerMiniColumn, 0.0f, 1.0f );
 
 
       for ( const auto entity : entities.vector( ))
@@ -180,7 +187,8 @@ namespace neuroscheme
                                      dendAreaToAngle,
                                      greenMapper,
                                      redMapper,
-                                     neuronsToPercentage );
+                                     neuronsToPercentage,
+                                     columnNeuronsToPercentage );
           representations.push_back( columnRep );
 
           if ( linkEntitiesToReps )
@@ -199,7 +207,8 @@ namespace neuroscheme
                                      dendAreaToAngle,
                                      greenMapper,
                                      redMapper,
-                                     neuronsToPercentage );
+                                     neuronsToPercentage,
+                                     miniColumnNeuronsToPercentage );
           representations.push_back( miniColumnRep );
 
           if ( linkEntitiesToReps )
@@ -218,7 +227,8 @@ namespace neuroscheme
       MapperFloatToFloat& dendAreaToAngle,
       ColorMapper& somaVolumeToColor,
       ColorMapper& dendVolumeToColor,
-      MapperFloatToFloat& neuronsToPercentage )
+      MapperFloatToFloat& neuronsToPercentage,
+      MapperFloatToFloat& layerNeuronsToPercentage )
     {
       NeuronRep meanNeuronRep;
 
@@ -264,11 +274,6 @@ namespace neuroscheme
       shiftgen::NeuronAggregationRep::Layers layersReps;
       shiftgen::LayerRep layerRep;
 
-      std::cout << "layerRep " << entity->getProperty( "Num Pyramidals" ).
-        value< float >( ) << std::endl;
-      std::cout << "layerRep " <<           neuronsToPercentage.map(
-            entity->getProperty( "Num Pyramidals" ).
-            value< float >( )) << std::endl;
       layerRep.setProperty(
         "leftPerc",
         roundf(
@@ -288,14 +293,14 @@ namespace neuroscheme
       {
         layerRep.setProperty(
           "leftPerc",
-            neuronsToPercentage.map(
+            layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Pyr Layer " ) +
                 std::to_string( layer )).
               value< float >( )));
         layerRep.setProperty(
           "rightPerc",
-            neuronsToPercentage.map(
+            layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Inter Layer " ) +
                 std::to_string( layer )).

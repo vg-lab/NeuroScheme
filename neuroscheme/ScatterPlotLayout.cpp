@@ -41,13 +41,11 @@ namespace neuroscheme
     // shift::Representations( )
     )
   {
-    std::cout << "ScatterPlotLayout::arranging" << std::endl;
     unsigned int margin = 150;
 
     // QGraphicsView* gv = _scene->views( )[0];
     auto width = _scene->width( );
     auto height = _scene->height( );
-    std::cout << "arranging in scene " << width << " x " << height << std::endl;
     auto xMin = -width/2 + margin;
     auto xMax = width/2 - margin;
     auto yMin = -height/2 + margin;
