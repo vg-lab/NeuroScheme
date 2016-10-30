@@ -10,27 +10,27 @@
                     "type": "uint"
                 },
                 {
-                    "name": "morphoType",
+                    "name": "Morpho Type",
                     "type": "TMorphologicalType"
                 },
                 {
-                    "name": "funcType",
+                    "name": "Funct Type",
                     "type": "TFunctionalType"
                 },
                 {
-                    "name": "somaVolume",
+                    "name": "Soma Volume",
                     "type": "float"
                 },
                 {
-                    "name": "somaArea",
+                    "name": "Soma Surface",
                     "type": "float"
                 },
                 {
-                    "name": "dendVolume",
+                    "name": "Dendritic Volume",
                     "type": "float"
                 },
                 {
-                    "name": "dendArea",
+                    "name": "Dendritic Surface",
                     "type": "float"
                 },
                 {

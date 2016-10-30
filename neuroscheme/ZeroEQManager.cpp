@@ -100,7 +100,7 @@ namespace neuroscheme
   void ZeroEQManager::publishSelection(
     const std::vector< unsigned int >& gids )
   {
-    if ( _publishSelection )
+    if ( _publisher && _publishSelection )
     {
       neuroscheme::Log::log(
         std::string( "NeuroScheme: publishing selection with " +

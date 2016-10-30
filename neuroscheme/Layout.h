@@ -140,21 +140,6 @@ namespace neuroscheme
     ScatterPlotWidget* _scatterPlotWidget;
   };
 
-  class ScatterplotLayout : public Layout
-  {
-  public:
-    ScatterplotLayout( void );
-    virtual void _arrangeItems( const shift::Representations& /* reps */,
-                                bool /* animate */,
-                                const shift::Representations&
-                                preFilterReps =
-                                shift::Representations( )) final;
-    Layout* clone( void ) const
-    {
-      return new ScatterplotLayout;
-    }
-  };
-
 }
 
 #endif

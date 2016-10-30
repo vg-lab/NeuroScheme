@@ -62,7 +62,7 @@ namespace neuroscheme
       }
 
     protected:
-      void _CreateColumnOrMiniColumn(
+      void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
         MapperFloatToFloat& somaAreaToAngle,

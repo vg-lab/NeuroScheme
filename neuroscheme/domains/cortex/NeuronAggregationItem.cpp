@@ -8,17 +8,17 @@ namespace neuroscheme
 {
 
   LayerItem::LayerItem( unsigned int layer_,
-                                    QGraphicsItem *parent_,
-                                    const QPoint& pLayerUL,
-                                    const QPoint& pLayerUM,
-                                    const QPoint& pLayerUR,
-                                    unsigned int layerHeight,
-                                    unsigned int numNeuronsHeight,
-                                    float percPyr,
-                                    float percInter,
-                                    const QBrush& brush_ )
-  : QGraphicsPathItem( parent_ )
-  , _layer( layer_  )
+                        QGraphicsItem *parent_,
+                        const QPoint& pLayerUL,
+                        const QPoint& pLayerUM,
+                        const QPoint& pLayerUR,
+                        unsigned int layerHeight,
+                        unsigned int numNeuronsHeight,
+                        float percPyr,
+                        float percInter,
+                        const QBrush& brush_ )
+    : QGraphicsPathItem( parent_ )
+    , _layer( layer_  )
   {
 
     QPainterPath layerPath;
@@ -81,7 +81,7 @@ namespace neuroscheme
     }
   }
 
-  unsigned int & LayerItem::layer( void )
+  unsigned int& LayerItem::layer( void )
   {
     return _layer;
   }

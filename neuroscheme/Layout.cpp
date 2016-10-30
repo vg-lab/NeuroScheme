@@ -67,7 +67,6 @@ namespace neuroscheme
     {
       std::cout << "Creating scatterplot widget " << _name << std::endl;
       _scatterPlotWidget = new ScatterPlotWidget( this );
-      std::cout << this << " -- " << _scatterPlotWidget << std::endl;
       QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
       _toolbox->addItem( _scatterPlotWidget, filterIcon,
                          QString( "ScatterPlot" ));
@@ -293,16 +292,16 @@ namespace neuroscheme
       }
     }
 
-    std::cout << "refresh properties for scatterplot " << _name << " " << this << " " 
-              <<  _scatterPlotWidget << " "
-              // << _scatterPlotWidget->propertyXSelector( ) << " "
-              // << _scatterPlotWidget->propertyYSelector( )
-              << std::endl;
+    // std::cout << "refresh properties for scatterplot " << _name << " " << this << " " 
+    //           <<  _scatterPlotWidget << " "
+    //           // << _scatterPlotWidget->propertyXSelector( ) << " "
+    //           // << _scatterPlotWidget->propertyYSelector( )
+    //           << std::endl;
     if ( _scatterPlotWidget &&
          _scatterPlotWidget->propertyXSelector( ) &&
          _scatterPlotWidget->propertyYSelector( ))
     {
-      std::cout << "refresh properties for scatterplot." << std::endl;
+      // std::cout << "refresh properties for scatterplot." << std::endl;
       auto selectorX = _scatterPlotWidget->propertyXSelector( );
       auto selectorY = _scatterPlotWidget->propertyYSelector( );
       selectorX->clear( );
@@ -537,152 +536,16 @@ namespace neuroscheme
       posAnim.setDuration( ANIM_DURATION );
       posAnim.setStartValue( graphicsItem->pos( ));
     }
-    posAnim.setEndValue( toPos );
+    if ( toPos.x( ) != toPos.x( ) ||
+         toPos.y( ) != toPos.y( ))
+      posAnim.setEndValue( QPoint( 0, 0 ));
+    else
+      posAnim.setEndValue( toPos );
 
     posAnim.start( );
     scaleAnim.start( );
 
   }
-
-
-  ScatterplotLayout::ScatterplotLayout( void )
-    : Layout( "Scatterplot", Layout::SCATTERPLOT_ENABLED )
-  {
-    _optionsWidget->layout( )->addWidget( new QPushButton(
-                                            "hola scatterplot" ));
-  }
-
-
-  void ScatterplotLayout::_arrangeItems(
-    const shift::Representations& reps ,
-    bool animate,
-    const shift::Representations&
-    // preFilterReps =
-    // shift::Representations( )
-    )
-  {
-    unsigned int margin = 150;
-
-    // QGraphicsView* gv = _scene->views( )[0];
-    auto width = _scene->width( );
-    auto height = _scene->height( );
-
-    auto xMin = -width/2 + margin;
-    auto xMax = width/2 - margin;
-    auto yMin = -height/2 + margin;
-    auto yMax = height/2 - margin;
-
-
-    // auto xAxis = new QGraphicsLineItem( -_scene->width( )/2 + margin,
-    //                                     +_scene->height( )/2 - margin,
-    //                                     +_scene->width( )/2 - margin,
-    //                                     +_scene->height( )/2 - margin );
-    // auto yAxis = new QGraphicsLineItem( -_scene->width( )/2 + margin,
-    //                                     +_scene->height( )/2 - margin,
-    //                                     -_scene->width( )/2 + margin,
-    //                                     -_scene->height( )/2 + margin );
-
-    // _scene->addItem( xAxis );
-    // _scene->addItem( yAxis );
-
-    auto xProp =
-      _scatterPlotWidget->propertyXSelector( )->currentText( ).toStdString( );
-    auto yProp =
-      _scatterPlotWidget->propertyYSelector( )->currentText( ).toStdString( );
-
-    if ( xProp.empty( ) || yProp.empty( ))
-      return;
-    auto xMaxValue = _properties[ xProp ].rangeMax;
-    auto xMinValue = _properties[ xProp ].rangeMin;
-    auto yMaxValue = _properties[ yProp ].rangeMax;
-    auto yMinValue = _properties[ yProp ].rangeMin;
-
-    MapperFloatToFloat xMapper( xMinValue, xMaxValue, xMin, xMax );
-    MapperFloatToFloat yMapper( yMinValue, yMaxValue, yMin, yMax );
-
-    const auto& repsToEntities =
-      RepresentationCreatorManager::repsToEntities( );
-
-    for ( const auto& representation : reps )
-    {
-      auto graphicsItemRep =
-        dynamic_cast< neuroscheme::QGraphicsItemRepresentation* >(
-          representation );
-      if ( !graphicsItemRep )
-      {
-        std::cerr << "Item null" << std::endl;
-      }
-      else
-      {
-        auto graphicsItem = graphicsItemRep->item( _scene );
-        auto item = dynamic_cast< Item* >( graphicsItem );
-        auto obj = dynamic_cast< QObject* >( graphicsItem );
-        if ( item )
-        {
-          auto& entity = *( repsToEntities.at( representation ).begin( ));
-          auto xVal = fires::PropertyManager::getPropertyCaster( xProp )->toInt(
-            entity->getProperty( xProp ));
-          auto yVal = fires::PropertyManager::getPropertyCaster( yProp )->toInt(
-            entity->getProperty( yProp ));
-
-          qreal posX = xMapper.map( xVal );
-          qreal posY = - yMapper.map( yVal );
-          qreal scale_ = 0.3;
-
-          // if ( useOpacityForFilter &&
-          //      filteredOutItems.count( graphicsItem ) == 1 )
-          // {
-          //   graphicsItem->setOpacity( 0.5f );
-          // }
-          // else
-          //   graphicsItem->setOpacity( 1.0f );
-
-          if ( obj && animate )
-          {
-            animateItem( graphicsItem, scale_, QPoint( posX, posY ));
-          }
-          else
-          {
-            graphicsItem->setPos( posX, posY );
-            graphicsItem->setScale( scale_ );
-          }
-          // std::cout << posX << " " << posY << " " << scale_ << std::endl;
-        }
-      }
-    } // for all reps
-  }
-
-  // void ScatterplotLayout::displayItems( const shift::Representations& reps,
-  //                                       bool /* animate */
-  //                                       const shift::Representations& )
-  // {
-  //   // std::cout << "ScatterplotLayout:: Display items" << std::endl;
-  //   // std::cout << "1" << std::endl;
-  //   // if ( !_scene ) return;
-  //   // std::cout << "2" << std::endl;
-
-  //   // _representations = reps;
-  //   // if ( reps.empty( ))
-  //   //   return;
-
-  //   // auto clearFirst = true;
-  //   // if ( clearFirst )
-  //   // {
-  //   //   std::cout << "Clearing" << std::endl;
-  //   //   // Remove top items without destroying them
-  //   //   QList< QGraphicsItem* > items_ = _scene->items( );
-  //   //   for ( auto item = items_.begin( ); item != items_.end( ); ++item )
-  //   //   {
-  //   //     auto item_ = dynamic_cast< Item* >( *item );
-  //   //     if ( item_ && item_->parentRep( ))
-  //   //       _scene->removeItem( *item );
-  //   //   }
-
-  //   //   // Remove the rest
-  //   //   _scene->clear( );
-  //   // }
-
-  // }
 
 
 }

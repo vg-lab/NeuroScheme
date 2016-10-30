@@ -20,6 +20,75 @@ namespace neuroscheme
     return _entities;
   }
 
+#ifdef NEUROSCHEME_USE_NSOL
+  std::string NeuronMorphologyToLabel(
+    nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat )
+  {
+    switch( stat )
+    {
+    // Volume
+    case nsol::NeuronMorphologyStats::DENDRITIC_VOLUME:
+      return std::string("Dendritic Volume");
+      break;
+    case nsol::NeuronMorphologyStats::AXON_VOLUME:
+      return std::string("Axon Volume");
+      break;
+    case nsol::NeuronMorphologyStats::NEURITIC_VOLUME:
+      return std::string("Neuritic Volume");
+      break;
+    case nsol::NeuronMorphologyStats::SOMA_VOLUME:
+      return std::string("Soma Volume");
+      break;
+    case nsol::NeuronMorphologyStats::VOLUME:
+      return std::string("Volume");
+      break;
+
+    // Surface
+    case nsol::NeuronMorphologyStats::DENDRITIC_SURFACE:
+      return std::string("Dendritic Surface");
+      break;
+    case nsol::NeuronMorphologyStats::AXON_SURFACE:
+      return std::string("Axon Surface");
+      break;
+    case nsol::NeuronMorphologyStats::NEURITIC_SURFACE:
+      return std::string("Neuritic Surface");
+      break;
+    case nsol::NeuronMorphologyStats::SOMA_SURFACE:
+      return std::string("Soma Surface");
+      break;
+    case nsol::NeuronMorphologyStats::SURFACE:
+      return std::string("Surface");
+      break;
+
+    // Length
+    case nsol::NeuronMorphologyStats::DENDRITIC_LENGTH:
+      return std::string("Dendritic Length");
+      break;
+    case nsol::NeuronMorphologyStats::AXON_LENGTH:
+      return std::string("Axon Length");
+      break;
+    case nsol::NeuronMorphologyStats::NEURITIC_LENGTH:
+      return std::string("Neuritic Length");
+      break;
+
+    // Bifurcations
+    case nsol::NeuronMorphologyStats::DENDRITIC_BIFURCATIONS:
+      return std::string("Dendritic Bifurcations");
+      break;
+    case nsol::NeuronMorphologyStats::AXON_BIFURCATIONS:
+      return std::string("Axon Bifurcations");
+      break;
+    case nsol::NeuronMorphologyStats::NEURITIC_BIFURCATIONS:
+      return std::string("Neuritic Bifurcations");
+      break;
+
+    default:
+      break;
+    }
+    return std::string("");
+  }
+#endif
+
   void DataManager::loadBlueConfig( const std::string& blueConfig,
                                     const std::string& targetLabel,
                                     const bool loadMorphologies,
@@ -68,7 +137,7 @@ namespace neuroscheme
       errorMessage.showMessage( "Error loading BlueConfig" );
       return;
     }
-    CreateEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,
+    createEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,
                                    csvNeuronStatsFileName );
 
 #endif
@@ -116,7 +185,7 @@ namespace neuroscheme
     return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
   }
 
-  void DataManager::CreateEntitiesFromNsolColumns(
+  void DataManager::createEntitiesFromNsolColumns(
     const nsol::Columns& columns,
     bool withMorphologies,
     const std::string& csvNeuronStatsFileName )
@@ -391,45 +460,45 @@ auto greenMapper = new DiscreteColorMapper( );
     } // if morphologies || !csvNeuronStatsFileName.empty( )
 
     // Compute maximums per layer for minicol and col reps
-    unsigned int maxNeuronsPerColumnLayer =
-      std::numeric_limits< unsigned int >::min( );
-    unsigned int maxNeuronsPerMiniColumnLayer =
-      std::numeric_limits< unsigned int >::min( );
-    for ( const auto& col : columns )
-    {
-      for ( unsigned int layer = 1; layer < 7; layer++ )
-      {
-        unsigned int numNeuronsPerColumnLayer = col->numberOfNeurons(
-          false, nsol::Neuron::PYRAMIDAL, layer );
+    // unsigned int maxNeuronsPerColumnLayer =
+    //   std::numeric_limits< unsigned int >::min( );
+    // unsigned int maxNeuronsPerMiniColumnLayer =
+    //   std::numeric_limits< unsigned int >::min( );
+    // for ( const auto& col : columns )
+    // {
+    //   for ( unsigned int layer = 1; layer < 7; layer++ )
+    //   {
+    //     unsigned int numNeuronsPerColumnLayer = col->numberOfNeurons(
+    //       false, nsol::Neuron::PYRAMIDAL, layer );
 
-        if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
-          maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
+    //     if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
+    //       maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
 
-        numNeuronsPerColumnLayer = col->numberOfNeurons(
-          false, nsol::Neuron::INTERNEURON, layer );
+    //     numNeuronsPerColumnLayer = col->numberOfNeurons(
+    //       false, nsol::Neuron::INTERNEURON, layer );
 
-        if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
-          maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
-      }
+    //     if ( numNeuronsPerColumnLayer > maxNeuronsPerColumnLayer )
+    //       maxNeuronsPerColumnLayer = numNeuronsPerColumnLayer;
+    //   }
 
-      for ( const auto miniCol : col->miniColumns( ))
-      {
-        for ( unsigned int layer = 1; layer < 7; layer++ )
-        {
-          unsigned int numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
-            false, nsol::Neuron::PYRAMIDAL, layer );
+    //   for ( const auto miniCol : col->miniColumns( ))
+    //   {
+    //     for ( unsigned int layer = 1; layer < 7; layer++ )
+    //     {
+    //       unsigned int numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
+    //         false, nsol::Neuron::PYRAMIDAL, layer );
 
-          if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
-            maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
+    //       if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
+    //         maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
 
-          numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
-            false, nsol::Neuron::INTERNEURON, layer );
+    //       numNeuronsPerMiniColumnLayer = miniCol->numberOfNeurons(
+    //         false, nsol::Neuron::INTERNEURON, layer );
 
-          if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
-            maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
-        }
-      }
-    }
+    //       if ( numNeuronsPerMiniColumnLayer > maxNeuronsPerMiniColumnLayer )
+    //         maxNeuronsPerMiniColumnLayer = numNeuronsPerMiniColumnLayer;
+    //     }
+    //   }
+    // }
 
     int columnsCounter = 0;
     for ( const auto& col : columns )
@@ -549,6 +618,9 @@ auto greenMapper = new DiscreteColorMapper( );
           meanDendsArea,
           meanCenter );
 
+      fires::PropertyManager::registerProperty(
+          colEntity, "Id", col->id( ));
+
       _entities.add( colEntity );
       relParentOf[ 0 ].insert( colEntity->entityGid( ));
       relChildOf[ colEntity->entityGid( ) ] = 0;
@@ -642,6 +714,9 @@ auto greenMapper = new DiscreteColorMapper( );
             meanDendsArea,
             mcMeanCenter );
 
+        fires::PropertyManager::registerProperty(
+          mcEntity, "Id", mc->id( ));
+
         _entities.add( mcEntity );
         relChildOf[ mcEntity->entityGid( ) ] = colEntity->entityGid( );
         relParentOf[ colEntity->entityGid( ) ].insert( mcEntity->entityGid( ));
@@ -692,6 +767,41 @@ auto greenMapper = new DiscreteColorMapper( );
                 .0f, .0f, .0f, .0f,
                 neuron->transform( ).col( 3 ).transpose( ));
           }
+
+
+          if ( neuron->morphology( ) && withMorphologies &&
+              csvNeuronStatsFileName.empty( ))
+          {
+
+            nsol::NeuronMorphologyStats* nms = neuron->morphology( )->stats( );
+
+            for ( int stat_ = 0;
+                  stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS;
+                  ++stat_ )
+            {
+              nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
+                nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
+
+              fires::PropertyManager::registerProperty(
+                neuronEntity, NeuronMorphologyToLabel( stat ),
+                nms->getStat( stat ));
+            }
+          }
+          else if ( !csvNeuronStatsFileName.empty( ))
+          {
+            for ( int stat_ = 0;
+                  stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS;
+                  ++stat_ )
+            {
+              nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
+                nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
+
+              fires::PropertyManager::registerProperty(
+                neuronEntity, NeuronMorphologyToLabel( stat ),
+                neuronsStats[ neuron->gid( ) ].morphologyStats[stat] );
+            }
+          }
+
           _entities.add( neuronEntity );
           relChildOf[ neuronEntity->entityGid( ) ] =
             mcEntity->entityGid( );

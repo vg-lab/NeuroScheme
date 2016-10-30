@@ -50,8 +50,9 @@ namespace neuroscheme
 
     bool useOpacityForFiltering( void )
     { return _useOpacityCheckBox->isChecked( ); }
+    int opacityValue( void ) { return _opacitySlider->value( ); }
 
-public slots:
+  public slots:
     void addedFilterProperty( void );
     void removeFilterProperty( const QString& propertyLabel );
     void sliderChanged( const QString& propertyLabel );

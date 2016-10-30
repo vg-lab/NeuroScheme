@@ -137,6 +137,9 @@ namespace neuroscheme
     int topMargin = (( deltaY * scale ) +
                      ( gv->height( ) - numRows * deltaY * scale )) / 2;
 
+    auto opacity = 1.0f;
+    if ( _filterWidget )
+      opacity = float( _filterWidget->opacityValue( )) / 100.0;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -164,7 +167,8 @@ namespace neuroscheme
           if ( useOpacityForFilter &&
                filteredOutItems.count( graphicsItem ) == 1 )
           {
-            graphicsItem->setOpacity( 0.5f );
+            std::cout << "opacity " << _filterWidget->opacityValue( ) << std::endl;
+            graphicsItem->setOpacity( opacity );
           }
           else
             graphicsItem->setOpacity( 1.0f );

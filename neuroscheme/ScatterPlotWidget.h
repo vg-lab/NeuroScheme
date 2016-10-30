@@ -43,8 +43,9 @@ namespace neuroscheme
     ~ScatterPlotWidget( void );
     QComboBox* propertyXSelector( void ) { return _propertyXSelector; }
     QComboBox* propertyYSelector( void ) { return _propertyYSelector; }
-
+    int scale( void ) { return _scaleSlider->value( ); }
 public slots:
+    void refreshParentLayout( void );
 
   protected slots:
     void _propertiesChanged( void );
@@ -54,6 +55,8 @@ public slots:
     QLabel* _yLabel;
     QComboBox* _propertyXSelector;
     QComboBox* _propertyYSelector;
+    QLabel* _scaleLabel;
+    QSlider* _scaleSlider;
   };
 
 }

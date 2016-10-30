@@ -227,9 +227,9 @@ namespace neuroscheme
     // }
     // std::cout <<  std::endl;
 
-    // _layoutRowsMap.erase( propertyLabel );
-    // _removeSignalMappers.erase( propertyLabel );
-    // _changeDirSignalMappers.erase( propertyLabel );
+    _layoutRowsMap.erase( propertyLabel );
+    _removeSignalMappers.erase( propertyLabel );
+    _changeDirSignalMappers.erase( propertyLabel );
 
     _parentLayout->refresh( true, false );
   }

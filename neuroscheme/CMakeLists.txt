@@ -41,6 +41,7 @@ set( NEUROSCHEME_SOURCES
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
   qxt/qxtspanslider.cpp
+  ScatterPlotLayout.cpp
   ScatterPlotWidget.cpp
   SelectionManager.cpp
   SortWidget.cpp
@@ -76,6 +77,7 @@ set( NEUROSCHEME_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
+  ScatterPlotLayout.h
   ScatterPlotWidget.h
   SelectedState.h
   SelectionManager.h

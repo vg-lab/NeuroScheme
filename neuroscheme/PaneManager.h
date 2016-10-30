@@ -25,6 +25,7 @@
 #include "Canvas.h"
 #include <set>
 #include <QGridLayout>
+#include <QSplitter>
 #include <Eigen/Dense>
 #include <chrono>
 
@@ -34,7 +35,7 @@ namespace neuroscheme
   {
   public:
     typedef std::set< Canvas* > TPanes;
-    static void mainLayout( QGridLayout* );
+    static void splitter( QSplitter* );
     static Canvas* activePane( void );
     static void activePane( Canvas* );
     static TPanes& panes( void );
@@ -64,7 +65,7 @@ namespace neuroscheme
     static const Matrix4f& viewMatrix( void ) { return _modelViewMatrix; }
 
   protected:
-    static QGridLayout* _mainGridLayout;
+    static QSplitter* _splitter;
     static Canvas* _activePane;
     static TPanes _panes;
     static QGridLayout* _layout;

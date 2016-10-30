@@ -260,19 +260,22 @@ int main( int argc, char** argv )
 
   MainWindow mainWindow( 0 );
   mainWindow.setWindowTitle( "NeuroScheme" );
+  mainWindow.show( );
   if ( initWindowSize )
     mainWindow.resize( initWindowWidth, initWindowHeight );
   else
-    mainWindow.resize( 1100, 920 );
+    mainWindow.resize( 800, 600 );
   if ( initWindowMaximized )
     mainWindow.showMaximized( );
   if ( fullscreen )
     mainWindow.showFullScreen( );
-  mainWindow.show( );
 
   if ( !neuroscheme::Config::zeroeqSession.empty( ))
     neuroscheme::ZeroEQManager::init( neuroscheme::Config::zeroeqSession );
 
+//   std::cout << "init" << std::endl;
+//  mainWindow.init( );
+//   std::cout << "init" << std::endl;
   return app.exec( );
 
 }

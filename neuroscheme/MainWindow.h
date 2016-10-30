@@ -76,7 +76,7 @@ public slots:
 
 protected:
 
-  void resizeEvent( QResizeEvent* );
+//  void resizeEvent( QResizeEvent* ) final;
   QString _tableColumnToString( TTableColumns column );
 
   StoredSelections _storedSelections;

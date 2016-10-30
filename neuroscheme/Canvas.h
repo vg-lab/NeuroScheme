@@ -17,6 +17,7 @@ namespace neuroscheme
 
   public:
     GraphicsView( QWidget* parent = 0 );
+    void mousePressEvent( QMouseEvent* /* event */ );
 
   protected:
     virtual void wheelEvent( QWheelEvent* event_ );
@@ -25,6 +26,11 @@ namespace neuroscheme
 
   class GraphicsScene : public QGraphicsScene
   {
+    // void mousePressEvent( QMouseEvent* /* event */ )
+    // {
+    //   PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));
+    // }
+
   }; // class GraphicsScene
 
 
@@ -41,10 +47,12 @@ namespace neuroscheme
     const GraphicsView& view( void ) const;
     GraphicsView& view( void );
 
-    void enterEvent( QEvent* /* event */ );
-    void leaveEvent( QEvent* /* event */ );
-    void keyPressEvent( QKeyEvent *event );
-
+    void enterEvent( QEvent* ) final;
+    void leaveEvent( QEvent* ) final;
+    void mousePressEvent( QMouseEvent* ) final;
+    void keyPressEvent( QKeyEvent* ) final;
+    void resizeEvent( QResizeEvent* ) final;
+    void showEvent( QShowEvent* ) final;
     void connectLayoutSelector( void );
     const Layouts& layouts( void ) const;
     Layouts& layouts( void );

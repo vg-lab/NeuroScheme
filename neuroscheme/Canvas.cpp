@@ -11,6 +11,12 @@ namespace neuroscheme
   {
   }
 
+  void GraphicsView::mousePressEvent( QMouseEvent* event )
+  {
+    PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));
+    QGraphicsView::mousePressEvent( event );
+  }
+
   void GraphicsView::wheelEvent( QWheelEvent* event_ )
   {
 
@@ -48,13 +54,19 @@ namespace neuroscheme
     _graphicsView->setRenderHints( QPainter::Antialiasing |
                                    QPainter::HighQualityAntialiasing );
     _graphicsView->setDragMode( QGraphicsView::ScrollHandDrag );
-    this->setSizePolicy( QSizePolicy::MinimumExpanding,
-                         QSizePolicy::MinimumExpanding );
-
+    _graphicsView->setSizePolicy( QSizePolicy::Expanding,
+                                  QSizePolicy::Expanding );
+    _graphicsView->setSizePolicy( QSizePolicy::Expanding,
+                                  QSizePolicy::Expanding );
+    _graphicsView->show( );
+    _graphicsView->resize( this->size( ));
+    // std::cout << "Canvas size " << this->width( ) << " x " << this->height( ) << std::endl;
+    // std::cout << "Canvas size " << _graphicsView->width( ) << " x " << _graphicsView->height( ) << std::endl;
     QHBoxLayout* layout_ = new QHBoxLayout;
     layout_->addWidget( _graphicsView );
     this->setLayout( layout_ );
     this->leaveEvent( nullptr );
+    this->setObjectName( "pane" );
   }
 
   Canvas::~Canvas( void )
@@ -92,18 +104,23 @@ namespace neuroscheme
     return *_graphicsView;
   }
 
-  void Canvas::enterEvent( QEvent*  )
+  void Canvas::mousePressEvent( QMouseEvent* /* event */ )
   {
     neuroscheme::PaneManager::activePane( this );
-    this->setObjectName("pane");
-    this->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
+  }
+
+  void Canvas::enterEvent( QEvent*  )
+  {
+    // neuroscheme::PaneManager::activePane( this );
+    // this->setObjectName("pane");
+    // this->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
 
   }
 
   void Canvas::leaveEvent( QEvent*  )
   {
-    this->setObjectName("pane");
-    this->setStyleSheet("#pane { border: 3px solid rgba( 0,0,0,0%); }");
+    // this->setObjectName("pane");
+    // this->setStyleSheet("#pane { border: 3px solid rgba( 0,0,0,0%); }");
   }
 
   void Canvas::keyPressEvent( QKeyEvent *event_ )
@@ -119,6 +136,32 @@ namespace neuroscheme
     default:
       break;
     }
+  }
+
+  void Canvas::resizeEvent( QResizeEvent* )
+  {
+    // std::cout << "Resize Canvas" << std::endl;
+    const QSize viewerSize = this->view( ).size( );
+    const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
+                                 - viewerSize.height( ) / 2,
+                                 viewerSize.width( ) -2,
+                                 viewerSize.height( ) -2);
+
+    QTransform transf = this->view( ).transform( );
+    this->view( ).fitInView( rectf, Qt::KeepAspectRatio );
+    this->view( ).setSceneRect( rectf );
+    this->view( ).setTransform( transf );
+
+    // std::cout << this->view( ).width( ) << " x "
+    //           << this->view( ).height( ) << std::endl;
+
+    this->layouts( ).getLayout(
+      this->activeLayoutIndex( ))->refresh( false, false );
+  }
+
+  void Canvas::showEvent( QShowEvent* /* event_ */ )
+  {
+    resizeEvent( 0 );
   }
 
 

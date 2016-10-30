@@ -94,6 +94,9 @@ namespace neuroscheme
     connect( _filterButton, SIGNAL( pressed( )),
              this, SLOT( refreshParentLayout( )));
 
+    connect( _opacitySlider, SIGNAL( valueChanged( int )),
+             this, SLOT( refreshParentLayout( )));
+
   }
 
 
@@ -324,7 +327,7 @@ namespace neuroscheme
 
   void FilterWidget::_useOpacityCheckBoxChanged( void )
   {
-    _opacitySlider->setEnabled( !_useOpacityCheckBox->isChecked( ));
+    _opacitySlider->setEnabled( _useOpacityCheckBox->isChecked( ));
     std::cout << "Refresh " << useOpacityForFiltering( ) << std::endl;
     refreshParentLayout( );
   }

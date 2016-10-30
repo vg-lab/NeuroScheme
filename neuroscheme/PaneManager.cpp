@@ -28,7 +28,7 @@
 
 namespace neuroscheme
 {
-  QGridLayout* PaneManager::_mainGridLayout = nullptr;
+  QSplitter* PaneManager::_splitter = nullptr;
   Canvas* PaneManager::_activePane = nullptr;
   PaneManager::TPanes PaneManager::_panes = PaneManager::TPanes( );
   QGridLayout* PaneManager::_layout = nullptr;
@@ -40,9 +40,9 @@ namespace neuroscheme
   std::chrono::time_point< std::chrono::system_clock >
   PaneManager::lastMatrixClock = std::chrono::system_clock::now( );
 
-  void PaneManager::mainLayout( QGridLayout* mainGridLayout )
+  void PaneManager::splitter( QSplitter* splitter_ )
   {
-    _mainGridLayout = mainGridLayout;
+    _splitter = splitter_;
   }
 
   Canvas* PaneManager::activePane( void )
@@ -55,6 +55,13 @@ namespace neuroscheme
     _activePane = pane;
     assert( _activePane->layouts( ).layoutSelector( ));
 
+    pane->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
+    for ( auto& otherPane : _panes )
+      if ( pane != otherPane )
+        otherPane->setStyleSheet(
+          "#pane { border: 3px dotted rgba( 0,0,0,0%); }" );
+
+      std::cout << "PaneManager::activePane::" << std::endl;
     if ( _layout )
     {
 
@@ -73,6 +80,7 @@ namespace neuroscheme
           }
         }
       }
+      std::cout << "PaneManager::activePane::add Label" << std::endl;
       _layout->addWidget( new QLabel( _activePane->name.c_str( )), 0, 0 );
 
 
@@ -139,26 +147,40 @@ namespace neuroscheme
 
   Canvas* PaneManager::newPane( Canvas* orig, TPaneDivision division )
   {
-    assert( _mainGridLayout );
+    ( void ) division;
+    assert( _splitter );
     Canvas* canvas;
     if ( !orig )
     {
-      canvas = new Canvas( );
-      _mainGridLayout->addWidget( canvas, _nextRow, _nextColumn );
+      // std::cout << "pane manager"
+      //           << _mainGridLayout->parentWidget( )->width( ) << " x "
+      //           << _mainGridLayout->parentWidget( )->height( ) << std::endl;
+
+      canvas = new Canvas( _splitter->parentWidget( ));
+      _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
     }
     else
     {
       canvas = orig->clone( );
-      if ( division == HORIZONTAL )
-        _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
-      else if ( division == VERTICAL )
-        _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
+      // if ( division == HORIZONTAL )
+      //   _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
+      // else if ( division == VERTICAL )
+      //   _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
+      _splitter->addWidget( canvas );
+      // QList< int > sizes;
+      // sizes << 100 << 100;
+      auto sizes = _splitter->sizes( );
+      for ( auto& size_ : sizes )
+        size_ = 100;
+      _splitter->setSizes( sizes );
       // canvas->displayEntities( orig->entities( ), false, true );
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );
     _panes.insert( canvas );
+    canvas->show( );
+
     return canvas;
   }
 
@@ -173,17 +195,6 @@ namespace neuroscheme
     _modelViewMatrix.row( 3 ) =
       Vector4f( values[3], values[7], values[11], values[15] );
 
-    // _modelViewMatrix.row( 0 ) =
-    //   Vector4f( 1,0,0, values[12] );
-    // _modelViewMatrix.row( 1 ) =
-    //   Vector4f( 0,1,0, values[13] );
-    // _modelViewMatrix.row( 2 ) =
-    //   Vector4f( 0,0,1, values[14] );
-    // _modelViewMatrix.row( 3 ) =
-    //   Vector4f( 0,0,0,1 );
-
-    // std::cout << "----------------" << std::endl;
-    // std::cout << _modelViewMatrix << std::endl;
     int elapsedMs = std::chrono::duration_cast< std::chrono::milliseconds >
       ( std::chrono::system_clock::now( ) - lastMatrixClock ).count( );
 
