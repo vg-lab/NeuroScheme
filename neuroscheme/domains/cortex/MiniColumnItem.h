@@ -36,6 +36,7 @@ namespace neuroscheme
   public:
 
     MiniColumnItem( const MiniColumnRep& miniColumnRep,
+                    QGraphicsScene* scene,
                     unsigned int size = 300 );
 
     virtual ~MiniColumnItem( void ) {}

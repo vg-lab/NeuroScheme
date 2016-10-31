@@ -19,29 +19,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__NEURON_REP__
-#define __NEUROSCHEME__NEURON_REP__
+#ifndef __NEUROSCHEME__LAYER_REP__
+#define __NEUROSCHEME__LAYER_REP__
 
 #include "../../reps/QGraphicsItemRepresentation.h"
 #include <shift/shift.h>
-#include <shift_NeuronRep.h>
+#include <shift_NeuronAggregationRep.h>
+#include <shift_LayerRep.h>
 
 namespace neuroscheme
 {
 
-
-  class NeuronRep
-    : public shiftgen::NeuronRep
+  class LayerRep
+    : public shiftgen::LayerRep
     , public QGraphicsItemRepresentation
   {
   public:
 
-    NeuronRep( void );
-    NeuronRep( const NeuronRep& );
-    NeuronRep( const neuroscheme::shiftgen::NeuronRep& );
-    virtual ~NeuronRep( void ) {}
-    QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                         bool create = true );
+    LayerRep( void );
+    LayerRep( const LayerRep& );
+    virtual ~LayerRep( void ) {}
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
 
   };
 

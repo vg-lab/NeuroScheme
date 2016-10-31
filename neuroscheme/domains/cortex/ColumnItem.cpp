@@ -1,13 +1,14 @@
 #include "../../error.h"
+#include "../../reps/CollapseButtonItem.h"
 #include "ColumnItem.h"
 #include "NeuronItem.h"
-#include "../../reps/CollapseButtonItem.h"
 #include <QPen>
 
 namespace neuroscheme
 {
 
   ColumnItem::ColumnItem( const ColumnRep& columnRep,
+                          QGraphicsScene* scene,
                           unsigned int size )
     : NeuronAggregationItem( )
   {
@@ -33,6 +34,7 @@ namespace neuroscheme
     path_.closeSubpath(  );
 
     _createNeuronAggregationItem(
+      scene,
       meanNeuron,
       layers,
       path_,

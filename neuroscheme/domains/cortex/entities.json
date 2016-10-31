@@ -65,6 +65,10 @@
             "includes" : [ "<Eigen/Dense>" ],
             "properties": [
                 {
+                    "name": "Id",
+                    "type": "uint"
+                },
+                {
                     "name": "Num Neurons",
                     "type": "float"
                 },
@@ -150,11 +154,15 @@
             [
             ]
         },
-                {
+        {
             "name": "MiniColumn",
             "namespace": "neuroscheme::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
             "properties": [
+                {
+                    "name": "Id",
+                    "type": "uint"
+                },
                 {
                     "name": "Num Neurons",
                     "type": "float"
@@ -240,7 +248,28 @@
             "types":
             [
             ]
+        },
+        {
+            "name": "Layer",
+            "namespace": "neuroscheme::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Parent Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Parent Type",
+                    "type": "uint"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint"
+                }
+            ],
+            "types":
+            [
+            ]
         }
-
     ]
 }

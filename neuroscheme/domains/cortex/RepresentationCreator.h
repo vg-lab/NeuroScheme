@@ -31,6 +31,7 @@
 namespace neuroscheme
 {
 
+  class LayerRep;
   namespace cortex
   {
 
@@ -66,15 +67,27 @@ namespace neuroscheme
       }
 
     protected:
+      #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
+      typedef std::map<
+        std::pair< unsigned int, std::pair< unsigned int, unsigned int>>,
+      LayerRep* > LayersMap;
+
       void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
+        unsigned int id,
+        unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
         MapperFloatToFloat& dendAreaToAngle,
         ColorMapper& somaVolumeToColor,
         ColorMapper& dendVolumeToColor,
         MapperFloatToFloat& neuronsToPercentage,
-        MapperFloatToFloat& layerNeuronsToPercentage);
+        MapperFloatToFloat& layerNeuronsToPercentage,
+        LayersMap& layersMap,
+        shift::TEntitiesToReps& entitiesToReps,
+        shift::TRepsToEntities& repsToEntities,
+        bool linkEntitiesToReps,
+        bool linkRepsToEntities );
 
       float _maxNeuronSomaVolume;
       float _maxNeuronSomaArea;

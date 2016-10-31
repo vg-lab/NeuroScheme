@@ -19,9 +19,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "RepresentationCreator.h"
 #include "mappers/ColorMapper.h"
 #include "mappers/VariableMapper.h"
 #include "domains/domains.h"
+#include "error.h"
 
 namespace neuroscheme
 {
@@ -38,6 +40,7 @@ namespace neuroscheme
       bool linkRepsToEntities
       )
     {
+      LayersMap layersMap;
 
       // if ( linkEntitiesToReps )
       //   entitiesToReps.clear( );
@@ -177,18 +180,31 @@ namespace neuroscheme
           if ( linkRepsToEntities )
             repsToEntities[ neuronRep ].insert( entity );
         } // end if its Neuron entity
-
+        else
         if ( dynamic_cast< Column* >( entity ))
         {
+          entity->registerProperty( "tt", uint( 0 ));
+          std::cout << " id type: "
+                    << entity->getProperty( "tt" ).type( ) << " --> "
+                    << demangleType( entity->getProperty( "tt" ).type( )) << "  "
+                    << entity->getProperty( "Id" ).type( ) << " --> "
+                    << demangleType( entity->getProperty( "Id" ).type( )) << " "
+                    << std::endl;
           auto column = dynamic_cast< Column* >( entity );
           auto columnRep = new ColumnRep( );
-          _createColumnOrMiniColumn( column, columnRep,
-                                     somaAreaToAngle,
-                                     dendAreaToAngle,
-                                     greenMapper,
-                                     redMapper,
-                                     neuronsToPercentage,
-                                     columnNeuronsToPercentage );
+          _createColumnOrMiniColumn(
+            column, columnRep,
+            entity->getProperty( "Id" ).value< uint >( ),
+            0,
+            somaAreaToAngle,
+            dendAreaToAngle,
+            greenMapper,
+            redMapper,
+            neuronsToPercentage,
+            columnNeuronsToPercentage,
+            layersMap,
+            entitiesToReps, repsToEntities,
+            linkEntitiesToReps, linkRepsToEntities );
           representations.push_back( columnRep );
 
           if ( linkEntitiesToReps )
@@ -197,18 +213,26 @@ namespace neuroscheme
             repsToEntities[ columnRep ].insert( entity );
 
         } // it its MiniColumn entity
+        else
         if ( dynamic_cast< MiniColumn* >( entity ))
         {
           // std::cout << "creating minicolumn rep" << std::endl;
           auto miniColumn = dynamic_cast< MiniColumn* >( entity );
           auto miniColumnRep = new MiniColumnRep( );
-          _createColumnOrMiniColumn( miniColumn, miniColumnRep,
-                                     somaAreaToAngle,
-                                     dendAreaToAngle,
-                                     greenMapper,
-                                     redMapper,
-                                     neuronsToPercentage,
-                                     miniColumnNeuronsToPercentage );
+          _createColumnOrMiniColumn(
+            miniColumn, miniColumnRep,
+            entity->getProperty( "Id" ).value< unsigned int >( ),
+            1,
+            somaAreaToAngle,
+            dendAreaToAngle,
+            greenMapper,
+            redMapper,
+            neuronsToPercentage,
+            miniColumnNeuronsToPercentage,
+            layersMap,
+            entitiesToReps, repsToEntities,
+            linkEntitiesToReps, linkRepsToEntities);
+
           representations.push_back( miniColumnRep );
 
           if ( linkEntitiesToReps )
@@ -217,18 +241,43 @@ namespace neuroscheme
             repsToEntities[ miniColumnRep ].insert( entity );
 
         } // if its Column entity
+        else
+        if ( dynamic_cast< Layer* >( entity ))
+        {
+          auto layerKey = TripleKey(
+              entity->getProperty( "Parent Id" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Layer" ).value< unsigned int >( ));
+          if ( layersMap.count( layerKey ) == 0 )
+          {
+            layersMap[ layerKey ] = new LayerRep( );
+
+            if ( linkEntitiesToReps )
+              entitiesToReps[ entity ].insert( layersMap.at( layerKey ));
+            if ( linkRepsToEntities )
+              repsToEntities[ layersMap.at( layerKey ) ].insert( entity );
+          }
+          representations.push_back( layersMap[ layerKey ] );
+        } // if Layer
       } // for all entities
     } // create
 
     void RepresentationCreator::_createColumnOrMiniColumn(
       shift::Entity *entity,
       shift::Representation* rep,
+      unsigned int id,
+      unsigned int columnOrMiniColumn,
       MapperFloatToFloat& somaAreaToAngle,
       MapperFloatToFloat& dendAreaToAngle,
       ColorMapper& somaVolumeToColor,
       ColorMapper& dendVolumeToColor,
       MapperFloatToFloat& neuronsToPercentage,
-      MapperFloatToFloat& layerNeuronsToPercentage )
+      MapperFloatToFloat& layerNeuronsToPercentage,
+      RepresentationCreator::LayersMap& layersMap,
+      shift::TEntitiesToReps& entitiesToReps,
+      shift::TRepsToEntities& repsToEntities,
+      bool linkEntitiesToReps,
+      bool linkRepsToEntities )
     {
       NeuronRep meanNeuronRep;
 
@@ -272,15 +321,15 @@ namespace neuroscheme
       rep->registerProperty( "meanNeuron", meanNeuronRep );
 
       shiftgen::NeuronAggregationRep::Layers layersReps;
-      shiftgen::LayerRep layerRep;
 
-      layerRep.setProperty(
+      auto layerRep = new LayerRep;
+      layerRep->setProperty(
         "leftPerc",
         roundf(
           neuronsToPercentage.map(
             entity->getProperty( "Num Pyramidals" ).
             value< float >( ))));
-      layerRep.setProperty(
+      layerRep->setProperty(
         "rightPerc",
         roundf(
           neuronsToPercentage.map(
@@ -291,14 +340,32 @@ namespace neuroscheme
 
       for ( unsigned int layer = 1; layer <= 6; ++layer )
       {
-        layerRep.setProperty(
+        auto layerKey = TripleKey(
+          id,
+          columnOrMiniColumn,
+          layer );
+
+        if ( layersMap.count( layerKey ) == 0 )
+        {
+          layersMap[ layerKey ] = new LayerRep( );
+ 
+          if ( linkEntitiesToReps )
+            entitiesToReps[ entity ].insert( layersMap.at( layerKey ));
+          if ( linkRepsToEntities )
+            repsToEntities[ layersMap.at( layerKey ) ].insert( entity );
+        }
+
+        layerRep = layersMap[ layerKey ]; //new LayerRep;
+
+        //layerRep = new LayerRep;
+        layerRep->setProperty(
           "leftPerc",
             layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Pyr Layer " ) +
                 std::to_string( layer )).
               value< float >( )));
-        layerRep.setProperty(
+        layerRep->setProperty(
           "rightPerc",
             layerNeuronsToPercentage.map(
               entity->getProperty(

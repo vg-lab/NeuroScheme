@@ -2,6 +2,7 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "domains/domains.h"
+#include "error.h"
 #include <Eigen/Geometry>
 
 
@@ -198,10 +199,20 @@ namespace neuroscheme
     _entities.relationships( )[ "isChildOf" ] =
       new shift::RelationshipOneToOne;
 
+    _entities.relationships( )[ "isAGroupOf" ] =
+      new shift::RelationshipOneToN;
+    _entities.relationships( )[ "isPartOf" ] =
+      new shift::RelationshipOneToN;
+
     auto& relParentOf =
       *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf =
       *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+
+    auto& relGroupOf =
+      *( _entities.relationships( )[ "isAGroupOf" ]->asOneToN( ));
+    auto& relPartOf =
+      *( _entities.relationships( )[ "isPartOf" ]->asOneToN( ));
 
     std::set< unsigned int > gids;
     for ( const auto& col : columns )
@@ -427,36 +438,36 @@ namespace neuroscheme
     if ( withMorphologies || !csvNeuronStatsFileName.empty( ))
     {
 
-#ifdef fdfdf
-auto greenMapper = new DiscreteColorMapper( );
-      auto redMapper = new DiscreteColorMapper( );
+// #ifdef fdfdf
+// auto greenMapper = new DiscreteColorMapper( );
+//       auto redMapper = new DiscreteColorMapper( );
 
 #define ColorF( r, g, b )                       \
       Color( uint8_t( roundf( r )),             \
              uint8_t( roundf( g )),             \
              uint8_t( roundf( b )))
-      greenMapper->push_back( ColorF( 0.62f, 1.00f, 0.75f ));
-      greenMapper->push_back( ColorF( 0.55f, 0.88f, 0.65f ));
-      greenMapper->push_back( ColorF( 0.46f, 0.75f, 0.56f ));
-      greenMapper->push_back( ColorF( 0.40f, 0.63f, 0.47f ));
-      greenMapper->push_back( ColorF( 0.31f, 0.51f, 0.37f ));
-      greenMapper->push_back( ColorF( 0.22f, 0.38f, 0.27f ));
+//       greenMapper->push_back( ColorF( 0.62f, 1.00f, 0.75f ));
+//       greenMapper->push_back( ColorF( 0.55f, 0.88f, 0.65f ));
+//       greenMapper->push_back( ColorF( 0.46f, 0.75f, 0.56f ));
+//       greenMapper->push_back( ColorF( 0.40f, 0.63f, 0.47f ));
+//       greenMapper->push_back( ColorF( 0.31f, 0.51f, 0.37f ));
+//       greenMapper->push_back( ColorF( 0.22f, 0.38f, 0.27f ));
 
-      redMapper->push_back( ColorF( 1.00f, 0.62f, 0.75f ));
-      redMapper->push_back( ColorF( 0.88f, 0.55f, 0.65f ));
-      redMapper->push_back( ColorF( 0.75f, 0.46f, 0.56f ));
-      redMapper->push_back( ColorF( 0.63f, 0.40f, 0.47f ));
-      redMapper->push_back( ColorF( 0.51f, 0.31f, 0.37f ));
-      redMapper->push_back( ColorF( 0.38f, 0.22f, 0.27f ));
+//       redMapper->push_back( ColorF( 1.00f, 0.62f, 0.75f ));
+//       redMapper->push_back( ColorF( 0.88f, 0.55f, 0.65f ));
+//       redMapper->push_back( ColorF( 0.75f, 0.46f, 0.56f ));
+//       redMapper->push_back( ColorF( 0.63f, 0.40f, 0.47f ));
+//       redMapper->push_back( ColorF( 0.51f, 0.31f, 0.37f ));
+//       redMapper->push_back( ColorF( 0.38f, 0.22f, 0.27f ));
 
-      greenMapper->max( ) = maxNeuronSomaVolume;
-      redMapper->max( ) = maxNeuronDendVolume;
+//       greenMapper->max( ) = maxNeuronSomaVolume;
+//       redMapper->max( ) = maxNeuronDendVolume;
 
-      auto somaAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronSomaArea, 0, -360 );
-      auto dendAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronDendArea, 0, -360 );
-#endif
+//       auto somaAreaToAngle =
+//         new MapperFloatToFloat( 0, maxNeuronSomaArea, 0, -360 );
+//       auto dendAreaToAngle =
+//         new MapperFloatToFloat( 0, maxNeuronDendArea, 0, -360 );
+// #endif
     } // if morphologies || !csvNeuronStatsFileName.empty( )
 
     // Compute maximums per layer for minicol and col reps
@@ -595,8 +606,19 @@ auto greenMapper = new DiscreteColorMapper( );
       //           << meanDendsVolume << " "
       //           << meanDendsArea <<  " "
       //           << meanCenter << std::endl;
+
+      shift::Entity* colLayerEntities[ 6 ];
+      for ( auto i = 0; i < 6; ++i )
+      {
+        auto layer = new neuroscheme::Layer;
+        layer->registerProperty( "Parent Id", ( unsigned int ) col->id( ));
+        layer->registerProperty( "Parent Type", ( unsigned int ) 0 );
+        layer->registerProperty( "Layer", ( unsigned int ) i+1 );
+        colLayerEntities[ i ] = layer;
+      }
       shift::Entity* colEntity =
         new neuroscheme::Column(
+          uint( col->id( )),
           col->numberOfNeurons( false ),
           col->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL ),
           col->numberOfNeurons( false, nsol::Neuron::INTERNEURON ),
@@ -617,9 +639,14 @@ auto greenMapper = new DiscreteColorMapper( );
           meanDendsVolume,
           meanDendsArea,
           meanCenter );
+      std::cout << " col id type: "
+                << colEntity->getProperty( "Id" ).type( ) << " "
+                << demangleType(
+                  colEntity->getProperty( "Id" ).type( )) << " "
+                << std::endl;
 
-      fires::PropertyManager::registerProperty(
-          colEntity, "Id", col->id( ));
+      // fires::PropertyManager::registerProperty(
+      //     colEntity, "Id", col->id( ));
 
       _entities.add( colEntity );
       relParentOf[ 0 ].insert( colEntity->entityGid( ));
@@ -691,8 +718,19 @@ auto greenMapper = new DiscreteColorMapper( );
             nsol::TAggregation::MEAN );
         }
 
+        shift::Entity* mcLayerEntities[ 6 ];
+        for ( auto i = 0; i < 6; ++i )
+        {
+          auto layer = new neuroscheme::Layer;
+          layer->registerProperty( "Parent Id", ( unsigned int ) mc->id( ));
+          layer->registerProperty( "Parent Type", ( unsigned int ) 0 );
+          layer->registerProperty( "Layer", ( unsigned int ) i+1 );
+          mcLayerEntities[ i ] = layer;
+        }
+
         shift::Entity* mcEntity =
           new neuroscheme::MiniColumn(
+            mc->id( ),
             mc->numberOfNeurons( false ),
             mc->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL ),
             mc->numberOfNeurons( false, nsol::Neuron::INTERNEURON ),
@@ -714,8 +752,8 @@ auto greenMapper = new DiscreteColorMapper( );
             meanDendsArea,
             mcMeanCenter );
 
-        fires::PropertyManager::registerProperty(
-          mcEntity, "Id", mc->id( ));
+        // fires::PropertyManager::registerProperty(
+        //   mcEntity, "Id", mc->id( ));
 
         _entities.add( mcEntity );
         relChildOf[ mcEntity->entityGid( ) ] = colEntity->entityGid( );
@@ -770,7 +808,7 @@ auto greenMapper = new DiscreteColorMapper( );
 
 
           if ( neuron->morphology( ) && withMorphologies &&
-              csvNeuronStatsFileName.empty( ))
+               csvNeuronStatsFileName.empty( ))
           {
 
             nsol::NeuronMorphologyStats* nms = neuron->morphology( )->stats( );
@@ -808,7 +846,34 @@ auto greenMapper = new DiscreteColorMapper( );
           relParentOf[ mcEntity->entityGid( ) ].insert(
             neuronEntity->entityGid( ));
 
-             } // for all neurons
+          relGroupOf[ mcEntity->entityGid( ) ].insert(
+            neuronEntity->entityGid( ));
+          relPartOf[ neuronEntity->entityGid( ) ].insert(
+            mcEntity->entityGid( ));
+
+          relGroupOf[ colEntity->entityGid( ) ].insert(
+            neuronEntity->entityGid( ));
+          relPartOf[ neuronEntity->entityGid( ) ].insert(
+            colEntity->entityGid( ));
+
+          for ( auto layer = 0; layer < 6; ++layer )
+          {
+            relGroupOf[ mcLayerEntities[ layer ]->entityGid( ) ].insert(
+              neuronEntity->entityGid( ));
+            relPartOf[ neuronEntity->entityGid( ) ].insert(
+              mcLayerEntities[ layer ]->entityGid( ));
+
+            relGroupOf[ colLayerEntities[ layer ]->entityGid( ) ].insert(
+              neuronEntity->entityGid( ));
+            relPartOf[ neuronEntity->entityGid( ) ].insert(
+              colLayerEntities[ layer ]->entityGid( ));
+          }
+          // ( void ) mcLayerEntities;
+          // ( void ) colLayerEntities;
+          // ( void ) relPartOf;
+          // ( void ) relGroupOf;
+ 
+        } // for all neurons
 
         std::cout << "\r("
                   << 100 * ( columnsCounter + 1 ) / columns.size( )

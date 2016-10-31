@@ -85,7 +85,7 @@
                 },
                 {
                     "class": "vector",
-                    "element": "LayerRep",
+                    "element": "LayerRep*",
                     "name": "Layers"
                 }
             ]

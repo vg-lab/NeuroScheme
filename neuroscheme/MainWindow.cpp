@@ -56,24 +56,15 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
-  // Set up main central layout for pane placing
-  // auto mainGridLayout = new QGridLayout( this );
-  // mainGridLayout->setContentsMargins( 0, 0, 0, 0 );
-  // mainGridLayout->setSpacing( 0 );
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
-//  widget->setLayout( mainGridLayout );
   this->setCentralWidget( widget );
-// }
 
-// void MainWindow::init( void )
-// {
   // Active domain
   neuroscheme::DomainManager::setActiveDomain(
     new neuroscheme::cortex::Domain );
 
-//  neuroscheme::DataManager::loadData( );
   if ( neuroscheme::Config::cliDataSource ==
        neuroscheme::Config::CLI_BLUECONFIG )
   {
@@ -83,54 +74,40 @@ MainWindow::MainWindow( QWidget* parent_ )
       neuroscheme::Config::loadMorphologies,
       neuroscheme::Config::csvNeuronStatsFileName );
   }
-  neuroscheme::PaneManager::splitter( //mainGridLayout );
-    // static_cast< QGridLayout* >(
-    // this->centralWidget( )->layout( ))
-    widget
-    );
-
+  neuroscheme::PaneManager::splitter( widget );
 
   // First pane
   auto canvas = neuroscheme::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
-  // auto gridLayout = new neuroscheme::GridLayout( );
-  // gridLayout->optionsWidget( )->setParent( );
-  //  canvas->layouts( ).addLayout( gridLayout );
   canvas->addLayout( new neuroscheme::GridLayout( ));
   canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
   canvas->addLayout( new neuroscheme::ScatterPlotLayout( ));
   canvas->displayEntities(
     neuroscheme::DataManager::rootEntities( ), false, true );
-//  canvas->displayReps( neuroscheme::DataManager::representations( ), false );
-  // for ( auto& layout_ : canvas->layouts( ).map( ))
-  //   layout_.second->refreshProperties(
-  //     canvas->layouts( ).getLayout(
-  //       canvas->activeLayoutIndex( ))->representations( ));
   neuroscheme::PaneManager::panes( ).insert( canvas );
-  // neuroscheme::PaneManager::activePane( canvas );
 
-  // Common sizes for docks
-  // unsigned int tabWidth = 300;
-  // unsigned int tabMargin = 25;
-  // unsigned int halfSceneHeight =
-  //   ( this->height( ) - tabMargin) / 3;
-  //( this->centralWidget( )->height( ) - tabMargin) / 3;
-//  std::cout << "halfSceneHeight: " << halfSceneHeight << std::endl;
-
+  // #include "domains/cortex/MiniColumnItem.h"
+  // auto mcr = new neuroscheme::MiniColumnRep( );
+  // //auto nr = new neuroscheme::shiftgen::NeuronRep( );
+  // // mcr->registerProperty( "meanNeuron", nr );
+  // std::cout << mcr->properties( ).size( ) << std::endl;
+  // neuroscheme::shiftgen::NeuronAggregationRep::Layers layers;
+  // for ( auto i = 0 ; i < 7 ; ++i )
+  //   layers.push_back( new neuroscheme::LayerRep( ));
+  // mcr->setProperty( "layers", layers );
+  // canvas->scene( ).addItem(
+  //   mcr->item( dynamic_cast< QGraphicsScene* >( &canvas->scene( ))));
+  // auto mci = new neuroscheme::MiniColumnItem( mcr,  );
   // Layouts dock
   {
     _layoutsDock = new QDockWidget( );
     this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
                          _layoutsDock, Qt::Vertical);
-    _layoutsDock->setMinimumSize( 300, 500 );
-
-    // _layoutsDock->setMinimumSize( tabWidth,
-    //                               halfSceneHeight - tabMargin / 3);
+    _layoutsDock->setMinimumSize( 300, 300 );
     _layoutsDock->setSizePolicy( QSizePolicy::MinimumExpanding,
                                  QSizePolicy::Expanding );
-
     _layoutsDock->setFeatures( QDockWidget::DockWidgetClosable |
                                QDockWidget::DockWidgetMovable |
                                QDockWidget::DockWidgetFloatable );
@@ -143,24 +120,21 @@ MainWindow::MainWindow( QWidget* parent_ )
     connect( _ui->actionLayouts, SIGNAL( triggered( )),
              this, SLOT( updateLayoutsDock( )));
 
-    QGridLayout* layoutsConfigLayout = new QGridLayout( );
+    QWidget* dockWidget = new QWidget( );
+    QGridLayout* layoutsConfigLayout = new QGridLayout( dockWidget );
     layoutsConfigLayout->setAlignment( Qt::AlignTop );
-    _layoutsDock->setLayout( layoutsConfigLayout );
     neuroscheme::PaneManager::layout( layoutsConfigLayout );
     neuroscheme::PaneManager::activePane( canvas );
 
-    QWidget* dockWidget = new QWidget( );
-    dockWidget->setLayout( layoutsConfigLayout );
+    // QWidget* dockWidget = new QWidget( );
+    // dockWidget->setLayout( layoutsConfigLayout );
     _layoutsDock->setWidget( dockWidget );
   }
 
   // Stored selections dock
   {
-    _storedSelections.dock = new QDockWidget();
+    _storedSelections.dock = new QDockWidget( );
     _storedSelections.dock->setWindowTitle( QString( "Stored selections" ));
-    // _storedSelections.dock->setMinimumSize( tabWidth,
-    //                                         halfSceneHeight - tabMargin / 3 );
-    // _storedSelections.dock->resize( tabWidth, halfSceneHeight - tabMargin / 3 );
     _storedSelections.dock->setSizePolicy( QSizePolicy::MinimumExpanding,
                                            QSizePolicy::MinimumExpanding );
 
@@ -181,10 +155,8 @@ MainWindow::MainWindow( QWidget* parent_ )
              this, SLOT( updateStoredSelectionsDock( )));
 
 
-    QGridLayout* selectionLayout = new QGridLayout( );
     QWidget* dockWidget = new QWidget( );
-
-    dockWidget->setLayout( selectionLayout );
+    QGridLayout* selectionLayout = new QGridLayout( dockWidget );
 
     _storedSelections.counter = 0;
     _storedSelections.table = new QTableWidget( );
@@ -240,39 +212,6 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   resizeEvent( 0 );
 }
-
-// void MainWindow::resizeEvent( QResizeEvent* /* event_ */ )
-// {
-//   std::cout << "MainWindow::resizeEvent" << std::endl;
-//   for ( const auto& _canvas : neuroscheme::PaneManager::panes( ))
-//   {
-//     const QSize viewerSize = _canvas->view( ).size( );
-//     const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
-//                                  - viewerSize.height( ) / 2,
-//                                  viewerSize.width( ) -2,
-//                                  viewerSize.height( ) -2);
-
-//     QTransform transf = _canvas->view( ).transform( );
-//     _canvas->view( ).fitInView( rectf, Qt::KeepAspectRatio );
-//     _canvas->view( ).setSceneRect( rectf );
-//     _canvas->view( ).setTransform( transf );
-
-//     // std::cout << _canvas->view( ).width( ) << " x "
-//     //           << _canvas->view( ).height( ) << std::endl;
-
-//     // std::cout << this->centralWidget( )->width( ) << " x "
-//     //           << this->centralWidget( )->height( ) << std::endl;
- 
-//     _canvas->layouts( ).getLayout(
-//       _canvas->activeLayoutIndex( ))->refresh( false, false );
-
-//     // neuroscheme::LayoutManager::setScene( &_canvas->scene( ));
-//     // neuroscheme::LayoutManager::update( );
-//   }
-
-// }
-
-
 
 MainWindow::~MainWindow( void )
 {
@@ -452,4 +391,3 @@ void MainWindow::sortStoredSelectionsTable( int column )
 {
   _storedSelections.table->sortByColumn( column );
 }
-

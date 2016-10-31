@@ -94,6 +94,7 @@ namespace neuroscheme
                                 bool animate,
                                 bool refreshProperties_ )
   {
+    std::cout << "Display entities " << entities.vector( ).size( ) << std::endl;
     _entities = entities;
     _representations.clear( );
 
@@ -172,7 +173,7 @@ namespace neuroscheme
                  []( const shift::Entity* a, const shift::Entity* b )
                  { return b->entityGid( ) < a->entityGid( ); } );
       neuroscheme::RepresentationCreatorManager::create(
-        _entities, _representations,
+       _entities, _representations,
         true, true );
     }
     // _representations = reps;
@@ -381,14 +382,20 @@ namespace neuroscheme
 
   void Layout::_clearScene( void )
   {
+    // return;
     // Remove top items without destroying them
-    QList< QGraphicsItem* > items_ = _scene->items( );
-    for ( auto item = items_.begin( ); item != items_.end( ); ++item )
+    for ( auto& item : _scene->items( ))
     {
-      auto item_ = dynamic_cast< Item* >( *item );
-      if ( item_ && item_->parentRep( ))
-        _scene->removeItem( *item );
+      if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
+        _scene->removeItem( item );
     }
+    // QList< QGraphicsItem* > items_ = _scene->items( );
+    // for ( auto item = items_.begin( ); item != items_.end( ); ++item )
+    // {
+    //   // auto item_ = dynamic_cast< Item* >( *item );
+    //   // if ( item_ ) // && item_->parentRep( ))
+    //     _scene->removeItem( *item );
+    // }
 
     // Remove the rest
     _scene->clear( );
@@ -399,6 +406,7 @@ namespace neuroscheme
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
+    // std::cout << "Adding reps " << reps.size( ) << std::endl;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -411,7 +419,8 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
-
+        if ( item->parentItem( ))
+          continue;
         // Find out if its entity is selected
         // and if so set its pen
         // const auto& repsToEntities =
@@ -445,7 +454,10 @@ namespace neuroscheme
           }
         }
         //std::cout << &scene << " add item " << std::endl;
-        _scene->addItem( item );
+        // std::cout << "Adding item" << item << std::endl;
+
+        if ( !item->parentItem( ))
+          _scene->addItem( item );
       }
     }
   } // _addRepresentations

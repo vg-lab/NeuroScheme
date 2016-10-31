@@ -4,6 +4,11 @@
 
 #include "Log.h"
 #include <stdexcept>
+#include <exception>
+#include <iostream>
+#include <cxxabi.h>
+#include <typeinfo>
+
 
 
 #define NEUROSCHEME_THROW( msg )                                               \
@@ -26,5 +31,14 @@
 #define NEUROSCHEME_DEBUG_CHECK( cond, errorMsg )
 #endif
 
+inline std::string demangleType( const std::string& tn )
+{
+
+  int status;
+  auto realname = abi::__cxa_demangle( tn.c_str( ), 0, 0, &status );
+  auto str = std::string( realname );
+  free( realname );
+  return str;
+}
 
 #endif // __NEUROSCHEME_ERROR__

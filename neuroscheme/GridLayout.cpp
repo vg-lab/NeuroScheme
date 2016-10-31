@@ -48,6 +48,7 @@ namespace neuroscheme
       _filterWidget &&
       _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
     unsigned int maxItemWidth = 0, maxItemHeight = 0;
+    unsigned int repsToBeArranged = 0;
     for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
@@ -60,6 +61,9 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
+        if ( item->parentItem( ))
+          continue;
+        ++repsToBeArranged;
         if ( doFiltering && useOpacityForFilter )
         {
           if ( std::find( postFilterReps.begin( ), postFilterReps.end( ),
@@ -106,16 +110,16 @@ namespace neuroscheme
 
 
     unsigned int numRows =
-      floor( sqrt( iconAspectRatio * float( reps.size( )) /
+      floor( sqrt( iconAspectRatio * float( repsToBeArranged ) /
                    canvasAspectRatio ));
 
-    if ( numRows < 1 && reps.size( ) > 0 )
+    if ( numRows < 1 && repsToBeArranged > 0 )
       numRows = 1;
 
     unsigned int numColumns =
-      ceil( float( reps.size( )) / float( numRows ));
+      ceil( float( repsToBeArranged ) / float( numRows ));
 
-    if ( numColumns < 1 && reps.size( ) > 0 )
+    if ( numColumns < 1 && repsToBeArranged > 0 )
       numColumns = 1;
 
     if ( gv->width( ) < gv->height( ) )
@@ -153,6 +157,9 @@ namespace neuroscheme
       {
         auto graphicsItem = graphicsItemRep->item( _scene );
         auto item = dynamic_cast< Item* >( graphicsItem );
+        if ( graphicsItem->parentItem( ))
+          continue;
+
         auto obj = dynamic_cast< QObject* >( graphicsItem );
         if ( item )
         {

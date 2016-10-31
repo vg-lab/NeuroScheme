@@ -146,10 +146,6 @@ namespace neuroscheme
     Canvas* canvas;
     if ( !orig )
     {
-      // std::cout << "pane manager"
-      //           << _mainGridLayout->parentWidget( )->width( ) << " x "
-      //           << _mainGridLayout->parentWidget( )->height( ) << std::endl;
-
       canvas = new Canvas( _splitter->parentWidget( ));
       _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
@@ -157,18 +153,11 @@ namespace neuroscheme
     else
     {
       canvas = orig->clone( );
-      // if ( division == HORIZONTAL )
-      //   _mainGridLayout->addWidget( canvas, ++_nextRow, _nextColumn );
-      // else if ( division == VERTICAL )
-      //   _mainGridLayout->addWidget( canvas, _nextRow, ++_nextColumn );
       _splitter->addWidget( canvas );
-      // QList< int > sizes;
-      // sizes << 100 << 100;
       auto sizes = _splitter->sizes( );
       for ( auto& size_ : sizes )
         size_ = 100;
       _splitter->setSizes( sizes );
-      // canvas->displayEntities( orig->entities( ), false, true );
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );

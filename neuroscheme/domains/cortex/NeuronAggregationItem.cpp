@@ -7,19 +7,31 @@
 namespace neuroscheme
 {
 
-  LayerItem::LayerItem( unsigned int layer_,
-                        QGraphicsItem *parent_,
-                        const QPoint& pLayerUL,
-                        const QPoint& pLayerUM,
-                        const QPoint& pLayerUR,
-                        unsigned int layerHeight,
-                        unsigned int numNeuronsHeight,
-                        float percPyr,
-                        float percInter,
-                        const QBrush& brush_ )
-    : QGraphicsPathItem( parent_ )
-    , _layer( layer_  )
+  LayerItem::LayerItem( // unsigned int layer_,
+                        // QGraphicsItem *parent_
+    const LayerRep& layerRep )
+    // : QGraphicsPathItem( parent_ )
+    // , _layer( layer_  )
   {
+    setAcceptHoverEvents( true );
+    this->_parentRep = &( const_cast< LayerRep& >( layerRep ));
+  }
+
+  void LayerItem::create(
+    unsigned int layer_,
+    QGraphicsItem *parent_,
+    const QPoint& pLayerUL,
+    const QPoint& pLayerUM,
+    const QPoint& pLayerUR,
+    unsigned int layerHeight,
+    unsigned int numNeuronsHeight,
+    float percPyr,
+    float percInter,
+    const QBrush& brush_ )
+  {
+    assert( parent_ );
+    _layer = layer_;
+    setParentItem( parent_ );
 
     QPainterPath layerPath;
     QPolygon layerPoly;
@@ -51,7 +63,7 @@ namespace neuroscheme
       layerPath.addPolygon( numNeuronsPoly );
       layerPath.closeSubpath(  );
 
-      QGraphicsPathItem * numNeuronsPathItem =
+      QGraphicsPathItem* numNeuronsPathItem =
         new QGraphicsPathItem( this );
       numNeuronsPathItem->setPath( layerPath );
       numNeuronsPathItem->setPen( Qt::NoPen );
@@ -87,6 +99,7 @@ namespace neuroscheme
   }
 
   void NeuronAggregationItem::_createNeuronAggregationItem(
+    QGraphicsScene* scene,
     const NeuronRep& meanNeuron,
     const Layers& layers,
     const QPainterPath& path_,
@@ -177,29 +190,64 @@ namespace neuroscheme
         QPoint( 0, layerPadding + ( i - 1 ) * ( layerHeight + layerPadding ));
 
       const float& percPyr =
-        layers[ i ].getProperty( "leftPerc" ).value< float >( );
+        layers[ i ]->getProperty( "leftPerc" ).value< float >( );
       const float& percInter =
-        layers[ i ].getProperty( "rightPerc" ).value< float >( );
+        layers[ i ]->getProperty( "rightPerc" ).value< float >( );
 
-      auto layerItem =
-        new LayerItem( i,
-                       collapseButton,
-                       pLayerUL - collapseButtonPos,
-                       pLayerUM - collapseButtonPos,
-                       pLayerUR - collapseButtonPos,
-                       layerHeight, size/40,
-                       percPyr, percInter,
-                       QBrush(
-                         QColor( std::min( baseColor.red( ) + i * 8, 255 ),
-                                 std::min( baseColor.green( ) + i * 8, 255 ),
-                                 std::min( baseColor.blue( ) + i * 5 , 255 ))));
+      auto layerRep = dynamic_cast< LayerRep* >( layers[ i ] );
+      assert( layerRep );
+      auto item_ = layerRep->item( scene );
+      auto layerItem = dynamic_cast< LayerItem* >( item_ );
+      assert( layerItem );
+      std::cout << "create " << layerItem << std::endl;
+      layerItem->create(
+        i,
+        collapseButton,
+        //this,
+        pLayerUL - collapseButtonPos,
+        pLayerUM - collapseButtonPos,
+        pLayerUR - collapseButtonPos,
+        layerHeight, size/40,
+        percPyr, percInter,
+        QBrush(
+          QColor( std::min( baseColor.red( ) + i * 8, 255 ),
+                  std::min( baseColor.green( ) + i * 8, 255 ),
+                  std::min( baseColor.blue( ) + i * 5 , 255 ))));
+      layerItem->setParentItem( collapseButton );
+      std::cout << "BR layer: "
+                << layerItem->boundingRect( ).width( ) << " "
+                << layerItem->boundingRect( ).height( ) << std::endl;;
+      std::cout << "BR: "
+                << collapseButton->childrenBoundingRect( ).width( ) << " "
+                << collapseButton->childrenBoundingRect( ).height( ) << std::endl;;
+      std::cout << "BR: "
+                << this->childrenBoundingRect( ).width( ) << " "
+                << this->childrenBoundingRect( ).height( ) << std::endl;;
+      std::cout <<"layerItem->create("
+                << i << " , "
+                << collapseButton << ", "
+                << (pLayerUL - collapseButtonPos).x( ) << " "
+                << (pLayerUL - collapseButtonPos).y( ) << ","
+                << (pLayerUM - collapseButtonPos).x( ) << " "
+                << (pLayerUM - collapseButtonPos).y( ) << ","
+                << ( pLayerUR - collapseButtonPos ).x( ) << ","
+                << ( pLayerUR - collapseButtonPos ).y( ) << ","
+                << layerHeight << "," << size/40 << ","
+                << percPyr << ","  <<  percInter << ","
+                << std::endl;
+
+      // std::cout << this << " " << collapseButton << " "
+      //           << layerItem->width( ) << " "
+      //           << layerItem->height( ) << std::endl;
       layerItem->setFlag( QGraphicsItem::ItemStacksBehindParent );
       _layerItems[ i - 1 ] = layerItem;
       _layerAnimations[ i - 1 ] =
         new QPropertyAnimation( layerItem, "opacity" );
 
+       // _layerItems[ i - 1 ]->setEnabled( true );
+       // _layerItems[ i - 1 ]->setVisible( true );
     }
-    this->collapse( false ); // Start collapsed without ani
+    this->collapse( false ); // Start collapsed
 
   }
 

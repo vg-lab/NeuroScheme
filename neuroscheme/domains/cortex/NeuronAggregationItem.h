@@ -28,6 +28,7 @@
 #include "../../reps/Item.h"
 #include "../../reps/InteractiveItem.h"
 #include "ColumnRep.h"
+#include "LayerRep.h"
 #include "NeuronRep.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>
@@ -44,13 +45,30 @@ namespace neuroscheme
   class LayerItem
     : public QObject
     , public QGraphicsPathItem
+    , public Item
+    , public SelectableItem
+    , public InteractiveItem
   {
     Q_OBJECT
     Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
   public:
 
-    LayerItem( unsigned int layer_,
+
+  LayerItem( const LayerRep& layerRep );
+      // unsigned int layer_,
+      //   QGraphicsItem *parent_ //,
+        // const QPoint& pLayerUL,
+        // const QPoint& pLayerUM,
+        // const QPoint& pLayerUR,
+        // unsigned int layerHeight,
+        // unsigned int numNeuronsHeight,
+        // float percPyr,
+        // float percInter,
+        // const QBrush& brush_
+        //);
+
+  void create( unsigned int layer_,
                QGraphicsItem *parent_,
                const QPoint& pLayerUL,
                const QPoint& pLayerUM,
@@ -60,15 +78,44 @@ namespace neuroscheme
                float percPyr,
                float percInter,
                const QBrush& brush_ );
-
     unsigned int& layer( void );
-
     virtual ~LayerItem( void ) {}
+
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverEnterEvent( this, event_ );
+    }
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverLeaveEvent( this, event_ );
+    }
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+    {
+      InteractionManager::contextMenuEvent( this, event_ );
+    }
+
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
+    {
+      InteractionManager::mousePressEvent( this, event_ );
+    }
+
+//     virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* // event_
+//       )
+//     {
+//       std::cout << "enter layer" << std::endl;
+// //InteractionManager::hoverEnterEvent( this, event_ );
+//     }
+//     virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* // event_
+//       )
+//     {
+//       std::cout << "leave layer" << std::endl;
+//       //InteractionManager::hoverLeaveEvent( this, event_ );
+//     }
 
 
   public slots:
 
-    void disable(void)
+    void disable( void )
     {
       this->setEnabled( false );
       this->setVisible( false );
@@ -126,6 +173,7 @@ namespace neuroscheme
   protected:
 
     void _createNeuronAggregationItem(
+      QGraphicsScene* scene,
       const NeuronRep& meanNeuron,
       const Layers& layers,
       const QPainterPath& path,

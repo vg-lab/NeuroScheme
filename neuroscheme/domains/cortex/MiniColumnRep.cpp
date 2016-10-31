@@ -9,12 +9,18 @@ namespace neuroscheme
 {
 
   MiniColumnRep::MiniColumnRep( void )
-    : neuroscheme::shiftgen::MiniColumnRep( )
+    : neuroscheme::shiftgen::NeuronAggregationRep( )
   {
   }
 
   MiniColumnRep::MiniColumnRep( const MiniColumnRep& other )
-    : neuroscheme::shiftgen::MiniColumnRep( other )
+    : neuroscheme::shiftgen::NeuronAggregationRep( other )
+  {
+  }
+
+  MiniColumnRep::MiniColumnRep(
+    const neuroscheme::shiftgen::NeuronAggregationRep& other )
+    : neuroscheme::shiftgen::NeuronAggregationRep( other )
   {
   }
 
@@ -24,7 +30,7 @@ namespace neuroscheme
       if ( create && ( _items.find( scene ) == _items.end( )) &&
            !_items[ scene ] )
       {
-        _items[ scene ] = new MiniColumnItem( *this );
+        _items[ scene ] = new MiniColumnItem( *this, scene );
       }
       return _items.at( scene );
     }

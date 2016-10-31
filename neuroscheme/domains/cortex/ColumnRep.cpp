@@ -9,12 +9,18 @@ namespace neuroscheme
 {
 
   ColumnRep::ColumnRep( void )
-    : neuroscheme::shiftgen::ColumnRep( )
+    : neuroscheme::shiftgen::NeuronAggregationRep( )
   {
   }
 
   ColumnRep::ColumnRep( const ColumnRep& other )
-    : neuroscheme::shiftgen::ColumnRep( other )
+    : neuroscheme::shiftgen::NeuronAggregationRep( other )
+  {
+  }
+
+  ColumnRep::ColumnRep(
+    const neuroscheme::shiftgen::NeuronAggregationRep& other )
+    : neuroscheme::shiftgen::NeuronAggregationRep( other )
   {
   }
 
@@ -25,8 +31,13 @@ namespace neuroscheme
     if ( create && ( _items.find( scene ) == _items.end( )) &&
          !_items[ scene ] )
     {
-      _items[ scene ] = new ColumnItem( *this );
+      // std::cout << "New ColumnItem" << std::endl;
+      _items[ scene ] = new ColumnItem( *this, scene );
+      std::cout << "New ColumnItem " << _items[ scene ] << std::endl;
     }
+    std::cout << "Return already created ColumnItem "
+              << _items.at( scene ) << std::endl;
+
     return _items.at( scene );
   }
 

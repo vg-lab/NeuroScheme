@@ -8,12 +8,20 @@ namespace neuroscheme
 {
 
   MiniColumnItem::MiniColumnItem( const MiniColumnRep& miniColumnRep,
+                                  QGraphicsScene* scene,
                                   unsigned int size )
     : NeuronAggregationItem( )
   {
+    // std::cout << "props: " << miniColumnRep.properties( ).size( ) << std::endl;;
+    // for ( const auto p : miniColumnRep.properties( ))
+    //   std::cout << p.first << std::endl;
+    // const auto& shiftNeuronRep =
+    //   miniColumnRep.getProperty( "meanNeuron" ).value< shiftgen::NeuronRep >( );
+    // NeuronRep meanNeuron( shiftNeuronRep );
 
     const NeuronRep& meanNeuron =
       miniColumnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
+
     const auto& layers =
       miniColumnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
 
@@ -35,6 +43,7 @@ namespace neuroscheme
     path_.addPolygon( poly );
     path_.closeSubpath(  );
     _createNeuronAggregationItem(
+      scene,
       meanNeuron,
       layers,
       path_,
