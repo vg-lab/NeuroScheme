@@ -269,6 +269,9 @@ namespace neuroscheme
       auto selectableItem = dynamic_cast< SelectableItem* >( item );
       if ( selectableItem )
       {
+         std::cout << "-------- mousePressEvent " << shapeItem << " "
+              <<  item->parentRep( ) << std::endl;
+
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
@@ -280,8 +283,11 @@ namespace neuroscheme
           else
             selectableItem->toggleSelected( );
 
+          std::cout << "-------- Selecting entities "
+                    << entities.size( ) << std::endl;
           for ( const auto& entity : entities )
           {
+            std::cout << "-------- " << entity->entityGid( ) << std::endl;
             // std::cout << "-- ShiFT gid: "
             //           << int( entity->entityGid( )) << std::endl;
 
@@ -303,6 +309,7 @@ namespace neuroscheme
 
             auto entityGid = ( *entities.begin( ))->entityGid( );
 
+            std::cout << "Propagate to children of " << entityGid << std::endl;
             _propagateSelectedStateToChilds(
               DataManager::entities( ),
               *( DataManager::entities( ).
@@ -348,13 +355,13 @@ namespace neuroscheme
     SelectedState state )
   {
     const auto& childrenIds = relParentOf[ entityGid ];
-    //std::cout << " -- Parent of: ";
+    std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
-      //  std::cout << childId << " ";
+      std::cout << childId << " ";
       SelectionManager::setSelectedState(
         entities.at( childId ), state );
-      _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
+//      _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
     }
 
   }

@@ -204,6 +204,11 @@ namespace neuroscheme
     _entities.relationships( )[ "isPartOf" ] =
       new shift::RelationshipOneToN;
 
+    _entities.relationships( )[ "isSuperEntityOf" ] =
+      new shift::RelationshipOneToN;
+    _entities.relationships( )[ "isSubEntityOf" ] =
+      new shift::RelationshipOneToOne;
+
     auto& relParentOf =
       *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf =
@@ -214,6 +219,13 @@ namespace neuroscheme
     auto& relPartOf =
       *( _entities.relationships( )[ "isPartOf" ]->asOneToN( ));
 
+    auto& relSuperEntityOf =
+      *( _entities.relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+    auto& relSubEntityOf =
+      *( _entities.relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+
+    assert( DataManager::entities( ).
+            relationships( ).count( "isSubEntityOf" ) == 1 );
     std::set< unsigned int > gids;
     for ( const auto& col : columns )
       for ( const auto& mc : col->miniColumns( ))
@@ -607,15 +619,6 @@ namespace neuroscheme
       //           << meanDendsArea <<  " "
       //           << meanCenter << std::endl;
 
-      shift::Entity* colLayerEntities[ 6 ];
-      for ( auto i = 0; i < 6; ++i )
-      {
-        auto layer = new neuroscheme::Layer;
-        layer->registerProperty( "Parent Id", ( unsigned int ) col->id( ));
-        layer->registerProperty( "Parent Type", ( unsigned int ) 0 );
-        layer->registerProperty( "Layer", ( unsigned int ) i+1 );
-        colLayerEntities[ i ] = layer;
-      }
       shift::Entity* colEntity =
         new neuroscheme::Column(
           uint( col->id( )),
@@ -639,11 +642,21 @@ namespace neuroscheme
           meanDendsVolume,
           meanDendsArea,
           meanCenter );
-      std::cout << " col id type: "
-                << colEntity->getProperty( "Id" ).type( ) << " "
-                << demangleType(
-                  colEntity->getProperty( "Id" ).type( )) << " "
-                << std::endl;
+
+      shift::Entity* colLayerEntities[ 6 ];
+      for ( auto i = 0; i < 6; ++i )
+      {
+        auto layerEntity = new neuroscheme::Layer;
+        layerEntity->registerProperty( "Parent Id", uint( col->id( )));
+        layerEntity->registerProperty( "Parent Type", uint( 0 ));
+        layerEntity->registerProperty( "Layer", uint( i+1 ));
+        colLayerEntities[ i ] = layerEntity;
+        relSuperEntityOf[ colEntity->entityGid( ) ].insert(
+          layerEntity->entityGid( ));
+        relSubEntityOf[ layerEntity->entityGid( ) ] =
+          colEntity->entityGid( );
+        _entities.add( layerEntity );
+      }
 
       // fires::PropertyManager::registerProperty(
       //     colEntity, "Id", col->id( ));
@@ -718,16 +731,6 @@ namespace neuroscheme
             nsol::TAggregation::MEAN );
         }
 
-        shift::Entity* mcLayerEntities[ 6 ];
-        for ( auto i = 0; i < 6; ++i )
-        {
-          auto layer = new neuroscheme::Layer;
-          layer->registerProperty( "Parent Id", ( unsigned int ) mc->id( ));
-          layer->registerProperty( "Parent Type", ( unsigned int ) 0 );
-          layer->registerProperty( "Layer", ( unsigned int ) i+1 );
-          mcLayerEntities[ i ] = layer;
-        }
-
         shift::Entity* mcEntity =
           new neuroscheme::MiniColumn(
             mc->id( ),
@@ -752,6 +755,20 @@ namespace neuroscheme
             meanDendsArea,
             mcMeanCenter );
 
+        shift::Entity* mcLayerEntities[ 6 ];
+        for ( auto i = 0; i < 6; ++i )
+        {
+          auto layerEntity = new neuroscheme::Layer;
+          layerEntity->registerProperty( "Parent Id", uint( mc->id( )));
+          layerEntity->registerProperty( "Parent Type", uint( 1 ));
+          layerEntity->registerProperty( "Layer", uint( i+1 ));
+          mcLayerEntities[ i ] = layerEntity;
+          relSuperEntityOf[ mcEntity->entityGid( ) ].insert(
+            layerEntity->entityGid( ));
+          relSubEntityOf[ layerEntity->entityGid( ) ] =
+            mcEntity->entityGid( );
+          _entities.add( layerEntity );
+        }
         // fires::PropertyManager::registerProperty(
         //   mcEntity, "Id", mc->id( ));
 
@@ -872,7 +889,7 @@ namespace neuroscheme
           // ( void ) colLayerEntities;
           // ( void ) relPartOf;
           // ( void ) relGroupOf;
- 
+
         } // for all neurons
 
         std::cout << "\r("

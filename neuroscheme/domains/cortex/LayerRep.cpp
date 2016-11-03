@@ -20,14 +20,13 @@ namespace neuroscheme
 
 
   QGraphicsItem* LayerRep::item( QGraphicsScene* scene, bool create )
+  {
+    if ( create && ( _items.find( scene ) == _items.end( )) &&
+         !_items[ scene ] )
     {
-      if ( create && ( _items.find( scene ) == _items.end( )) &&
-           !_items[ scene ] )
-      {
-        std::cout << "new LayerRep item for scene " << scene << std::endl;
-        _items[ scene ] = new LayerItem( *this );
-      }
-      return _items.at( scene );
+      _items[ scene ] = new LayerItem( *this );
     }
+    return _items.at( scene );
+  }
 
 } // namespace neuroscheme

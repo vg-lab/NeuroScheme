@@ -24,6 +24,7 @@
 #include "mappers/VariableMapper.h"
 #include "domains/domains.h"
 #include "error.h"
+#include "../../DataManager.h"
 
 namespace neuroscheme
 {
@@ -40,7 +41,6 @@ namespace neuroscheme
       bool linkRepsToEntities
       )
     {
-      LayersMap layersMap;
 
       // if ( linkEntitiesToReps )
       //   entitiesToReps.clear( );
@@ -89,12 +89,15 @@ namespace neuroscheme
         miniColumnNeuronsToPercentage(
           0, _maxNeuronsPerMiniColumn, 0.0f, 1.0f );
 
-
       for ( const auto entity : entities.vector( ))
       {
+        // std::cout << ", new entity " << entity->entityGid( )
+        //           << " --> LayersMap size = "
+        //             << _layersMap.size( ) << std::endl;
         // if the entity has already a rep(s) don't create it
         if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
         {
+          // std::cout << "Entity with already a rep" << std::endl;
           for ( const auto rep : entitiesToReps[ entity ] )
             representations.push_back( rep );
           continue;
@@ -183,16 +186,17 @@ namespace neuroscheme
         else
         if ( dynamic_cast< Column* >( entity ))
         {
-          entity->registerProperty( "tt", uint( 0 ));
-          std::cout << " id type: "
-                    << entity->getProperty( "tt" ).type( ) << " --> "
-                    << demangleType( entity->getProperty( "tt" ).type( )) << "  "
-                    << entity->getProperty( "Id" ).type( ) << " --> "
-                    << demangleType( entity->getProperty( "Id" ).type( )) << " "
-                    << std::endl;
+          // entity->registerProperty( "tt", uint( 0 ));
+          // std::cout << " id type: "
+          //           << entity->getProperty( "tt" ).type( ) << " --> "
+          //           << demangleType( entity->getProperty( "tt" ).type( )) << "  "
+          //           << entity->getProperty( "Id" ).type( ) << " --> "
+          //           << demangleType( entity->getProperty( "Id" ).type( )) << " "
+          //           << std::endl;
           auto column = dynamic_cast< Column* >( entity );
           auto columnRep = new ColumnRep( );
-          _createColumnOrMiniColumn(
+       // std::cout << ", RepresentationCreator::_createColumnOrMiniColumn" << std::endl;
+         _createColumnOrMiniColumn(
             column, columnRep,
             entity->getProperty( "Id" ).value< uint >( ),
             0,
@@ -202,10 +206,13 @@ namespace neuroscheme
             redMapper,
             neuronsToPercentage,
             columnNeuronsToPercentage,
-            layersMap,
+            _layersMap,
             entitiesToReps, repsToEntities,
             linkEntitiesToReps, linkRepsToEntities );
           representations.push_back( columnRep );
+          // std::cout << ", POST _createColumnOrMiniColumn LayersMap size = "
+          //           << _layersMap.size( ) << std::endl;
+
 
           if ( linkEntitiesToReps )
             entitiesToReps[ entity ].insert( columnRep );
@@ -229,7 +236,7 @@ namespace neuroscheme
             redMapper,
             neuronsToPercentage,
             miniColumnNeuronsToPercentage,
-            layersMap,
+            _layersMap,
             entitiesToReps, repsToEntities,
             linkEntitiesToReps, linkRepsToEntities);
 
@@ -240,26 +247,59 @@ namespace neuroscheme
           if ( linkRepsToEntities )
             repsToEntities[ miniColumnRep ].insert( entity );
 
-        } // if its Column entity
+        } // if Column entity
         else
         if ( dynamic_cast< Layer* >( entity ))
         {
+          // std::cout << ", RepresentationCreator::Layer "
+          //           << _layersMap.size( ) << std::endl;
           auto layerKey = TripleKey(
               entity->getProperty( "Parent Id" ).value< unsigned int >( ),
               entity->getProperty( "Parent Type" ).value< unsigned int >( ),
               entity->getProperty( "Layer" ).value< unsigned int >( ));
-          if ( layersMap.count( layerKey ) == 0 )
+          if ( _layersMap.count( layerKey ) == 0 )
           {
-            layersMap[ layerKey ] = new LayerRep( );
+            // std::cout << ", Creating layer "
+            //           << entity->getProperty( "Parent Id" ).value< uint >( )
+            //           << ", "
+            //           << entity->getProperty( "Parent Type" ).value< uint >( )
+            //           << ", "
+            //           << entity->getProperty( "Layer" ).value< uint >( )
+            //           << std::endl;
 
-            if ( linkEntitiesToReps )
-              entitiesToReps[ entity ].insert( layersMap.at( layerKey ));
-            if ( linkRepsToEntities )
-              repsToEntities[ layersMap.at( layerKey ) ].insert( entity );
+            _layersMap[ layerKey ] = new LayerRep( );
           }
-          representations.push_back( layersMap[ layerKey ] );
+          // std::cout << "Linking " << _layersMap.at( layerKey )
+          //           << " to " << entity << std::endl;
+          if ( linkEntitiesToReps )
+            entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
+          if ( linkRepsToEntities )
+            repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
+          representations.push_back( _layersMap[ layerKey ] );
         } // if Layer
+
+
+        // std::cout << ", end entity --> LayersMap size = "
+        //           << _layersMap.size( ) << std::endl;
       } // for all entities
+
+
+      // Create subentities
+      const auto& relSuperEntityOf =
+        *( DataManager::entities( ).
+           relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+      shift::Entities subEntities;
+      for ( const auto& entity : entities.vector( ))
+      {
+        auto entityGid = entity->entityGid( );
+        if ( relSuperEntityOf.count( entityGid ) > 0 )
+          for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
+            subEntities.add( DataManager::entities( ).at( subEntity ));
+      }
+      if ( subEntities.size( ) > 0 )
+        this->create( subEntities, representations,
+                      entitiesToReps, repsToEntities,
+                      linkEntitiesToReps, linkRepsToEntities );
     } // create
 
     void RepresentationCreator::_createColumnOrMiniColumn(
@@ -273,11 +313,15 @@ namespace neuroscheme
       ColorMapper& dendVolumeToColor,
       MapperFloatToFloat& neuronsToPercentage,
       MapperFloatToFloat& layerNeuronsToPercentage,
-      RepresentationCreator::LayersMap& layersMap,
-      shift::TEntitiesToReps& entitiesToReps,
-      shift::TRepsToEntities& repsToEntities,
-      bool linkEntitiesToReps,
-      bool linkRepsToEntities )
+      RepresentationCreator::LayersMap& layersMap_,
+      shift::TEntitiesToReps& // entitiesToReps
+      ,
+      shift::TRepsToEntities& // repsToEntities
+      ,
+      bool // linkEntitiesToReps
+      ,
+      bool // linkRepsToEntities
+      )
     {
       NeuronRep meanNeuronRep;
 
@@ -345,17 +389,26 @@ namespace neuroscheme
           columnOrMiniColumn,
           layer );
 
-        if ( layersMap.count( layerKey ) == 0 )
+
+        if ( layersMap_.count( layerKey ) == 0 )
         {
-          layersMap[ layerKey ] = new LayerRep( );
- 
-          if ( linkEntitiesToReps )
-            entitiesToReps[ entity ].insert( layersMap.at( layerKey ));
-          if ( linkRepsToEntities )
-            repsToEntities[ layersMap.at( layerKey ) ].insert( entity );
+        // std::cout << ", Creating layer "
+        //           << id
+        //           << ", "
+        //           << columnOrMiniColumn
+        //           << ", "
+        //           << layer
+        //           << std::endl;
+
+          layersMap_[ layerKey ] = new LayerRep( );
+          assert( layersMap_.count( layerKey ) == 1);
+          // if ( linkEntitiesToReps )
+          //   entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
+          // if ( linkRepsToEntities )
+          //   repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
         }
 
-        layerRep = layersMap[ layerKey ]; //new LayerRep;
+        layerRep = layersMap_[ layerKey ]; //new LayerRep;
 
         //layerRep = new LayerRep;
         layerRep->setProperty(
@@ -376,6 +429,8 @@ namespace neuroscheme
       }
       rep->registerProperty( "layers", layersReps );
 
+      // std::cout << ", End of _createColumnOrMiniColumn LayersMap size = "
+      //           << layersMap_.size( ) << std::endl;
     }
 
 

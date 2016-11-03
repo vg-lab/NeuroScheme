@@ -40,7 +40,7 @@ namespace neuroscheme
                                   bool animate,
                                   const shift::Representations& postFilterReps )
   {
-    // std::cout << "pre filter: " << reps.size( ) << std::endl;
+    std::cout << "pre filter: " << reps.size( ) << std::endl;
     // std::cout << "post filter: " << postFilterReps.size( ) << std::endl;
     std::unordered_set< QGraphicsItem* > filteredOutItems;
     auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
@@ -61,28 +61,35 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
-        if ( item->parentItem( ))
-          continue;
-        ++repsToBeArranged;
-        if ( doFiltering && useOpacityForFilter )
+        // std::cout << " --- arrange item "
+        //           << "parent=" << item->parentItem( ) << " "
+        //           << "isLayerItem=" << dynamic_cast< LayerItem* >( item )
+        //           << std::endl;
+        if ( !item->parentItem( ))
         {
-          if ( std::find( postFilterReps.begin( ), postFilterReps.end( ),
-                          representation ) == postFilterReps.end( ))
+          ++repsToBeArranged;
+          if ( doFiltering && useOpacityForFilter )
           {
-            filteredOutItems.insert( item );
+            if ( std::find( postFilterReps.begin( ), postFilterReps.end( ),
+                            representation ) == postFilterReps.end( ))
+            {
+              filteredOutItems.insert( item );
+            }
           }
+          //_scene->addItem( item );
+          QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
+
+          if ( rect.width( ) > maxItemWidth )
+            maxItemWidth = rect.width( );
+
+          if ( rect.height( ) > maxItemHeight )
+            maxItemHeight = rect.height( );
         }
-        //_scene->addItem( item );
-        QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
-
-        if ( rect.width( ) > maxItemWidth )
-          maxItemWidth = rect.width( );
-
-        if ( rect.height( ) > maxItemHeight )
-          maxItemHeight = rect.height( );
+        // else std::cout << "Item with parentItem, skipping" << std::endl;
       }
-    }
+    } // for all reps
     //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
+    // std::cout << "Arranging " << repsToBeArranged << std::endl;
 
     bool forceScale = false;
     float forcedScale = 1.0f;

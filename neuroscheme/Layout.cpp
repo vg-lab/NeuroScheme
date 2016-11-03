@@ -20,10 +20,13 @@
  *
  */
 #include "error.h"
+#include "DataManager.h"
 #include "Layout.h"
 #include "reps/Item.h"
 #include "reps/SelectableItem.h"
 #include "RepresentationCreatorManager.h"
+#include "domains/cortex/NeuronAggregationItem.h"
+#include "reps/CollapseButtonItem.h"
 namespace neuroscheme
 {
 
@@ -94,7 +97,8 @@ namespace neuroscheme
                                 bool animate,
                                 bool refreshProperties_ )
   {
-    std::cout << "Display entities " << entities.vector( ).size( ) << std::endl;
+    // std::cout << "+++ Layout::displayEntities "
+    //           << entities.vector( ).size( ) << std::endl;
     _entities = entities;
     _representations.clear( );
 
@@ -114,8 +118,20 @@ namespace neuroscheme
     if ( doFiltering || doSorting )
     {
       for ( const auto& entity : _entities.vector( ))
-        objects.add( entity );
-
+      {
+        // If the entity is a sub-entity skip it
+        if ( DataManager::entities( ).
+             relationships( ).count( "isSubEntityOf" ) == 0 )
+        {
+          const auto& relSubEntityOf =
+            *( DataManager::entities( ).
+               relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+          if ( relSubEntityOf.count( entity->entityGid( )) == 0 )
+            objects.add( entity );
+        }
+        else
+          objects.add( entity );
+      }
       if ( doSorting )
       {
         fires::Sort firesSort;
@@ -182,18 +198,18 @@ namespace neuroscheme
 
     if ( refreshProperties_ )
     {
-//      std::cout << "Refresh properties" << std::endl;
+      std::cout << "Refresh properties" << std::endl;
       refreshProperties( _representations );
     }
     if ( !animate )
     {
-      //    std::cout << "Clear scene" << std::endl;
+      std::cout << "Clear scene" << std::endl;
       _clearScene( );
     }
-    _drawCorners( );
+//    _drawCorners( );
     if ( !animate )
     {
-      // std::cout << "Adding reps" << std::endl;
+      std::cout << "Adding reps" << std::endl;
       if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
         _addRepresentations( preFilterRepresentations );
       else
@@ -203,11 +219,13 @@ namespace neuroscheme
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
       // std::cout << "Arranging "
-      //           << preFilterRepresentations.size( ) << " reps " << std::endl;
+      //            << preFilterRepresentations.size( ) << " reps " << std::endl;
       _arrangeItems( preFilterRepresentations, animate, _representations );
     }
     else
     {
+      std::cout << "+ Arranging "
+                 << _representations.size( ) << " reps " << std::endl;
       _arrangeItems( _representations, animate );
     }
   }
@@ -246,10 +264,31 @@ namespace neuroscheme
                   LOG_LEVEL_ERROR );
       const auto& entity = *( entities.begin( ));
 
-      objs.push_back( entity );
-
+      if ( DataManager::entities( ).
+           relationships( ).count( "isSubEntityOf" ) != 0 )
+      {
+        const auto& relSubEntityOf =
+          *( DataManager::entities( ).
+             relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+        if ( relSubEntityOf.count( entity->entityGid( )) == 0 )
+        {
+          // std::cout << " --- adding properties of NOT sub entity " << std::endl;
+          objs.add( entity );
+        }
+        else
+        {
+          // std::cout << " --- not adding properties of sub entity " << std::endl;
+          continue;
+        }
+      }
+      else
+      {
+        // std::cout << " --- repSubEntityOf not exists " << std::endl;
+        objs.push_back( entity );
+      }
       for ( auto property_ : entity->properties( ))
       {
+        // std::cout << "##### Adding property " << property_.first << std::endl;
         // Check if property is scalar
         if ( fires::PropertyManager::getAggregator( property_.first ))
         {
@@ -382,12 +421,26 @@ namespace neuroscheme
 
   void Layout::_clearScene( void )
   {
-    // return;
     // Remove top items without destroying them
     for ( auto& item : _scene->items( ))
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
+      {
+        std::cout << "remove " << item << std::endl;
+        for ( const auto c : item->childItems( ))
+        {
+          std::cout << "remove child " << c << std::endl;
+          std::cout << " " << dynamic_cast< CollapseButtonItem* >( c ) << std::endl;
+            for ( const auto cc : c->childItems( ))
+          {
+            std::cout << "remove child2 " << cc;
+            std::cout << " " << dynamic_cast< LayerItem* >( cc ) << std::endl;
+            std::cout << " " << cc->boundingRect( ).width( ) << " "
+                      << cc->boundingRect( ).height( ) << std::endl;
+          }
+        }
         _scene->removeItem( item );
+      }
     }
     // QList< QGraphicsItem* > items_ = _scene->items( );
     // for ( auto item = items_.begin( ); item != items_.end( ); ++item )
@@ -406,7 +459,8 @@ namespace neuroscheme
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    // std::cout << "Adding reps " << reps.size( ) << std::endl;
+    // std::cout << "+++ Layout::_addRepresentations "
+    //           << reps.size( ) << std::endl;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -418,9 +472,14 @@ namespace neuroscheme
       }
       else
       {
+        // std::cout << "+++++ Retrieving item" << std::endl;
         auto item = graphicsItemRep->item( _scene );
+
         if ( item->parentItem( ))
+        {
           continue;
+        }
+
         // Find out if its entity is selected
         // and if so set its pen
         // const auto& repsToEntities =

@@ -96,6 +96,7 @@ namespace neuroscheme
       unsigned int _maxNeurons;
       unsigned int _maxNeuronsPerColumn;
       unsigned int _maxNeuronsPerMiniColumn;
+      LayersMap _layersMap;
     };
 
     // class RepresentationCreatorManager

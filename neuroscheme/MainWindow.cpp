@@ -88,18 +88,6 @@ MainWindow::MainWindow( QWidget* parent_ )
     neuroscheme::DataManager::rootEntities( ), false, true );
   neuroscheme::PaneManager::panes( ).insert( canvas );
 
-  // #include "domains/cortex/MiniColumnItem.h"
-  // auto mcr = new neuroscheme::MiniColumnRep( );
-  // //auto nr = new neuroscheme::shiftgen::NeuronRep( );
-  // // mcr->registerProperty( "meanNeuron", nr );
-  // std::cout << mcr->properties( ).size( ) << std::endl;
-  // neuroscheme::shiftgen::NeuronAggregationRep::Layers layers;
-  // for ( auto i = 0 ; i < 7 ; ++i )
-  //   layers.push_back( new neuroscheme::LayerRep( ));
-  // mcr->setProperty( "layers", layers );
-  // canvas->scene( ).addItem(
-  //   mcr->item( dynamic_cast< QGraphicsScene* >( &canvas->scene( ))));
-  // auto mci = new neuroscheme::MiniColumnItem( mcr,  );
   // Layouts dock
   {
     _layoutsDock = new QDockWidget( );

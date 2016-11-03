@@ -41,6 +41,10 @@ namespace neuroscheme
     // shift::Representations( )
     )
   {
+    std::cout << "ScatterPlotLayout::_arrangeItems" << std::endl;
+    if ( reps.size( ) == 0 )
+      return;
+
     unsigned int margin = 150;
 
     // QGraphicsView* gv = _scene->views( )[0];
@@ -136,6 +140,8 @@ namespace neuroscheme
         }
       }
     } // for all reps
+    std::cout << "ScatterPlotLayout::_arrangeItems DONE" << std::endl;
+
   }
 
 
