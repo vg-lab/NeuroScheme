@@ -32,6 +32,7 @@ namespace neuroscheme
 {
 
   class LayerRep;
+  class NeuronTypeAggregationRep;
   namespace cortex
   {
 
@@ -71,6 +72,14 @@ namespace neuroscheme
       typedef std::map<
         std::pair< unsigned int, std::pair< unsigned int, unsigned int>>,
       LayerRep* > LayersMap;
+      #define QuadKey( x, y, z, w ) \
+        std::make_pair( x, std::make_pair( y, std::make_pair( z, w )))
+      typedef std::map<
+        std::pair< unsigned int,
+                   std::pair< unsigned int,
+                              std::pair< unsigned int,
+                                         unsigned int>>>,
+        NeuronTypeAggregationRep* > NeuronTypeAggsMaps;
 
       void _createColumnOrMiniColumn(
         shift::Entity *obj,
@@ -97,6 +106,7 @@ namespace neuroscheme
       unsigned int _maxNeuronsPerColumn;
       unsigned int _maxNeuronsPerMiniColumn;
       LayersMap _layersMap;
+      NeuronTypeAggsMaps _neuronTypeAggsMap;
     };
 
     // class RepresentationCreatorManager

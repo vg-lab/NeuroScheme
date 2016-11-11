@@ -79,15 +79,15 @@ namespace neuroscheme
 
   void ScatterPlotWidget::refreshParentLayout( void )
   {
-    std::cout << "ScatterPlotWidget::refreshParentLayout" << std::endl;
+    // std::cout << "ScatterPlotWidget::refreshParentLayout" << std::endl;
     _parentLayout->refresh( false, false );
   }
 
 
   void ScatterPlotWidget::_propertiesChanged( void )
   {
-    std::cout << "ScatterPlotWidget::_propertiesChanged " << this
-              << " " <<  _parentLayout << std::endl;
+    // std::cout << "ScatterPlotWidget::_propertiesChanged " << this
+    //           << " " <<  _parentLayout << std::endl;
     _parentLayout->refresh( true, false );
   }
 

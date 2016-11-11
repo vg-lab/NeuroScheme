@@ -41,6 +41,8 @@ namespace neuroscheme
 {
 
   using Layers = shiftgen::NeuronAggregationRep::Layers;
+  using NeuronTypeAggregations =
+    shiftgen::NeuronAggregationRep::NeuronTypeAggregations;
 
   class LayerItem
     : public QObject
@@ -126,6 +128,7 @@ namespace neuroscheme
   };
 
 
+
   class NeuronAggregationItem
     : public QObject
     , public QGraphicsPathItem
@@ -176,6 +179,7 @@ namespace neuroscheme
       QGraphicsScene* scene,
       const NeuronRep& meanNeuron,
       const Layers& layers,
+      const NeuronTypeAggregations& neuronTypeAggs,
       const QPainterPath& path,
       const QPoint& layerLeftPoint,
       const QPoint& layerCenterPoint,

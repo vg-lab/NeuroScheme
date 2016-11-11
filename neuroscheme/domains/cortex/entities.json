@@ -270,6 +270,32 @@
             "types":
             [
             ]
+        },
+        {
+            "name": "NeuronTypeAggregation",
+            "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<shift_Neuron.h>" ],
+            "properties": [
+                {
+                    "name": "Parent Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Parent Type",
+                    "type": "uint"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint"
+                },
+                {
+                    "name": "Morpho Type",
+                    "type": "Neuron::TMorphologicalType"
+                }
+            ],
+            "types":
+            [
+            ]
         }
     ]
 }

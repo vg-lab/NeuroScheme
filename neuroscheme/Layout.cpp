@@ -162,6 +162,7 @@ namespace neuroscheme
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
+
     }
     // if ( doSorting )
     // {
@@ -192,24 +193,27 @@ namespace neuroscheme
        _entities, _representations,
         true, true );
     }
+
+    // std::cout << "Filtered and sorted" << _representations.size( ) << std::endl;
+
     // _representations = reps;
     // if ( reps.empty( ))
     //   return;
 
     if ( refreshProperties_ )
     {
-      std::cout << "Refresh properties" << std::endl;
+      //std::cout << "Refresh properties" << std::endl;
       refreshProperties( _representations );
     }
     if ( !animate )
     {
-      std::cout << "Clear scene" << std::endl;
+      //std::cout << "Clear scene" << std::endl;
       _clearScene( );
     }
 //    _drawCorners( );
     if ( !animate )
     {
-      std::cout << "Adding reps" << std::endl;
+      //std::cout << "Adding reps" << std::endl;
       if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
         _addRepresentations( preFilterRepresentations );
       else
@@ -224,8 +228,8 @@ namespace neuroscheme
     }
     else
     {
-      std::cout << "+ Arranging "
-                 << _representations.size( ) << " reps " << std::endl;
+      // std::cout << "+ Arranging "
+      //            << _representations.size( ) << " reps " << std::endl;
       _arrangeItems( _representations, animate );
     }
   }
@@ -368,16 +372,17 @@ namespace neuroscheme
         fires::PropertyManager::getAggregator( p.first ),
         fires::PropertyAggregator::MIN );
 
-      }
+      // std::cout << ",, " << p.first << "--" << std::endl;
+    }
 
-      fires::Aggregate aggregate;
-      fires::Objects aggregatedMinObjects = objs;
-      aggregate.eval( aggregatedMinObjects, aggregateConfigMin );
-      fires::Object* aggregatedMinObj = aggregatedMinObjects[ 0 ];
+    fires::Aggregate aggregate;
+    fires::Objects aggregatedMinObjects = objs;
+    aggregate.eval( aggregatedMinObjects, aggregateConfigMin );
+    fires::Object* aggregatedMinObj = aggregatedMinObjects[ 0 ];
 
-      fires::Objects aggregatedMaxObjects = objs;
-      aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
-      fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
+    fires::Objects aggregatedMaxObjects = objs;
+    aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
+    fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
 
     for ( auto& p : _properties )
     {
@@ -426,19 +431,19 @@ namespace neuroscheme
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
-        std::cout << "remove " << item << std::endl;
-        for ( const auto c : item->childItems( ))
-        {
-          std::cout << "remove child " << c << std::endl;
-          std::cout << " " << dynamic_cast< CollapseButtonItem* >( c ) << std::endl;
-            for ( const auto cc : c->childItems( ))
-          {
-            std::cout << "remove child2 " << cc;
-            std::cout << " " << dynamic_cast< LayerItem* >( cc ) << std::endl;
-            std::cout << " " << cc->boundingRect( ).width( ) << " "
-                      << cc->boundingRect( ).height( ) << std::endl;
-          }
-        }
+        // std::cout << "remove " << item << std::endl;
+        // for ( const auto c : item->childItems( ))
+        // {
+          // std::cout << "remove child " << c << std::endl;
+          // std::cout << " " << dynamic_cast< CollapseButtonItem* >( c ) << std::endl;
+          //   for ( const auto cc : c->childItems( ))
+          // {
+          //   std::cout << "remove child2 " << cc;
+          //   std::cout << " " << dynamic_cast< LayerItem* >( cc ) << std::endl;
+          //   std::cout << " " << cc->boundingRect( ).width( ) << " "
+          //             << cc->boundingRect( ).height( ) << std::endl;
+          // }
+        // }
         _scene->removeItem( item );
       }
     }

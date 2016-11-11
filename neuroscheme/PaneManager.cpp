@@ -139,6 +139,11 @@ namespace neuroscheme
     _layout = layout_;
   }
 
+  Canvas* PaneManager::newPaneFromActivePane( TPaneDivision division )
+  {
+    return newPane( _activePane, division );
+  }
+
   Canvas* PaneManager::newPane( Canvas* orig, TPaneDivision division )
   {
     ( void ) division;

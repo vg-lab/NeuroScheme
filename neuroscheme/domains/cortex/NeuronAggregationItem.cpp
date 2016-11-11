@@ -1,4 +1,6 @@
 #include "NeuronAggregationItem.h"
+#include "NeuronTypeAggregationRep.h"
+#include "NeuronTypeAggregationItem.h"
 #include "NeuronItem.h"
 #include "../../reps/CollapseButtonItem.h"
 #include "../../error.h"
@@ -86,7 +88,7 @@ namespace neuroscheme
       layerPath.addPolygon( numNeuronsPoly );
       layerPath.closeSubpath(  );
 
-      QGraphicsPathItem * numNeuronsPathItem =
+      QGraphicsPathItem* numNeuronsPathItem =
         new QGraphicsPathItem( this );
       numNeuronsPathItem->setPath( layerPath );
 
@@ -100,10 +102,12 @@ namespace neuroscheme
     return _layer;
   }
 
+
   void NeuronAggregationItem::_createNeuronAggregationItem(
     QGraphicsScene* scene,
     const NeuronRep& meanNeuron,
     const Layers& layers,
+    const NeuronTypeAggregations& neuronTypeAggs,
     const QPainterPath& path_,
     const QPoint& layerLeftPoint,
     const QPoint& layerCenterPoint,
@@ -177,32 +181,35 @@ namespace neuroscheme
       "neuroscheme::ColumnItem: incorrect number of LayerReps" );
     unsigned int layerHeight = size / 20;
     unsigned int layerPadding = size/100;
-    for ( int i = 1; i <= 6; i++ )
+    for ( int layer = 1; layer <= 6; ++layer )
     {
       QPoint pLayerUL =
         layerCenterPoint +
         ( layerLeftPoint - layerCenterPoint ) * 0.8 +
-        QPoint( 0, layerPadding + ( i - 1 ) * ( layerHeight + layerPadding ));
+        QPoint( 0, layerPadding + ( layer - 1 ) *
+                ( layerHeight + layerPadding ));
       QPoint pLayerUM =
         layerCenterPoint +
-        QPoint( 0, layerPadding + ( i - 1 ) * (layerHeight + layerPadding ));
+        QPoint( 0, layerPadding + ( layer - 1 ) *
+                (layerHeight + layerPadding ));
       QPoint pLayerUR =
         layerRightPoint -
         ( layerRightPoint - layerCenterPoint ) * ( 1 - 0.8f ) +
-        QPoint( 0, layerPadding + ( i - 1 ) * ( layerHeight + layerPadding ));
+        QPoint( 0, layerPadding + ( layer - 1 ) *
+                ( layerHeight + layerPadding ));
 
       const float& percPyr =
-        layers[ i ]->getProperty( "leftPerc" ).value< float >( );
+        layers[ layer ]->getProperty( "leftPerc" ).value< float >( );
       const float& percInter =
-        layers[ i ]->getProperty( "rightPerc" ).value< float >( );
+        layers[ layer ]->getProperty( "rightPerc" ).value< float >( );
 
-      auto layerRep = dynamic_cast< LayerRep* >( layers[ i ] );
+      auto layerRep = dynamic_cast< LayerRep* >( layers[ layer ] );
       assert( layerRep );
       auto item_ = layerRep->item( scene );
       auto layerItem = dynamic_cast< LayerItem* >( item_ );
       assert( layerItem );
       layerItem->create(
-        i,
+        layer,
         collapseButton,
         //this,
         pLayerUL - collapseButtonPos,
@@ -211,17 +218,101 @@ namespace neuroscheme
         layerHeight, size/40,
         percPyr, percInter,
         QBrush(
-          QColor( std::min( baseColor.red( ) + i * 8, 255 ),
-                  std::min( baseColor.green( ) + i * 8, 255 ),
-                  std::min( baseColor.blue( ) + i * 5 , 255 ))));
+          QColor( std::min( baseColor.red( ) + layer * 8, 255 ),
+                  std::min( baseColor.green( ) + layer * 8, 255 ),
+                  std::min( baseColor.blue( ) + layer * 5 , 255 ))));
       //layerItem->setParentItem( collapseButton );
 
       layerItem->setFlag( QGraphicsItem::ItemStacksBehindParent );
-      _layerItems[ i - 1 ] = layerItem;
-      _layerAnimations[ i - 1 ] =
+      _layerItems[ layer - 1 ] = layerItem;
+      _layerAnimations[ layer - 1 ] =
         new QPropertyAnimation( layerItem, "opacity" );
 
+      for ( int i = 0; i < 2; ++i )
+      {
+        auto neuronTypeAggRep =
+          dynamic_cast< NeuronTypeAggregationRep* >(
+            neuronTypeAggs[ layer + i * 7 ] );
+        assert( neuronTypeAggRep );
+        std::cout << layer + i * 7 << std::endl;
+        auto item__ = neuronTypeAggRep->item( scene );
+        auto neuronTypeAggItem =
+          dynamic_cast< NeuronTypeAggregationItem* >( item__ );
+        assert( neuronTypeAggItem );
+        neuronTypeAggItem->create( size / 25 );
+        neuronTypeAggItem->setParentItem( layerItem );
+        auto item = neuronTypeAggItem->symbolItem( );
+        item->setBrush(
+          QBrush(
+            QColor( std::min( baseColor.red( ) + layer * 8, 255 ),
+                    std::min( baseColor.green( ) + layer * 8, 255 ),
+                    std::min( baseColor.blue( ) + layer * 5 , 255 ))));
+        item->setPen( Qt::NoPen );
+        if ( i == 0 )
+        {
+          item->setX(( pLayerUL - collapseButtonPos ).x( ) - int(size)/20 );
+          item->setY(( pLayerUL - collapseButtonPos ).y( ) + int(size)/40 );
+        }
+        else
+        {
+          item->setX( -( pLayerUL - collapseButtonPos ).x( ) + int(size)/20 );
+          item->setY(( pLayerUL - collapseButtonPos ).y( ) + int(size)/40 );
+        }
+      }
     }
+      for ( int i = 0; i < 2; ++i )
+      {
+        auto neuronTypeAggRep =
+          dynamic_cast< NeuronTypeAggregationRep* >(
+            neuronTypeAggs[ i * 7 ] );
+        assert( neuronTypeAggRep );
+        std::cout << i * 7 << std::endl;
+        auto item__ = neuronTypeAggRep->item( scene );
+        auto neuronTypeAggItem =
+          dynamic_cast< NeuronTypeAggregationItem* >( item__ );
+        assert( neuronTypeAggItem );
+        neuronTypeAggItem->create( size / 15 );
+        neuronTypeAggItem->setParentItem( this );
+        auto item = neuronTypeAggItem->symbolItem( );
+        item->setBrush( QBrush( baseColor ));
+        item->setPen( Qt::NoPen );
+        if ( i == 0 )
+        {
+          item->setX( -int(size)/2.5f );
+          item->setY( 0 );
+        }
+        else
+        {
+          item->setX( int(size)/2.5f );
+          item->setY( 0 );
+        }
+      }
+
+
+    NEUROSCHEME_DEBUG_CHECK(
+      neuronTypeAggs.size( ) == 14,
+      "neuroscheme::NeuronAggregationItem: incorrect number"
+      "of NeuronTypeAggregations" );
+
+    // for ( int i = 0; i < 14; i++ )
+    // {
+    //   auto neuronTypeAggRep =
+    //     dynamic_cast< NeuronTypeAggregationRep* >( neuronTypeAggs[ i ] );
+    //   assert( neuronTypeAggRep );
+    //   auto item_ = neuronTypeAggRep->item( scene );
+    //   auto neuronTypeAggItem =
+    //     dynamic_cast< NeuronTypeAggregationItem* >( item_ );
+    //   assert( neuronTypeAggItem );
+    //   neuronTypeAggItem->create( );
+    //   neuronTypeAggItem->setParentItem( this );
+    //   auto item = neuronTypeAggItem->symbolItem( );
+    //   item->setBrush( QBrush( baseColor ));
+    //   item->setPen( Qt::NoPen );
+    //   item->setX( pLayerUL.x( ) - size / 1.5f );
+    //   item->setY( pLayerUL.y( ) + size / 2 );
+
+    // }
+
     this->collapse( false ); // Start collapsed
 
   }

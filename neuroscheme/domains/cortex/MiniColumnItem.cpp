@@ -21,9 +21,11 @@ namespace neuroscheme
 
     const NeuronRep& meanNeuron =
       miniColumnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
-
     const auto& layers =
       miniColumnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
+    const auto& neuronAggReps =
+      miniColumnRep.getProperty( "neuronTypeAggregations" ).
+      value< MiniColumnRep::NeuronTypeAggregations >( );
 
     // Create the polygon for the basic column icon
     QPainterPath path_;
@@ -46,6 +48,7 @@ namespace neuroscheme
       scene,
       meanNeuron,
       layers,
+      neuronAggReps,
       path_,
       pLL, pLM, pLR,
       QColor( 126, 204, 145 ),

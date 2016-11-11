@@ -41,7 +41,7 @@ namespace neuroscheme
     // shift::Representations( )
     )
   {
-    std::cout << "ScatterPlotLayout::_arrangeItems" << std::endl;
+    // std::cout << "ScatterPlotLayout::_arrangeItems" << std::endl;
     if ( reps.size( ) == 0 )
       return;
 
@@ -140,7 +140,7 @@ namespace neuroscheme
         }
       }
     } // for all reps
-    std::cout << "ScatterPlotLayout::_arrangeItems DONE" << std::endl;
+    // std::cout << "ScatterPlotLayout::_arrangeItems DONE" << std::endl;
 
   }
 

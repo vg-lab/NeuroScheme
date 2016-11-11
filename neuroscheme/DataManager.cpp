@@ -658,6 +658,38 @@ namespace neuroscheme
         _entities.add( layerEntity );
       }
 
+      // Pos 0 and 7 will be used for whole column
+      shift::Entity* colNeuronTypeAggregationEntities[ 14 ];
+      for ( auto i = 0; i < 7; ++i )
+      {
+        std::cout << "rrr" <<  uint( col->id( )) << "," << uint( 0 )
+                  << "," <<  uint( i ) <<  ","
+                  << (int) neuroscheme::Neuron::PYRAMIDAL << std::endl;
+        auto neuronTypeAggregationEntity =
+          new neuroscheme::NeuronTypeAggregation(
+            uint( col->id( )), uint( 0 ), uint( i ),
+            neuroscheme::Neuron::PYRAMIDAL );
+        colNeuronTypeAggregationEntities[ i ] = neuronTypeAggregationEntity;
+        shift::Relationship::Establish(
+          relSuperEntityOf, relSubEntityOf,
+          colEntity, neuronTypeAggregationEntity );
+        _entities.add( neuronTypeAggregationEntity );
+
+        std::cout << "rtt" << uint( col->id( )) << "," << uint( 0 ) << ","
+                  <<  uint( i + 7 ) << "," <<
+          (int)neuroscheme::Neuron::INTERNEURON << std::endl;
+        neuronTypeAggregationEntity =
+          new neuroscheme::NeuronTypeAggregation(
+            uint( col->id( )), uint( 0 ), uint( i ),
+            neuroscheme::Neuron::INTERNEURON );
+        colNeuronTypeAggregationEntities[ i + 7 ] = neuronTypeAggregationEntity;
+        shift::Relationship::Establish(
+          relSuperEntityOf, relSubEntityOf,
+          colEntity, neuronTypeAggregationEntity );
+        _entities.add( neuronTypeAggregationEntity );
+
+      }
+
       // fires::PropertyManager::registerProperty(
       //     colEntity, "Id", col->id( ));
 
@@ -769,6 +801,33 @@ namespace neuroscheme
             mcEntity->entityGid( );
           _entities.add( layerEntity );
         }
+
+        // Pos 0 and 7 will be used for whole minicolumn
+        shift::Entity* mcNeuronTypeAggregationEntities[ 14 ];
+        for ( auto i = 0; i < 7; ++i )
+        {
+          auto neuronTypeAggregationEntity =
+            new neuroscheme::NeuronTypeAggregation(
+              uint( mc->id( )), uint( 1 ), uint( i ),
+              neuroscheme::Neuron::INTERNEURON );
+          mcNeuronTypeAggregationEntities[ i ] = neuronTypeAggregationEntity;
+          shift::Relationship::Establish(
+            relSuperEntityOf, relSubEntityOf,
+            mcEntity, neuronTypeAggregationEntity );
+          _entities.add( neuronTypeAggregationEntity );
+
+          neuronTypeAggregationEntity =
+            new neuroscheme::NeuronTypeAggregation(
+              uint( mc->id( )), uint( 1 ), uint( i ),
+              neuroscheme::Neuron::PYRAMIDAL );
+          mcNeuronTypeAggregationEntities[ i + 7 ] =
+            neuronTypeAggregationEntity;
+          shift::Relationship::Establish(
+            relSuperEntityOf, relSubEntityOf,
+            mcEntity, neuronTypeAggregationEntity );
+          _entities.add( neuronTypeAggregationEntity );
+        }
+
         // fires::PropertyManager::registerProperty(
         //   mcEntity, "Id", mc->id( ));
 
@@ -856,6 +915,9 @@ namespace neuroscheme
                 neuronsStats[ neuron->gid( ) ].morphologyStats[stat] );
             }
           }
+          fires::PropertyManager::registerProperty(
+            neuronEntity, "Layer", uint( neuron->layer( )));
+
 
           _entities.add( neuronEntity );
           relChildOf[ neuronEntity->entityGid( ) ] =
@@ -875,16 +937,71 @@ namespace neuroscheme
 
           for ( auto layer = 0; layer < 6; ++layer )
           {
-            relGroupOf[ mcLayerEntities[ layer ]->entityGid( ) ].insert(
-              neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].insert(
-              mcLayerEntities[ layer ]->entityGid( ));
+            if ( neuron->layer( ) == layer+1 )
+            {
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                mcLayerEntities[ layer ], neuronEntity );
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                colLayerEntities[ layer ], neuronEntity );
+              // relGroupOf[ mcLayerEntities[ layer ]->entityGid( ) ].insert(
+              //   neuronEntity->entityGid( ));
+              // relPartOf[ neuronEntity->entityGid( ) ].insert(
+              //   mcLayerEntities[ layer ]->entityGid( ));
 
-            relGroupOf[ colLayerEntities[ layer ]->entityGid( ) ].insert(
-              neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].insert(
-              colLayerEntities[ layer ]->entityGid( ));
+              // relGroupOf[ colLayerEntities[ layer ]->entityGid( ) ].insert(
+              //   neuronEntity->entityGid( ));
+              // relPartOf[ neuronEntity->entityGid( ) ].insert(
+              //   colLayerEntities[ layer ]->entityGid( ));
+            }
           }
+
+
+          if ( neuron->morphologicalType( ) == nsol::Neuron::PYRAMIDAL )
+          {
+            shift::Relationship::Establish(
+              relGroupOf, relPartOf,
+              mcNeuronTypeAggregationEntities[ 0 ], neuronEntity );
+            shift::Relationship::Establish(
+              relGroupOf, relPartOf,
+              colNeuronTypeAggregationEntities[ 0 ], neuronEntity );
+          }
+          else if ( neuron->morphologicalType( ) == nsol::Neuron::INTERNEURON )
+          {
+            shift::Relationship::Establish(
+              relGroupOf, relPartOf,
+              mcNeuronTypeAggregationEntities[ 7 ], neuronEntity );
+            shift::Relationship::Establish(
+              relGroupOf, relPartOf,
+              colNeuronTypeAggregationEntities[ 7 ], neuronEntity );
+          }
+
+          for ( auto layer = 1; layer < 7; ++layer )
+          {
+            if ( neuron->layer( ) == layer &&
+                 neuron->morphologicalType( ) == nsol::Neuron::PYRAMIDAL )
+            {
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                mcNeuronTypeAggregationEntities[ layer ], neuronEntity );
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                colNeuronTypeAggregationEntities[ layer ], neuronEntity );
+            }
+            else if ( neuron->layer( ) == layer &&
+                      neuron->morphologicalType( ) ==
+                      nsol::Neuron::INTERNEURON )
+            {
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                mcNeuronTypeAggregationEntities[ layer+7 ], neuronEntity );
+              shift::Relationship::Establish(
+                relGroupOf, relPartOf,
+                colNeuronTypeAggregationEntities[ layer+7 ], neuronEntity );
+            }
+          }
+
           // ( void ) mcLayerEntities;
           // ( void ) colLayerEntities;
           // ( void ) relPartOf;

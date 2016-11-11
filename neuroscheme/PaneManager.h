@@ -59,6 +59,8 @@ namespace neuroscheme
     static Canvas* newPane( Canvas* orig = nullptr,
                             TPaneDivision division = HORIZONTAL );
 
+    static Canvas* newPaneFromActivePane( TPaneDivision division = HORIZONTAL );
+
     static void setViewMatrix( const double* values );
 
     using Matrix4f = Eigen::Matrix4f;

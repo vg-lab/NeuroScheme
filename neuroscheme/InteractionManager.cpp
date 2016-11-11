@@ -108,7 +108,6 @@ namespace neuroscheme
     else
       _contextMenu->clear( );
 
-    //std::cout << "InteractionManager::contextMenu" << std::endl;
     {
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
@@ -120,78 +119,102 @@ namespace neuroscheme
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
           auto entityGid = ( *entities.begin( ))->entityGid( );
-          // std::cout << "-- ShiFT gid: "
-          //           << int( entityGid ) << std::endl;
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
-          // std::cout << " -- Parent of: ";
-          // for ( auto const& child : children )
-          //   std::cout << child << " ";
-          // std::cout << std::endl;;
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
                                 [ "isChildOf" ]->asOneToOne( ));
           const auto& parent = relChildOf[ entityGid ];
-          // std::cout << " -- Child of: ";
-          // std::cout << parent << std::endl;;
 
           const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
-          // std::cout << " -- GrandChild of: ";
-          // std::cout << grandParent << std::endl;;
 
           const auto& parentSiblings = relParentOf[ grandParent ];
-          // std::cout << " -- Parent of: ";
-          // for ( auto const& parentSibling : parentSiblings )
-          //   std::cout << parentSibling << " ";
-          // std::cout << std::endl;;
+
+          auto& relAGroupOf = *( DataManager::entities( ).relationships( )
+                                [ "isAGroupOf" ]->asOneToN( ));
+          const auto& groupedEntities = relAGroupOf[ entityGid ];
 
           QAction* levelUp = nullptr;
           QAction* levelDown = nullptr;
+          QAction* expandGroup = nullptr;
+          QAction* levelUpToNewPane = nullptr;
+          QAction* levelDownToNewPane = nullptr;
+          QAction* expandGroupToNewPane = nullptr;
+
           if ( parent != 0 )
             levelUp = _contextMenu->addAction( QString( "Level up" ));
           if ( children.size( ) > 0 )
             levelDown = _contextMenu->addAction( QString( "Level down" ));
-          if ( levelUp || levelDown )
+          if ( groupedEntities.size( ) > 0 )
+            expandGroup = _contextMenu->addAction( QString( "Expand group" ));
+
+          if ( levelUp || levelDown || expandGroup )
+            _contextMenu->addSeparator( );
+
+          if ( parent != 0 )
+            levelUpToNewPane =
+              _contextMenu->addAction( QString( "Level up [new pane]" ));
+          if ( children.size( ) > 0 )
+            levelDownToNewPane =
+              _contextMenu->addAction( QString( "Level down [new pane]" ));
+          if ( groupedEntities.size( ) > 0 )
+            expandGroupToNewPane = _contextMenu->addAction(
+              QString( "Expand group [new pane]" ));
+
+          if ( levelUp || levelDown || expandGroup ||
+               levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
-            if ( levelUp && levelUp == selectedAction )
+
+            if (( levelUpToNewPane &&
+                  levelUpToNewPane == selectedAction ) ||
+                ( levelDownToNewPane &&
+                  levelDownToNewPane == selectedAction ) ||
+                ( expandGroupToNewPane &&
+                  expandGroupToNewPane == selectedAction ))
             {
-              // std::cout << "up" << std::endl;
+              neuroscheme::PaneManager::activePane(
+                neuroscheme::PaneManager::newPaneFromActivePane( ));
+            }
+
+            if (( levelUp && levelUp == selectedAction ) ||
+                ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
+            {
               if ( parentSiblings.size( ) > 0 )
                 for ( const auto& parentSibling : parentSiblings )
                   targetEntities.add(
                     DataManager::entities( ).at( parentSibling ));
               else
                 targetEntities.add( DataManager::entities( ).at( parent ));
-
-
             }
-            if ( levelDown && levelDown == selectedAction )
+
+            if (( levelDown && levelDown == selectedAction ) ||
+                ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
             {
-              //std::cout << "down" << std::endl;
               for ( const auto& child : children )
                 targetEntities.add( DataManager::entities( ).at( child ));
             }
+
+            if (( expandGroup && expandGroup == selectedAction ) ||
+                ( expandGroupToNewPane &&
+                  expandGroupToNewPane == selectedAction ))
+            {
+              for ( const auto& groupedEntity : groupedEntities )
+                targetEntities.add(
+                  DataManager::entities( ).at( groupedEntity ));
+            }
+            std::cout << ",,Target entities " << targetEntities.size( ) << std::endl;
             if ( targetEntities.size( ) > 0 )
             {
-              // neuroscheme::RepresentationCreatorManager::create(
-              //   targetEntities, representations,
-              //   true, true );
-
-              auto canvas = dynamic_cast< Canvas* >(
-                shapeItem->scene( )->parent( ));
-              assert( canvas );
+              // auto canvas = dynamic_cast< Canvas* >(
+              //   shapeItem->scene( )->parent( ));
+              // assert( canvas );
+              auto canvas = PaneManager::activePane( );
               canvas->displayEntities( targetEntities, false, true );
-              //canvas->displayReps( representations, false );
-              // neuroscheme::LayoutManager::setScene( shapeItem->scene( ));
-              // neuroscheme::LayoutManager::displayItems(
-              //   representations, true );
-              // neuroscheme::LayoutManager::displayItems(
-              //   representations, true );
             }
           }
         }
@@ -201,58 +224,11 @@ namespace neuroscheme
                     LOG_LEVEL_ERROR );
           return;
         }
-
-
       }
       else
         Log::log( NS_LOG_HEADER + "clicked element is not item",
                   LOG_LEVEL_ERROR );
     }
-
-    return;
-
-    auto neuronItem = dynamic_cast< NeuronItem* >( shapeItem );
-    if ( neuronItem )
-    {
-      const auto entities =
-        RepresentationCreatorManager::repsToEntities( ).at(
-          neuronItem->parentRep( ));
-      if ( entities.size( ) < 1 )
-        Log::log( NS_LOG_HEADER + "neuron item without entity",
-                  LOG_LEVEL_ERROR );
-      //std::cout << "--------------"
-        //         << (int) ( *entities.begin( ))->getProperty( "gid" ).
-        // value< unsigned int >( ) << std::endl;
-      // // QAction* action1 =
-      // _contextMenu->addAction( QString( "Show minicolumns" ));
-      // // QAction* action2 =
-      // _contextMenu->addAction( QString( "Show columns" ));
-      // // QAction* selectedAction =
-      // _contextMenu->exec( event->screenPos( ));
-      return;
-    }
-
-    auto columnItem = dynamic_cast< ColumnItem* >( shapeItem );
-    if ( columnItem )
-    {
-      // QAction* action1 =
-      _contextMenu->addAction( QString( "Show minicolumns" ));
-      _contextMenu->exec( event->screenPos( ));
-      return;
-    }
-
-    auto miniColumnItem = dynamic_cast< MiniColumnItem* >( shapeItem );
-    if ( miniColumnItem )
-    {
-      // QAction* action1 =
-      _contextMenu->addAction( QString( "Show neurons" ));
-      _contextMenu->addAction( QString( "Show columns" ));
-      _contextMenu->exec( event->screenPos( ));
-      return;
-    }
-
-    Log::log( NS_LOG_HEADER + "context menu not handled for this item",
-              LOG_LEVEL_WARNING );
 
   }
 

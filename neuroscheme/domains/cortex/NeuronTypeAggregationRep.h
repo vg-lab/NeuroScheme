@@ -19,30 +19,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME__NEURON__
-#define __NEUROSCHEME__NEURON__
+#ifndef __NEUROSCHEME__NEURON_TYPE_AGGREGATION_REP__
+#define __NEUROSCHEME__NEURON_TYPE_AGGREGATION_REP__
 
-#include <shift_Neuron.h>
-#include <shift_Column.h>
-#include <shift_Layer.h>
-#include <shift_MiniColumn.h>
-#include <shift_NeuronTypeAggregation.h>
-#include "../../SelectionManager.h"
+#include "../../reps/QGraphicsItemRepresentation.h"
+#include <shift/shift.h>
+#include <shift_NeuronAggregationRep.h>
+#include <shift_NeuronTypeAggregationRep.h>
 
 namespace neuroscheme
 {
 
-  using Neuron = shiftgen::Neuron;
-  // class Neuron
-  //   : public shiftgen::Neuron
-  //   , public SelectableEntity
-  // {
-  // };
-  using Column = shiftgen::Column;
-  using MiniColumn = shiftgen::MiniColumn;
-  using Layer = shiftgen::Layer;
-  using NeuronTypeAggregation = shiftgen::NeuronTypeAggregation;
+  class NeuronTypeAggregationRep
+    : public shiftgen::NeuronTypeAggregationRep
+    , public QGraphicsItemRepresentation
+  {
+  public:
+
+    NeuronTypeAggregationRep( void );
+    NeuronTypeAggregationRep( const NeuronTypeAggregationRep& );
+    virtual ~NeuronTypeAggregationRep( void ) {}
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
+
+  };
+
 
 } // namespace neuroscheme
 
-#endif // __NEUROSCHEME__NEURON__
+#endif

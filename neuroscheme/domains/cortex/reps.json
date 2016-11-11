@@ -65,6 +65,27 @@
             "types": [ ]
         },
         {
+            "name": "NeuronTypeAggregationRep",
+            "namespace": "neuroscheme::shiftgen",
+            "properties": [
+                {
+                    "name": "symbol",
+                    "type": "TSymbol"
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TSymbol",
+                    "values": [
+                        "NO_SYMBOL",
+                        "TRIANGLE",
+                        "CIRCLE"
+                    ]
+                }
+            ]
+        },
+        {
             "name": "NeuronAggregationRep",
             "namespace": "neuroscheme::shiftgen",
             "properties": [
@@ -75,6 +96,10 @@
                 {
                     "name": "meanNeuron",
                     "type": "NeuronRep"
+                },
+                {
+                    "name": "neuronTypeAggregations",
+                    "type": "NeuronTypeAggregations"
                 }
             ],
             "types": [
@@ -87,6 +112,11 @@
                     "class": "vector",
                     "element": "LayerRep*",
                     "name": "Layers"
+                },
+                {
+                    "class": "vector",
+                    "element": "NeuronTypeAggregationRep*",
+                    "name": "NeuronTypeAggregations"
                 }
             ]
         }

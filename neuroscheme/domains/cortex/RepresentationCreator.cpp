@@ -259,24 +259,49 @@ namespace neuroscheme
               entity->getProperty( "Layer" ).value< unsigned int >( ));
           if ( _layersMap.count( layerKey ) == 0 )
           {
-            // std::cout << ", Creating layer "
-            //           << entity->getProperty( "Parent Id" ).value< uint >( )
-            //           << ", "
-            //           << entity->getProperty( "Parent Type" ).value< uint >( )
-            //           << ", "
-            //           << entity->getProperty( "Layer" ).value< uint >( )
-            //           << std::endl;
-
             _layersMap[ layerKey ] = new LayerRep( );
           }
-          // std::cout << "Linking " << _layersMap.at( layerKey )
-          //           << " to " << entity << std::endl;
           if ( linkEntitiesToReps )
             entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
           if ( linkRepsToEntities )
             repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
           representations.push_back( _layersMap[ layerKey ] );
         } // if Layer
+        else
+        if ( dynamic_cast< NeuronTypeAggregation* >( entity ))
+        {
+          // std::cout << ", RepresentationCreator "
+          //           << _neuronTypeAggsMap.size( ) << std::endl;
+          auto neuronTypeAggregationKey = QuadKey(
+              entity->getProperty( "Parent Id" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Layer" ).value< unsigned int >( ),
+              uint( entity->getProperty( "Morpho Type" ).value<
+                    Neuron::TMorphologicalType >( )));
+
+          // std::cout << "-Quadkey"
+          //           << entity->getProperty( "Parent Id" ).value< unsigned int >( ) << ","
+          //           << entity->getProperty( "Parent Type" ).value< unsigned int >( ) << ","
+          //           << entity->getProperty( "Layer" ).value< unsigned int >( ) << ","
+          //           << uint( entity->getProperty( "Morpho Type" ).value<
+          //                    Neuron::TMorphologicalType >( )) 
+          //           << std::endl;
+
+          if ( _neuronTypeAggsMap.count( neuronTypeAggregationKey ) == 0 )
+          {
+            // std::cout << "+++ Doesnt exist" << std::endl;
+            _neuronTypeAggsMap[ neuronTypeAggregationKey ] =
+              new NeuronTypeAggregationRep( );
+          }
+          if ( linkEntitiesToReps )
+            entitiesToReps[ entity ].insert(
+              _neuronTypeAggsMap.at( neuronTypeAggregationKey ));
+          if ( linkRepsToEntities )
+            repsToEntities[ _neuronTypeAggsMap.at( neuronTypeAggregationKey ) ].
+              insert( entity );
+          representations.push_back(
+            _neuronTypeAggsMap[ neuronTypeAggregationKey ] );
+        } // if NeuronTypeAggregationRep
 
 
         // std::cout << ", end entity --> LayersMap size = "
@@ -392,20 +417,8 @@ namespace neuroscheme
 
         if ( layersMap_.count( layerKey ) == 0 )
         {
-        // std::cout << ", Creating layer "
-        //           << id
-        //           << ", "
-        //           << columnOrMiniColumn
-        //           << ", "
-        //           << layer
-        //           << std::endl;
-
           layersMap_[ layerKey ] = new LayerRep( );
           assert( layersMap_.count( layerKey ) == 1);
-          // if ( linkEntitiesToReps )
-          //   entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
-          // if ( linkRepsToEntities )
-          //   repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
         }
 
         layerRep = layersMap_[ layerKey ]; //new LayerRep;
@@ -429,6 +442,38 @@ namespace neuroscheme
       }
       rep->registerProperty( "layers", layersReps );
 
+      NeuronTypeAggregationRep* neuronTypeAggRep;
+      shiftgen::NeuronAggregationRep::NeuronTypeAggregations neuronTypeAggsReps;
+      std::vector< neuroscheme::Neuron::TMorphologicalType>
+        neuronTypes =
+        {
+          neuroscheme::Neuron::PYRAMIDAL,
+          neuroscheme::Neuron::INTERNEURON
+        };
+      for ( const auto& neuronType : neuronTypes )
+      {
+        for ( unsigned int layer = 0; layer <= 6; ++layer )
+        {
+          auto neuronTypeAggKey = QuadKey(
+            id, columnOrMiniColumn, layer, uint( neuronType ));
+
+          // std::cout << "Quadkey" << id  << "," <<  columnOrMiniColumn
+          //           << "," <<  layer <<  "," <<  uint( neuronType ) << std::endl;
+          if ( _neuronTypeAggsMap.count( neuronTypeAggKey ) == 0 )
+            _neuronTypeAggsMap[ neuronTypeAggKey ] =
+              new NeuronTypeAggregationRep( );
+
+          neuronTypeAggRep = _neuronTypeAggsMap[ neuronTypeAggKey ];
+
+          neuronTypeAggRep->setProperty(
+            "symbol",
+            neuronType == neuroscheme::Neuron::PYRAMIDAL ?
+            NeuronTypeAggregationRep::TSymbol::TRIANGLE :
+            NeuronTypeAggregationRep::TSymbol::CIRCLE );
+          neuronTypeAggsReps.push_back( neuronTypeAggRep );
+        }
+      }
+      rep->registerProperty( "neuronTypeAggregations", neuronTypeAggsReps );
       // std::cout << ", End of _createColumnOrMiniColumn LayersMap size = "
       //           << layersMap_.size( ) << std::endl;
     }

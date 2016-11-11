@@ -40,7 +40,7 @@ namespace neuroscheme
                                   bool animate,
                                   const shift::Representations& postFilterReps )
   {
-    std::cout << "pre filter: " << reps.size( ) << std::endl;
+    // std::cout << "pre filter: " << reps.size( ) << std::endl;
     // std::cout << "post filter: " << postFilterReps.size( ) << std::endl;
     std::unordered_set< QGraphicsItem* > filteredOutItems;
     auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
@@ -67,6 +67,7 @@ namespace neuroscheme
         //           << std::endl;
         if ( !item->parentItem( ))
         {
+          // std::cout << "++++++ Arranging " << item << std::endl;
           ++repsToBeArranged;
           if ( doFiltering && useOpacityForFilter )
           {
@@ -181,7 +182,7 @@ namespace neuroscheme
           if ( useOpacityForFilter &&
                filteredOutItems.count( graphicsItem ) == 1 )
           {
-            std::cout << "opacity " << _filterWidget->opacityValue( ) << std::endl;
+            //std::cout << "opacity " << _filterWidget->opacityValue( ) << std::endl;
             graphicsItem->setOpacity( opacity );
           }
           else
