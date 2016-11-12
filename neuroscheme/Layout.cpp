@@ -510,10 +510,10 @@ namespace neuroscheme
           if ( shapeItem )
           {
             if ( selectedState == SelectedState::SELECTED )
-              shapeItem->setPen( InteractionManager::getSelectedPen( ));
+              shapeItem->setPen( SelectableItem::selectedPen( ));
             else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
               shapeItem->setPen(
-                InteractionManager::getPartiallySelectedPen( ));
+                SelectableItem::partiallySelectedPen( ));
 
           }
         }
@@ -535,9 +535,14 @@ namespace neuroscheme
       if ( selectableItem_ )
       {
         auto item = dynamic_cast< Item* >( *qitem );
+        if ( !item ) continue;
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
 
+        // if ( item->parentRep( )) {
+        //   std::cerr << "Item without parent" << std::endl;
+        //   continue;
+        // }
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
@@ -552,12 +557,12 @@ namespace neuroscheme
             const auto state = SelectionManager::getSelectedState( entity );
             selectableItem_->setSelected( state );
             if ( state == SelectedState::UNSELECTED )
-              shapeItem->setPen( InteractionManager::getUnselectedPen( ));
+              shapeItem->setPen( SelectableItem::unselectedPen( ));
             else if ( state == SelectedState::SELECTED )
-              shapeItem->setPen( InteractionManager::getSelectedPen( ));
+              shapeItem->setPen( SelectableItem::selectedPen( ));
             else if ( state == SelectedState::PARTIALLY_SELECTED )
               shapeItem->setPen(
-                InteractionManager::getPartiallySelectedPen( ));
+                SelectableItem::partiallySelectedPen( ));
 
           }
         }

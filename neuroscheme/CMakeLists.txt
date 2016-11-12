@@ -40,6 +40,7 @@ set( NEUROSCHEME_SOURCES
   RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
+  reps/SelectableItem.cpp
   qxt/qxtspanslider.cpp
   ScatterPlotLayout.cpp
   ScatterPlotWidget.cpp

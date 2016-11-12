@@ -16,7 +16,10 @@ namespace neuroscheme
     this->_parentRep = &( const_cast< NeuronTypeAggregationRep& >( parentRep ));
   }
 
-  class Triangle : public QGraphicsPolygonItem
+  class Triangle
+    : public QGraphicsPolygonItem
+    , public SelectableItem
+    , public Item
   {
   public:
     Triangle( QPolygonF polygon_, QGraphicsItem* parent_ )
@@ -25,26 +28,33 @@ namespace neuroscheme
       setAcceptHoverEvents( true );
       setFlags( QGraphicsItem::ItemIsPanel );
     }
-    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    shift::Representation* parentRep( void ) const final
+    {
+      return dynamic_cast< Item* >(this ->parentItem( ))->parentRep( );
+    }
+
+    void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) final
     {
       InteractionManager::hoverEnterEvent( this, event_ );
         // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
         // event_ );
     }
-    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+
+    void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) final
     {
       InteractionManager::hoverLeaveEvent( this, event_ );
         // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
         // event_ );
     }
-    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+
+    void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ ) final
     {
       InteractionManager::contextMenuEvent(
         dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
         event_ );
     }
 
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
+    void mousePressEvent( QGraphicsSceneMouseEvent* event_ ) final
     {
       InteractionManager::mousePressEvent(
         dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
@@ -52,7 +62,11 @@ namespace neuroscheme
     }
   };
 
-  class Circle : public QGraphicsEllipseItem
+  class Circle
+    : public QGraphicsEllipseItem
+    , public SelectableItem
+    , public Item
+
   {
   public:
     Circle( QGraphicsItem* parent_ )
@@ -61,6 +75,12 @@ namespace neuroscheme
       setAcceptHoverEvents( true );
       setFlags( QGraphicsItem::ItemIsPanel );
     }
+
+    shift::Representation* parentRep( void ) const final
+    {
+      return dynamic_cast< Item* >(this ->parentItem( ))->parentRep( );
+    }
+
     virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       InteractionManager::hoverEnterEvent( this, event_ );

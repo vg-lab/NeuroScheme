@@ -31,27 +31,27 @@
 namespace neuroscheme
 {
 
-  QPen InteractionManager::_selectedPen =
-    QPen( Qt::red, 3, Qt::SolidLine,
-          Qt::RoundCap, Qt::RoundJoin );
+  // QPen InteractionManager::_selectedPen =
+  //   QPen( Qt::red, 3, Qt::SolidLine,
+  //         Qt::RoundCap, Qt::RoundJoin );
 
-  QPen InteractionManager::_hoverSelectedPen =
-    QPen( Qt::red, 3, Qt::DotLine,
-          Qt::RoundCap, Qt::RoundJoin );
+  // QPen InteractionManager::_hoverSelectedPen =
+  //   QPen( Qt::red, 3, Qt::DotLine,
+  //         Qt::RoundCap, Qt::RoundJoin );
 
-  QPen InteractionManager::_partiallySelectedPen =
-    QPen( Qt::yellow, 3, Qt::SolidLine,
-          Qt::RoundCap, Qt::RoundJoin );
+  // QPen InteractionManager::_partiallySelectedPen =
+  //   QPen( Qt::yellow, 3, Qt::SolidLine,
+  //         Qt::RoundCap, Qt::RoundJoin );
 
-  QPen InteractionManager::_hoverPartiallySelectedPen =
-    QPen( Qt::yellow, 3, Qt::DotLine,
-          Qt::RoundCap, Qt::RoundJoin );
+  // QPen InteractionManager::_hoverPartiallySelectedPen =
+  //   QPen( Qt::yellow, 3, Qt::DotLine,
+  //         Qt::RoundCap, Qt::RoundJoin );
 
-  QPen InteractionManager::_unselectedPen = QPen( Qt::NoPen );
+  // QPen InteractionManager::_unselectedPen = QPen( Qt::NoPen );
 
-  QPen InteractionManager::_hoverUnselectedPen =
-    QPen( QColor( 200, 200, 200, 255 ), 3, Qt::DotLine,
-          Qt::RoundCap, Qt::RoundJoin );
+  // QPen InteractionManager::_hoverUnselectedPen =
+  //   QPen( QColor( 200, 200, 200, 255 ), 3, Qt::DotLine,
+  //         Qt::RoundCap, Qt::RoundJoin );
 
   QMenu* InteractionManager::_contextMenu = nullptr;
 
@@ -60,19 +60,22 @@ namespace neuroscheme
     QAbstractGraphicsShapeItem* item,
     QGraphicsSceneHoverEvent* /* event */ )
   {
+    // std::cout << "hover" << std::endl;
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
-      if ( selectableItem->selected( ))
-        item->setPen( _hoverSelectedPen );
-      else if ( selectableItem->partiallySelected( ))
-        item->setPen( _hoverPartiallySelectedPen );
-      else
-        item->setPen( _hoverUnselectedPen );
+      selectableItem->hover( true );
+      selectableItem->setSelected( selectableItem->selectedState( ));
+      // if ( selectableItem->selected( ))
+      //   item->setPen( _hoverSelectedPen );
+      // else if ( selectableItem->partiallySelected( ))
+      //   item->setPen( _hoverPartiallySelectedPen );
+      // else
+      //   item->setPen( _hoverUnselectedPen );
     }
     else
     {
-      item->setPen( _hoverUnselectedPen );
+      item->setPen( SelectableItem::hoverUnselectedPen( ));
     }
   }
 
@@ -84,16 +87,18 @@ namespace neuroscheme
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
-      if ( selectableItem->selected( ))
-        item->setPen( _selectedPen );
-      else if ( selectableItem->partiallySelected( ))
-        item->setPen( _partiallySelectedPen );
-      else
-        item->setPen( _unselectedPen );
+      selectableItem->hover( false );
+      selectableItem->setSelected( selectableItem->selectedState( ));
+      // if ( selectableItem->selected( ))
+      //   item->setPen( _selectedPen );
+      // else if ( selectableItem->partiallySelected( ))
+      //   item->setPen( _partiallySelectedPen );
+      // else
+      //   item->setPen( _unselectedPen );
     }
     else
     {
-      item->setPen( _unselectedPen );
+      item->setPen( SelectableItem::unselectedPen( ));
     }
   }
 
@@ -285,11 +290,23 @@ namespace neuroscheme
 
             auto entityGid = ( *entities.begin( ))->entityGid( );
 
+            const auto& relSuperEntityOf =
+              *( DataManager::entities( ).relationships( )
+                 [ "isSuperEntityOf" ]->asOneToN( ));
+            if ( relSuperEntityOf.count( entityGid ) > 0 )
+            {
+              const auto& subEntities = relSuperEntityOf.at( entityGid );
+              for ( const auto& subEntity : subEntities )
+                SelectionManager::setSelectedState(
+                  DataManager::entities( ).at( subEntity ), parentState );
+            }
+
             std::cout << "Propagate to children of " << entityGid << std::endl;
             _propagateSelectedStateToChilds(
               DataManager::entities( ),
               *( DataManager::entities( ).
                  relationships( )[ "isParentOf" ]->asOneToN( )),
+              relSuperEntityOf,
               entityGid,
               parentState );
 
@@ -327,6 +344,7 @@ namespace neuroscheme
   void InteractionManager::_propagateSelectedStateToChilds(
     shift::Entities& entities,
     shift::RelationshipOneToN& relParentOf,
+    const shift::RelationshipOneToN& relSuperEntityOf,
     unsigned int entityGid,
     SelectedState state )
   {
@@ -335,9 +353,17 @@ namespace neuroscheme
     for ( auto const& childId : childrenIds )
     {
       std::cout << childId << " ";
+      if ( relSuperEntityOf.count( childId ) > 0 )
+      {
+        const auto& subEntities = relSuperEntityOf.at( childId );
+        for ( const auto& subEntity : subEntities )
+          SelectionManager::setSelectedState(
+            DataManager::entities( ).at( subEntity ), state );
+      }
       SelectionManager::setSelectedState(
         entities.at( childId ), state );
-//      _propagateSelectedStateToChilds( entities, relParentOf, childId, state );
+      _propagateSelectedStateToChilds( entities, relParentOf, relSuperEntityOf,
+                                       childId, state );
     }
 
   }
