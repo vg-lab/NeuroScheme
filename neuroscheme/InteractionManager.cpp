@@ -27,6 +27,7 @@
 #include "SelectionManager.h"
 #include "ZeroEQManager.h"
 #include "domains/domains.h"
+#include <unordered_set>
 
 namespace neuroscheme
 {
@@ -286,41 +287,74 @@ namespace neuroscheme
             }
 
             auto parentState = SelectionManager::getSelectedState( entity );
+            // auto entityGid = ( *entities.begin( ))->entityGid( );
+            auto entityGid = entity->entityGid( );
 
-
-            auto entityGid = ( *entities.begin( ))->entityGid( );
-
+            const auto& allEntities = DataManager::entities( );
+            const auto& relationships = allEntities.relationships( );
+            const auto& relChildOf =
+              *( relationships.at( "isChildOf" )->asOneToOne( ));
+            const auto& relParentOf =
+              *( relationships.at( "isParentOf" )->asOneToN( ));
+            const auto& relSubEntityOf =
+              *( relationships.at( "isSubEntityOf" )->asOneToOne( ));
             const auto& relSuperEntityOf =
-              *( DataManager::entities( ).relationships( )
-                 [ "isSuperEntityOf" ]->asOneToN( ));
-            if ( relSuperEntityOf.count( entityGid ) > 0 )
+              *( relationships.at( "isSuperEntityOf" )->asOneToN( ));
+            const auto& relAGroupOf =
+              *( relationships.at( "isAGroupOf" )->asOneToN( ));
+
+            if ( relSubEntityOf.count( entityGid ) > 0 )
             {
-              const auto& subEntities = relSuperEntityOf.at( entityGid );
-              for ( const auto& subEntity : subEntities )
-                SelectionManager::setSelectedState(
-                  DataManager::entities( ).at( subEntity ), parentState );
-            }
 
-            std::cout << "Propagate to children of " << entityGid << std::endl;
-            _propagateSelectedStateToChilds(
-              DataManager::entities( ),
-              *( DataManager::entities( ).
-                 relationships( )[ "isParentOf" ]->asOneToN( )),
-              relSuperEntityOf,
-              entityGid,
-              parentState );
+              std::unordered_set< unsigned int > parentIds;
+              if ( relAGroupOf.count( entityGid ) > 0 )
+              {
+                const auto& groupedIds = relAGroupOf.at( entityGid );
+                // std::cout << " -- Parent of: ";
+                for ( auto const& groupedId : groupedIds )
+                {
+                  SelectionManager::setSelectedState(
+                    allEntities.at( groupedId ), parentState );
+                  // Save unique parent set for updating only once per parent
+                  if ( relChildOf.count( groupedId ) > 0 )
+                    parentIds.insert( relChildOf.at( groupedId ));
+                }
+                std::unordered_set< unsigned int > uniqueParentChildIds;
+                for ( auto const& parentId : parentIds )
+                {
+                  uniqueParentChildIds.insert(
+                    *relParentOf.at( parentId ).begin( ));
+                }
+                for ( auto const& uniqueParentChildId : uniqueParentChildIds )
+                {
+                  _propagateSelectedStateToParent(
+                    allEntities, relChildOf, relParentOf,
+                    relSuperEntityOf, relAGroupOf,
+                    uniqueParentChildId, parentState );
+                }
+              }
+            } // if subentity
+            else
+            {
+              if ( relSuperEntityOf.count( entityGid ) > 0 )
+              {
+                const auto& subEntities = relSuperEntityOf.at( entityGid );
+                for ( const auto& subEntity : subEntities )
+                  SelectionManager::setSelectedState(
+                    allEntities.at( subEntity ), parentState );
+              }
 
-            _propagateSelectedStateToParent(
-              DataManager::entities( ),
-              *( DataManager::entities( ).
-                 relationships( )[ "isChildOf" ]->asOneToOne( )),
-              *( DataManager::entities( ).
-                 relationships( )[ "isParentOf" ]->asOneToN( )),
-              entityGid,
-              parentState );
+              // std::cout << "Propagate to children of " << entityGid << std::endl;
+              _propagateSelectedStateToChilds(
+                allEntities, relParentOf, relSuperEntityOf,
+                entityGid, parentState );
 
+              _propagateSelectedStateToParent(
+                allEntities, relChildOf, relParentOf,
+                relSuperEntityOf, relAGroupOf,
+                entityGid, parentState );
             //std::cout << std::endl;
-
+            }
             //LayoutManager::updateAllScenesSelection( );
             PaneManager::updateSelection( );
           }
@@ -342,13 +376,15 @@ namespace neuroscheme
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
-    shift::Entities& entities,
-    shift::RelationshipOneToN& relParentOf,
+    const shift::Entities& entities,
+    const shift::RelationshipOneToN& relParentOf,
     const shift::RelationshipOneToN& relSuperEntityOf,
     unsigned int entityGid,
     SelectedState state )
   {
-    const auto& childrenIds = relParentOf[ entityGid ];
+    if ( relParentOf.count( entityGid ) == 0 )
+      return;
+    const auto& childrenIds = relParentOf.at( entityGid );
     std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
@@ -369,13 +405,17 @@ namespace neuroscheme
   }
 
   void InteractionManager::_propagateSelectedStateToParent(
-    shift::Entities& entities,
-    shift::RelationshipOneToOne& relChildOf,
-    shift::RelationshipOneToN& relParentOf,
+    const shift::Entities& entities,
+    const shift::RelationshipOneToOne& relChildOf,
+    const shift::RelationshipOneToN& relParentOf,
+    const shift::RelationshipOneToN& relSuperEntityOf,
+    const shift::RelationshipOneToN& relAGroupOf,
     unsigned int entityGid,
     SelectedState childState )
   {
-    const auto& parentId = relChildOf[ entityGid ];
+    if ( relChildOf.count( entityGid ) == 0 )
+      return;
+    const auto& parentId = relChildOf.at( entityGid );
 
     if ( parentId == 0 ) return;
 
@@ -385,6 +425,7 @@ namespace neuroscheme
       SelectionManager::setSelectedState(
         entities.at( parentId ), childState );
       _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
+                                       relSuperEntityOf, relAGroupOf,
                                        parentId, childState );
       return;
     }
@@ -403,20 +444,41 @@ namespace neuroscheme
 
     SelectionManager::setSelectedState(
       entities.at( parentId ), state );
+
+    for ( const auto& subEntityId : relSuperEntityOf.at( parentId ))
+    {
+      bool allGroupedSelected, noGroupedSelected;
+      _queryGroupedSelectedState( entities, relAGroupOf, subEntityId,
+                                  allGroupedSelected, noGroupedSelected );
+    //std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
+      SelectedState groupedState;
+      if ( noGroupedSelected )
+        groupedState = SelectedState::UNSELECTED;
+      else if ( allChildrenSelected )
+        groupedState = SelectedState::SELECTED;
+      else
+        groupedState = SelectedState::PARTIALLY_SELECTED;
+
+      SelectionManager::setSelectedState(
+        entities.at( subEntityId ), groupedState );
+
+    }
+
     _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
+                                     relSuperEntityOf, relAGroupOf,
                                      parentId, state );
   }
 
   void InteractionManager::queryChildrenSelectedState(
     const shift::Entities& entities,
-    shift::RelationshipOneToN& relParentOf,
+    const shift::RelationshipOneToN& relParentOf,
     unsigned int entityGid,
     bool& allChildrenSelected,
     bool& noChildrenSelected )
   {
     allChildrenSelected = true;
     noChildrenSelected = true;
-    const auto& childrenIds = relParentOf[ entityGid ];
+    const auto& childrenIds = relParentOf.at( entityGid );
     for ( auto const& childId : childrenIds )
     {
       if ( SelectionManager::getSelectedState( entities.at( childId )) !=
@@ -428,4 +490,32 @@ namespace neuroscheme
     }
     return;
   }
-}
+
+  void InteractionManager::_queryGroupedSelectedState(
+    const shift::Entities& entities,
+    const shift::RelationshipOneToN& relAGroupOf,
+    unsigned int entityGid,
+    bool& allGroupedSelected,
+    bool& noGroupedSelected )
+  {
+    allGroupedSelected = true;
+    noGroupedSelected = true;
+    if ( relAGroupOf.count( entityGid ) == 0 )
+    {
+      allGroupedSelected = true;
+      noGroupedSelected = true;
+      return;
+    }
+    const auto& groupedIds = relAGroupOf.at( entityGid );
+    for ( auto const& groupedId : groupedIds )
+    {
+      if ( SelectionManager::getSelectedState( entities.at( groupedId )) !=
+           SelectedState::SELECTED )
+        allGroupedSelected = false;
+      if ( SelectionManager::getSelectedState( entities.at( groupedId )) ==
+           SelectedState::SELECTED )
+        noGroupedSelected = false;
+    }
+  }
+
+} // namespace neuroscheme

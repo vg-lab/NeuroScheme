@@ -60,7 +60,7 @@ namespace neuroscheme
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
-      shift::RelationshipOneToN& relParentOf,
+      const shift::RelationshipOneToN& relParentOf,
       unsigned int entityGid,
       bool& allChildrenSelected,
       bool& noChildrenSelected );
@@ -75,19 +75,27 @@ namespace neuroscheme
   //   SelectedState state
 
     static void _propagateSelectedStateToChilds(
-      shift::Entities& entities,
-      shift::RelationshipOneToN& relParentOf,
+      const shift::Entities& entities,
+      const shift::RelationshipOneToN& relParentOf,
       const shift::RelationshipOneToN& relSuperEntityOf,
       unsigned int entityGid,
       SelectedState state );
 
     static void _propagateSelectedStateToParent(
-    shift::Entities& entities,
-    shift::RelationshipOneToOne& relChildOf,
-    shift::RelationshipOneToN& relParentOf,
-    unsigned int entityGid,
-    SelectedState state = SelectedState::SELECTED );
+      const shift::Entities& entities,
+      const shift::RelationshipOneToOne& relChildOf,
+      const shift::RelationshipOneToN& relParentOf,
+      const shift::RelationshipOneToN& relSuperEntityOf,
+      const shift::RelationshipOneToN& relAGroupOf,
+      unsigned int entityGid,
+      SelectedState state = SelectedState::SELECTED );
 
+    static void _queryGroupedSelectedState(
+      const shift::Entities& entities,
+      const shift::RelationshipOneToN& relAGroupOf,
+      unsigned int entityGid,
+      bool& allGroupedSelected,
+      bool& noGroupedSelected );
     // static QPen _selectedPen;
     // static QPen _partiallySelectedPen;
     // static QPen _unselectedPen;

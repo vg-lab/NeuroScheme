@@ -82,7 +82,7 @@ namespace neuroscheme
     static const QPen& unselectedPen( ) { return _unselectedPen; };
     static const QPen& partiallySelectedPen( )
     { return _partiallySelectedPen; };
-
+    static void init( void );
   protected:
 
     void _updatePen( )

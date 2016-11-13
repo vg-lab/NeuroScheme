@@ -119,10 +119,10 @@ namespace neuroscheme
             neuronRep->setProperty( "symbol", NeuronRep::NO_SYMBOL );
             break;
           case Neuron::INTERNEURON:
-            neuronRep->setProperty( "symbol", NeuronRep::TRIANGLE );
+            neuronRep->setProperty( "symbol", NeuronRep::CIRCLE );
             break;
           case Neuron::PYRAMIDAL:
-            neuronRep->setProperty( "symbol", NeuronRep::CIRCLE );
+            neuronRep->setProperty( "symbol", NeuronRep::TRIANGLE );
             break;
           default:
             break;

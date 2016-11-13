@@ -23,6 +23,7 @@
 #include "Config.h"
 #include "MainWindow.h"
 #include "ZeroEQManager.h"
+#include "reps/SelectableItem.h"
 #include <neuroscheme/version.h>
 
 
@@ -273,6 +274,7 @@ int main( int argc, char** argv )
   if ( !neuroscheme::Config::zeroeqSession.empty( ))
     neuroscheme::ZeroEQManager::init( neuroscheme::Config::zeroeqSession );
 
+  neuroscheme::SelectableItem::init( );
 //   std::cout << "init" << std::endl;
 //  mainWindow.init( );
 //   std::cout << "init" << std::endl;
