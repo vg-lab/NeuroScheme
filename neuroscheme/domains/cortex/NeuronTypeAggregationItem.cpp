@@ -119,7 +119,7 @@ namespace neuroscheme
     switch ( symbol )
     {
     case NeuronTypeAggregationRep::TRIANGLE:
-      std::cout << "NeuronTypeAggregationItem::TRIANGLE" << std::endl;
+      // std::cout << "NeuronTypeAggregationItem::TRIANGLE" << std::endl;
       triangle.append( QPointF(              0, -int( size ) / 2.8f ));
       triangle.append( QPointF(         size/2,  size / 2 ));
       triangle.append( QPointF( -int( size )/2,  size / 2 ));
@@ -128,14 +128,14 @@ namespace neuroscheme
       new Triangle( triangle, this );
       break;
     case NeuronTypeAggregationRep::CIRCLE:
-      std::cout << "NeuronTypeAggregationItem::CIRCLE" << std::endl;
+      // std::cout << "NeuronTypeAggregationItem::CIRCLE" << std::endl;
       ellipseItem = new Circle( this );
       ellipseItem->setRect( -int( size ) / 2.5f , -int( size ) / 2.5f,
                             size, size );
       _symbolItem = ellipseItem;
       break;
     default:
-      std::cout << "NeuronTypeAggregationItem::UNDEFINED" << std::endl;
+      // std::cout << "NeuronTypeAggregationItem::UNDEFINED" << std::endl;
       assert( false );
     }
   }

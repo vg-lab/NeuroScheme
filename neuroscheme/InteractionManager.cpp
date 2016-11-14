@@ -32,28 +32,6 @@
 namespace neuroscheme
 {
 
-  // QPen InteractionManager::_selectedPen =
-  //   QPen( Qt::red, 3, Qt::SolidLine,
-  //         Qt::RoundCap, Qt::RoundJoin );
-
-  // QPen InteractionManager::_hoverSelectedPen =
-  //   QPen( Qt::red, 3, Qt::DotLine,
-  //         Qt::RoundCap, Qt::RoundJoin );
-
-  // QPen InteractionManager::_partiallySelectedPen =
-  //   QPen( Qt::yellow, 3, Qt::SolidLine,
-  //         Qt::RoundCap, Qt::RoundJoin );
-
-  // QPen InteractionManager::_hoverPartiallySelectedPen =
-  //   QPen( Qt::yellow, 3, Qt::DotLine,
-  //         Qt::RoundCap, Qt::RoundJoin );
-
-  // QPen InteractionManager::_unselectedPen = QPen( Qt::NoPen );
-
-  // QPen InteractionManager::_hoverUnselectedPen =
-  //   QPen( QColor( 200, 200, 200, 255 ), 3, Qt::DotLine,
-  //         Qt::RoundCap, Qt::RoundJoin );
-
   QMenu* InteractionManager::_contextMenu = nullptr;
 
 
@@ -67,12 +45,6 @@ namespace neuroscheme
     {
       selectableItem->hover( true );
       selectableItem->setSelected( selectableItem->selectedState( ));
-      // if ( selectableItem->selected( ))
-      //   item->setPen( _hoverSelectedPen );
-      // else if ( selectableItem->partiallySelected( ))
-      //   item->setPen( _hoverPartiallySelectedPen );
-      // else
-      //   item->setPen( _hoverUnselectedPen );
     }
     else
     {
@@ -90,12 +62,6 @@ namespace neuroscheme
     {
       selectableItem->hover( false );
       selectableItem->setSelected( selectableItem->selectedState( ));
-      // if ( selectableItem->selected( ))
-      //   item->setPen( _selectedPen );
-      // else if ( selectableItem->partiallySelected( ))
-      //   item->setPen( _partiallySelectedPen );
-      // else
-      //   item->setPen( _unselectedPen );
     }
     else
     {
@@ -213,12 +179,8 @@ namespace neuroscheme
                 targetEntities.add(
                   DataManager::entities( ).at( groupedEntity ));
             }
-            std::cout << ",,Target entities " << targetEntities.size( ) << std::endl;
             if ( targetEntities.size( ) > 0 )
             {
-              // auto canvas = dynamic_cast< Canvas* >(
-              //   shapeItem->scene( )->parent( ));
-              // assert( canvas );
               auto canvas = PaneManager::activePane( );
               canvas->displayEntities( targetEntities, false, true );
             }
@@ -251,25 +213,21 @@ namespace neuroscheme
       auto selectableItem = dynamic_cast< SelectableItem* >( item );
       if ( selectableItem )
       {
-         std::cout << "-------- mousePressEvent " << shapeItem << " "
-              <<  item->parentRep( ) << std::endl;
-
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          // auto entityGid = ( *entities.begin( ))->entityGid( );
           if ( selectableItem->partiallySelected( ))
             selectableItem->setSelected( );
           else
             selectableItem->toggleSelected( );
 
-          std::cout << "-------- Selecting entities "
-                    << entities.size( ) << std::endl;
+          // std::cout << "-------- Selecting entities "
+          //           << entities.size( ) << std::endl;
           for ( const auto& entity : entities )
           {
-            std::cout << "-------- " << entity->entityGid( ) << std::endl;
+            // std::cout << "-------- " << entity->entityGid( ) << std::endl;
             // std::cout << "-- ShiFT gid: "
             //           << int( entity->entityGid( )) << std::endl;
 
@@ -277,16 +235,14 @@ namespace neuroscheme
             {
               SelectionManager::setSelectedState(
                 entity, SelectedState::SELECTED );
-//              shapeItem->setPen( _selectedPen );
             }
             else
             {
-//              shapeItem->setPen( _unselectedPen );
               SelectionManager::setSelectedState(
                 entity, SelectedState::UNSELECTED );
             }
 
-            auto parentState = SelectionManager::getSelectedState( entity );
+            auto entityState = SelectionManager::getSelectedState( entity );
             // auto entityGid = ( *entities.begin( ))->entityGid( );
             auto entityGid = entity->entityGid( );
 
@@ -305,32 +261,36 @@ namespace neuroscheme
 
             if ( relSubEntityOf.count( entityGid ) > 0 )
             {
-
               std::unordered_set< unsigned int > parentIds;
               if ( relAGroupOf.count( entityGid ) > 0 )
               {
                 const auto& groupedIds = relAGroupOf.at( entityGid );
                 // std::cout << " -- Parent of: ";
+                // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
                 for ( auto const& groupedId : groupedIds )
                 {
                   SelectionManager::setSelectedState(
-                    allEntities.at( groupedId ), parentState );
+                    allEntities.at( groupedId ), entityState );
                   // Save unique parent set for updating only once per parent
                   if ( relChildOf.count( groupedId ) > 0 )
                     parentIds.insert( relChildOf.at( groupedId ));
                 }
+                _updateSelectedStateOfSubEntities(
+                  allEntities, relSuperEntityOf, relAGroupOf,
+                  relSubEntityOf.at( entityGid ));
                 std::unordered_set< unsigned int > uniqueParentChildIds;
                 for ( auto const& parentId : parentIds )
                 {
                   uniqueParentChildIds.insert(
                     *relParentOf.at( parentId ).begin( ));
                 }
+                // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
                 for ( auto const& uniqueParentChildId : uniqueParentChildIds )
                 {
                   _propagateSelectedStateToParent(
                     allEntities, relChildOf, relParentOf,
                     relSuperEntityOf, relAGroupOf,
-                    uniqueParentChildId, parentState );
+                    uniqueParentChildId, entityState );
                 }
               }
             } // if subentity
@@ -341,18 +301,18 @@ namespace neuroscheme
                 const auto& subEntities = relSuperEntityOf.at( entityGid );
                 for ( const auto& subEntity : subEntities )
                   SelectionManager::setSelectedState(
-                    allEntities.at( subEntity ), parentState );
+                    allEntities.at( subEntity ), entityState );
               }
 
               // std::cout << "Propagate to children of " << entityGid << std::endl;
               _propagateSelectedStateToChilds(
                 allEntities, relParentOf, relSuperEntityOf,
-                entityGid, parentState );
+                entityGid, entityState );
 
               _propagateSelectedStateToParent(
                 allEntities, relChildOf, relParentOf,
                 relSuperEntityOf, relAGroupOf,
-                entityGid, parentState );
+                entityGid, entityState );
             //std::cout << std::endl;
             }
             //LayoutManager::updateAllScenesSelection( );
@@ -385,10 +345,10 @@ namespace neuroscheme
     if ( relParentOf.count( entityGid ) == 0 )
       return;
     const auto& childrenIds = relParentOf.at( entityGid );
-    std::cout << " -- Parent of: ";
+    // std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
-      std::cout << childId << " ";
+      // std::cout << childId << " ";
       if ( relSuperEntityOf.count( childId ) > 0 )
       {
         const auto& subEntities = relSuperEntityOf.at( childId );
@@ -445,16 +405,29 @@ namespace neuroscheme
     SelectionManager::setSelectedState(
       entities.at( parentId ), state );
 
-    for ( const auto& subEntityId : relSuperEntityOf.at( parentId ))
+    _updateSelectedStateOfSubEntities(
+      entities, relSuperEntityOf, relAGroupOf, parentId );
+
+    _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
+                                     relSuperEntityOf, relAGroupOf,
+                                     parentId, state );
+  }
+
+  void InteractionManager::_updateSelectedStateOfSubEntities(
+    const shift::Entities& entities,
+    const shift::RelationshipOneToN& relSuperEntityOf,
+    const shift::RelationshipOneToN& relAGroupOf,
+    unsigned int entityGid )
+  {
+    for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
     {
       bool allGroupedSelected, noGroupedSelected;
       _queryGroupedSelectedState( entities, relAGroupOf, subEntityId,
                                   allGroupedSelected, noGroupedSelected );
-    //std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
       SelectedState groupedState;
       if ( noGroupedSelected )
         groupedState = SelectedState::UNSELECTED;
-      else if ( allChildrenSelected )
+      else if ( allGroupedSelected )
         groupedState = SelectedState::SELECTED;
       else
         groupedState = SelectedState::PARTIALLY_SELECTED;
@@ -463,10 +436,6 @@ namespace neuroscheme
         entities.at( subEntityId ), groupedState );
 
     }
-
-    _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
-                                     relSuperEntityOf, relAGroupOf,
-                                     parentId, state );
   }
 
   void InteractionManager::queryChildrenSelectedState(
@@ -502,7 +471,7 @@ namespace neuroscheme
     noGroupedSelected = true;
     if ( relAGroupOf.count( entityGid ) == 0 )
     {
-      allGroupedSelected = true;
+      allGroupedSelected = false;
       noGroupedSelected = true;
       return;
     }

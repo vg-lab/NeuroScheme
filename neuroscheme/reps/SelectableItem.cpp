@@ -21,7 +21,7 @@ namespace  neuroscheme
   QPen SelectableItem::_unselectedPen = QPen( Qt::NoPen );
 
   QPen SelectableItem::_hoverUnselectedPen =
-    QPen( QColor( 200, 200, 200, 255 ), 2, Qt::DotLine,
+    QPen( QColor( 90, 90, 90, 255 ), 2, Qt::DotLine,
           Qt::RoundCap, Qt::RoundJoin );
 
   void SelectableItem::init( void )

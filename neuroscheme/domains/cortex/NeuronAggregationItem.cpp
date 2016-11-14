@@ -234,7 +234,6 @@ namespace neuroscheme
           dynamic_cast< NeuronTypeAggregationRep* >(
             neuronTypeAggs[ layer + i * 7 ] );
         assert( neuronTypeAggRep );
-        std::cout << layer + i * 7 << std::endl;
         auto item__ = neuronTypeAggRep->item( scene );
         auto neuronTypeAggItem =
           dynamic_cast< NeuronTypeAggregationItem* >( item__ );
@@ -266,7 +265,6 @@ namespace neuroscheme
           dynamic_cast< NeuronTypeAggregationRep* >(
             neuronTypeAggs[ i * 7 ] );
         assert( neuronTypeAggRep );
-        std::cout << i * 7 << std::endl;
         auto item__ = neuronTypeAggRep->item( scene );
         auto neuronTypeAggItem =
           dynamic_cast< NeuronTypeAggregationItem* >( item__ );

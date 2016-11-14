@@ -662,9 +662,6 @@ namespace neuroscheme
       shift::Entity* colNeuronTypeAggregationEntities[ 14 ];
       for ( auto i = 0; i < 7; ++i )
       {
-        std::cout << "rrr" <<  uint( col->id( )) << "," << uint( 0 )
-                  << "," <<  uint( i ) <<  ","
-                  << (int) neuroscheme::Neuron::PYRAMIDAL << std::endl;
         auto neuronTypeAggregationEntity =
           new neuroscheme::NeuronTypeAggregation(
             uint( col->id( )), uint( 0 ), uint( i ),
@@ -675,9 +672,6 @@ namespace neuroscheme
           colEntity, neuronTypeAggregationEntity );
         _entities.add( neuronTypeAggregationEntity );
 
-        std::cout << "rtt" << uint( col->id( )) << "," << uint( 0 ) << ","
-                  <<  uint( i + 7 ) << "," <<
-          (int)neuroscheme::Neuron::INTERNEURON << std::endl;
         neuronTypeAggregationEntity =
           new neuroscheme::NeuronTypeAggregation(
             uint( col->id( )), uint( 0 ), uint( i ),
@@ -809,7 +803,7 @@ namespace neuroscheme
           auto neuronTypeAggregationEntity =
             new neuroscheme::NeuronTypeAggregation(
               uint( mc->id( )), uint( 1 ), uint( i ),
-              neuroscheme::Neuron::INTERNEURON );
+              neuroscheme::Neuron::PYRAMIDAL );
           mcNeuronTypeAggregationEntities[ i ] = neuronTypeAggregationEntity;
           shift::Relationship::Establish(
             relSuperEntityOf, relSubEntityOf,
@@ -819,7 +813,7 @@ namespace neuroscheme
           neuronTypeAggregationEntity =
             new neuroscheme::NeuronTypeAggregation(
               uint( mc->id( )), uint( 1 ), uint( i ),
-              neuroscheme::Neuron::PYRAMIDAL );
+              neuroscheme::Neuron::INTERNEURON );
           mcNeuronTypeAggregationEntities[ i + 7 ] =
             neuronTypeAggregationEntity;
           shift::Relationship::Establish(

@@ -90,18 +90,18 @@ namespace neuroscheme
       unsigned int entityGid,
       SelectedState state = SelectedState::SELECTED );
 
+    static void _updateSelectedStateOfSubEntities(
+      const shift::Entities& entities,
+      const shift::RelationshipOneToN& relSuperEntityOf,
+      const shift::RelationshipOneToN& relAGroupOf,
+      unsigned int entityGid );
+
     static void _queryGroupedSelectedState(
       const shift::Entities& entities,
       const shift::RelationshipOneToN& relAGroupOf,
       unsigned int entityGid,
       bool& allGroupedSelected,
       bool& noGroupedSelected );
-    // static QPen _selectedPen;
-    // static QPen _partiallySelectedPen;
-    // static QPen _unselectedPen;
-    // static QPen _hoverSelectedPen;
-    // static QPen _hoverPartiallySelectedPen;
-    // static QPen _hoverUnselectedPen;
 
     static QMenu* _contextMenu;
 

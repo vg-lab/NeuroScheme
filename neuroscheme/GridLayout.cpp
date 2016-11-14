@@ -40,8 +40,6 @@ namespace neuroscheme
                                   bool animate,
                                   const shift::Representations& postFilterReps )
   {
-    // std::cout << "pre filter: " << reps.size( ) << std::endl;
-    // std::cout << "post filter: " << postFilterReps.size( ) << std::endl;
     std::unordered_set< QGraphicsItem* > filteredOutItems;
     auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
     bool doFiltering =
@@ -61,10 +59,6 @@ namespace neuroscheme
       else
       {
         auto item = graphicsItemRep->item( _scene );
-        // std::cout << " --- arrange item "
-        //           << "parent=" << item->parentItem( ) << " "
-        //           << "isLayerItem=" << dynamic_cast< LayerItem* >( item )
-        //           << std::endl;
         if ( !item->parentItem( ))
         {
           // std::cout << "++++++ Arranging " << item << std::endl;
