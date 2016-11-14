@@ -19,9 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "RepresentationCreator.h"
 #include "mappers/ColorMapper.h"
 #include "mappers/VariableMapper.h"
 #include "domains/domains.h"
+#include "error.h"
+#include "../../DataManager.h"
 
 namespace neuroscheme
 {
@@ -44,64 +47,90 @@ namespace neuroscheme
       // if ( linkRepsToEntities )
       //   repsToEntities.clear( );
 
-      auto _greenMapper = new DiscreteColorMapper( );
-      auto _redMapper = new DiscreteColorMapper( );
+      DiscreteColorMapper greenMapper;
+      DiscreteColorMapper redMapper;
 
-      _greenMapper->push_back( Color( 0.62 * 255, 1.00 * 255, 0.75 * 255 ));
-      _greenMapper->push_back( Color( 0.55 * 255, 0.88 * 255, 0.65 * 255 ));
-      _greenMapper->push_back( Color( 0.46 * 255, 0.75 * 255, 0.56 * 255 ));
-      _greenMapper->push_back( Color( 0.40 * 255, 0.63 * 255, 0.47 * 255 ));
-      _greenMapper->push_back( Color( 0.31 * 255, 0.51 * 255, 0.37 * 255 ));
-      _greenMapper->push_back( Color( 0.22 * 255, 0.38 * 255, 0.27 * 255 ));
+#define ColorF( r, g, b )                             \
+      Color( uint8_t( roundf( r * 255 )),             \
+             uint8_t( roundf( g * 255 )),             \
+             uint8_t( roundf( b * 255 )))
+      greenMapper.push_back( ColorF( 0.62f, 1.00f, 0.75f ));
+      greenMapper.push_back( ColorF( 0.55f, 0.88f, 0.65f ));
+      greenMapper.push_back( ColorF( 0.46f, 0.75f, 0.56f ));
+      greenMapper.push_back( ColorF( 0.40f, 0.63f, 0.47f ));
+      greenMapper.push_back( ColorF( 0.31f, 0.51f, 0.37f ));
+      greenMapper.push_back( ColorF( 0.22f, 0.38f, 0.27f ));
 
-      _redMapper->push_back( Color( 1.00 * 255, 0.62 * 255, 0.75 * 255 ));
-      _redMapper->push_back( Color( 0.88 * 255, 0.55 * 255, 0.65 * 255 ));
-      _redMapper->push_back( Color( 0.75 * 255, 0.46 * 255, 0.56 * 255 ));
-      _redMapper->push_back( Color( 0.63 * 255, 0.40 * 255, 0.47 * 255 ));
-      _redMapper->push_back( Color( 0.51 * 255, 0.31 * 255, 0.37 * 255 ));
-      _redMapper->push_back( Color( 0.38 * 255, 0.22 * 255, 0.27 * 255 ));
+      redMapper.push_back( ColorF( 1.00f, 0.62f, 0.75f ));
+      redMapper.push_back( ColorF( 0.88f, 0.55f, 0.65f ));
+      redMapper.push_back( ColorF( 0.75f, 0.46f, 0.56f ));
+      redMapper.push_back( ColorF( 0.63f, 0.40f, 0.47f ));
+      redMapper.push_back( ColorF( 0.51f, 0.31f, 0.37f ));
+      redMapper.push_back( ColorF( 0.38f, 0.22f, 0.27f ));
 
-      _greenMapper->max( ) = 100.0f;
-      _redMapper->max( ) = 100.0f;
+      greenMapper.max( ) =
+        _maxNeuronSomaVolume == 0 ? 0.1f : _maxNeuronSomaVolume;
+      redMapper.max( ) =
+        _maxNeuronDendsVolume == 0 ? 0.1f : _maxNeuronDendsVolume;
 
-      const float maxNeuronSomaArea = 100.0f;
-      const float maxNeuronDendArea = 100.0f;
-      auto _somaAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronSomaArea, 0.0f, -360.0f);
-      auto _dendAreaToAngle =
-        new MapperFloatToFloat( 0, maxNeuronDendArea, 0.0f, -360.0f );
+      MapperFloatToFloat somaAreaToAngle(
+        0, _maxNeuronSomaArea == 0 ? 0.1f : _maxNeuronSomaArea, 0, -360 );
+      MapperFloatToFloat dendAreaToAngle(
+        0, _maxNeuronDendsArea == 0 ? 0.1f : _maxNeuronDendsArea, 0, -360 );
 
-      const float maxNeurons = 100.0f;
-      auto _neuronsToPercentage =
-        new MapperFloatToFloat( 0, maxNeurons, 0.0f, 1.0f );
+      // std::cout << "--------------------" << _maxNeurons << std::endl;
+      // std::cout << "max neurons per layer " <<  " " << _maxNeuronsPerColumn
+      //           << " " << _maxNeuronsPerMiniColumn << std::endl;
+      MapperFloatToFloat
+        neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
+      MapperFloatToFloat
+        columnNeuronsToPercentage( 0, _maxNeuronsPerColumn, 0.0f, 1.0f );
+      MapperFloatToFloat
+        miniColumnNeuronsToPercentage(
+          0, _maxNeuronsPerMiniColumn, 0.0f, 1.0f );
 
-
-      for ( const auto entityPair : entities )
+      for ( const auto entity : entities.vector( ))
       {
-        auto& entity = entityPair.second;
+        // std::cout << ", new entity " << entity->entityGid( )
+        //           << " --> LayersMap size = "
+        //             << _layersMap.size( ) << std::endl;
+        // if the entity has already a rep(s) don't create it
+        if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
+        {
+          // std::cout << "Entity with already a rep" << std::endl;
+          for ( const auto rep : entitiesToReps[ entity ] )
+            representations.push_back( rep );
+          continue;
+        }
+//        auto& entity = entityPair.second;
         if ( dynamic_cast< Neuron* >( entity ))
         {
           auto neuron = dynamic_cast< Neuron* >( entity );
           auto neuronRep = new NeuronRep( );
 
-          switch ( neuron->getProperty( "morphoType" ).
+          // std::cout
+          //   << fires::PropertyManager::getPropertyCaster(
+          //     "morphoType" )->toString(
+          //     neuron->getProperty( "morphoType" )) << std::endl;
+          switch ( neuron->getProperty( "Morpho Type" ).
                    value< Neuron::TMorphologicalType >( ))
           {
           case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
             neuronRep->setProperty( "symbol", NeuronRep::NO_SYMBOL );
             break;
           case Neuron::INTERNEURON:
-            neuronRep->setProperty( "symbol", NeuronRep::TRIANGLE );
+            neuronRep->setProperty( "symbol", NeuronRep::CIRCLE );
             break;
           case Neuron::PYRAMIDAL:
-            neuronRep->setProperty( "symbol", NeuronRep::CIRCLE );
+            neuronRep->setProperty( "symbol", NeuronRep::TRIANGLE );
             break;
           default:
             break;
           }
 
           switch (
-            neuron->getProperty( "funcType" ).value< Neuron::TFunctionalType >( ))
+            neuron->getProperty(
+              "Funct Type" ).value< Neuron::TFunctionalType >( ))
           {
           case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
             neuronRep->setProperty( "bg", Color( 100, 100, 100 ));
@@ -123,11 +152,11 @@ namespace neuroscheme
             "angle",
             int(
               roundf(
-                _somaAreaToAngle->map(
-                  neuron->getProperty( "somaVolume" ).value< float >( )))));
-          _greenMapper->value( ) =
-            neuron->getProperty( "somaArea" ).value< float >( );
-          somaRing.setProperty( "color", _greenMapper->map( ));
+                somaAreaToAngle.map(
+                  neuron->getProperty( "Soma Surface" ).value< float >( )))));
+          greenMapper.value( ) =
+            neuron->getProperty( "Soma Volume" ).value< float >( );
+          somaRing.setProperty( "color", greenMapper.map( ));
           rings.push_back( somaRing );
 
           shiftgen::Ring dendRing;
@@ -135,11 +164,12 @@ namespace neuroscheme
             "angle",
             int(
               roundf(
-                _dendAreaToAngle->map(
-                  neuron->getProperty( "dendVolume" ).value< float >( )))));
-          _redMapper->value( ) =
-            neuron->getProperty( "dendArea" ).value< float >( );
-          dendRing.setProperty( "color", _redMapper->map( ));
+                dendAreaToAngle.map(
+                  neuron->getProperty(
+                    "Dendritic Surface" ).value< float >( )))));
+          redMapper.value( ) =
+            neuron->getProperty( "Dendritic Volume" ).value< float >( );
+          dendRing.setProperty( "color", redMapper.map( ));
           rings.push_back( dendRing );
 
 
@@ -153,18 +183,36 @@ namespace neuroscheme
           if ( linkRepsToEntities )
             repsToEntities[ neuronRep ].insert( entity );
         } // end if its Neuron entity
-
+        else
         if ( dynamic_cast< Column* >( entity ))
         {
+          // entity->registerProperty( "tt", uint( 0 ));
+          // std::cout << " id type: "
+          //           << entity->getProperty( "tt" ).type( ) << " --> "
+          //           << demangleType( entity->getProperty( "tt" ).type( )) << "  "
+          //           << entity->getProperty( "Id" ).type( ) << " --> "
+          //           << demangleType( entity->getProperty( "Id" ).type( )) << " "
+          //           << std::endl;
           auto column = dynamic_cast< Column* >( entity );
           auto columnRep = new ColumnRep( );
-          _CreateColumnOrMiniColumn( column, columnRep,
-                                     *_somaAreaToAngle,
-                                     *_dendAreaToAngle,
-                                     *_greenMapper,
-                                     *_redMapper,
-                                     *_neuronsToPercentage );
+       // std::cout << ", RepresentationCreator::_createColumnOrMiniColumn" << std::endl;
+         _createColumnOrMiniColumn(
+            column, columnRep,
+            entity->getProperty( "Id" ).value< uint >( ),
+            0,
+            somaAreaToAngle,
+            dendAreaToAngle,
+            greenMapper,
+            redMapper,
+            neuronsToPercentage,
+            columnNeuronsToPercentage,
+            _layersMap,
+            entitiesToReps, repsToEntities,
+            linkEntitiesToReps, linkRepsToEntities );
           representations.push_back( columnRep );
+          // std::cout << ", POST _createColumnOrMiniColumn LayersMap size = "
+          //           << _layersMap.size( ) << std::endl;
+
 
           if ( linkEntitiesToReps )
             entitiesToReps[ entity ].insert( columnRep );
@@ -172,17 +220,26 @@ namespace neuroscheme
             repsToEntities[ columnRep ].insert( entity );
 
         } // it its MiniColumn entity
+        else
         if ( dynamic_cast< MiniColumn* >( entity ))
         {
-          std::cout << "creating minicolumn rep" << std::endl;
+          // std::cout << "creating minicolumn rep" << std::endl;
           auto miniColumn = dynamic_cast< MiniColumn* >( entity );
           auto miniColumnRep = new MiniColumnRep( );
-          _CreateColumnOrMiniColumn( miniColumn, miniColumnRep,
-                                     *_somaAreaToAngle,
-                                     *_dendAreaToAngle,
-                                     *_greenMapper,
-                                     *_redMapper,
-                                     *_neuronsToPercentage );
+          _createColumnOrMiniColumn(
+            miniColumn, miniColumnRep,
+            entity->getProperty( "Id" ).value< unsigned int >( ),
+            1,
+            somaAreaToAngle,
+            dendAreaToAngle,
+            greenMapper,
+            redMapper,
+            neuronsToPercentage,
+            miniColumnNeuronsToPercentage,
+            _layersMap,
+            entitiesToReps, repsToEntities,
+            linkEntitiesToReps, linkRepsToEntities);
+
           representations.push_back( miniColumnRep );
 
           if ( linkEntitiesToReps )
@@ -190,18 +247,106 @@ namespace neuroscheme
           if ( linkRepsToEntities )
             repsToEntities[ miniColumnRep ].insert( entity );
 
-        } // it its Column entity
+        } // if Column entity
+        else
+        if ( dynamic_cast< Layer* >( entity ))
+        {
+          // std::cout << ", RepresentationCreator::Layer "
+          //           << _layersMap.size( ) << std::endl;
+          auto layerKey = TripleKey(
+              entity->getProperty( "Parent Id" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Layer" ).value< unsigned int >( ));
+          if ( _layersMap.count( layerKey ) == 0 )
+          {
+            _layersMap[ layerKey ] = new LayerRep( );
+          }
+          if ( linkEntitiesToReps )
+            entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
+          if ( linkRepsToEntities )
+            repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
+          representations.push_back( _layersMap[ layerKey ] );
+        } // if Layer
+        else
+        if ( dynamic_cast< NeuronTypeAggregation* >( entity ))
+        {
+          // std::cout << ", RepresentationCreator "
+          //           << _neuronTypeAggsMap.size( ) << std::endl;
+          auto neuronTypeAggregationKey = QuadKey(
+              entity->getProperty( "Parent Id" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Layer" ).value< unsigned int >( ),
+              uint( entity->getProperty( "Morpho Type" ).value<
+                    Neuron::TMorphologicalType >( )));
+
+          // std::cout << "-Quadkey"
+          //           << entity->getProperty( "Parent Id" ).value< unsigned int >( ) << ","
+          //           << entity->getProperty( "Parent Type" ).value< unsigned int >( ) << ","
+          //           << entity->getProperty( "Layer" ).value< unsigned int >( ) << ","
+          //           << uint( entity->getProperty( "Morpho Type" ).value<
+          //                    Neuron::TMorphologicalType >( )) 
+          //           << std::endl;
+
+          if ( _neuronTypeAggsMap.count( neuronTypeAggregationKey ) == 0 )
+          {
+            // std::cout << "+++ Doesnt exist" << std::endl;
+            _neuronTypeAggsMap[ neuronTypeAggregationKey ] =
+              new NeuronTypeAggregationRep( );
+          }
+          if ( linkEntitiesToReps )
+            entitiesToReps[ entity ].insert(
+              _neuronTypeAggsMap.at( neuronTypeAggregationKey ));
+          if ( linkRepsToEntities )
+            repsToEntities[ _neuronTypeAggsMap.at( neuronTypeAggregationKey ) ].
+              insert( entity );
+          representations.push_back(
+            _neuronTypeAggsMap[ neuronTypeAggregationKey ] );
+        } // if NeuronTypeAggregationRep
+
+
+        // std::cout << ", end entity --> LayersMap size = "
+        //           << _layersMap.size( ) << std::endl;
       } // for all entities
+
+
+      // Create subentities
+      const auto& relSuperEntityOf =
+        *( DataManager::entities( ).
+           relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+      shift::Entities subEntities;
+      for ( const auto& entity : entities.vector( ))
+      {
+        auto entityGid = entity->entityGid( );
+        if ( relSuperEntityOf.count( entityGid ) > 0 )
+          for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
+            subEntities.add( DataManager::entities( ).at( subEntity ));
+      }
+      if ( subEntities.size( ) > 0 )
+        this->create( subEntities, representations,
+                      entitiesToReps, repsToEntities,
+                      linkEntitiesToReps, linkRepsToEntities );
     } // create
 
-    void RepresentationCreator::_CreateColumnOrMiniColumn(
+    void RepresentationCreator::_createColumnOrMiniColumn(
       shift::Entity *entity,
       shift::Representation* rep,
+      unsigned int id,
+      unsigned int columnOrMiniColumn,
       MapperFloatToFloat& somaAreaToAngle,
       MapperFloatToFloat& dendAreaToAngle,
       ColorMapper& somaVolumeToColor,
       ColorMapper& dendVolumeToColor,
-      MapperFloatToFloat& neuronsToPercentage )
+      MapperFloatToFloat& neuronsToPercentage,
+      MapperFloatToFloat& layerNeuronsToPercentage,
+      RepresentationCreator::LayersMap& layersMap_,
+      shift::TEntitiesToReps& // entitiesToReps
+      ,
+      shift::TRepsToEntities& // repsToEntities
+      ,
+      bool // linkEntitiesToReps
+      ,
+      bool // linkRepsToEntities
+      )
     {
       NeuronRep meanNeuronRep;
 
@@ -210,17 +355,21 @@ namespace neuroscheme
 
       shiftgen::NeuronAggregationRep::Rings rings;
 
+
+      somaVolumeToColor.value( ) =
+        entity->getProperty( "meanSomaVolume" ).value< float >( );
+
       shiftgen::Ring somaRing;
       somaRing.setProperty(
         "angle",
         int(
           roundf(
             somaAreaToAngle.map(
-              entity->getProperty( "meanSomaVolume" ).
+              entity->getProperty( "meanSomaArea" ).
               value< float >( )))));
       somaVolumeToColor.value( ) =
-        entity->getProperty( "meanSomaArea" ).value< float >( );
-      somaRing.setProperty( "color", dendVolumeToColor.map( ));
+        entity->getProperty( "meanSomaVolume" ).value< float >( );
+      somaRing.setProperty( "color", somaVolumeToColor.map( ));
       rings.push_back( somaRing );
 
       shiftgen::Ring dendRing;
@@ -229,10 +378,10 @@ namespace neuroscheme
         int(
           roundf(
             dendAreaToAngle.map(
-              entity->getProperty( "meanDendVolume" ).
+              entity->getProperty( "meanDendArea" ).
               value< float >( )))));
       dendVolumeToColor.value( ) =
-        entity->getProperty( "meanDendArea" ).value< float >( );
+        entity->getProperty( "meanDendVolume" ).value< float >( );
       dendRing.setProperty( "color", dendVolumeToColor.map( ));
       rings.push_back( dendRing );
 
@@ -241,16 +390,15 @@ namespace neuroscheme
       rep->registerProperty( "meanNeuron", meanNeuronRep );
 
       shiftgen::NeuronAggregationRep::Layers layersReps;
-      shiftgen::LayerRep layerRep;
 
-      (void) neuronsToPercentage;
-      layerRep.setProperty(
+      auto layerRep = new LayerRep;
+      layerRep->setProperty(
         "leftPerc",
         roundf(
           neuronsToPercentage.map(
             entity->getProperty( "Num Pyramidals" ).
             value< float >( ))));
-      layerRep.setProperty(
+      layerRep->setProperty(
         "rightPerc",
         roundf(
           neuronsToPercentage.map(
@@ -258,28 +406,76 @@ namespace neuroscheme
             value< float >( ))));
       layersReps.push_back( layerRep );
 
+
       for ( unsigned int layer = 1; layer <= 6; ++layer )
       {
-        layerRep.setProperty(
+        auto layerKey = TripleKey(
+          id,
+          columnOrMiniColumn,
+          layer );
+
+
+        if ( layersMap_.count( layerKey ) == 0 )
+        {
+          layersMap_[ layerKey ] = new LayerRep( );
+          assert( layersMap_.count( layerKey ) == 1);
+        }
+
+        layerRep = layersMap_[ layerKey ]; //new LayerRep;
+
+        //layerRep = new LayerRep;
+        layerRep->setProperty(
           "leftPerc",
-          roundf(
-            neuronsToPercentage.map(
+            layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Pyr Layer " ) +
                 std::to_string( layer )).
-              value< float >( ))));
-        layerRep.setProperty(
+              value< float >( )));
+        layerRep->setProperty(
           "rightPerc",
-          roundf(
-            neuronsToPercentage.map(
+            layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Inter Layer " ) +
                 std::to_string( layer )).
-              value< float >( ))));
+              value< float >( )));
         layersReps.push_back( layerRep );
       }
       rep->registerProperty( "layers", layersReps );
 
+      NeuronTypeAggregationRep* neuronTypeAggRep;
+      shiftgen::NeuronAggregationRep::NeuronTypeAggregations neuronTypeAggsReps;
+      std::vector< neuroscheme::Neuron::TMorphologicalType>
+        neuronTypes =
+        {
+          neuroscheme::Neuron::PYRAMIDAL,
+          neuroscheme::Neuron::INTERNEURON
+        };
+      for ( const auto& neuronType : neuronTypes )
+      {
+        for ( unsigned int layer = 0; layer <= 6; ++layer )
+        {
+          auto neuronTypeAggKey = QuadKey(
+            id, columnOrMiniColumn, layer, uint( neuronType ));
+
+          // std::cout << "Quadkey" << id  << "," <<  columnOrMiniColumn
+          //           << "," <<  layer <<  "," <<  uint( neuronType ) << std::endl;
+          if ( _neuronTypeAggsMap.count( neuronTypeAggKey ) == 0 )
+            _neuronTypeAggsMap[ neuronTypeAggKey ] =
+              new NeuronTypeAggregationRep( );
+
+          neuronTypeAggRep = _neuronTypeAggsMap[ neuronTypeAggKey ];
+
+          neuronTypeAggRep->setProperty(
+            "symbol",
+            neuronType == neuroscheme::Neuron::PYRAMIDAL ?
+            NeuronTypeAggregationRep::TSymbol::TRIANGLE :
+            NeuronTypeAggregationRep::TSymbol::CIRCLE );
+          neuronTypeAggsReps.push_back( neuronTypeAggRep );
+        }
+      }
+      rep->registerProperty( "neuronTypeAggregations", neuronTypeAggsReps );
+      // std::cout << ", End of _createColumnOrMiniColumn LayersMap size = "
+      //           << layersMap_.size( ) << std::endl;
     }
 
 

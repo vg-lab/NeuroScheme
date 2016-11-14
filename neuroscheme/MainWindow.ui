@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>NeuroScheme</string>
+   <string>MainWindow</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
@@ -24,64 +24,12 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="actionLoadBlueConfig"/>
-    <addaction name="actionOpenXmlScene"/>
-    <addaction name="actionCloseData"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionAbout"/>
-   </widget>
-   <widget class="QMenu" name="menuSelect">
-    <property name="title">
-     <string>Select</string>
-    </property>
-    <addaction name="actionClearSelection"/>
-    <addaction name="actionClearViewingSelection"/>
-    <addaction name="actionSelectAllViewed"/>
-    <addaction name="actionDisplaySelectedNeurons"/>
-   </widget>
-   <widget class="QMenu" name="menuOptions">
-    <property name="title">
-     <string>Options</string>
-    </property>
-    <addaction name="actionSearchAndFilter"/>
-    <addaction name="actionStoredSelections"/>
-    <addaction name="separator"/>
-    <addaction name="actionLoadMorphologies"/>
-    <addaction name="separator"/>
-    <addaction name="actionEnableZeroEQ"/>
-    <addaction name="actionZeroEQSession"/>
-    <addaction name="actionAutomaticSelectionPublishing"/>
-    <addaction name="actionPublishSelection"/>
-    <addaction name="actionAutoFocusOnDisplayed"/>
-    <addaction name="actionFocusOnDisplayed"/>
-    <addaction name="actionAutoFocusOnSelection"/>
-    <addaction name="actionFocusOnSelection"/>
-    <addaction name="actionCellSetOperation"/>
-    <addaction name="separator"/>
-    <addaction name="actionStreamDisplayCluster"/>
-    <addaction name="actionDisplayClusterHostAddress"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuSelect"/>
-   <addaction name="menuOptions"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -91,188 +39,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadBlueConfig"/>
-   <addaction name="actionOpenXmlScene"/>
-   <addaction name="actionCloseData"/>
    <addaction name="separator"/>
-   <addaction name="actionHome"/>
-   <addaction name="actionFullscreen"/>
-   <addaction name="actionChangeCameraView"/>
-   <addaction name="separator"/>
-   <addaction name="actionEnableZeroEQ"/>
-   <addaction name="actionAutoFocusOnDisplayed"/>
-   <addaction name="actionFocusOnDisplayed"/>
-   <addaction name="actionAutoFocusOnSelection"/>
-   <addaction name="actionFocusOnSelection"/>
-   <addaction name="actionCellSetOperation"/>
-   <addaction name="separator"/>
-   <addaction name="actionStreamDisplayCluster"/>
-   <addaction name="separator"/>
-   <addaction name="actionSearchAndFilter"/>
+   <addaction name="actionLayouts"/>
    <addaction name="actionStoredSelections"/>
   </widget>
-  <action name="actionClearSelection">
-   <property name="text">
-    <string>Clear Selection</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+C</string>
-   </property>
-  </action>
-  <action name="actionClearViewingSelection">
-   <property name="text">
-    <string>Clear Selected Viewed Neurons</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+C</string>
-   </property>
-  </action>
-  <action name="actionSelectAllViewed">
-   <property name="text">
-    <string>Select All Viewed Neurons</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+E</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About...</string>
-   </property>
-  </action>
-  <action name="actionLoadBlueConfig">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/open_bc.png</normaloff>:/icons/open_bc.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Load BlueConfig</string>
-   </property>
-   <property name="toolTip">
-    <string>Load a BlueConfig file</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+B</string>
-   </property>
-  </action>
-  <action name="actionCloseData">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;CloseData</string>
-   </property>
-   <property name="toolTip">
-    <string>Close Data</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
-   </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>&amp;Exit</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-  </action>
-  <action name="actionEnableZeroEQ">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/network.png</normaloff>:/icons/network.png</iconset>
-   </property>
-   <property name="text">
-    <string>Enable ZeroEQ</string>
-   </property>
-   <property name="toolTip">
-    <string>Enable ZeroEQ connection</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+Z</string>
-   </property>
-  </action>
-  <action name="actionChangeCameraView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/switch_camera.png</normaloff>:/icons/switch_camera.png</iconset>
-   </property>
-   <property name="text">
-    <string>Change camera view</string>
-   </property>
-   <property name="toolTip">
-    <string>Change from grid to 3D view</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+V</string>
-   </property>
-  </action>
-  <action name="actionZeroEQSession">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>ZeroEQ session</string>
-   </property>
-  </action>
-  <action name="actionHome">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
-   </property>
-   <property name="text">
-    <string>Home</string>
-   </property>
-   <property name="toolTip">
-    <string>Go to top-level view</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+H</string>
-   </property>
-  </action>
-  <action name="actionStreamDisplayCluster">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/deflect.png</normaloff>:/icons/deflect.png</iconset>
-   </property>
-   <property name="text">
-    <string>Stream to DisplayCluster</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle streaming to DisplayCluster</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+D</string>
-   </property>
-  </action>
-  <action name="actionDisplayClusterHostAddress">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Display Cluster host address</string>
-   </property>
-  </action>
-  <action name="actionSearchAndFilter">
+  <action name="actionLayouts">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -288,120 +59,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
-   </property>
-  </action>
-  <action name="actionAutoFocusOnDisplayed">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/autofocusondisplayed.png</normaloff>:/icons/autofocusondisplayed.png</iconset>
-   </property>
-   <property name="text">
-    <string>Auto focus on layer event</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto focus on displayed elements</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+A</string>
-   </property>
-  </action>
-  <action name="actionFocusOnDisplayed">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/focusondisplayed.png</normaloff>:/icons/focusondisplayed.png</iconset>
-   </property>
-   <property name="text">
-    <string>Focus on layer event</string>
-   </property>
-   <property name="toolTip">
-    <string>Focus on displayed elements</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+E</string>
-   </property>
-  </action>
-  <action name="actionAutoFocusOnSelection">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/autofocus.png</normaloff>:/icons/autofocus.png</iconset>
-   </property>
-   <property name="text">
-    <string>Auto focus on selection event</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto focus on selection event</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+D</string>
-   </property>
-  </action>
-  <action name="actionFocusOnSelection">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/focusonselection.png</normaloff>:/icons/focusonselection.png</iconset>
-   </property>
-   <property name="text">
-    <string>Focus on selection event</string>
-   </property>
-   <property name="toolTip">
-    <string>Focus on selection event</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+E</string>
-   </property>
-  </action>
-  <action name="actionOpenXmlScene">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/open_xml.png</normaloff>:/icons/open_xml.png</iconset>
-   </property>
-   <property name="text">
-    <string>Open Xml scene</string>
-   </property>
-   <property name="toolTip">
-    <string>Open Xml scene</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+X</string>
-   </property>
-  </action>
-  <action name="actionFullscreen">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/fullscreen.png</normaloff>:/icons/fullscreen.png</iconset>
-   </property>
-   <property name="text">
-    <string>Fullscreen</string>
-   </property>
-   <property name="toolTip">
-    <string>Show window in fullscreen</string>
-   </property>
-   <property name="shortcut">
-    <string>F11</string>
    </property>
   </action>
   <action name="actionStoredSelections">
@@ -420,74 +77,6 @@
    </property>
    <property name="shortcut">
     <string>Shift+S</string>
-   </property>
-  </action>
-  <action name="actionLoadMorphologies">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Load morphologies</string>
-   </property>
-   <property name="toolTip">
-    <string>Load morphologies</string>
-   </property>
-  </action>
-  <action name="actionCellSetOperation">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/cellsetop.png</normaloff>:/icons/cellsetop.png</iconset>
-   </property>
-   <property name="text">
-    <string>Cell Set Operation Dock</string>
-   </property>
-   <property name="toolTip">
-    <string>Cell Set Binary Operation Dock</string>
-   </property>
-  </action>
-  <action name="actionDisplaySelectedNeurons">
-   <property name="text">
-    <string>Display Selected Neurons</string>
-   </property>
-   <property name="toolTip">
-    <string>Display Selected Neurons</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+D</string>
-   </property>
-  </action>
-  <action name="actionAutomaticSelectionPublishing">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Automatic selection publishing</string>
-   </property>
-   <property name="toolTip">
-    <string>Automatic selection publishing</string>
-   </property>
-  </action>
-  <action name="actionPublishSelection">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Publish Selection</string>
-   </property>
-   <property name="shortcut">
-    <string>Alt+S</string>
    </property>
   </action>
  </widget>

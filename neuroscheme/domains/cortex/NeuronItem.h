@@ -34,11 +34,16 @@ namespace neuroscheme
 {
 
   class NeuronItem
-    : public QGraphicsEllipseItem
+    : public QObject
+    , public QGraphicsEllipseItem
     , public Item
     , public SelectableItem
     , public InteractiveItem
   {
+    Q_OBJECT
+    Q_PROPERTY( QPointF pos READ pos WRITE setPos )
+    Q_PROPERTY( qreal scale READ scale WRITE setScale )
+    // Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
   public:
 
@@ -48,28 +53,28 @@ namespace neuroscheme
 
     virtual ~NeuronItem( void ) {}
 
-    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
-        InteractionManager::hoverEnterEvent( this, event );
+        InteractionManager::hoverEnterEvent( this, event_ );
     }
 
-    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
-        InteractionManager::hoverLeaveEvent( this, event );
+        InteractionManager::hoverLeaveEvent( this, event_ );
     }
 
-    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
     {
       if ( _interactive )
-        InteractionManager::contextMenuEvent( this, event );
+        InteractionManager::contextMenuEvent( this, event_ );
     }
 
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event )
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
     {
       if ( _interactive )
-        InteractionManager::mousePressEvent( this, event );
+        InteractionManager::mousePressEvent( this, event_ );
     }
 
 

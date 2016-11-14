@@ -24,7 +24,9 @@
 
 #include <shift_Neuron.h>
 #include <shift_Column.h>
+#include <shift_Layer.h>
 #include <shift_MiniColumn.h>
+#include <shift_NeuronTypeAggregation.h>
 #include "../../SelectionManager.h"
 
 namespace neuroscheme
@@ -38,6 +40,8 @@ namespace neuroscheme
   // };
   using Column = shiftgen::Column;
   using MiniColumn = shiftgen::MiniColumn;
+  using Layer = shiftgen::Layer;
+  using NeuronTypeAggregation = shiftgen::NeuronTypeAggregation;
 
 } // namespace neuroscheme
 

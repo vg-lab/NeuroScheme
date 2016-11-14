@@ -28,6 +28,7 @@
 #include "../../reps/Item.h"
 #include "../../reps/InteractiveItem.h"
 #include "ColumnRep.h"
+#include "LayerRep.h"
 #include "NeuronRep.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>
@@ -40,17 +41,36 @@ namespace neuroscheme
 {
 
   using Layers = shiftgen::NeuronAggregationRep::Layers;
+  using NeuronTypeAggregations =
+    shiftgen::NeuronAggregationRep::NeuronTypeAggregations;
 
   class LayerItem
     : public QObject
     , public QGraphicsPathItem
+    , public Item
+    , public SelectableItem
+    , public InteractiveItem
   {
     Q_OBJECT
     Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
   public:
 
-    LayerItem( unsigned int layer_,
+
+  LayerItem( const LayerRep& layerRep );
+      // unsigned int layer_,
+      //   QGraphicsItem *parent_ //,
+        // const QPoint& pLayerUL,
+        // const QPoint& pLayerUM,
+        // const QPoint& pLayerUR,
+        // unsigned int layerHeight,
+        // unsigned int numNeuronsHeight,
+        // float percPyr,
+        // float percInter,
+        // const QBrush& brush_
+        //);
+
+  void create( unsigned int layer_,
                QGraphicsItem *parent_,
                const QPoint& pLayerUL,
                const QPoint& pLayerUM,
@@ -60,15 +80,44 @@ namespace neuroscheme
                float percPyr,
                float percInter,
                const QBrush& brush_ );
-
     unsigned int& layer( void );
-
     virtual ~LayerItem( void ) {}
+
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverEnterEvent( this, event_ );
+    }
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverLeaveEvent( this, event_ );
+    }
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+    {
+      InteractionManager::contextMenuEvent( this, event_ );
+    }
+
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
+    {
+      InteractionManager::mousePressEvent( this, event_ );
+    }
+
+//     virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* // event_
+//       )
+//     {
+//       std::cout << "enter layer" << std::endl;
+// //InteractionManager::hoverEnterEvent( this, event_ );
+//     }
+//     virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* // event_
+//       )
+//     {
+//       std::cout << "leave layer" << std::endl;
+//       //InteractionManager::hoverLeaveEvent( this, event_ );
+//     }
 
 
   public slots:
 
-    void disable(void)
+    void disable( void )
     {
       this->setEnabled( false );
       this->setVisible( false );
@@ -79,13 +128,18 @@ namespace neuroscheme
   };
 
 
+
   class NeuronAggregationItem
-    : public QGraphicsPathItem
+    : public QObject
+    , public QGraphicsPathItem
     , public Item
     , public CollapsableItem
     , public SelectableItem
     , public InteractiveItem
   {
+    Q_OBJECT
+    Q_PROPERTY( QPointF pos READ pos WRITE setPos )
+    Q_PROPERTY( qreal scale READ scale WRITE setScale )
 
   public:
 
@@ -100,30 +154,32 @@ namespace neuroscheme
     void collapse( bool anim = true );
     void uncollapse( bool anim = true );
 
-    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
-      InteractionManager::hoverEnterEvent( this, event );
+      InteractionManager::hoverEnterEvent( this, event_ );
     }
-    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event )
+    virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
-      InteractionManager::hoverLeaveEvent( this, event );
+      InteractionManager::hoverLeaveEvent( this, event_ );
     }
-    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
     {
-      InteractionManager::contextMenuEvent( this, event );
+      InteractionManager::contextMenuEvent( this, event_ );
     }
 
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event )
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
     {
-      InteractionManager::mousePressEvent( this, event );
+      InteractionManager::mousePressEvent( this, event_ );
     }
 
 
   protected:
 
     void _createNeuronAggregationItem(
+      QGraphicsScene* scene,
       const NeuronRep& meanNeuron,
       const Layers& layers,
+      const NeuronTypeAggregations& neuronTypeAggs,
       const QPainterPath& path,
       const QPoint& layerLeftPoint,
       const QPoint& layerCenterPoint,

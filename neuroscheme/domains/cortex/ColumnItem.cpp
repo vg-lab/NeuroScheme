@@ -1,13 +1,14 @@
 #include "../../error.h"
+#include "../../reps/CollapseButtonItem.h"
 #include "ColumnItem.h"
 #include "NeuronItem.h"
-#include "../../reps/CollapseButtonItem.h"
 #include <QPen>
 
 namespace neuroscheme
 {
 
   ColumnItem::ColumnItem( const ColumnRep& columnRep,
+                          QGraphicsScene* scene,
                           unsigned int size )
     : NeuronAggregationItem( )
   {
@@ -16,6 +17,9 @@ namespace neuroscheme
       columnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
     const auto& layers =
       columnRep.getProperty( "layers" ).value< ColumnRep::Layers >( );
+    const auto& neuronAggReps =
+      columnRep.getProperty( "neuronTypeAggregations" ).
+      value< ColumnRep::NeuronTypeAggregations >( );
 
     // Create the polygon for the basic column icon
     QPainterPath path_;
@@ -33,8 +37,10 @@ namespace neuroscheme
     path_.closeSubpath(  );
 
     _createNeuronAggregationItem(
+      scene,
       meanNeuron,
       layers,
+      neuronAggReps,
       path_,
       pLL, pLM, pLR,
       QColor( 114, 188, 196 ),

@@ -82,6 +82,8 @@ namespace neuroscheme
 #ifdef NEUROSCHEME_USE_LEXIS
     static void _selectionUpdateCallback ( lexis::data::ConstSelectedIDsPtr )
       NEUROSCHEME_USE_ZEROEQ_IMPL;
+    static void _modelViewUpdatedCallback ( lexis::render::ConstLookOutPtr )
+      NEUROSCHEME_USE_ZEROEQ_IMPL;
 #endif
 
     static bool _publishSelection;
@@ -92,7 +94,6 @@ namespace neuroscheme
 #endif
 
     static SubscriberTimer* _timer;
-
 
   };
 } // namespace neuroscheme

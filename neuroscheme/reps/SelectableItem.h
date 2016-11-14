@@ -23,6 +23,9 @@
 #define __NEUROSCHEME__SELECTABLE_ITEM__
 
 #include "../SelectedState.h"
+#include <QPen>
+#include <QAbstractGraphicsShapeItem>
+#include <iostream>
 
 namespace neuroscheme
 {
@@ -33,15 +36,20 @@ namespace neuroscheme
   public:
 
     SelectableItem( SelectedState selected_ = SelectedState::UNSELECTED )
-      : _selected( selected_ ) { }
+      : _selected( selected_ )
+      , _hover( false ) { }
 
     virtual ~SelectableItem( void ) { }
 
-    void select( void ) { _selected = SelectedState::SELECTED; }
-    void unselect( void ) { _selected = SelectedState::UNSELECTED; }
-    void setSelected( SelectedState selected_ = SelectedState::SELECTED )
+    virtual void select( void )
+    { _selected = SelectedState::SELECTED; _updatePen( ); }
+    virtual void unselect( void )
+    { _selected = SelectedState::UNSELECTED; _updatePen( ); }
+    virtual void setSelected(
+      SelectedState selected_ = SelectedState::SELECTED )
     {
       _selected = selected_;
+      _updatePen( );
     }
     void toggleSelected( void )
     {
@@ -49,6 +57,7 @@ namespace neuroscheme
         _selected = SelectedState::UNSELECTED;
       else if ( _selected == SelectedState::UNSELECTED )
         _selected = SelectedState::SELECTED;
+      _updatePen( );
     }
 
     bool selected( void ) const
@@ -56,14 +65,56 @@ namespace neuroscheme
       return _selected == SelectedState::SELECTED;
     };
 
+    SelectedState selectedState( void ) const
+    {
+      return _selected;;
+    };
+
     bool partiallySelected( void ) const
     {
       return _selected == SelectedState::PARTIALLY_SELECTED;
     };
 
+    void hover( bool hover_ ) { _hover = hover_; }
+
+    static const QPen& hoverUnselectedPen( ) { return _hoverUnselectedPen; };
+    static const QPen& selectedPen( ) { return _selectedPen; };
+    static const QPen& unselectedPen( ) { return _unselectedPen; };
+    static const QPen& partiallySelectedPen( )
+    { return _partiallySelectedPen; };
+    static void init( void );
   protected:
 
+    void _updatePen( )
+    {
+      // std::cout << "update pen1" << std::endl;
+      auto item = dynamic_cast< QAbstractGraphicsShapeItem* >( this );
+      if ( item )
+      {
+        // std::cout << "update pen2" << std::endl;
+        switch ( _selected )
+        {
+        case SelectedState::SELECTED:
+          item->setPen( _hover ? _hoverSelectedPen : _selectedPen );
+          break;
+        case SelectedState::UNSELECTED:
+          item->setPen( _hover ? _hoverUnselectedPen : _unselectedPen );
+          break;
+        case SelectedState::PARTIALLY_SELECTED:
+          item->setPen( _hover ? _hoverPartiallySelectedPen :
+                        _partiallySelectedPen );
+          break;
+        }
+      }
+    }
     SelectedState _selected;
+    bool _hover;
+    static QPen _selectedPen;
+    static QPen _partiallySelectedPen;
+    static QPen _unselectedPen;
+    static QPen _hoverSelectedPen;
+    static QPen _hoverPartiallySelectedPen;
+    static QPen _hoverUnselectedPen;
 
   };
 

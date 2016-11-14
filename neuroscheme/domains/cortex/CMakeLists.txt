@@ -2,7 +2,8 @@ include( shift_generate_cxx )
 
 set( CURRENT_DOMAIN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/domains/cortex )
 # Generate objects
-set( SHIFT_GENERATED_OBJECTS Neuron Column MiniColumn )
+set( SHIFT_GENERATED_OBJECTS
+  Neuron Column MiniColumn Layer NeuronTypeAggregation )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -19,7 +20,8 @@ foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
 endforeach( )
 
 # Generate representations
-set( SHIFT_GENERATED_OBJECTS NeuronRep Ring LayerRep NeuronAggregationRep )
+set( SHIFT_GENERATED_OBJECTS
+  NeuronRep Ring LayerRep NeuronTypeAggregationRep NeuronAggregationRep )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -40,9 +42,12 @@ set( NEUROSCHEME_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
   ${CURRENT_DOMAIN_SOURCE_DIR}/ColumnItem.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/ColumnRep.cpp
+  ${CURRENT_DOMAIN_SOURCE_DIR}/LayerRep.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/MiniColumnItem.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/MiniColumnRep.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronAggregationItem.cpp
+  ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronTypeAggregationItem.cpp
+  ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronTypeAggregationRep.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronRep.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronItem.cpp
   ${CURRENT_DOMAIN_SOURCE_DIR}/RepresentationCreator.cpp
@@ -54,9 +59,12 @@ set( NEUROSCHEME_HEADERS
   ${CURRENT_DOMAIN_SOURCE_DIR}/Neuron.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/ColumnItem.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/ColumnRep.h
+  ${CURRENT_DOMAIN_SOURCE_DIR}/LayerRep.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/MiniColumnItem.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/MiniColumnRep.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronAggregationItem.h
+  ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronTypeAggregationItem.h
+  ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronTypeAggregationRep.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronRep.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/NeuronItem.h
   ${CURRENT_DOMAIN_SOURCE_DIR}/RepresentationCreator.h

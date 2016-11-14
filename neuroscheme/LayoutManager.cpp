@@ -144,7 +144,7 @@ namespace neuroscheme
 
           }
         }
-        std::cout << &scene << " add item " << std::endl;
+        //std::cout << &scene << " add item " << std::endl;
         scene.addItem( item );
         QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 

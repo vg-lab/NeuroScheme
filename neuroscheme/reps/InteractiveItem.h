@@ -31,8 +31,14 @@ namespace neuroscheme
   {
   public:
 
-    InteractiveItem( void )
+    enum
+    {
+      HIERARCHY_ENABLED = 0x01,
+    };
+
+    InteractiveItem( unsigned int flags_ = 0 )
       : _interactive( true )
+      , _interactiveItemFlags( flags_ )
     {
     }
     virtual ~InteractiveItem( void ) { }
@@ -47,8 +53,14 @@ namespace neuroscheme
       return _interactive;
     }
 
+    unsigned int interactiveItemFlags( void )
+    {
+      return _interactiveItemFlags;
+    }
+
   protected:
     bool _interactive;
+    unsigned int _interactiveItemFlags;
 
   };
 

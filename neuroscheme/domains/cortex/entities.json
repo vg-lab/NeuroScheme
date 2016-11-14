@@ -3,34 +3,39 @@
         {
             "name": "Neuron",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
             "properties": [
                 {
                     "name": "gid",
                     "type": "uint"
                 },
                 {
-                    "name": "morphoType",
+                    "name": "Morpho Type",
                     "type": "TMorphologicalType"
                 },
                 {
-                    "name": "funcType",
+                    "name": "Funct Type",
                     "type": "TFunctionalType"
                 },
                 {
-                    "name": "somaVolume",
+                    "name": "Soma Volume",
                     "type": "float"
                 },
                 {
-                    "name": "somaArea",
+                    "name": "Soma Surface",
                     "type": "float"
                 },
                 {
-                    "name": "dendVolume",
+                    "name": "Dendritic Volume",
                     "type": "float"
                 },
                 {
-                    "name": "dendArea",
+                    "name": "Dendritic Surface",
                     "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
                 }
             ],
             "types": [
@@ -57,7 +62,12 @@
         {
             "name": "Column",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
             "properties": [
+                {
+                    "name": "Id",
+                    "type": "uint"
+                },
                 {
                     "name": "Num Neurons",
                     "type": "float"
@@ -133,97 +143,159 @@
                 {
                     "name": "meanDendArea",
                     "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
+                }
+
+            ],
+            "types":
+            [
+            ]
+        },
+        {
+            "name": "MiniColumn",
+            "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
+            "properties": [
+                {
+                    "name": "Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Num Neurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyramidals",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Interneurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaArea",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendArea",
+                    "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
+                }
+
+            ],
+            "types":
+            [
+            ]
+        },
+        {
+            "name": "Layer",
+            "namespace": "neuroscheme::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Parent Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Parent Type",
+                    "type": "uint"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint"
                 }
             ],
             "types":
             [
             ]
         },
-                {
-            "name": "MiniColumn",
+        {
+            "name": "NeuronTypeAggregation",
             "namespace": "neuroscheme::shiftgen",
+            "includes" : [ "<shift_Neuron.h>" ],
             "properties": [
                 {
-                    "name": "Num Neurons",
-                    "type": "float"
+                    "name": "Parent Id",
+                    "type": "uint"
                 },
                 {
-                    "name": "Num Pyramidals",
-                    "type": "float"
+                    "name": "Parent Type",
+                    "type": "uint"
                 },
                 {
-                    "name": "Num Interneurons",
-                    "type": "float"
+                    "name": "Layer",
+                    "type": "uint"
                 },
                 {
-                    "name": "Num Pyr Layer 1",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Pyr Layer 2",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Pyr Layer 3",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Pyr Layer 4",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Pyr Layer 5",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Pyr Layer 6",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 1",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 2",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 3",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 4",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 5",
-                    "type": "float"
-                },
-                {
-                    "name": "Num Inter Layer 6",
-                    "type": "float"
-                },
-                {
-                    "name": "meanSomaVolume",
-                    "type": "float"
-                },
-                {
-                    "name": "meanSomaArea",
-                    "type": "float"
-                },
-                {
-                    "name": "meanDendVolume",
-                    "type": "float"
-                },
-                {
-                    "name": "meanDendArea",
-                    "type": "float"
+                    "name": "Morpho Type",
+                    "type": "Neuron::TMorphologicalType"
                 }
             ],
             "types":
             [
             ]
         }
-
     ]
 }

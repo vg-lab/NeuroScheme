@@ -24,6 +24,7 @@
 #include <zeroeq/zeroeq.h>
 #include <lexis/lexis.h>
 #include <QObject>
+#include "PaneManager.h"
 
 #ifdef NEUROSCHEME_USE_GMRVLEX
 #include <gmrvlex/gmrvlex.h>
@@ -39,7 +40,6 @@ namespace neuroscheme
   zeroeq::Subscriber* ZeroEQManager::_subscriber = nullptr;
   zeroeq::Publisher* ZeroEQManager::_publisher = nullptr;
   SubscriberTimer* ZeroEQManager::_timer = nullptr;
-
 
   SubscriberTimer::SubscriberTimer( void )
   {
@@ -88,6 +88,11 @@ namespace neuroscheme
       { _selectionUpdateCallback(
           lexis::data::SelectedIDs::create( data, size ));});
 
+    _subscriber->subscribe(
+      lexis::render::LookOut::ZEROBUF_TYPE_IDENTIFIER(),
+      [&]( const void* data, const size_t size )
+      { _modelViewUpdatedCallback(
+          lexis::render::LookOut::create( data, size ));});
 
     _timer->start( 50 );
   }
@@ -95,7 +100,7 @@ namespace neuroscheme
   void ZeroEQManager::publishSelection(
     const std::vector< unsigned int >& gids )
   {
-    if ( _publishSelection )
+    if ( _publisher && _publishSelection )
     {
       neuroscheme::Log::log(
         std::string( "NeuroScheme: publishing selection with " +
@@ -104,26 +109,32 @@ namespace neuroscheme
         neuroscheme::LOG_LEVEL_VERBOSE );
       _publisher->publish( lexis::data::SelectedIDs( gids ) );
     }
-    std::cout << "Publish GIDS: ";
-    for ( auto gid : gids )
-    {
-      std::cout << gid << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Publish GIDS: ";
+    // for ( auto gid : gids )
+    // {
+    //   std::cout << gid << " ";
+    // }
+    // std::cout << std::endl;
 
   }
 
   void ZeroEQManager::_selectionUpdateCallback (
     lexis::data::ConstSelectedIDsPtr event )
   {
-    std::cout << "Received GIDS: ";
-    for ( auto gid : event->getIdsVector( ))
-    {
-      std::cout << gid << " ";
-    }
+    std::cout << "Received " << event->getIdsVector( ).size( ) << " GIDS: ";
+    // for ( auto gid : event->getIdsVector( ))
+    // {
+    //   std::cout << gid << " ";
+    // }
     std::cout << std::endl;
     SelectionManager::setSelectionFromSelectableEntitiesIds(
       event->getIdsVector( ));
+  }
+
+  void ZeroEQManager::_modelViewUpdatedCallback (
+    lexis::render::ConstLookOutPtr event )
+  {
+    PaneManager::setViewMatrix( event->getMatrix( ));
   }
 
   zeroeq::Subscriber* ZeroEQManager::subscriber( void )

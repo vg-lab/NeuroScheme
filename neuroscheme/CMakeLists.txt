@@ -20,37 +20,56 @@ set( NEUROSCHEME_SOURCES
   ${PROJECT_BINARY_DIR}/src/version.cpp
   MainWindow.ui
   resources.qrc
+  CameraBasedLayout.cpp
   Canvas.cpp
   Color.cpp
+  Config.cpp
   DataManager.cpp
   DomainManager.cpp
+  FilterWidget.cpp
+  GridLayout.cpp
   InteractionManager.cpp
-  LayoutManager.cpp
+  Layout.cpp
+  #LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
   mappers/ColorMapper.cpp
   mappers/VariableMapper.cpp
   neuroScheme.cpp
+  PaneManager.cpp
   RepresentationCreatorManager.cpp
   reps/CollapseButtonItem.cpp
   reps/RingItem.cpp
+  reps/SelectableItem.cpp
+  qxt/qxtspanslider.cpp
+  ScatterPlotLayout.cpp
+  ScatterPlotWidget.cpp
   SelectionManager.cpp
+  SortWidget.cpp
   ZeroEQManager.cpp
   )
 
 set( NEUROSCHEME_HEADERS
   ${PROJECT_BINARY_DIR}/include/neuroscheme/version.h
+  CameraBasedLayout.h
   Canvas.h
   Color.h
+  Config.h
   DataManager.h
   DomainManager.cpp
   error.h
+  FilterWidget.h
+  GridLayout.h
   InteractionManager.h
+  Layout.h
   LayoutManager.h
   Log.h
   MainWindow.h
   mappers/ColorMapper.h
   mappers/VariableMapper.h
+  PaneManager.h
+  qxt/qxtspanslider.h
+  qxt/qxtspanslider_p.h
   RepresentationCreatorManager.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h
@@ -59,12 +78,16 @@ set( NEUROSCHEME_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
+  ScatterPlotLayout.h
+  ScatterPlotWidget.h
   SelectedState.h
   SelectionManager.h
-  ZeroEQManager.cpp
+  SortWidget.h
+  ZeroEQManager.h
   )
 
 include ( domains/cortex/CMakeLists.txt )
+include ( domains/spines/CMakeLists.txt )
 
 set( NEUROSCHEME_LINK_LIBRARIES
   ShiFT
@@ -84,6 +107,10 @@ endif( )
 
 if ( TARGET gmrvlex )
   list( APPEND NEUROSCHEME_LINK_LIBRARIES gmrvlex )
+endif( )
+
+if ( TARGET nsol )
+  list( APPEND NEUROSCHEME_LINK_LIBRARIES nsol )
 endif( )
 
 

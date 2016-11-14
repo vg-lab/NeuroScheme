@@ -31,6 +31,8 @@
 namespace neuroscheme
 {
 
+  class LayerRep;
+  class NeuronTypeAggregationRep;
   namespace cortex
   {
 
@@ -48,15 +50,63 @@ namespace neuroscheme
         bool linkRepsToObjs = false );
 
 
+      void setMaximums( float maxNeuronSomaVolume_,
+                        float maxNeuronSomaArea_,
+                        float maxNeuronDendsVolume_,
+                        float maxNeuronDendsArea_,
+                        unsigned int maxNeurons_,
+                        unsigned int maxNeuronsPerColumn_,
+                        unsigned int maxNeuronsPerMiniColumn_ )
+      {
+        _maxNeuronSomaVolume = maxNeuronSomaVolume_;
+        _maxNeuronSomaArea = maxNeuronSomaArea_;
+        _maxNeuronDendsVolume = maxNeuronDendsVolume_;
+        _maxNeuronDendsArea = maxNeuronDendsArea_;
+        _maxNeurons = maxNeurons_;
+        _maxNeuronsPerColumn = maxNeuronsPerColumn_;
+        _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+      }
+
     protected:
-      void _CreateColumnOrMiniColumn(
+      #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
+      typedef std::map<
+        std::pair< unsigned int, std::pair< unsigned int, unsigned int>>,
+      LayerRep* > LayersMap;
+      #define QuadKey( x, y, z, w ) \
+        std::make_pair( x, std::make_pair( y, std::make_pair( z, w )))
+      typedef std::map<
+        std::pair< unsigned int,
+                   std::pair< unsigned int,
+                              std::pair< unsigned int,
+                                         unsigned int>>>,
+        NeuronTypeAggregationRep* > NeuronTypeAggsMaps;
+
+      void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
+        unsigned int id,
+        unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
         MapperFloatToFloat& dendAreaToAngle,
         ColorMapper& somaVolumeToColor,
         ColorMapper& dendVolumeToColor,
-        MapperFloatToFloat& neuronsToPercentage );
+        MapperFloatToFloat& neuronsToPercentage,
+        MapperFloatToFloat& layerNeuronsToPercentage,
+        LayersMap& layersMap,
+        shift::TEntitiesToReps& entitiesToReps,
+        shift::TRepsToEntities& repsToEntities,
+        bool linkEntitiesToReps,
+        bool linkRepsToEntities );
+
+      float _maxNeuronSomaVolume;
+      float _maxNeuronSomaArea;
+      float _maxNeuronDendsVolume;
+      float _maxNeuronDendsArea;
+      unsigned int _maxNeurons;
+      unsigned int _maxNeuronsPerColumn;
+      unsigned int _maxNeuronsPerMiniColumn;
+      LayersMap _layersMap;
+      NeuronTypeAggsMaps _neuronTypeAggsMap;
     };
 
     // class RepresentationCreatorManager

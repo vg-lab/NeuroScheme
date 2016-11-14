@@ -55,11 +55,12 @@ namespace neuroscheme
     unsigned int repCreatorId )
   {
     //TODO check if exists
-    _repCreators[ repCreatorId ]->create( entities, representations,
-                                          _entitiesToReps[ repCreatorId ],
-                                          _repsToEntities[ repCreatorId ],
-                                          linkEntitiesToReps,
-                                          linkRepsToObjs );
+    if ( _repCreators.count( repCreatorId ) == 1 )
+      _repCreators[ repCreatorId ]->create( entities, representations,
+                                            _entitiesToReps[ repCreatorId ],
+                                            _repsToEntities[ repCreatorId ],
+                                            linkEntitiesToReps,
+                                            linkRepsToObjs );
   }
 
   const shift::TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(

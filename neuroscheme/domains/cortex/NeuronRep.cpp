@@ -17,6 +17,11 @@ namespace neuroscheme
   {
   }
 
+  NeuronRep::NeuronRep( const neuroscheme::shiftgen::NeuronRep& other )
+    : neuroscheme::shiftgen::NeuronRep( other )
+  {
+  }
+
 
   QGraphicsItem* NeuronRep::item( QGraphicsScene* scene, bool create )
   {

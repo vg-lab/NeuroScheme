@@ -31,13 +31,13 @@ namespace neuroscheme
 {
 
 
-  using LayerRep = shiftgen::LayerRep;
+//  using LayerRep = shiftgen::LayerRep;
 
-  namespace shiftgen
-  {
-    using ColumnRep = shiftgen::NeuronAggregationRep;
-  }
+  // namespace shiftgen
+  // {
+  //   using ColumnRep = shiftgen::NeuronAggregationRep;
 
+  // }
   class ColumnRep
     : public shiftgen::NeuronAggregationRep
     , public QGraphicsItemRepresentation
@@ -46,6 +46,7 @@ namespace neuroscheme
 
     ColumnRep( void );
     ColumnRep( const ColumnRep& );
+    ColumnRep( const neuroscheme::shiftgen::NeuronAggregationRep& );
     virtual ~ColumnRep( void ) {}
     QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                          bool create = true );

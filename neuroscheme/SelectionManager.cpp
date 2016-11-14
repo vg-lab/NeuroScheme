@@ -21,7 +21,7 @@
  */
 #include "DataManager.h"
 #include "DomainManager.h"
-#include "LayoutManager.h"
+#include "PaneManager.h"
 #include "SelectionManager.h"
 
 namespace neuroscheme
@@ -156,7 +156,7 @@ namespace neuroscheme
     // TODO improve, this map could be computed once per domain
     std::unordered_map< unsigned int, shift::Entity* > idToEntity;
     const auto& entities = DataManager::entities( );
-    for ( const auto& entity : entities)
+    for ( const auto& entity : entities.map( ))
     {
       if ( domain->isSelectableEntity( entity.second ))
         idToEntity[ domain->selectableEntityId( entity.second ) ] =
@@ -213,8 +213,8 @@ namespace neuroscheme
           setSelectedState( entity, SelectedState::SELECTED );
 
         if ( relChildOf.find( entityGid ) != relChildOf.end( ) &&
-             entities.find( relChildOf[ entityGid ] ) !=
-             entities.end( ))
+             entities.map( ).find( relChildOf[ entityGid ] ) !=
+             entities.map( ).end( ))
         {
           // std::cout << entity->entityGid( ) << " child of " <<
           //   relChildOf[ entity->entityGid( ) ] << std::endl;
@@ -234,10 +234,9 @@ namespace neuroscheme
     //             << int( getSelectedState( entity.second )) << std::endl;
     // }
     std::cout << _activeSelection.size( ) << std::endl;
-    LayoutManager::updateAllScenesSelection( );
-
+    // LayoutManager::updateAllScenesSelection( );
+    PaneManager::updateSelection( );
   }
-
 
 
 } // namespace neuroscheme
