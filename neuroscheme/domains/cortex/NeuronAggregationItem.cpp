@@ -104,7 +104,7 @@ namespace neuroscheme
 
 
   void NeuronAggregationItem::_createNeuronAggregationItem(
-    QGraphicsScene* scene,
+    QGraphicsScene* scene_,
     const NeuronRep& meanNeuron,
     const Layers& layers,
     const NeuronTypeAggregations& neuronTypeAggs,
@@ -205,7 +205,7 @@ namespace neuroscheme
 
       auto layerRep = dynamic_cast< LayerRep* >( layers[ layer ] );
       assert( layerRep );
-      auto item_ = layerRep->item( scene );
+      auto item_ = layerRep->item( scene_ );
       auto layerItem = dynamic_cast< LayerItem* >( item_ );
       assert( layerItem );
       layerItem->create(
@@ -234,7 +234,7 @@ namespace neuroscheme
           dynamic_cast< NeuronTypeAggregationRep* >(
             neuronTypeAggs[ layer + i * 7 ] );
         assert( neuronTypeAggRep );
-        auto item__ = neuronTypeAggRep->item( scene );
+        auto item__ = neuronTypeAggRep->item( scene_ );
         auto neuronTypeAggItem =
           dynamic_cast< NeuronTypeAggregationItem* >( item__ );
         assert( neuronTypeAggItem );
@@ -265,7 +265,7 @@ namespace neuroscheme
           dynamic_cast< NeuronTypeAggregationRep* >(
             neuronTypeAggs[ i * 7 ] );
         assert( neuronTypeAggRep );
-        auto item__ = neuronTypeAggRep->item( scene );
+        auto item__ = neuronTypeAggRep->item( scene_ );
         auto neuronTypeAggItem =
           dynamic_cast< NeuronTypeAggregationItem* >( item__ );
         assert( neuronTypeAggItem );

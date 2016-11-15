@@ -8,12 +8,12 @@ namespace neuroscheme
 {
 
   NeuronTypeAggregationItem::NeuronTypeAggregationItem(
-    const NeuronTypeAggregationRep& parentRep )
+    const NeuronTypeAggregationRep& parentRep_ )
   {
     setAcceptHoverEvents( true );
     setFlags( QGraphicsItem::ItemIsPanel );
     assert( this->isPanel( ));
-    this->_parentRep = &( const_cast< NeuronTypeAggregationRep& >( parentRep ));
+    this->_parentRep = &( const_cast< NeuronTypeAggregationRep& >( parentRep_ ));
   }
 
   class Triangle

@@ -8,7 +8,7 @@ namespace neuroscheme
 {
 
   ColumnItem::ColumnItem( const ColumnRep& columnRep,
-                          QGraphicsScene* scene,
+                          QGraphicsScene* scene_,
                           unsigned int size )
     : NeuronAggregationItem( )
   {
@@ -37,7 +37,7 @@ namespace neuroscheme
     path_.closeSubpath(  );
 
     _createNeuronAggregationItem(
-      scene,
+      scene_,
       meanNeuron,
       layers,
       neuronAggReps,

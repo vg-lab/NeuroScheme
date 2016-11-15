@@ -11,10 +11,10 @@ namespace neuroscheme
   {
   }
 
-  void GraphicsView::mousePressEvent( QMouseEvent* event )
+  void GraphicsView::mousePressEvent( QMouseEvent* event_ )
   {
     PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));
-    QGraphicsView::mousePressEvent( event );
+    QGraphicsView::mousePressEvent( event_ );
   }
 
   void GraphicsView::wheelEvent( QWheelEvent* event_ )

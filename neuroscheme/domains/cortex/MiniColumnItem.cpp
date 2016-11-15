@@ -8,7 +8,7 @@ namespace neuroscheme
 {
 
   MiniColumnItem::MiniColumnItem( const MiniColumnRep& miniColumnRep,
-                                  QGraphicsScene* scene,
+                                  QGraphicsScene* scene_,
                                   unsigned int size )
     : NeuronAggregationItem( )
   {
@@ -45,7 +45,7 @@ namespace neuroscheme
     path_.addPolygon( poly );
     path_.closeSubpath(  );
     _createNeuronAggregationItem(
-      scene,
+      scene_,
       meanNeuron,
       layers,
       neuronAggReps,
