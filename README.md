@@ -1,1 +1,53 @@
-NeuroScheme
+# NeuroScheme
+
+## Introduction
+
+NeuroScheme is a tool for navigating, exploring and interacting with
+NeuroScience data using abstract, schematic or expressive representations. This
+project is a refactor of https://gitlab.gmrv.es/nsviz/neuroscheme.git
+
+## Dependencies
+
+* Required dependencies:
+    * ShiFT (requires FiReS and Boost )
+    * Qt5
+    * Eigen3
+
+* Optional dependencies:
+    * nsol: needed to load data via nsol. In order to load BlueConfig files nsol
+      has to be built with Brion support.
+    * ZeroEQ & Lexis: enables syncing selections, syncing camera position and
+      sending binary cell set operations
+    * (TODO) gmrvlex: enables sending focus messages
+    * (TODO) Deflect: eanbles streaming the main window of the app
+
+In order to check which optional dependencies have been used the following
+command can be used:
+
+```bash
+./NeuroScheme --version
+```
+
+
+## Building
+
+NeuroScheme has been succesfully built and used on Ubuntu 14.04, Mac OSX
+Yosemite and Windows 7/8 Visual Studio 2013 Win64. The following steps should be
+enough to build it just with the required dependencies.
+
+```bash
+git clone https://gitlab.gmrv.es/nsviz/NeuroScheme.git
+mkdir neuroscheme/build && cd neuroscheme/build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+## Running
+
+All the features should be accesible using the GUI but some of the are also
+available through CLI. Running the following can provide a list of the CLI
+arguments NeuroScheme accepts:
+
+```bash
+./NeuroScheme --help
+```
