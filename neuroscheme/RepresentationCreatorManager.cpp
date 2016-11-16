@@ -74,4 +74,16 @@ namespace neuroscheme
     return _repsToEntities[ repCreatorId ];
   }
 
+  void RepresentationCreatorManager::deleteItemsOfCanvas( Canvas* canvas )
+  {
+    for ( auto& entitiesToReps : _entitiesToReps )
+      for ( auto& entityToReps : entitiesToReps.second )
+        for ( auto& rep : entityToReps.second )
+        {
+          auto qGraphicsRep =
+            dynamic_cast< QGraphicsItemRepresentation* >( rep );
+          if ( qGraphicsRep )
+            qGraphicsRep->deleteItem( &canvas->scene( ));
+        }
+  }
 }

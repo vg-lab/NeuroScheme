@@ -56,6 +56,20 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
+  QActionGroup* splitTypeGroup = new QActionGroup( this );
+  _ui->actionSplitHorizontally->setCheckable( true );
+  _ui->actionSplitHorizontally->setActionGroup( splitTypeGroup );
+  _ui->actionSplitVertically->setCheckable( true );
+  _ui->actionSplitVertically->setActionGroup( splitTypeGroup );
+  _ui->actionSplitVertically->setChecked( true );
+  connect( splitTypeGroup, SIGNAL( triggered( QAction* )),
+           this, SLOT( paneDivisionChanged(  )));
+
+  connect( _ui->actionDuplicatePane, SIGNAL( triggered( )),
+           this, SLOT( duplicateActivePane( )));
+  connect( _ui->actionKillPane, SIGNAL( triggered( )),
+           this, SLOT( killActivePane( )));
+
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
@@ -378,4 +392,25 @@ void MainWindow::deleteStoredSelection( void )
 void MainWindow::sortStoredSelectionsTable( int column )
 {
   _storedSelections.table->sortByColumn( column );
+}
+
+
+void MainWindow::paneDivisionChanged( void )
+{
+  neuroscheme::PaneManager::paneDivision(
+    _ui->actionSplitVertically->isChecked( ) ?
+    neuroscheme::PaneManager::VERTICAL :
+    neuroscheme::PaneManager::HORIZONTAL );
+}
+
+
+void MainWindow::killActivePane( void )
+{
+  neuroscheme::PaneManager::killActivePane( );
+}
+
+void MainWindow::duplicateActivePane( void )
+{
+  neuroscheme::PaneManager::newPaneFromActivePane( );
+
 }

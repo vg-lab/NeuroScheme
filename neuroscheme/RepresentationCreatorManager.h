@@ -47,6 +47,8 @@ namespace neuroscheme
     static const shift::TRepsToEntities& repsToEntities(
       unsigned int repCreatorId = 0 );
 
+    static void deleteItemsOfCanvas( Canvas* canvas );
+
     // static const shift::Representation& objectToRep(
   protected:
     static std::map< unsigned int, shift::RepresentationCreator* > _repCreators;

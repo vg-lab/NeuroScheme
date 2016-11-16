@@ -56,6 +56,13 @@ namespace neuroscheme
       _items.clear( );
     }
 
+    virtual void deleteItem( QGraphicsScene* scene_ )
+    {
+      auto it = _items.find( scene_ );
+      if ( it != _items.end( ))
+        delete it->second;
+    }
+
   protected:
 
     std::map< QGraphicsScene*, QGraphicsItem* > _items;

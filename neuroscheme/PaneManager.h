@@ -56,16 +56,20 @@ namespace neuroscheme
       VERTICAL
     } TPaneDivision;
 
-    static Canvas* newPane( Canvas* orig = nullptr,
-                            TPaneDivision division = HORIZONTAL );
-
-    static Canvas* newPaneFromActivePane( TPaneDivision division = HORIZONTAL );
+    static Canvas* newPane( Canvas* orig = nullptr );
+    static Canvas* newPaneFromActivePane( void );
+    static void killActivePane( void );
+    static void killPane( Canvas* orig );
 
     static void setViewMatrix( const double* values );
 
     using Matrix4f = Eigen::Matrix4f;
     static const Matrix4f& viewMatrix( void ) { return _modelViewMatrix; }
 
+    static void paneDivision( TPaneDivision paneDivision_ )
+    {
+      _paneDivision = paneDivision_;
+    }
   protected:
     static QSplitter* _splitter;
     static Canvas* _activePane;
@@ -77,7 +81,7 @@ namespace neuroscheme
 
     static Matrix4f _modelViewMatrix;
     static std::chrono::time_point< std::chrono::system_clock > lastMatrixClock;
-
+    static TPaneDivision _paneDivision;
   };
 } // namespace neuroscheme
 

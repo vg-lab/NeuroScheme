@@ -13,7 +13,10 @@ namespace neuroscheme
 
   void GraphicsView::mousePressEvent( QMouseEvent* event_ )
   {
-    PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));
+    if ( this->parentWidget( ) &&
+         dynamic_cast< Canvas* >( this->parentWidget( )))
+      PaneManager::activePane(
+        dynamic_cast< Canvas* >( this->parentWidget( )));
     QGraphicsView::mousePressEvent( event_ );
   }
 
@@ -128,10 +131,15 @@ namespace neuroscheme
     switch( event_->key( ))
     {
     case Qt::Key_H:
-      PaneManager::newPane( this, PaneManager::HORIZONTAL );
+      PaneManager::paneDivision( PaneManager::HORIZONTAL );
+      PaneManager::newPane( this );
       break;
     case Qt::Key_V:
-      PaneManager::newPane( this, PaneManager::VERTICAL );
+      PaneManager::paneDivision( PaneManager::VERTICAL );
+      PaneManager::newPane( this );
+      break;
+    case Qt::Key_K:
+      PaneManager::killPane( this );
       break;
     default:
       break;

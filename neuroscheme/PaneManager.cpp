@@ -39,6 +39,8 @@ namespace neuroscheme
     Eigen::Matrix4f::Identity( );
   std::chrono::time_point< std::chrono::system_clock >
   PaneManager::lastMatrixClock = std::chrono::system_clock::now( );
+  PaneManager::TPaneDivision PaneManager::_paneDivision =
+    PaneManager::VERTICAL;
 
   void PaneManager::splitter( QSplitter* splitter_ )
   {
@@ -139,30 +141,36 @@ namespace neuroscheme
     _layout = layout_;
   }
 
-  Canvas* PaneManager::newPaneFromActivePane( TPaneDivision division )
+  Canvas* PaneManager::newPaneFromActivePane( void )
   {
-    return newPane( _activePane, division );
+    return newPane( _activePane );
   }
 
-  Canvas* PaneManager::newPane( Canvas* orig, TPaneDivision division )
+  Canvas* PaneManager::newPane( Canvas* orig )
   {
-    ( void ) division;
     assert( _splitter );
     Canvas* canvas;
     if ( !orig )
     {
-      canvas = new Canvas( _splitter->parentWidget( ));
+      canvas = new Canvas( _splitter ); //->parentWidget( ));
       _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
     }
     else
     {
       canvas = orig->clone( );
-      _splitter->addWidget( canvas );
-      auto sizes = _splitter->sizes( );
-      for ( auto& size_ : sizes )
-        size_ = 100;
-      _splitter->setSizes( sizes );
+      auto parentSplitter =
+        dynamic_cast< QSplitter* >( orig->parentWidget( ));
+      assert( parentSplitter );
+      auto newSplitter = new QSplitter(
+        _paneDivision == TPaneDivision::HORIZONTAL ? Qt::Vertical :
+        Qt::Horizontal );
+      auto index = parentSplitter->indexOf( orig );
+      parentSplitter->insertWidget( index, newSplitter );
+      newSplitter->addWidget( orig );
+      newSplitter->addWidget( canvas );
+      newSplitter->setStretchFactor( 0, 1 );
+      newSplitter->setStretchFactor( 1, 1 );
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );
@@ -170,6 +178,46 @@ namespace neuroscheme
     canvas->show( );
 
     return canvas;
+  }
+
+  void PaneManager::killPane( Canvas* orig )
+  {
+    auto parentSplitter =
+      dynamic_cast< QSplitter* >( orig->parentWidget( ));
+    assert( parentSplitter );
+    auto grandParentSplitter =
+      dynamic_cast< QSplitter* >( parentSplitter->parentWidget( ));
+
+    if ( grandParentSplitter )
+    {
+      // std::cout << "index of parent to kill" << parentSplitter->indexOf( orig ) << std::endl;
+      auto indexOfSibling = parentSplitter->indexOf( orig ) == 0 ? 0 : 1;
+      auto sibling = dynamic_cast< Canvas* >(
+        parentSplitter->children( )[ indexOfSibling ] );
+      //WAR review if there is a better way
+      if( sibling == orig )
+      {
+        indexOfSibling = parentSplitter->indexOf( orig ) == 0 ? 1 : 0;
+        sibling = dynamic_cast< Canvas* >(
+          parentSplitter->children( )[ indexOfSibling ] );
+      }
+      assert( sibling != orig );
+      assert( sibling );
+      auto indexOfParentSplitter =
+        grandParentSplitter->indexOf( parentSplitter );
+       grandParentSplitter->insertWidget( indexOfParentSplitter, sibling );
+       auto paneIt = std::find( _panes.begin( ), _panes.end( ), orig );
+       _panes.erase( paneIt );
+       delete orig;
+       delete parentSplitter;
+       _activePane = sibling;
+
+    }
+  }
+
+  void PaneManager::killActivePane( void )
+  {
+    killPane( _activePane );
   }
 
   void PaneManager::setViewMatrix( const double* values )
