@@ -24,9 +24,20 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuPanes">
+    <property name="title">
+     <string>Panes</string>
+    </property>
+    <addaction name="actionDuplicatePane"/>
+    <addaction name="actionKillPane"/>
+    <addaction name="separator"/>
+    <addaction name="actionSplitVertically"/>
+    <addaction name="actionSplitHorizontally"/>
+   </widget>
+   <addaction name="menuPanes"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -77,6 +88,32 @@
    </property>
    <property name="shortcut">
     <string>Shift+S</string>
+   </property>
+  </action>
+  <action name="actionSplitHorizontally">
+   <property name="text">
+    <string>Split horizontally</string>
+   </property>
+  </action>
+  <action name="actionSplitVertically">
+   <property name="text">
+    <string>Split vertically</string>
+   </property>
+  </action>
+  <action name="actionKillPane">
+   <property name="text">
+    <string>Kill pane</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
+  </action>
+  <action name="actionDuplicatePane">
+   <property name="text">
+    <string>Duplicate Pane</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
  </widget>
