@@ -34,9 +34,7 @@ namespace neuroscheme
                        size,
                        size );
     somaItem->setPen( Qt::NoPen );
-    somaItem->setBrush( QBrush( QColor( bgColor.r( ),
-                                        bgColor.g( ),
-                                        bgColor.b( ))));
+    somaItem->setBrush( QBrush( bgColor ));
 
     QGraphicsItem* symbolItem = _createSymbolItem( symbol, size );
 

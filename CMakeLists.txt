@@ -52,6 +52,7 @@ include( Common )
 
 common_find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 common_find_package( ShiFT REQUIRED )
+common_find_package( scoop REQUIRED )
 common_find_package( Qt5Widgets SYSTEM REQUIRED )
 common_find_package( Eigen3 SYSTEM REQUIRED )
 common_find_package( nsol ${NEUROSCHEME_OPTS_FIND_ARGS} )
@@ -61,7 +62,7 @@ common_find_package( Servus ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package( gmrvlex ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package_post( )
 
-list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT Qt5Widgets )
+list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT scoop Qt5Widgets )
 
 add_subdirectory( neuroscheme )
 

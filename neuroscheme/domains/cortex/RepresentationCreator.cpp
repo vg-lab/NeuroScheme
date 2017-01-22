@@ -19,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include <scoop/scoop.h>
 #include "RepresentationCreator.h"
-#include "mappers/ColorMapper.h"
 #include "mappers/VariableMapper.h"
 #include "domains/domains.h"
 #include "error.h"
@@ -47,40 +47,22 @@ namespace neuroscheme
       // if ( linkRepsToEntities )
       //   repsToEntities.clear( );
 
-      DiscreteColorMapper greenMapper;
-      DiscreteColorMapper redMapper;
+      scoop::SequentialColorMap greenMapper(
+        scoop::ColorPalette::colorBrewerSequential(
+          scoop::ColorPalette::ColorBrewerSequential::Greens, 6 ),
+        0.0f, ( _maxNeuronSomaVolume == 0 ? 0.1f : _maxNeuronSomaVolume ));
 
-#define ColorF( r, g, b )                             \
-      Color( uint8_t( roundf( r * 255 )),             \
-             uint8_t( roundf( g * 255 )),             \
-             uint8_t( roundf( b * 255 )))
-      greenMapper.push_back( ColorF( 0.62f, 1.00f, 0.75f ));
-      greenMapper.push_back( ColorF( 0.55f, 0.88f, 0.65f ));
-      greenMapper.push_back( ColorF( 0.46f, 0.75f, 0.56f ));
-      greenMapper.push_back( ColorF( 0.40f, 0.63f, 0.47f ));
-      greenMapper.push_back( ColorF( 0.31f, 0.51f, 0.37f ));
-      greenMapper.push_back( ColorF( 0.22f, 0.38f, 0.27f ));
+      scoop::SequentialColorMap redMapper(
+        scoop::ColorPalette::colorBrewerSequential(
+          scoop::ColorPalette::ColorBrewerSequential::Reds, 6 ),
+        0.0f, ( _maxNeuronDendsVolume == 0 ? 0.1f : _maxNeuronDendsVolume ));
 
-      redMapper.push_back( ColorF( 1.00f, 0.62f, 0.75f ));
-      redMapper.push_back( ColorF( 0.88f, 0.55f, 0.65f ));
-      redMapper.push_back( ColorF( 0.75f, 0.46f, 0.56f ));
-      redMapper.push_back( ColorF( 0.63f, 0.40f, 0.47f ));
-      redMapper.push_back( ColorF( 0.51f, 0.31f, 0.37f ));
-      redMapper.push_back( ColorF( 0.38f, 0.22f, 0.27f ));
-
-      greenMapper.max( ) =
-        _maxNeuronSomaVolume == 0 ? 0.1f : _maxNeuronSomaVolume;
-      redMapper.max( ) =
-        _maxNeuronDendsVolume == 0 ? 0.1f : _maxNeuronDendsVolume;
 
       MapperFloatToFloat somaAreaToAngle(
         0, _maxNeuronSomaArea == 0 ? 0.1f : _maxNeuronSomaArea, 0, -360 );
       MapperFloatToFloat dendAreaToAngle(
         0, _maxNeuronDendsArea == 0 ? 0.1f : _maxNeuronDendsArea, 0, -360 );
 
-      // std::cout << "--------------------" << _maxNeurons << std::endl;
-      // std::cout << "max neurons per layer " <<  " " << _maxNeuronsPerColumn
-      //           << " " << _maxNeuronsPerMiniColumn << std::endl;
       MapperFloatToFloat
         neuronsToPercentage( 0, _maxNeurons, 0.0f, 1.0f );
       MapperFloatToFloat
@@ -154,9 +136,13 @@ namespace neuroscheme
               roundf(
                 somaAreaToAngle.map(
                   neuron->getProperty( "Soma Surface" ).value< float >( )))));
-          greenMapper.value( ) =
-            neuron->getProperty( "Soma Volume" ).value< float >( );
-          somaRing.setProperty( "color", greenMapper.map( ));
+          // greenMapper.value( ) =
+          //   neuron->getProperty( "Soma Volume" ).value< float >( );
+          // somaRing.setProperty( "color", greenMapper.map( ));
+          somaRing.setProperty(
+            "color",
+            greenMapper.getColor(
+              neuron->getProperty( "Soma Volume" ).value< float >( )));
           rings.push_back( somaRing );
 
           shiftgen::Ring dendRing;
@@ -167,9 +153,13 @@ namespace neuroscheme
                 dendAreaToAngle.map(
                   neuron->getProperty(
                     "Dendritic Surface" ).value< float >( )))));
-          redMapper.value( ) =
-            neuron->getProperty( "Dendritic Volume" ).value< float >( );
-          dendRing.setProperty( "color", redMapper.map( ));
+          // redMapper.value( ) =
+          //   neuron->getProperty( "Dendritic Volume" ).value< float >( );
+          // dendRing.setProperty( "color", redMapper.map( ));
+          dendRing.setProperty(
+            "color",
+            redMapper.getColor(
+              neuron->getProperty( "Dendritic Volume" ).value< float >( )));
           rings.push_back( dendRing );
 
 
@@ -334,8 +324,8 @@ namespace neuroscheme
       unsigned int columnOrMiniColumn,
       MapperFloatToFloat& somaAreaToAngle,
       MapperFloatToFloat& dendAreaToAngle,
-      ColorMapper& somaVolumeToColor,
-      ColorMapper& dendVolumeToColor,
+      scoop::SequentialColorMap& somaVolumeToColor,
+      scoop::SequentialColorMap& dendVolumeToColor,
       MapperFloatToFloat& neuronsToPercentage,
       MapperFloatToFloat& layerNeuronsToPercentage,
       RepresentationCreator::LayersMap& layersMap_,
@@ -356,8 +346,8 @@ namespace neuroscheme
       shiftgen::NeuronAggregationRep::Rings rings;
 
 
-      somaVolumeToColor.value( ) =
-        entity->getProperty( "meanSomaVolume" ).value< float >( );
+      // somaVolumeToColor.value( ) =
+      //   entity->getProperty( "meanSomaVolume" ).value< float >( );
 
       shiftgen::Ring somaRing;
       somaRing.setProperty(
@@ -367,9 +357,13 @@ namespace neuroscheme
             somaAreaToAngle.map(
               entity->getProperty( "meanSomaArea" ).
               value< float >( )))));
-      somaVolumeToColor.value( ) =
-        entity->getProperty( "meanSomaVolume" ).value< float >( );
-      somaRing.setProperty( "color", somaVolumeToColor.map( ));
+      // somaVolumeToColor.value( ) =
+      //   entity->getProperty( "meanSomaVolume" ).value< float >( );
+      // somaRing.setProperty( "color", somaVolumeToColor.map( ));
+      somaRing.setProperty(
+        "color",
+        somaVolumeToColor.getColor(
+          entity->getProperty( "meanSomaVolume" ).value< float >( )));
       rings.push_back( somaRing );
 
       shiftgen::Ring dendRing;
@@ -380,9 +374,13 @@ namespace neuroscheme
             dendAreaToAngle.map(
               entity->getProperty( "meanDendArea" ).
               value< float >( )))));
-      dendVolumeToColor.value( ) =
-        entity->getProperty( "meanDendVolume" ).value< float >( );
-      dendRing.setProperty( "color", dendVolumeToColor.map( ));
+      // dendVolumeToColor.value( ) =
+      //   entity->getProperty( "meanDendVolume" ).value< float >( );
+      // dendRing.setProperty( "color", dendVolumeToColor.map( ));
+      dendRing.setProperty(
+        "color",
+        dendVolumeToColor.getColor(
+          entity->getProperty( "meanDendVolume" ).value< float >( )));
       rings.push_back( dendRing );
 
       meanNeuronRep.registerProperty( "rings", rings );
