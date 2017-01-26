@@ -23,7 +23,7 @@
 #define __NEUROSCHEME__REPRESENTATION_CREATOR__
 #include <shift/shift.h>
 #include "mappers/VariableMapper.h"
-#include "mappers/ColorMapper.h"
+#include <scoop/scoop.h>
 
 #include <unordered_map>
 #include <set>
@@ -88,8 +88,8 @@ namespace neuroscheme
         unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
         MapperFloatToFloat& dendAreaToAngle,
-        ColorMapper& somaVolumeToColor,
-        ColorMapper& dendVolumeToColor,
+        scoop::SequentialColorMap& somaVolumeToColor,
+        scoop::SequentialColorMap& dendVolumeToColor,
         MapperFloatToFloat& neuronsToPercentage,
         MapperFloatToFloat& layerNeuronsToPercentage,
         LayersMap& layersMap,

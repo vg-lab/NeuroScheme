@@ -22,7 +22,7 @@ set( NEUROSCHEME_SOURCES
   resources.qrc
   CameraBasedLayout.cpp
   Canvas.cpp
-  Color.cpp
+  # Color.cpp
   Config.cpp
   DataManager.cpp
   DomainManager.cpp
@@ -33,7 +33,7 @@ set( NEUROSCHEME_SOURCES
   #LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
-  mappers/ColorMapper.cpp
+  # mappers/ColorMapper.cpp
   mappers/VariableMapper.cpp
   neuroScheme.cpp
   PaneManager.cpp
@@ -65,7 +65,7 @@ set( NEUROSCHEME_HEADERS
   LayoutManager.h
   Log.h
   MainWindow.h
-  mappers/ColorMapper.h
+  # mappers/ColorMapper.h
   mappers/VariableMapper.h
   PaneManager.h
   qxt/qxtspanslider.h
@@ -91,6 +91,7 @@ include ( domains/spines/CMakeLists.txt )
 
 set( NEUROSCHEME_LINK_LIBRARIES
   ShiFT
+  scoop
   Qt5::Widgets
   )
 

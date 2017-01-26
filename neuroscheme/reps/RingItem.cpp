@@ -34,10 +34,7 @@ namespace neuroscheme
     QPainterPath ringFill = outerFill.subtracted( innerFill );
     this->setPath( ringFill );
 
-    setBrush( QBrush(
-                QColor( color.r( ),
-                        color.g( ),
-                        color.b( ))));
+    setBrush( QBrush( color ));
 
   }
 
