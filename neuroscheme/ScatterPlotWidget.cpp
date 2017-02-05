@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Layout.h"
+#include "layouts/Layout.h"
 #include "ScatterPlotWidget.h"
 
 namespace neuroscheme

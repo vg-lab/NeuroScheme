@@ -1,7 +1,7 @@
 #ifndef __NEUROSCHEME__CANVAS__
 #define __NEUROSCHEME__CANVAS__
 
-#include "Layouts.h"
+#include "layouts/Layouts.h"
 #include <QWidget>
 #include <QGraphicsView>
 #include <QMouseEvent>

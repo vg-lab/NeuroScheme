@@ -60,13 +60,15 @@ namespace neuroscheme
     _storedSelections.clear( );
   }
 
-  void SelectionManager::storeActiveSelection( const std::string& selectionName )
+  void SelectionManager::storeActiveSelection(
+    const std::string& selectionName )
   {
     _storedSelections[ selectionName ] = _activeSelection;
 //    return _storedSelectionNextId++;
   }
 
-  void SelectionManager::restoreStoredSelection( const std::string& selectionName )
+  void SelectionManager::restoreStoredSelection(
+    const std::string& selectionName )
   {
     _activeSelection = _storedSelections[ selectionName ];
   }

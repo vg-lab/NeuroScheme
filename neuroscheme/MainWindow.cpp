@@ -22,14 +22,15 @@
 #include "MainWindow.h"
 #include "DataManager.h"
 #include "DomainManager.h"
-#include "GridLayout.h"
-#include "CameraBasedLayout.h"
 #include "Config.h"
-#include "LayoutManager.h"
 #include "PaneManager.h"
-#include "ScatterPlotLayout.h"
 #include "SelectionManager.h"
 #include "Log.h"
+#include "layouts/CircularLayout.h"
+#include "layouts/GridLayout.h"
+#include "layouts/CameraBasedLayout.h"
+#include "layouts/LayoutManager.h"
+#include "layouts/ScatterPlotLayout.h"
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -82,7 +83,8 @@ MainWindow::MainWindow( QWidget* parent_ )
   if ( neuroscheme::Config::cliDataSource ==
        neuroscheme::Config::CLI_BLUECONFIG )
   {
-    neuroscheme::DataManager::loadBlueConfig(
+ std::cout << "Loading blue config" << std::endl;
+       neuroscheme::DataManager::loadBlueConfig(
       neuroscheme::Config::cliInputFile,
       neuroscheme::Config::targetLabel,
       neuroscheme::Config::loadMorphologies,
@@ -98,6 +100,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   canvas->addLayout( new neuroscheme::GridLayout( ));
   canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
   canvas->addLayout( new neuroscheme::ScatterPlotLayout( ));
+  canvas->addLayout( new neuroscheme::CircularLayout( ));
   canvas->displayEntities(
     neuroscheme::DataManager::rootEntities( ), false, true );
   neuroscheme::PaneManager::panes( ).insert( canvas );
@@ -352,7 +355,10 @@ void MainWindow::restoreSelection( void )
     neuroscheme::SelectionManager::restoreStoredSelection(
       label.toStdString( ));
     resizeEvent( nullptr );
-
+    for ( const auto& pane : neuroscheme::PaneManager( ).panes( ))
+    {
+      pane->resizeEvent( 0 );
+    }
   }
 }
 

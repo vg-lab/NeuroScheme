@@ -95,13 +95,13 @@ namespace neuroscheme
                                     const bool loadMorphologies,
                                     const std::string& csvNeuronStatsFileName )
   {
-    QErrorMessage errorMessage;
+    auto  errorMessage = new QErrorMessage;
 #ifndef NSOL_USE_BRION
     ( void ) blueConfig;
     ( void ) targetLabel;
     ( void ) loadMorphologies;
     ( void ) csvNeuronStatsFileName;
-    errorMessage.showMessage( "Brion support not built-in" );
+    errorMessage->showMessage( "Brion support not built-in" );
     return;
 #else
     try
@@ -135,7 +135,7 @@ namespace neuroscheme
     } catch ( ... )
     {
       std::cerr << "Error loading BlueConfig" << std::endl;
-      errorMessage.showMessage( "Error loading BlueConfig" );
+      errorMessage->showMessage( "Error loading BlueConfig" );
       return;
     }
     createEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,

@@ -20,33 +20,33 @@ set( NEUROSCHEME_SOURCES
   ${PROJECT_BINARY_DIR}/src/version.cpp
   MainWindow.ui
   resources.qrc
-  CameraBasedLayout.cpp
   Canvas.cpp
   # Color.cpp
   Config.cpp
   DataManager.cpp
   DomainManager.cpp
   FilterWidget.cpp
-  GridLayout.cpp
   InteractionManager.cpp
-  Layout.cpp
-  #LayoutManager.cpp
   Log.cpp
   MainWindow.cpp
   # mappers/ColorMapper.cpp
-  mappers/VariableMapper.cpp
   neuroScheme.cpp
   PaneManager.cpp
   RepresentationCreatorManager.cpp
-  reps/CollapseButtonItem.cpp
-  reps/RingItem.cpp
-  reps/SelectableItem.cpp
-  qxt/qxtspanslider.cpp
-  ScatterPlotLayout.cpp
   ScatterPlotWidget.cpp
   SelectionManager.cpp
   SortWidget.cpp
   ZeroEQManager.cpp
+  layouts/CircularLayout.cpp
+  layouts/GridLayout.cpp
+  layouts/Layout.cpp
+  layouts/CameraBasedLayout.cpp
+  layouts/ScatterPlotLayout.cpp
+  mappers/VariableMapper.cpp
+  reps/CollapseButtonItem.cpp
+  reps/RingItem.cpp
+  reps/SelectableItem.cpp
+  qxt/qxtspanslider.cpp
   )
 
 set( NEUROSCHEME_HEADERS
@@ -59,18 +59,25 @@ set( NEUROSCHEME_HEADERS
   DomainManager.cpp
   error.h
   FilterWidget.h
-  GridLayout.h
   InteractionManager.h
-  Layout.h
-  LayoutManager.h
   Log.h
   MainWindow.h
   # mappers/ColorMapper.h
-  mappers/VariableMapper.h
   PaneManager.h
+  RepresentationCreatorManager.h
+  ScatterPlotWidget.h
+  SelectedState.h
+  SelectionManager.h
+  SortWidget.h
+  ZeroEQManager.h
+  layouts/CircularLayout.h
+  layouts/GridLayout.h
+  layouts/Layout.h
+  layouts/LayoutManager.h
+  layouts/ScatterPlotLayout.h
+  mappers/VariableMapper.h
   qxt/qxtspanslider.h
   qxt/qxtspanslider_p.h
-  RepresentationCreatorManager.h
   reps/CollapsableItem.h
   reps/CollapseButtonItem.h
   reps/InteractiveItem.h
@@ -78,12 +85,6 @@ set( NEUROSCHEME_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
-  ScatterPlotLayout.h
-  ScatterPlotWidget.h
-  SelectedState.h
-  SelectionManager.h
-  SortWidget.h
-  ZeroEQManager.h
   )
 
 include ( domains/cortex/CMakeLists.txt )
