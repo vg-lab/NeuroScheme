@@ -643,6 +643,8 @@ namespace neuroscheme
           meanDendsArea,
           meanCenter );
 
+      colEntity->label( ) = "c" + std::to_string( uint( col->id( )));
+
       shift::Entity* colLayerEntities[ 6 ];
       for ( auto i = 0; i < 6; ++i )
       {
@@ -656,6 +658,10 @@ namespace neuroscheme
         relSubEntityOf[ layerEntity->entityGid( ) ] =
           colEntity->entityGid( );
         _entities.add( layerEntity );
+
+        layerEntity->label( ) = "c" + std::to_string( uint( col->id( ))) +
+          "l" + std::to_string( i );
+
       }
 
       // Pos 0 and 7 will be used for whole column
@@ -672,6 +678,9 @@ namespace neuroscheme
           colEntity, neuronTypeAggregationEntity );
         _entities.add( neuronTypeAggregationEntity );
 
+        neuronTypeAggregationEntity->label( ) = "c" +
+          std::to_string( uint( col->id( ))) + "p" + std::to_string( i );
+
         neuronTypeAggregationEntity =
           new neuroscheme::NeuronTypeAggregation(
             uint( col->id( )), uint( 0 ), uint( i ),
@@ -682,6 +691,8 @@ namespace neuroscheme
           colEntity, neuronTypeAggregationEntity );
         _entities.add( neuronTypeAggregationEntity );
 
+        neuronTypeAggregationEntity->label( ) = "c" +
+          std::to_string( uint( col->id( ))) + "i" + std::to_string( i );
       }
 
       // fires::PropertyManager::registerProperty(
@@ -781,6 +792,8 @@ namespace neuroscheme
             meanDendsArea,
             mcMeanCenter );
 
+        mcEntity->label( ) = "mc" + std::to_string( uint( mc->id( )));
+
         shift::Entity* mcLayerEntities[ 6 ];
         for ( auto i = 0; i < 6; ++i )
         {
@@ -794,6 +807,9 @@ namespace neuroscheme
           relSubEntityOf[ layerEntity->entityGid( ) ] =
             mcEntity->entityGid( );
           _entities.add( layerEntity );
+
+          layerEntity->label( ) = "mc" + std::to_string( uint( mc->id( ))) +
+            "l" + std::to_string( i + 1 );
         }
 
         // Pos 0 and 7 will be used for whole minicolumn
@@ -810,6 +826,9 @@ namespace neuroscheme
             mcEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
 
+          neuronTypeAggregationEntity->label( ) = "mc" +
+            std::to_string( uint( mc->id( ))) + "p" + std::to_string( i );
+
           neuronTypeAggregationEntity =
             new neuroscheme::NeuronTypeAggregation(
               uint( mc->id( )), uint( 1 ), uint( i ),
@@ -820,6 +839,9 @@ namespace neuroscheme
             relSuperEntityOf, relSubEntityOf,
             mcEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
+
+          neuronTypeAggregationEntity->label( ) = "mc" +
+            std::to_string( uint( mc->id( ))) + "i" + std::to_string( i );
         }
 
         // fires::PropertyManager::registerProperty(
@@ -876,6 +898,7 @@ namespace neuroscheme
                 neuron->transform( ).col( 3 ).transpose( ));
           }
 
+          neuronEntity->label( ) = "n" + std::to_string( uint( neuron->gid( )));
 
           if ( neuron->morphology( ) && withMorphologies &&
                csvNeuronStatsFileName.empty( ))

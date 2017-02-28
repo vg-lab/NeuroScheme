@@ -93,31 +93,31 @@ namespace neuroscheme
     return _optionsWidget;
   }
 
-  void Layout::displayEntities( const shift::Entities& entities,
-                                bool animate,
-                                bool refreshProperties_ )
+  void Layout::refresh( bool animate )
   {
-    // std::cout << "+++ Layout::displayEntities "
-    //           << entities.vector( ).size( ) << std::endl;
-    _entities = entities;
-    _representations.clear( );
+    display( _canvas->entities( ), _canvas->reps( ), animate );
+  }
+
+  void Layout::display( shift::Entities& entities,
+                        shift::Representations& representations,
+                        bool animate )
+  {
+    representations.clear( );
 
     bool doFiltering =
       _filterWidget &&
-      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0 &&
-      !refreshProperties_;
+      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
 
     bool doSorting =
       _sortWidget &&
-      _sortWidget->sortConfig( ).properties( ).size( ) > 0 &&
-      !refreshProperties_;
+      _sortWidget->sortConfig( ).properties( ).size( ) > 0;
 
     fires::Objects objects;
     shift::Representations preFilterRepresentations;
 
     if ( doFiltering || doSorting )
     {
-      for ( const auto& entity : _entities.vector( ))
+      for ( const auto& entity : entities.vector( ))
       {
         // If the entity is a sub-entity skip it
         if ( DataManager::entities( ).
@@ -139,7 +139,6 @@ namespace neuroscheme
       }
 
       fires::Objects objectsPreFilter = objects;
-//      std::cout << "objects pre filter " << objectsPreFilter.size( ) << std::endl;
       if ( doFiltering )
       {
         fires::FilterSet firesFilterSet;
@@ -151,7 +150,7 @@ namespace neuroscheme
         filteredAndSortedEntities.add( static_cast< shift::Entity* >( entity ));
 
       neuroscheme::RepresentationCreatorManager::create(
-        filteredAndSortedEntities, _representations,
+        filteredAndSortedEntities, representations,
         true, true );
 
       shift::Entities entitiesPreFilter;
@@ -164,158 +163,62 @@ namespace neuroscheme
 
 
     }
-    // if ( doSorting )
-    // {
-    //   fires::Sort firesSort;
-    //   fires::Objects objects;
-    //   //fires::FilterSet _firesFilterSet;
-
-    //   for ( const auto& entity : _entities.vector( ))
-    //     objects.add( entity );
-    //   firesSort.eval( objects, _sortWidget->sortConfig( ));
-
-    //   shift::Entities sortedEntities;
-    //   for ( const auto& entity : objects )
-    //     sortedEntities.add( static_cast< shift::Entity* >( entity ));
-
-    //   neuroscheme::RepresentationCreatorManager::create(
-    //     sortedEntities, _representations,
-    //     true, true );
-    // }
     else
     {
-      // std::cout << "Sorting by entitygid " << std::endl;
-      auto& vector = _entities.vector( );
+      // Default sorting by ShiFT's gid
+      auto& vector = entities.vector( );
       std::sort( vector.begin( ), vector.end( ),
                  []( const shift::Entity* a, const shift::Entity* b )
                  { return b->entityGid( ) < a->entityGid( ); } );
       neuroscheme::RepresentationCreatorManager::create(
-       _entities, _representations,
+       entities, representations,
         true, true );
     }
 
-    // std::cout << "Filtered and sorted" << _representations.size( ) << std::endl;
-
-    // _representations = reps;
-    // if ( reps.empty( ))
-    //   return;
-
-    if ( refreshProperties_ )
-    {
-      //std::cout << "Refresh properties" << std::endl;
-      refreshProperties( _representations );
-    }
     if ( !animate )
     {
-      //std::cout << "Clear scene" << std::endl;
       _clearScene( );
     }
-//    _drawCorners( );
     if ( !animate )
     {
-      //std::cout << "Adding reps" << std::endl;
       if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
         _addRepresentations( preFilterRepresentations );
       else
-        _addRepresentations( _representations );
+        _addRepresentations( representations );
     }
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
-      // std::cout << "Arranging "
-      //            << preFilterRepresentations.size( ) << " reps " << std::endl;
-      _arrangeItems( preFilterRepresentations, animate, _representations );
+      _arrangeItems( preFilterRepresentations, animate, representations );
     }
     else
     {
-      // std::cout << "+ Arranging "
-      //            << _representations.size( ) << " reps " << std::endl;
-      _arrangeItems( _representations, animate );
+      // std::cout << "Arranging " << _name <<  " [ ";
+      // for ( const auto& r : representations )
+      // {
+      //   fires::Object* o = *repsToEntities.at( r ).begin( );
+      //   std::cout << o->label( ) << " ";
+      // }
+      // std::cout << "]" << std::endl;
+      _arrangeItems( representations, animate );
     }
   }
 
-  // void Layout::displayItems( const shift::Representations& reps,
-  //                            bool animate )
-  // {
-  //   _representations = reps;
-  //   if ( reps.empty( ))
-  //     return;
-
-  //   _refreshProperties( );
-  //   _clearScene( );
-  //   _drawCorners( );
-  //   _addRepresentations( reps );
-  //   _arrangeItems( reps, animate );
-  // }
-
-  void Layout::refreshProperties(
-    const shift::Representations&  representations_  )
+   void Layout::refreshWidgetsProperties(
+    const TProperties& properties )
   {
-    fires::Objects objs;
-    fires::Objects filteredObjs;
-    const auto& repsToEntities =
-      RepresentationCreatorManager::repsToEntities( );
-
-    _properties.clear( );
-
-    //std::cout << "Refreshing properties for " << _representations.size( ) << " entities" << std::endl;
-    for ( const auto& representation : representations_ )
-    {
-      const auto entities = repsToEntities.at( representation );
-      if ( entities.size( ) < 1 )
-        Log::log( NS_LOG_HEADER +
-                  "No entities associated to representation",
-                  LOG_LEVEL_ERROR );
-      const auto& entity = *( entities.begin( ));
-
-      if ( DataManager::entities( ).
-           relationships( ).count( "isSubEntityOf" ) != 0 )
-      {
-        const auto& relSubEntityOf =
-          *( DataManager::entities( ).
-             relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
-        if ( relSubEntityOf.count( entity->entityGid( )) == 0 )
-        {
-          // std::cout << " --- adding properties of NOT sub entity " << std::endl;
-          objs.add( entity );
-        }
-        else
-        {
-          // std::cout << " --- not adding properties of sub entity " << std::endl;
-          continue;
-        }
-      }
-      else
-      {
-        // std::cout << " --- repSubEntityOf not exists " << std::endl;
-        objs.push_back( entity );
-      }
-      for ( auto property_ : entity->properties( ))
-      {
-        // std::cout << "##### Adding property " << property_.first << std::endl;
-        // Check if property is scalar
-        if ( fires::PropertyManager::getAggregator( property_.first ))
-        {
-          if ( _properties.find( property_.first ) == _properties.end( ))
-            _properties[ property_.first  ] = TPropertyData{ 0, 0 };
-        }
-      }
-    }
+    Log::log( NS_LOG_HEADER + _name, LOG_LEVEL_VERBOSE );
 
     if ( _sortWidget &&
          _sortWidget->propertiesSelector( ))
     {
       _sortWidget->clear( );
       auto selector = _sortWidget->propertiesSelector( );
-      //std::cout << selector << std::endl;
+
       int i = -1;
-      for ( const auto& prop : _properties )
+      for ( const auto& prop : properties )
       {
-        //if ( !std::is_scalar< p.first >( ))
-        // if ( !fires::PropertyManager::getAggregator( p.first ))
-        // std::cout << prop.first << std::endl;
         selector->insertItem( ++i, QString( prop.first.c_str( )));
-        // std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
       }
     }
     if ( _filterWidget &&
@@ -323,111 +226,66 @@ namespace neuroscheme
     {
       _filterWidget->clear( );
       auto selector = _filterWidget->propertiesSelector( );
-      //std::cout << selector << std::endl;
       int i = -1;
-      for ( const auto& prop : _properties )
+      for ( const auto& prop : properties )
       {
-        //if ( !std::is_scalar< p.first >( ))
-        // if ( !fires::PropertyManager::getAggregator( p.first ))
-        // std::cout << prop.first << std::endl;
         selector->insertItem( ++i, QString( prop.first.c_str( )));
-        // std::cout << "selector->insertItem( " << i << ", QString( " << prop.first.c_str( ) << ")); " << std::endl;
       }
     }
 
-    // std::cout << "refresh properties for scatterplot " << _name << " " << this << " " 
-    //           <<  _scatterPlotWidget << " "
-    //           // << _scatterPlotWidget->propertyXSelector( ) << " "
-    //           // << _scatterPlotWidget->propertyYSelector( )
-    //           << std::endl;
     if ( _scatterPlotWidget &&
          _scatterPlotWidget->propertyXSelector( ) &&
          _scatterPlotWidget->propertyYSelector( ))
     {
-      // std::cout << "refresh properties for scatterplot." << std::endl;
+      // Block signals while refreshing the widget
+      _scatterPlotWidget->blockSignals( true );
+      _scatterPlotWidget->blockChildrenSignals( true );
       auto selectorX = _scatterPlotWidget->propertyXSelector( );
       auto selectorY = _scatterPlotWidget->propertyYSelector( );
       selectorX->clear( );
       selectorY->clear( );
       int i = -1;
-      for ( const auto& prop : _properties )
+      for ( const auto& prop : properties )
       {
         selectorX->insertItem( ++i, QString( prop.first.c_str( )));
         selectorY->insertItem( ++i, QString( prop.first.c_str( )));
       }
+      _scatterPlotWidget->blockChildrenSignals( false );
+      _scatterPlotWidget->blockSignals( false );
+
     }
+    Log::log( NS_LOG_HEADER + _name + " Done", LOG_LEVEL_VERBOSE );
 
-
-    fires::AggregateConfig aggregateConfigMax;
-    fires::AggregateConfig aggregateConfigMin;
-
-    for ( const auto& p : _properties )
-    {
-      aggregateConfigMax.addProperty(
-        p.first,
-        fires::PropertyManager::getAggregator( p.first ),
-        fires::PropertyAggregator::MAX );
-      aggregateConfigMin.addProperty(
-        p.first,
-        fires::PropertyManager::getAggregator( p.first ),
-        fires::PropertyAggregator::MIN );
-
-      // std::cout << ",, " << p.first << "--" << std::endl;
-    }
-
-    fires::Aggregate aggregate;
-    fires::Objects aggregatedMinObjects = objs;
-    aggregate.eval( aggregatedMinObjects, aggregateConfigMin );
-    fires::Object* aggregatedMinObj = aggregatedMinObjects[ 0 ];
-
-    fires::Objects aggregatedMaxObjects = objs;
-    aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
-    fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
-
-    for ( auto& p : _properties )
-    {
-      std::string label = p.first;
-
-      p.second = TPropertyData
-        {
-          fires::PropertyManager::getPropertyCaster( label )->toInt(
-            aggregatedMinObj->getProperty( label ),
-            fires::PropertyCaster::FLOOR ),
-          fires::PropertyManager::getPropertyCaster( label )->toInt(
-            aggregatedMaxObj->getProperty( label ),
-            fires::PropertyCaster::CEIL )
-        };
-    }
   }
 
   void Layout::_drawCorners( )
   {
-    NEUROSCHEME_DEBUG_CHECK( _scene->views( ).size( ) != 0,
+    NEUROSCHEME_DEBUG_CHECK( _canvas->scene( ).views( ).size( ) != 0,
                              "Scene with no view" );
-    QGraphicsView* gv = _scene->views( )[0];
+    QGraphicsView* gv = _canvas->scene( ).views( )[0];
 
     // std::cout << gv->width( ) << " x " << gv->height( ) << std::endl;
     QGraphicsEllipseItem* center =
       new QGraphicsEllipseItem( -10, -10, 20, 20 );
-    _scene->addItem( center );
+    _canvas->scene( ).addItem( center );
     QGraphicsEllipseItem* tl =
       new QGraphicsEllipseItem( -gv->width( ) / 2 - 10,
                                 -gv->height( ) / 2 - 10,
                                 20, 20 );
 
-    _scene->addItem( tl );
+    _canvas->scene( ).addItem( tl );
     QGraphicsEllipseItem* br =
       new QGraphicsEllipseItem( gv->width( ) / 2 - 10,
                                 gv->height( ) / 2 - 10,
                                 20, 20 );
 
-    _scene->addItem( br );
+    _canvas->scene( ).addItem( br );
   }
 
   void Layout::_clearScene( void )
   {
     // Remove top items without destroying them
-    for ( auto& item : _scene->items( ))
+    for ( auto& item : _canvas->scene( ).items( ))
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
@@ -444,7 +302,7 @@ namespace neuroscheme
           //             << cc->boundingRect( ).height( ) << std::endl;
           // }
         // }
-        _scene->removeItem( item );
+        _canvas->scene( ).removeItem( item );
       }
     }
     // QList< QGraphicsItem* > items_ = _scene->items( );
@@ -456,7 +314,7 @@ namespace neuroscheme
     // }
 
     // Remove the rest
-    _scene->clear( );
+    _canvas->scene( ).clear( );
   }
 
   void Layout::_addRepresentations( const shift::Representations& reps )
@@ -478,7 +336,7 @@ namespace neuroscheme
       else
       {
         // std::cout << "+++++ Retrieving item" << std::endl;
-        auto item = graphicsItemRep->item( _scene );
+        auto item = graphicsItemRep->item( &_canvas->scene( ));
 
         if ( item->parentItem( ))
         {
@@ -521,14 +379,14 @@ namespace neuroscheme
         // std::cout << "Adding item" << item << std::endl;
 
         if ( !item->parentItem( ))
-          _scene->addItem( item );
+          _canvas->scene( ).addItem( item );
       }
     }
   } // _addRepresentations
 
   void Layout::updateSelection( void )
   {
-    QList< QGraphicsItem* > items_ = _scene->items( );
+    QList< QGraphicsItem* > items_ = _canvas->scene( ).items( );
     for ( auto qitem = items_.begin( ); qitem != items_.end( ); ++qitem )
     {
       auto selectableItem_ = dynamic_cast< SelectableItem* >( *qitem );

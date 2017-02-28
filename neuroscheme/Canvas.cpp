@@ -1,6 +1,8 @@
 #include "Canvas.h"
+#include "DataManager.h"
 #include "Log.h"
 #include "PaneManager.h"
+#include "RepresentationCreatorManager.h"
 #include <QHBoxLayout>
 
 namespace neuroscheme
@@ -63,8 +65,6 @@ namespace neuroscheme
                                   QSizePolicy::Expanding );
     _graphicsView->show( );
     _graphicsView->resize( this->size( ));
-    // std::cout << "Canvas size " << this->width( ) << " x " << this->height( ) << std::endl;
-    // std::cout << "Canvas size " << _graphicsView->width( ) << " x " << _graphicsView->height( ) << std::endl;
     QHBoxLayout* layout_ = new QHBoxLayout;
     layout_->addWidget( _graphicsView );
     this->setLayout( layout_ );
@@ -148,7 +148,7 @@ namespace neuroscheme
 
   void Canvas::resizeEvent( QResizeEvent* )
   {
-    // std::cout << "Resize Canvas" << std::endl;
+    Log::log( NS_LOG_HEADER, LOG_LEVEL_VERBOSE );
     const QSize viewerSize = this->view( ).size( );
     const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
                                  - viewerSize.height( ) / 2,
@@ -160,11 +160,8 @@ namespace neuroscheme
     this->view( ).setSceneRect( rectf );
     this->view( ).setTransform( transf );
 
-    // std::cout << this->view( ).width( ) << " x "
-    //           << this->view( ).height( ) << std::endl;
-
     this->layouts( ).getLayout(
-      this->activeLayoutIndex( ))->refresh( false, false );
+      this->activeLayoutIndex( ))->refresh( false );
   }
 
   void Canvas::showEvent( QShowEvent* /* event_ */ )
@@ -186,6 +183,7 @@ namespace neuroscheme
   {
     return _activeLayoutIndex;
   }
+
   void Canvas::activeLayoutIndex( int activeLayoutIndex_ )
   {
     _activeLayoutIndex = activeLayoutIndex_;
@@ -201,12 +199,11 @@ namespace neuroscheme
 
       return;
     }
-    // std::cout << "layout changed in " << this
-    //           << " to index " << index << std::endl;
+    Log::log( NS_LOG_HEADER + "layout changed to " + std::to_string( index ),
+              LOG_LEVEL_VERBOSE );
     if ( _layouts.getLayout( index ))
     {
       _activeLayoutIndex = index;
-      // std::cout << _layouts.getLayout( index )->name( ) << std::endl;
       _layouts.getLayout( index )->optionsWidget( );
       auto layout_ = PaneManager::layout( );
       if ( layout_ )
@@ -226,66 +223,69 @@ namespace neuroscheme
           }
         }
 
-        layout_->addWidget(
-          _layouts.getLayout( index )->optionsWidget( ),
-          2, 0 );
-        _layouts.getLayout( index )->optionsWidget( )->show( );
-        //displayReps( _reps, true );
+        layout_->addWidget( _layouts.getLayout( index )->optionsWidget( ),
+                            2, 0 );
         displayEntities( _entities, true, false );
+        _layouts.getLayout( index )->optionsWidget( )->show( );
+
       }
+      else
+        Log::log( NS_LOG_HEADER + " null pane layout",
+                  LOG_LEVEL_WARNING );
     }
+    else
+      Log::log( NS_LOG_HEADER +
+                " null layout with index" + std::to_string( index ),
+                LOG_LEVEL_WARNING );
+
   }
 
-  void Canvas::displayEntities( const shift::Entities& entities_,
-                                bool animate, bool refreshProperties )
+  void Canvas::displayEntities( shift::Entities& entities_,
+                                bool animate, bool refreshProperties_ )
   {
-    _entities = entities_;
-    assert( _layouts.getLayout( _activeLayoutIndex ));
-    _layouts.getLayout( _activeLayoutIndex )->displayEntities(
-      entities_, animate, refreshProperties );
+    neuroscheme::Log::log( NS_LOG_HEADER + "displayEntities",
+                           neuroscheme::LOG_LEVEL_VERBOSE );
 
-    if ( refreshProperties )
+    if ( refreshProperties_ )
     {
+      refreshProperties( entities_ );
       for ( auto& layout_ : layouts( ).map( ))
       {
-        if ( layout_.second == layouts( ).getLayout( activeLayoutIndex( )))
-          continue;
-        layout_.second->refreshProperties(
-          layouts( ).getLayout(
-            activeLayoutIndex( ))->representations( ));
+        layout_.second->refreshWidgetsProperties( _properties );
       }
     }
-  }
 
-  // void Canvas::displayReps( shift::Representations& reps_, bool animate )
-  // {
-  //   _reps = reps_;
-  //   assert( _layouts.getLayout( _activeLayoutIndex ));
-  //   _layouts.getLayout( _activeLayoutIndex )->displayItems(
-  //     reps_, animate );
-  // }
+    _entities = entities_;
+    assert( _layouts.getLayout( _activeLayoutIndex ));
+    _layouts.getLayout( _activeLayoutIndex )->display(
+      entities_, _reps, animate// , refreshProperties
+      );
+
+  }
 
   void Canvas::addLayout( Layout* layout_ )
   {
+    Log::log( NS_LOG_HEADER, LOG_LEVEL_VERBOSE );
+
     _layouts.addLayout( layout_ );
-    layout_->scene( _graphicsScene );
+    layout_->canvas( this );
   }
 
   Canvas* Canvas::clone( void ) const
   {
     auto canvas = new Canvas( );
+    canvas->_properties = _properties;
+    canvas->_reps = _reps;
+    canvas->_entities = _entities;
     assert( canvas->scene( ).views( ).size( ) != 0 );
     for ( auto layout_ : _layouts.map( ))
     {
       auto newLayout = layout_.second->clone( );
-      newLayout->setRepresentations( layout_.second->representations( ));
-      newLayout->refreshProperties( layout_.second->representations( ));
+      newLayout->refreshWidgetsProperties( _properties );
       canvas->addLayout( newLayout );
-      // std::cout << "clone layout" << layout_.second->name( ) << std::endl;
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
-//    std::cout << "setting active layout " << this->_activeLayoutIndex << std::endl;
-    canvas->displayEntities( _entities, false, true );
+    canvas->displayEntities( canvas->_entities, false, true );
     canvas->layouts( ).layoutSelector( )->setCurrentIndex(
       this->_activeLayoutIndex );
     canvas->connectLayoutSelector( );
@@ -299,6 +299,87 @@ namespace neuroscheme
   shift::Representations& Canvas::reps( void )
   {
     return _reps;
+  }
+
+  void Canvas::refreshProperties(
+    const shift::Entities& entities_ )
+  {
+    fires::Objects objs;
+    fires::Objects filteredObjs;
+
+    _properties.clear( );
+
+    for ( const auto& entity : entities_.vector( ))
+    {
+      if ( DataManager::entities( ).
+           relationships( ).count( "isSubEntityOf" ) != 0 )
+      {
+        const auto& relSubEntityOf =
+          *( DataManager::entities( ).
+             relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+        if ( relSubEntityOf.count( entity->entityGid( )) == 0 )
+        {
+          // If not subentity add it
+          objs.add( entity );
+        }
+        else
+        {
+          continue;
+        }
+      }
+      else // if the realtionship does not exist
+      {
+        objs.push_back( entity );
+      }
+
+      for ( const auto& property_ : entity->properties( ))
+      {
+        if ( fires::PropertyManager::getAggregator( property_.first ))
+        {
+          if ( _properties.find( property_.first ) == _properties.end( ))
+            _properties[ property_.first  ] = TPropertyData{ 0, 0 };
+        }
+      }
+    }
+
+    fires::AggregateConfig aggregateConfigMax;
+    fires::AggregateConfig aggregateConfigMin;
+
+    for ( const auto& p : _properties )
+    {
+      aggregateConfigMax.addProperty(
+        p.first,
+        fires::PropertyManager::getAggregator( p.first ),
+        fires::PropertyAggregator::MAX );
+      aggregateConfigMin.addProperty(
+        p.first,
+        fires::PropertyManager::getAggregator( p.first ),
+        fires::PropertyAggregator::MIN );
+    }
+
+    fires::Aggregate aggregate;
+    fires::Objects aggregatedMinObjects = objs;
+    aggregate.eval( aggregatedMinObjects, aggregateConfigMin );
+    fires::Object* aggregatedMinObj = aggregatedMinObjects[ 0 ];
+
+    fires::Objects aggregatedMaxObjects = objs;
+    aggregate.eval( aggregatedMaxObjects, aggregateConfigMax );
+    fires::Object* aggregatedMaxObj = aggregatedMaxObjects[ 0 ];
+
+    for ( auto& p : _properties )
+    {
+      const std::string& label = p.first;
+      p.second = TPropertyData
+        {
+          fires::PropertyManager::getPropertyCaster( label )->toInt(
+            aggregatedMinObj->getProperty( label ),
+            fires::PropertyCaster::FLOOR ),
+          fires::PropertyManager::getPropertyCaster( label )->toInt(
+            aggregatedMaxObj->getProperty( label ),
+            fires::PropertyCaster::CEIL )
+        };
+    }
+
   }
 
 

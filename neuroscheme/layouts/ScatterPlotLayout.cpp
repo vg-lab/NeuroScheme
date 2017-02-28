@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "Log.h"
 #include "ScatterPlotLayout.h"
 #include "mappers/VariableMapper.h"
 #include "reps/QGraphicsItemRepresentation.h"
@@ -39,22 +40,23 @@ namespace neuroscheme
     const shift::Representations&
     // preFilterReps =
     // shift::Representations( )
-    )
+   )
   {
-    // std::cout << "ScatterPlotLayout::_arrangeItems" << std::endl;
     if ( reps.size( ) == 0 )
+    {
+      Log::log( NS_LOG_HEADER + " empty set of reps to arrange.",
+                LOG_LEVEL_WARNING );
       return;
-
+    }
     unsigned int margin = 150;
 
-    // QGraphicsView* gv = _scene->views( )[0];
-    auto width = _scene->width( );
-    auto height = _scene->height( );
-    auto xMin = -width/2 + margin;
-    auto xMax = width/2 - margin;
-    auto yMin = -height/2 + margin;
-    auto yMax = height/2 - margin;
-
+    QGraphicsView* gv = _canvas->scene( ).views( )[0];
+    auto width = gv->width( );
+    auto height = gv->height( );
+    float xMin = -float( width ) / 2.0f + margin;
+    float xMax = width/2 - margin;
+    float yMin = -float( height ) / 2.0f + margin;
+    float yMax = height / 2.0f - margin;
 
     // auto xAxis = new QGraphicsLineItem( -_scene->width( )/2 + margin,
     //                                     +_scene->height( )/2 - margin,
@@ -64,7 +66,6 @@ namespace neuroscheme
     //                                     +_scene->height( )/2 - margin,
     //                                     -_scene->width( )/2 + margin,
     //                                     -_scene->height( )/2 + margin );
-
     // _scene->addItem( xAxis );
     // _scene->addItem( yAxis );
 
@@ -75,10 +76,10 @@ namespace neuroscheme
 
     if ( xProp.empty( ) || yProp.empty( ))
       return;
-    auto xMaxValue = _properties[ xProp ].rangeMax;
-    auto xMinValue = _properties[ xProp ].rangeMin;
-    auto yMaxValue = _properties[ yProp ].rangeMax;
-    auto yMinValue = _properties[ yProp ].rangeMin;
+    float xMaxValue = _canvas->properties( ).at( xProp ).rangeMax;
+    float xMinValue = _canvas->properties( ).at( xProp ).rangeMin;
+    float yMaxValue = _canvas->properties( ).at( yProp ).rangeMax;
+    float yMinValue = _canvas->properties( ).at( yProp ).rangeMin;
 
     MapperFloatToFloat xMapper( xMinValue, xMaxValue, xMin, xMax );
     MapperFloatToFloat yMapper( yMinValue, yMaxValue, yMin, yMax );
@@ -93,11 +94,11 @@ namespace neuroscheme
           representation );
       if ( !graphicsItemRep )
       {
-        std::cerr << "Item null" << std::endl;
+        Log::log( "Item null", LOG_LEVEL_WARNING );
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( _scene );
+        auto graphicsItem = graphicsItemRep->item( &_canvas->scene( ));
         if ( graphicsItem->parentItem( ))
           continue;
         auto item = dynamic_cast< Item* >( graphicsItem );
@@ -115,20 +116,9 @@ namespace neuroscheme
           if ( posX != posX ) posX = 0;
           if ( posY != posY ) posY = 0;
           qreal scale_ = _scatterPlotWidget->scale( ) / 100.0f;
-          // std::cout << xMax  << std::endl;
-          // std::cout << posX << " " << posY << " scale: " << scale_ << std::endl;
-
-          // if ( useOpacityForFilter &&
-          //      filteredOutItems.count( graphicsItem ) == 1 )
-          // {
-          //   graphicsItem->setOpacity( 0.5f );
-          // }
-          // else
-          //   graphicsItem->setOpacity( 1.0f );
 
           if ( obj && animate )
           {
-            // std::cout << "ScatterPlotLayout::animateItem" << std::endl;
             animateItem( graphicsItem, scale_, QPoint( posX, posY ));
           }
           else
@@ -136,12 +126,9 @@ namespace neuroscheme
             graphicsItem->setPos( posX, posY );
             graphicsItem->setScale( scale_ );
           }
-          // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }
     } // for all reps
-    // std::cout << "ScatterPlotLayout::_arrangeItems DONE" << std::endl;
-
   }
 
 

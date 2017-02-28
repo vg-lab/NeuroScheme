@@ -75,9 +75,9 @@ namespace neuroscheme
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( _scene );
-        // if ( graphicsItem->parentItem( ))
-        //   continue;
+        auto graphicsItem = graphicsItemRep->item( &_canvas->scene( ));
+        if ( graphicsItem->parentItem( ))
+          continue;
 
         auto item = dynamic_cast< Item* >( graphicsItem );
         auto obj = dynamic_cast< QObject* >( graphicsItem );

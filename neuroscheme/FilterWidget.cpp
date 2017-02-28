@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "Canvas.h"
 #include "layouts/Layout.h"
 #include "FilterWidget.h"
 #include <QGridLayout>
@@ -126,13 +127,13 @@ namespace neuroscheme
     auto spanSlider = new QxtSpanSlider( Qt::Horizontal, this );
     spanSlider->setSpan( 0, 100 );
     spanSlider->setMinimum(
-      _parentLayout->_properties[ propertyLabel ].rangeMin );
+      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMin );
     spanSlider->setMaximum(
-      _parentLayout->_properties[ propertyLabel ].rangeMax );
+      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMax );
     spanSlider->setLowerPosition(
-      _parentLayout->_properties[ propertyLabel ].rangeMin );
+      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMin );
     spanSlider->setUpperPosition(
-      _parentLayout->_properties[ propertyLabel ].rangeMax );
+      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMax );
     spanSlider->setEnabled( true );
 
     auto rangeLabel =  new QLabel(
@@ -315,7 +316,8 @@ namespace neuroscheme
 
   void FilterWidget::refreshParentLayout( void )
   {
-    _parentLayout->refresh( false, false );
+    _parentLayout->refresh( false// , false
+      );
   }
 
   void FilterWidget::_autoFilterCheckBoxChanged( void )

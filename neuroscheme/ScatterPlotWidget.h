@@ -41,6 +41,7 @@ namespace neuroscheme
   public:
     ScatterPlotWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
     ~ScatterPlotWidget( void );
+    void blockChildrenSignals( bool block );
     QComboBox* propertyXSelector( void ) { return _propertyXSelector; }
     QComboBox* propertyYSelector( void ) { return _propertyYSelector; }
     int scale( void ) { return _scaleSlider->value( ); }

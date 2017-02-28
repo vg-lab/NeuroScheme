@@ -58,7 +58,7 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( _scene );
+        auto item = graphicsItemRep->item( &_canvas->scene( ));
         if ( !item->parentItem( ))
         {
           // std::cout << "++++++ Arranging " << item << std::endl;
@@ -105,7 +105,7 @@ namespace neuroscheme
     float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
     float canvasAspectRatio;
 
-    QGraphicsView* gv = _scene->views( )[0];
+    QGraphicsView* gv = _canvas->scene( ).views( )[0];
     if ( gv->width( ) > gv->height( ))
       canvasAspectRatio = float( gv->width( )) / float( gv->height( ));
     else
@@ -159,7 +159,7 @@ namespace neuroscheme
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( _scene );
+        auto graphicsItem = graphicsItemRep->item( &_canvas->scene( ));
         auto item = dynamic_cast< Item* >( graphicsItem );
         if ( graphicsItem->parentItem( ))
           continue;
