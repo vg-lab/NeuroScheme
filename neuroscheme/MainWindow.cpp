@@ -22,14 +22,15 @@
 #include "MainWindow.h"
 #include "DataManager.h"
 #include "DomainManager.h"
-#include "GridLayout.h"
-#include "CameraBasedLayout.h"
 #include "Config.h"
-#include "LayoutManager.h"
 #include "PaneManager.h"
-#include "ScatterPlotLayout.h"
 #include "SelectionManager.h"
 #include "Log.h"
+#include "layouts/CircularLayout.h"
+#include "layouts/GridLayout.h"
+#include "layouts/CameraBasedLayout.h"
+#include "layouts/LayoutManager.h"
+#include "layouts/ScatterPlotLayout.h"
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -56,6 +57,11 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
+  // Connect about dialog
+  connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
+
+
+
   QActionGroup* splitTypeGroup = new QActionGroup( this );
   _ui->actionSplitHorizontally->setCheckable( true );
   _ui->actionSplitHorizontally->setActionGroup( splitTypeGroup );
@@ -70,6 +76,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   connect( _ui->actionKillPane, SIGNAL( triggered( )),
            this, SLOT( killActivePane( )));
 
+  connect( _ui->actionHome, SIGNAL( triggered( )),
+           this, SLOT( home( )));
+
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
@@ -82,6 +91,8 @@ MainWindow::MainWindow( QWidget* parent_ )
   if ( neuroscheme::Config::cliDataSource ==
        neuroscheme::Config::CLI_BLUECONFIG )
   {
+    neuroscheme::Log::log( NS_LOG_HEADER + "Loading blue config",
+                           neuroscheme::LOG_LEVEL_VERBOSE );
     neuroscheme::DataManager::loadBlueConfig(
       neuroscheme::Config::cliInputFile,
       neuroscheme::Config::targetLabel,
@@ -90,7 +101,10 @@ MainWindow::MainWindow( QWidget* parent_ )
   }
   neuroscheme::PaneManager::splitter( widget );
 
+
   // First pane
+  neuroscheme::Log::log( NS_LOG_HEADER + "Creating first pane",
+                         neuroscheme::LOG_LEVEL_VERBOSE );
   auto canvas = neuroscheme::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->setSizePolicy( QSizePolicy::Expanding,
@@ -98,6 +112,8 @@ MainWindow::MainWindow( QWidget* parent_ )
   canvas->addLayout( new neuroscheme::GridLayout( ));
   canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
   canvas->addLayout( new neuroscheme::ScatterPlotLayout( ));
+  canvas->addLayout( new neuroscheme::CircularLayout( ));
+
   canvas->displayEntities(
     neuroscheme::DataManager::rootEntities( ), false, true );
   neuroscheme::PaneManager::panes( ).insert( canvas );
@@ -352,7 +368,10 @@ void MainWindow::restoreSelection( void )
     neuroscheme::SelectionManager::restoreStoredSelection(
       label.toStdString( ));
     resizeEvent( nullptr );
-
+    for ( const auto& pane : neuroscheme::PaneManager( ).panes( ))
+    {
+      pane->resizeEvent( 0 );
+    }
   }
 }
 
@@ -413,4 +432,30 @@ void MainWindow::duplicateActivePane( void )
 {
   neuroscheme::PaneManager::newPaneFromActivePane( );
 
+}
+
+void MainWindow::home( void )
+{
+    neuroscheme::PaneManager::activePane( )->displayEntities(
+      neuroscheme::DataManager::rootEntities( ), false, true );
+}
+
+void MainWindow::aboutDialog( void )
+{
+  QMessageBox::about(
+    this, tr("About neuroscheme"),
+    tr("<p><BIG><b>NeuroScheme</b></BIG><br><br>") +
+    tr( "version " ) +
+    tr( neuroscheme::Version::getString( ).c_str( )) +
+    tr( " (" ) +
+    tr( std::to_string( neuroscheme::Version::getRevision( )).c_str( )) +
+    tr( ")" ) +
+    tr ("<br><br>GMRV - Universidad Rey Juan Carlos<br><br>"
+        "<a href=www.gmrv.es>www.gmrv.es</a><br>"
+        "<a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
+        "<br>(c) 2015. Universidad Rey Juan Carlos<br><br>"
+        "<img src=':/icons/logoGMRV.png' > &nbsp; &nbsp;"
+        "<img src=':/icons/logoURJC.png' >"
+        "</p>"
+        ""));
 }

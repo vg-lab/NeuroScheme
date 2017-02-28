@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Layout.h"
+#include "layouts/Layout.h"
 #include "SortWidget.h"
 #include <QGridLayout>
 #include <QLabel>
@@ -145,7 +145,8 @@ namespace neuroscheme
     // }
     // std::cout <<  std::endl;
 
-    _parentLayout->refresh( true, false );
+    _parentLayout->refresh( true// , false 
+      );
   }
   void SortWidget::clear( )
   {
@@ -231,7 +232,8 @@ namespace neuroscheme
     _removeSignalMappers.erase( propertyLabel );
     _changeDirSignalMappers.erase( propertyLabel );
 
-    _parentLayout->refresh( true, false );
+    _parentLayout->refresh( true// , false 
+      );
   }
 
   void SortWidget::changeSortPropertyDir( const QString& propertyLabel_ )
@@ -268,7 +270,8 @@ namespace neuroscheme
     // }
     // std::cout <<  std::endl;
 
-    _parentLayout->refresh( true, false );
+    _parentLayout->refresh( true// , false 
+      );
   }
 
   SortWidget::~SortWidget( void )

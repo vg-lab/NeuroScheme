@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Layout.h"
+#include "layouts/Layout.h"
 #include "ScatterPlotWidget.h"
 
 namespace neuroscheme
@@ -77,18 +77,24 @@ namespace neuroscheme
 
   }
 
+  void ScatterPlotWidget::blockChildrenSignals( bool block )
+  {
+    _propertyXSelector->blockSignals( block );
+    _propertyYSelector->blockSignals( block );
+    _scaleSlider->blockSignals( block );
+  }
+
   void ScatterPlotWidget::refreshParentLayout( void )
   {
-    // std::cout << "ScatterPlotWidget::refreshParentLayout" << std::endl;
-    _parentLayout->refresh( false, false );
+    // refresh witout animation
+    _parentLayout->refresh( false );
   }
 
 
   void ScatterPlotWidget::_propertiesChanged( void )
   {
-    // std::cout << "ScatterPlotWidget::_propertiesChanged " << this
-    //           << " " <<  _parentLayout << std::endl;
-    _parentLayout->refresh( true, false );
+    // refresh witout animation
+    _parentLayout->refresh( true );
   }
 
   ScatterPlotWidget::~ScatterPlotWidget( void )

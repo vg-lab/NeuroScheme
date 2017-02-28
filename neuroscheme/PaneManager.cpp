@@ -152,12 +152,16 @@ namespace neuroscheme
     Canvas* canvas;
     if ( !orig )
     {
+      neuroscheme::Log::log( NS_LOG_HEADER + "Creating canvas",
+                             neuroscheme::LOG_LEVEL_VERBOSE );
       canvas = new Canvas( _splitter ); //->parentWidget( ));
       _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
     }
     else
     {
+      neuroscheme::Log::log( NS_LOG_HEADER + "Cloning canvas",
+                             neuroscheme::LOG_LEVEL_VERBOSE );
       canvas = orig->clone( );
       auto parentSplitter =
         dynamic_cast< QSplitter* >( orig->parentWidget( ));
@@ -242,7 +246,8 @@ namespace neuroscheme
         auto layout
           = canvas->layouts( ).getLayout( canvas->activeLayoutIndex( ));
         if ( layout->flags( ) & Layout::CAMERA_ENABLED )
-          layout->refresh( false, false );
+          layout->refresh( false// , false 
+            );
       }
       lastMatrixClock = std::chrono::system_clock::now( );
     }

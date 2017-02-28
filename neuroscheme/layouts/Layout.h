@@ -35,15 +35,11 @@
 #include "FilterWidget.h"
 #include "ScatterPlotWidget.h"
 #include "SortWidget.h"
+#include "../Properties.h"
 
 namespace neuroscheme
 {
-  typedef struct
-  {
-    int rangeMin;
-    int rangeMax;
-  } TPropertyData;
-  typedef std::map< std::string, TPropertyData > TProperties;
+  class Canvas;
 
   class LayoutOptionsWidget : public QFrame
   {
@@ -73,48 +69,35 @@ namespace neuroscheme
 
     Layout( const std::string& name_ = "unnamed",
             unsigned int flags_ = 0 );
+
     virtual ~Layout( void );
+
     const std::string& name( void );
+
     const unsigned int& flags( void ) { return _flags; }
+
     LayoutOptionsWidget* optionsWidget( void );
 
-    void refresh( bool animate = true,
-                  bool refreshProperties_ = true )
-    {
-      //std::cout << "Layout::refresh" << std::endl;
-      // displayItems( _representations, false );
-      displayEntities( _entities, animate, refreshProperties_ );
-    }
+    void refresh( bool animate = true );
 
-    virtual void displayEntities( const shift::Entities& entities,
-                                  bool animate = true,
-                                  bool refreshProperties = true );
-
-    // virtual void displayItems( const shift::Representations& reps,
-    //                            bool animate );
+    virtual void display( shift::Entities& entities,
+                          shift::Representations& representations,
+                          bool animate = true );
 
     void updateSelection( );
-    void scene( QGraphicsScene* scene_ )
+
+    void canvas( Canvas* canvas_ )
     {
-      _scene = scene_;
+      _canvas = canvas_;
     }
     virtual Layout* clone( void ) const = 0;
 
     void animateItem( QGraphicsItem* graphicsItem,
                       float toScale, const QPoint& toPos );
 
-    void refreshProperties( const shift::Representations& representations_ );
+    void refreshWidgetsProperties( const TProperties& properties );
 
-    const shift::Representations& representations( void )
-    { return _representations; }
-    void setRepresentations( const shift::Representations& representations_ )
-    { _representations = representations_; }
 
-  public slots:
-    void addedSortProperty( void )
-    {
-      //std::cout << "<><><><> Added sorted propery" << std::endl;
-    }
   protected:
     void _drawCorners( );
     void _clearScene( );
@@ -127,13 +110,10 @@ namespace neuroscheme
     { ( void ) preFilterReps; }
     virtual void _updateOptionsWidget( void );
 
-    QGraphicsScene* _scene;
+    Canvas* _canvas;
     unsigned int _flags;
     LayoutOptionsWidget* _optionsWidget;
     std::string _name;
-    shift::Representations _representations;
-    shift::Entities _entities;
-    TProperties _properties;
     QToolBox* _toolbox;
     SortWidget* _sortWidget;
     FilterWidget* _filterWidget;

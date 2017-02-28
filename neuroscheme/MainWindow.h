@@ -23,7 +23,9 @@
 #define __NEUROSCHEME__MAINWINDOW__
 
 #include <ui_MainWindow.h>
+#include <neuroscheme/version.h>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QTableWidget>
 #include <QDockWidget>
 #include <unordered_map>
@@ -65,6 +67,7 @@ public:
 public slots:
 
   // Stored selections solts
+  void aboutDialog( void );
   void updateStoredSelectionsDock( void );
   void sortStoredSelectionsTable( int column );
   void storeSelection( void );
@@ -74,6 +77,8 @@ public slots:
   void paneDivisionChanged( void );
   void killActivePane( void );
   void duplicateActivePane( void );
+  void home( void );
+
 protected:
 
   QString _tableColumnToString( TTableColumns column );

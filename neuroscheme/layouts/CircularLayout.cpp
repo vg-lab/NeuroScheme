@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "GridLayout.h"
+#include "CircularLayout.h"
 #include "reps/Item.h"
 #include "reps/QGraphicsItemRepresentation.h"
 #include "error.h"
@@ -29,14 +29,14 @@
 namespace neuroscheme
 {
 
-  GridLayout::GridLayout( void )
-    : Layout( "Grid",
+  CircularLayout::CircularLayout( void )
+    : Layout( "Circular",
               Layout::SORT_ENABLED |
               Layout::FILTER_ENABLED )
   {
   }
 
-  void GridLayout::_arrangeItems( const shift::Representations& reps,
+  void CircularLayout::_arrangeItems( const shift::Representations& reps,
                                   bool animate,
                                   const shift::Representations& postFilterReps )
   {
@@ -58,7 +58,7 @@ namespace neuroscheme
       }
       else
       {
-        auto item = graphicsItemRep->item( _scene );
+        auto item = graphicsItemRep->item( &_canvas->scene( ));
         if ( !item->parentItem( ))
         {
           // std::cout << "++++++ Arranging " << item << std::endl;
@@ -90,25 +90,29 @@ namespace neuroscheme
     float forcedScale = 1.0f;
     const unsigned int marginX = 20;
     const unsigned int marginY = 20;
-    const float scalePaddingX = 1.1f;
-    const float scalePaddingY = 1.1f;
-    const unsigned int fixedPaddingX = 0;
-    const unsigned int fixedPaddingY = 0;
+    // const float scalePaddingX = 1.1f;
+    // const float scalePaddingY = 1.1f;
+    // const unsigned int fixedPaddingX = 0;
+    // const unsigned int fixedPaddingY = 0;
 
-    unsigned int deltaX = scalePaddingX * maxItemWidth + fixedPaddingX;
-    unsigned int deltaY = scalePaddingY * maxItemHeight + fixedPaddingY;
+    // unsigned int deltaX = scalePaddingX * maxItemWidth + fixedPaddingX;
+    // unsigned int deltaY = scalePaddingY * maxItemHeight + fixedPaddingY;
 
+    int counter = 0;
     int _x = 0;
     int _y = 0;
 
     float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
     float canvasAspectRatio;
 
-    QGraphicsView* gv = _scene->views( )[0];
+    QGraphicsView* gv = _canvas->scene( ).views( )[0];
     if ( gv->width( ) > gv->height( ))
       canvasAspectRatio = float( gv->width( )) / float( gv->height( ));
     else
       canvasAspectRatio = float( gv->height( )) / float( gv->width( ));
+
+    float deltaAngle = 2 * M_PI / repsToBeArranged;
+    float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
 
 
     unsigned int numRows =
@@ -128,20 +132,18 @@ namespace neuroscheme
       std::swap( numColumns, numRows );
 
     // std::cout << "Num rows: " << numRows << " Num cols: " << numColumns << std::endl;
-
-    float scale;
-    float scaleX = float( gv->width( ) - 2 * marginX ) /
-      float( numColumns * deltaX );
-    float scaleY = float( gv->height( ) - 2 * marginY ) /
-      float( numRows * deltaY );
-    scale = std::min( scaleX, scaleY );
+    // float scale;
+    // float scaleX = deltaAngle / float( numColumns * deltaX );
+    // float scaleY = float( gv->height( ) - 2 * marginY ) /
+    //   float( numRows * deltaY );
+    // scale = std::min( scaleX, scaleY );
 
     // std::cout << "Scale: " << scaleX << " " << scaleY << " " << scale << std::endl;
 
-    int leftMargin = (( deltaX * scale )  +
-                      ( gv->width( ) - numColumns * deltaX * scale )) / 2;
-    int topMargin = (( deltaY * scale ) +
-                     ( gv->height( ) - numRows * deltaY * scale )) / 2;
+    // int leftMargin = (( deltaX * scale )  +
+    //                   ( gv->width( ) - numColumns * deltaX * scale )) / 2;
+    // int topMargin = (( deltaY * scale ) +
+    //                  ( gv->height( ) - numRows * deltaY * scale )) / 2;
 
     auto opacity = 1.0f;
     if ( _filterWidget )
@@ -157,7 +159,7 @@ namespace neuroscheme
       }
       else
       {
-        auto graphicsItem = graphicsItemRep->item( _scene );
+        auto graphicsItem = graphicsItemRep->item( &_canvas->scene( ));
         auto item = dynamic_cast< Item* >( graphicsItem );
         if ( graphicsItem->parentItem( ))
           continue;
@@ -167,10 +169,26 @@ namespace neuroscheme
         {
           QRectF rect = graphicsItem->childrenBoundingRect( ) |
             graphicsItem->boundingRect( );
-          qreal posX = _x * deltaX * scale - gv->width( ) / 2 +
-            leftMargin - scale * rect.center( ).x( );
-          qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
-            topMargin - scale * rect.center( ).y( );
+          qreal angle = counter * deltaAngle;
+          qreal posX = radius * cos( angle );
+          qreal posY = radius * sin( angle );
+          // qreal posX = _x * deltaX * scale - gv->width( ) / 2 +
+          //   leftMargin - scale * rect.center( ).x( );
+          // qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
+          //   topMargin - scale * rect.center( ).y( );
+          float scale;
+          float scaleX = deltaAngle * radius / rect.width( );
+          float scaleY = deltaAngle * radius / rect.height( );
+          scale = std::min( scaleX, scaleY ) * 0.9f;
+
+          if ( repsToBeArranged == 1 )
+          {
+            scaleX = float( gv->width( ) - 2 * marginX ) / rect.width( );
+            scaleY = float( gv->height( ) - 2 * marginY ) / rect.height( );
+            scale = std::min( scaleX, scaleY );
+            posX = 0;
+            posY = 0;
+          }
           qreal scale_ = forceScale ? forcedScale : scale;
 
           if ( useOpacityForFilter &&
@@ -195,7 +213,7 @@ namespace neuroscheme
         }
       }
 
-      _x++;
+      counter++;
       if (((unsigned int ) _x ) >= numColumns )
       {
         _x = 0;
@@ -206,14 +224,14 @@ namespace neuroscheme
 
   }
 
-  void GridLayout::_updateOptionsWidget( void )
+  void CircularLayout::_updateOptionsWidget( void )
   {
 
   }
 
-  Layout* GridLayout::clone( void ) const
+  Layout* CircularLayout::clone( void ) const
   {
-    return new GridLayout( );
+    return new CircularLayout( );
   }
 
 }

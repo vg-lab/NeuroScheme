@@ -1,7 +1,8 @@
 #ifndef __NEUROSCHEME__CANVAS__
 #define __NEUROSCHEME__CANVAS__
 
-#include "Layouts.h"
+#include "layouts/Layouts.h"
+#include "Properties.h"
 #include <QWidget>
 #include <QGraphicsView>
 #include <QMouseEvent>
@@ -63,20 +64,27 @@ namespace neuroscheme
 
     std::string name;
 
-    void displayEntities( const shift::Entities& entities_, bool animate,
+    void displayEntities( shift::Entities& entities_, bool animate,
                           bool refreshProperties );
 //    void displayReps( shift::Representations&, bool animate );
     Canvas* clone( void ) const;
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );
     shift::Entities& entities( void ) { return _entities; }
+    const TProperties& properties( void ) { return _properties; }
+    void refreshProperties( const shift::Entities& entities_ );
+
+
 protected:
     GraphicsView* _graphicsView;
     GraphicsScene* _graphicsScene;
     Layouts _layouts;
     int _activeLayoutIndex;
+
     shift::Representations _reps;
     shift::Entities _entities;
+    TProperties _properties;
+
   public slots:
     void layoutChanged( int );
   }; // class Canvas

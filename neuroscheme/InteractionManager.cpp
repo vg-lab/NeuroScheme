@@ -21,7 +21,7 @@
  */
 #include "DataManager.h"
 #include "InteractionManager.h"
-#include "LayoutManager.h"
+#include "layouts/LayoutManager.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "SelectionManager.h"
