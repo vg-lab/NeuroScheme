@@ -20,6 +20,7 @@
  *
  */
 #include "RepresentationCreatorManager.h"
+#include "reps/QGraphicsItemRepresentation.h"
 
 namespace neuroscheme
 {

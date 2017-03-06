@@ -19,20 +19,39 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Config.h"
+#ifndef __NEUROSCHEME__CORTEX_DOMAIN_MANAGER__
+#define __NEUROSCHEME__CORTEX_DOMAIN_MANAGER__
+
+#include <neuroscheme/DomainManager.h>
+#include "DataLoader.h"
 
 namespace neuroscheme
 {
 
-  // Config::TCliDataSource Config::cliDataSource = CLI_NODATA;
-  // std::string Config::cliInputFile = std::string( );
-  // std::string Config::targetLabel = std::string( );
-  // bool Config::loadMorphologies = true;
-  // std::string Config::csvNeuronStatsFileName = std::string( );
-  // std::string Config::zeroeqSession = std::string( );
-  // std::string Config::deflectHost = std::string( );
-  // bool Config::deflectExitOnClose = true;
-  // bool Config::autoPublishSelection = true;
-  NeuroSchemeInputArguments Config::inputArgs = NeuroSchemeInputArguments( );
+  namespace cortex
+  {
+    class Domain
+      : public ::neuroscheme::Domain
+    {
 
+    public:
+
+      Domain( void )
+      {
+        this->_dataLoader = new DataLoader;
+      }
+
+      virtual ~Domain( void )
+      {
+        delete _dataLoader;
+      }
+
+      bool isSelectableEntity( shift::Entity* entity ) const;
+      unsigned int selectableEntityId( shift::Entity* entity ) const;
+      const Vector4f entity3DPosition ( shift::Entity* entity ) const;
+
+    };
+  }
 }
+
+#endif

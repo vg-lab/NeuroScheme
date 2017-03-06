@@ -21,6 +21,7 @@
  */
 #include "DataManager.h"
 #include "PaneManager.h"
+#include "Log.h"
 #include <assert.h>
 #include <QLabel>
 #include <QPushButton>
@@ -28,6 +29,8 @@
 
 namespace neuroscheme
 {
+  using Vector4f = ::Eigen::Vector4f;
+
   QSplitter* PaneManager::_splitter = nullptr;
   Canvas* PaneManager::_activePane = nullptr;
   PaneManager::TPanes PaneManager::_panes = PaneManager::TPanes( );

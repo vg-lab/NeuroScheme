@@ -22,11 +22,13 @@
 #include "DataManager.h"
 #include "InteractionManager.h"
 #include "layouts/LayoutManager.h"
+#include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "reps/Item.h"
 #include "SelectionManager.h"
 #include "ZeroEQManager.h"
-#include "domains/domains.h"
+//#include "domains/domains.h"
 #include <unordered_set>
 
 namespace neuroscheme

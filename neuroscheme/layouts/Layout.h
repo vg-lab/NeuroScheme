@@ -32,9 +32,9 @@
 #include <map>
 #include <iostream>
 #include <shift/shift.h>
-#include "FilterWidget.h"
-#include "ScatterPlotWidget.h"
-#include "SortWidget.h"
+#include "../FilterWidget.h"
+#include "../ScatterPlotWidget.h"
+#include "../SortWidget.h"
 #include "../Properties.h"
 
 namespace neuroscheme

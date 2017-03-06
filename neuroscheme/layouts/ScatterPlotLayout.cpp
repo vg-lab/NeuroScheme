@@ -19,11 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Log.h"
+#include "../Log.h"
 #include "ScatterPlotLayout.h"
-#include "mappers/VariableMapper.h"
-#include "reps/QGraphicsItemRepresentation.h"
-#include "RepresentationCreatorManager.h"
+#include "../mappers/VariableMapper.h"
+#include "../reps/QGraphicsItemRepresentation.h"
+#include "../reps/Item.h"
+#include "../RepresentationCreatorManager.h"
 
 namespace neuroscheme
 {

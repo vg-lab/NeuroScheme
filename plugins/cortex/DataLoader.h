@@ -19,39 +19,41 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_CAMERA_BASED_LAYOUT__
-#define __NEUROSCHEME_CAMERA_BASED_LAYOUT__
+#ifndef __NEUROSCHEME__CORTEX_DATA_LOADER__
+#define __NEUROSCHEME__CORTEX_DATA_LOADER__
 
-#include "Layout.h"
-#include "../DomainManager.h"
+#include <neuroscheme/Config.h>
+#include <neuroscheme/DataLoader.h>
+#include <neuroscheme/Log.h>
+#include <unordered_map>
+#include <string>
+
+#ifdef NEUROSCHEME_USE_NSOL
+#include <nsol/nsol.h>
+#endif
 
 namespace neuroscheme
 {
-
-
-  class CameraBasedLayout : public Layout
+  namespace cortex
   {
-  public:
-    CameraBasedLayout( void );
-    // void displayItems( QGraphicsScene* scene,
-    //                       const shift::Representations& reps );
-  protected:
-    void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true,
-                        const shift::Representations& postFilterReps =
-                        shift::Representations( )) final;
-
-    Layout* clone( void ) const
+    class DataLoader
+      : public neuroscheme::DataLoader
     {
-      return new CameraBasedLayout;
-    }
+    public:
 
-    // Matrix4f _viewMatrix;
-    //Matrix4f _projectionMatrix;
+      virtual ~DataLoader( void ) {}
 
-  };
+      virtual bool loadData(
+        const NeuroSchemeInputArguments& arguments ) final;
 
-
+#ifdef NEUROSCHEME_USE_NSOL
+      void createEntitiesFromNsolColumns(
+        const nsol::Columns& columns,
+        bool withMorphologies,
+        const std::string& csvNeuronStatsFileName );
+#endif
+    };
+  }
 }
 
 #endif

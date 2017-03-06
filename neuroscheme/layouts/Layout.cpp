@@ -19,14 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "error.h"
-#include "DataManager.h"
+#include "../error.h"
+#include "../DataManager.h"
 #include "Layout.h"
-#include "reps/Item.h"
-#include "reps/SelectableItem.h"
-#include "RepresentationCreatorManager.h"
-#include "domains/cortex/NeuronAggregationItem.h"
-#include "reps/CollapseButtonItem.h"
+#include "../reps/Item.h"
+#include "../reps/SelectableItem.h"
+#include "../RepresentationCreatorManager.h"
+#include "../reps/CollapseButtonItem.h"
+#include "../SelectionManager.h"
 namespace neuroscheme
 {
 

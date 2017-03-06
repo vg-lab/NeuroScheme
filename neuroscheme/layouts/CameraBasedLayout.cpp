@@ -20,10 +20,10 @@
  *
  */
 #include "CameraBasedLayout.h"
-#include "reps/Item.h"
-#include "error.h"
-#include "PaneManager.h"
-#include "RepresentationCreatorManager.h"
+#include "../reps/Item.h"
+#include "../error.h"
+#include "../PaneManager.h"
+#include "../RepresentationCreatorManager.h"
 
 namespace neuroscheme
 {

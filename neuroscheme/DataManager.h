@@ -23,7 +23,7 @@
 #define __NEUROSCHEME__DATA_MANAGER__
 
 #include <shift/shift.h>
-#include "domains/domains.h"
+//#include "domains/domains.h"
 #include <QErrorMessage>
 
 #ifdef NEUROSCHEME_USE_NSOL
@@ -32,6 +32,7 @@
 
 namespace neuroscheme
 {
+
   class DataManager
   {
   public:
@@ -44,10 +45,11 @@ namespace neuroscheme
                                 const std::string& csvNeuronStatsFileName );
 
 #ifdef NEUROSCHEME_USE_NSOL
-    static void createEntitiesFromNsolColumns(
-      const nsol::Columns& columns,
-      bool withMorphologies,
-      const std::string& csvNeuronStatsFileName );
+//     static void createEntitiesFromNsolColumns(
+//       const nsol::Columns& columns,
+//       bool withMorphologies,
+//       const std::string& csvNeuronStatsFileName );
+    static nsol::DataSet& nsolDataSet( void ) { return _nsolDataSet; }
 #endif
 
   protected:

@@ -22,7 +22,7 @@
 #ifndef __NEUROSCHEME__INTERACTIVE_ITEM__
 #define __NEUROSCHEME__INTERACTIVE_ITEM__
 
-#include "Log.h"
+#include "../Log.h"
 #include <QGraphicsItem>
 
 namespace neuroscheme

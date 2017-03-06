@@ -24,6 +24,7 @@
 
 #include <shift/shift.h>
 #include <Eigen/Dense>
+#include "DataLoader.h"
 
 namespace neuroscheme
 {
@@ -34,10 +35,18 @@ namespace neuroscheme
   {
 
   public:
+    Domain( void )
+      : _dataLoader( nullptr )
+    {
+    }
     virtual ~Domain( void ) {}
     virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
     virtual unsigned int selectableEntityId( shift::Entity* entity ) const = 0;
     virtual const Vector4f entity3DPosition ( shift::Entity* entity ) const = 0;
+    DataLoader* dataLoader( void ) { return _dataLoader; }
+
+  protected:
+    DataLoader* _dataLoader;
   };
 
   class DomainManager

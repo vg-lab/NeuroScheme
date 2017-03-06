@@ -20,10 +20,10 @@
  *
  */
 #include "CircularLayout.h"
-#include "reps/Item.h"
-#include "reps/QGraphicsItemRepresentation.h"
-#include "error.h"
-#include "RepresentationCreatorManager.h"
+#include "../reps/Item.h"
+#include "../reps/QGraphicsItemRepresentation.h"
+#include "../error.h"
+#include "../RepresentationCreatorManager.h"
 #include <QToolBox>
 
 namespace neuroscheme

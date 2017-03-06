@@ -23,7 +23,7 @@
 
 namespace neuroscheme
 {
-  
+
   Domain* DomainManager::_domain = nullptr;
 
   // unsigned int _activeDomain = 0;

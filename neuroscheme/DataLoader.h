@@ -19,39 +19,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_CAMERA_BASED_LAYOUT__
-#define __NEUROSCHEME_CAMERA_BASED_LAYOUT__
+#ifndef __NEUROSCHEME__DATA_LOADER__
+#define __NEUROSCHEME__DATA_LOADER__
 
-#include "Layout.h"
-#include "../DomainManager.h"
+#include <string>
+#include "Config.h"
 
 namespace neuroscheme
 {
-
-
-  class CameraBasedLayout : public Layout
+  class DataLoader
   {
+
   public:
-    CameraBasedLayout( void );
-    // void displayItems( QGraphicsScene* scene,
-    //                       const shift::Representations& reps );
-  protected:
-    void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true,
-                        const shift::Representations& postFilterReps =
-                        shift::Representations( )) final;
 
-    Layout* clone( void ) const
-    {
-      return new CameraBasedLayout;
-    }
+    virtual ~DataLoader( void ) {}
 
-    // Matrix4f _viewMatrix;
-    //Matrix4f _projectionMatrix;
+    virtual bool loadData(
+      const NeuroSchemeInputArguments& arguments ) = 0;
+
 
   };
-
-
 }
 
 #endif

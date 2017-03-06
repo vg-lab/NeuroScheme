@@ -19,20 +19,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Config.h"
+
+#include "Domain.h"
+#include "Neuron.h"
 
 namespace neuroscheme
 {
+  namespace cortex
+  {
+    bool Domain::isSelectableEntity( shift::Entity* entity ) const
+    {
+      return dynamic_cast< Neuron* >( entity );
+    }
 
-  // Config::TCliDataSource Config::cliDataSource = CLI_NODATA;
-  // std::string Config::cliInputFile = std::string( );
-  // std::string Config::targetLabel = std::string( );
-  // bool Config::loadMorphologies = true;
-  // std::string Config::csvNeuronStatsFileName = std::string( );
-  // std::string Config::zeroeqSession = std::string( );
-  // std::string Config::deflectHost = std::string( );
-  // bool Config::deflectExitOnClose = true;
-  // bool Config::autoPublishSelection = true;
-  NeuroSchemeInputArguments Config::inputArgs = NeuroSchemeInputArguments( );
+    unsigned int Domain::selectableEntityId( shift::Entity* entity ) const
+    {
+      assert( dynamic_cast< Neuron* >( entity ));
+      return dynamic_cast< Neuron* >( entity )->
+        getProperty( "gid" ).value< uint >( );
+    }
 
+    const Vector4f Domain::entity3DPosition ( shift::Entity* entity ) const
+    {
+      // std::cout << entity->getProperty( "Position3D" ).type( ) << std::endl;
+      return entity->getProperty( "Position3D" ).value< Vector4f >( );
+    }
+
+  }
 }

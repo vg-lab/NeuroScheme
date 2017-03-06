@@ -19,31 +19,44 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#ifndef __NEUROSCHEME_CONFIG__
+#define __NEUROSCHEME_CONFIG__
+#include <string>
+#include <unordered_map>
+#include <vector>
 #include <string>
 
 namespace neuroscheme
 {
 
+  typedef std::unordered_map< std::string, std::vector< std::string >>
+  NeuroSchemeInputArguments;
+
+
   class Config
   {
   public:
-    typedef enum
-    {
-      CLI_NODATA,
-      CLI_SWCLIST,
-      CLI_BLUECONFIG,
-      CLI_XMLSCENE
-    } TCliDataSource;
+    // typedef enum
+    // {
+    //   CLI_NODATA,
+    //   CLI_SWCLIST,
+    //   CLI_BLUECONFIG,
+    //   CLI_XMLSCENE
+    // } TCliDataSource;
 
-    static TCliDataSource cliDataSource;
-    static std::string cliInputFile;
-    static std::string targetLabel;
-    static bool loadMorphologies;
-    static std::string csvNeuronStatsFileName;
-    static std::string zeroeqSession;
-    static std::string deflectHost;
-    static bool deflectExitOnClose;
-    static bool autoPublishSelection;
+    // static TCliDataSource cliDataSource;
+    // static std::string cliInputFile;
+    // static std::string targetLabel;
+    // static bool loadMorphologies;
+    // static std::string csvNeuronStatsFileName;
+    // static std::string zeroeqSession;
+    // static std::string deflectHost;
+    // static bool deflectExitOnClose;
+    // static bool autoPublishSelection;
+
+    static NeuroSchemeInputArguments inputArgs;
   };
 
 }
+
+#endif // __NEUROSCHEME_CONFIG__

@@ -65,6 +65,8 @@ common_find_package_post( )
 list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT scoop Qt5Widgets )
 
 add_subdirectory( neuroscheme )
+add_subdirectory( plugins )
+add_subdirectory( app )
 
 include( CPackConfig )
 include( DoxygenRule )

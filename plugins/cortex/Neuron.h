@@ -19,39 +19,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_CAMERA_BASED_LAYOUT__
-#define __NEUROSCHEME_CAMERA_BASED_LAYOUT__
+#ifndef __NEUROSCHEME__NEURON__
+#define __NEUROSCHEME__NEURON__
 
-#include "Layout.h"
-#include "../DomainManager.h"
+#include <shift_Neuron.h>
+#include <shift_Column.h>
+#include <shift_Layer.h>
+#include <shift_MiniColumn.h>
+#include <shift_NeuronTypeAggregation.h>
+#include <neuroscheme/SelectionManager.h>
 
 namespace neuroscheme
 {
 
+  using Neuron = shiftgen::Neuron;
+  // class Neuron
+  //   : public shiftgen::Neuron
+  //   , public SelectableEntity
+  // {
+  // };
+  using Column = shiftgen::Column;
+  using MiniColumn = shiftgen::MiniColumn;
+  using Layer = shiftgen::Layer;
+  using NeuronTypeAggregation = shiftgen::NeuronTypeAggregation;
 
-  class CameraBasedLayout : public Layout
-  {
-  public:
-    CameraBasedLayout( void );
-    // void displayItems( QGraphicsScene* scene,
-    //                       const shift::Representations& reps );
-  protected:
-    void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true,
-                        const shift::Representations& postFilterReps =
-                        shift::Representations( )) final;
+} // namespace neuroscheme
 
-    Layout* clone( void ) const
-    {
-      return new CameraBasedLayout;
-    }
-
-    // Matrix4f _viewMatrix;
-    //Matrix4f _projectionMatrix;
-
-  };
-
-
-}
-
-#endif
+#endif // __NEUROSCHEME__NEURON__

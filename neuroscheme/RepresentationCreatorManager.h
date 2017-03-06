@@ -22,7 +22,9 @@
 #ifndef __NEUROSCHEME__REPRESENTATION_CREATOR_MANAGER__
 #define __NEUROSCHEME__REPRESENTATION_CREATOR_MANAGER__
 
-#include "domains/domains.h"
+#include <shift/shift.h>
+#include "Canvas.h"
+// #include "domains/domains.h"
 
 namespace neuroscheme
 {

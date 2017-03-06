@@ -19,39 +19,41 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NEUROSCHEME_CAMERA_BASED_LAYOUT__
-#define __NEUROSCHEME_CAMERA_BASED_LAYOUT__
+#ifndef __NEUROSCHEME__COLUMN_REP__
+#define __NEUROSCHEME__COLUMN_REP__
 
-#include "Layout.h"
-#include "../DomainManager.h"
+#include <neuroscheme/reps/QGraphicsItemRepresentation.h>
+#include <shift/shift.h>
+#include <shift_NeuronAggregationRep.h>
+#include <shift_LayerRep.h>
 
 namespace neuroscheme
 {
 
 
-  class CameraBasedLayout : public Layout
+//  using LayerRep = shiftgen::LayerRep;
+
+  // namespace shiftgen
+  // {
+  //   using ColumnRep = shiftgen::NeuronAggregationRep;
+
+  // }
+  class ColumnRep
+    : public shiftgen::NeuronAggregationRep
+    , public QGraphicsItemRepresentation
   {
   public:
-    CameraBasedLayout( void );
-    // void displayItems( QGraphicsScene* scene,
-    //                       const shift::Representations& reps );
-  protected:
-    void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true,
-                        const shift::Representations& postFilterReps =
-                        shift::Representations( )) final;
 
-    Layout* clone( void ) const
-    {
-      return new CameraBasedLayout;
-    }
-
-    // Matrix4f _viewMatrix;
-    //Matrix4f _projectionMatrix;
+    ColumnRep( void );
+    ColumnRep( const ColumnRep& );
+    ColumnRep( const neuroscheme::shiftgen::NeuronAggregationRep& );
+    virtual ~ColumnRep( void ) {}
+    QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                         bool create = true );
 
   };
 
 
-}
+} // namespace neuroscheme
 
 #endif
