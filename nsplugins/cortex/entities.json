@@ -1,0 +1,301 @@
+{
+    "reps": [
+        {
+            "name": "Neuron",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
+            "properties": [
+                {
+                    "name": "gid",
+                    "type": "uint"
+                },
+                {
+                    "name": "Morpho Type",
+                    "type": "TMorphologicalType"
+                },
+                {
+                    "name": "Funct Type",
+                    "type": "TFunctionalType"
+                },
+                {
+                    "name": "Soma Volume",
+                    "type": "float"
+                },
+                {
+                    "name": "Soma Surface",
+                    "type": "float"
+                },
+                {
+                    "name": "Dendritic Volume",
+                    "type": "float"
+                },
+                {
+                    "name": "Dendritic Surface",
+                    "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TMorphologicalType",
+                    "values": [
+                        "UNDEFINED_MORPHOLOGICAL_TYPE",
+                        "INTERNEURON",
+                        "PYRAMIDAL"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TFunctionalType",
+                    "values": [
+                        "UNDEFINED_FUNCTIONAL_TYPE",
+                        "INHIBITORY",
+                        "EXCITATORY"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Column",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
+            "properties": [
+                {
+                    "name": "Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Num Neurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyramidals",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Interneurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaArea",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendArea",
+                    "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
+                }
+
+            ],
+            "types":
+            [
+            ]
+        },
+        {
+            "name": "MiniColumn",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ "<Eigen/Dense>" ],
+            "properties": [
+                {
+                    "name": "Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Num Neurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyramidals",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Interneurons",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Pyr Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 1",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 2",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 3",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 4",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 5",
+                    "type": "float"
+                },
+                {
+                    "name": "Num Inter Layer 6",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanSomaArea",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendVolume",
+                    "type": "float"
+                },
+                {
+                    "name": "meanDendArea",
+                    "type": "float"
+                },
+                {
+                    "name": "Position3D",
+                    "type": "Eigen::Vector4f"
+                }
+
+            ],
+            "types":
+            [
+            ]
+        },
+        {
+            "name": "Layer",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Parent Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Parent Type",
+                    "type": "uint"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint"
+                }
+            ],
+            "types":
+            [
+            ]
+        },
+        {
+            "name": "NeuronTypeAggregation",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ "<shift_Neuron.h>" ],
+            "properties": [
+                {
+                    "name": "Parent Id",
+                    "type": "uint"
+                },
+                {
+                    "name": "Parent Type",
+                    "type": "uint"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint"
+                },
+                {
+                    "name": "Morpho Type",
+                    "type": "Neuron::TMorphologicalType"
+                }
+            ],
+            "types":
+            [
+            ]
+        }
+    ]
+}

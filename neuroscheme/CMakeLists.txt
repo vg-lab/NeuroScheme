@@ -1,85 +1,36 @@
-set( NEUROSCHEMELIB_SOURCES
-  Canvas.cpp
-  Config.cpp
-  DataManager.cpp
-  DomainManager.cpp
-  FilterWidget.cpp
-  InteractionManager.cpp
-  Log.cpp
-  PaneManager.cpp
-  RepresentationCreatorManager.cpp
-  ScatterPlotWidget.cpp
-  SelectionManager.cpp
-  SortWidget.cpp
-  ZeroEQManager.cpp
-  layouts/CircularLayout.cpp
-  layouts/GridLayout.cpp
-  layouts/Layout.cpp
-  layouts/CameraBasedLayout.cpp
-  layouts/ScatterPlotLayout.cpp
-  mappers/VariableMapper.cpp
-  reps/CollapseButtonItem.cpp
-  reps/RingItem.cpp
-  reps/SelectableItem.cpp
-  qxt/qxtspanslider.cpp
+set( NEUROSCHEME_SOURCES
+  MainWindow.ui
+  resources.qrc
+  MainWindow.cpp
+  neuroScheme.cpp
   )
 
-set( NEUROSCHEMELIB_HEADERS
-  Canvas.h
-  Color.h
-  Config.h
-  DataLoader.h
-  DataManager.h
-  DomainManager.cpp
-  error.h
-  FilterWidget.h
-  InteractionManager.h
-  Log.h
-  PaneManager.h
-  RepresentationCreatorManager.h
-  ScatterPlotWidget.h
-  SelectedState.h
-  SelectionManager.h
-  SortWidget.h
-  ZeroEQManager.h
-  layouts/CameraBasedLayout.h
-  layouts/CircularLayout.h
-  layouts/GridLayout.h
-  layouts/Layout.h
-  layouts/LayoutManager.h
-  layouts/ScatterPlotLayout.h
-  mappers/VariableMapper.h
-  qxt/qxtspanslider.h
-  qxt/qxtspanslider_p.h
-  reps/CollapsableItem.h
-  reps/CollapseButtonItem.h
-  reps/InteractiveItem.h
-  reps/Item.h
-  reps/QGraphicsItemRepresentation.h
-  reps/RingItem.h
-  reps/SelectableItem.h
-  )
-
-set( NEUROSCHEMELIB_LINK_LIBRARIES
-  ShiFT
-  scoop
-  Qt5::Widgets
+set( NEUROSCHEME_HEADERS
+  MainWindow.h
   )
 
 
+set( NEUROSCHEME_LINK_LIBRARIES
+  nslib
+  nslibcortex
+  )
 
-if ( TARGET ZeroEQ AND TARGET Lexis AND TARGET Servus )
-  list( APPEND NEUROSCHEMELIB_LINK_LIBRARIES Lexis ZeroEQ Servus )
+include_directories(
+  ${PROJECT_BINARY_DIR}/neuroscheme
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/nsplugins
+  ${PROJECT_SOURCE_DIR}/neuroscheme
+  ${NEUROSCHEME_SHIFT_GENERATED_DIR} # This line is a temporary WAR
+  )
+
+if (MSVC)
+  add_definitions(-DNEUROSCHEME_STATIC)
+  if (WITH_NO_CONSOLE)
+    message(STATUS "No console, WIN32 added to common app args")
+    set(COMMON_APP_ARGS WIN32)
+  else()
+    message(STATUS "neuroscheme with console")
+  endif()
 endif( )
 
-if ( TARGET gmrvlex )
-  list( APPEND NEUROSCHEMELIB_LINK_LIBRARIES gmrvlex )
-endif( )
-
-if ( TARGET nsol )
-  list( APPEND NEUROSCHEMELIB_LINK_LIBRARIES nsol )
-endif( )
-
-
-set( NEUROSCHEMELIB_INCLUDE_NAME neuroscheme )
-common_library( NeuroSchemeLib )
+common_application( NeuroScheme GUI ${COMMON_APP_ARGS})
