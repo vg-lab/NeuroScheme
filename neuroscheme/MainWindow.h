@@ -23,13 +23,12 @@
 #define __NEUROSCHEME__MAINWINDOW__
 
 #include <ui_MainWindow.h>
-#include <neuroscheme/version.h>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QDockWidget>
 #include <unordered_map>
-#include "Canvas.h"
+#include <nslib/Canvas.h>
 
 namespace Ui
 {

@@ -64,6 +64,8 @@ common_find_package_post( )
 
 list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT scoop Qt5Widgets )
 
+add_subdirectory( nslib )
+add_subdirectory( nsplugins )
 add_subdirectory( neuroscheme )
 
 include( CPackConfig )

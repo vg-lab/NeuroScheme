@@ -20,17 +20,19 @@
  *
  */
 #include "MainWindow.h"
-#include "DataManager.h"
-#include "DomainManager.h"
-#include "Config.h"
-#include "PaneManager.h"
-#include "SelectionManager.h"
-#include "Log.h"
-#include "layouts/CircularLayout.h"
-#include "layouts/GridLayout.h"
-#include "layouts/CameraBasedLayout.h"
-#include "layouts/LayoutManager.h"
-#include "layouts/ScatterPlotLayout.h"
+#include <nslib/version.h>
+#include <nslib/DataManager.h>
+#include <nslib/DomainManager.h>
+#include <nslib/Config.h>
+#include <nslib/PaneManager.h>
+#include <nslib/SelectionManager.h>
+#include <nslib/Log.h>
+#include <nslib/layouts/CircularLayout.h>
+#include <nslib/layouts/GridLayout.h>
+#include <nslib/layouts/CameraBasedLayout.h>
+#include <nslib/layouts/LayoutManager.h>
+#include <nslib/layouts/ScatterPlotLayout.h>
+#include <cortex/Domain.h>
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -85,38 +87,48 @@ MainWindow::MainWindow( QWidget* parent_ )
   this->setCentralWidget( widget );
 
   // Active domain
-  neuroscheme::DomainManager::setActiveDomain(
-    new neuroscheme::cortex::Domain );
-
-  if ( neuroscheme::Config::cliDataSource ==
-       neuroscheme::Config::CLI_BLUECONFIG )
+  if ( nslib::Config::inputArgs( ).count( "-domain" ) == 1 &&
+       nslib::Config::inputArgs( )["-domain"].size( ) == 1 )
   {
-    neuroscheme::Log::log( NS_LOG_HEADER + "Loading blue config",
-                           neuroscheme::LOG_LEVEL_VERBOSE );
-    neuroscheme::DataManager::loadBlueConfig(
-      neuroscheme::Config::cliInputFile,
-      neuroscheme::Config::targetLabel,
-      neuroscheme::Config::loadMorphologies,
-      neuroscheme::Config::csvNeuronStatsFileName );
-  }
-  neuroscheme::PaneManager::splitter( widget );
+    if ( nslib::Config::inputArgs( )["-domain"][0] == "cortex" )
+    {
+      nslib::Domain* domain = new nslib::cortex::Domain;
+      nslib::DomainManager::setActiveDomain( domain );
+      if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+        exit( -1 );
+      // domain->
 
+      // if ( nslib::Config::cliDataSource ==
+      //      nslib::Config::CLI_BLUECONFIG )
+      // {
+      //   nslib::Log::log( NS_LOG_HEADER + "Loading blue config",
+      //                          nslib::LOG_LEVEL_VERBOSE );
+      //   nslib::DataManager::loadBlueConfig(
+      //     nslib::Config::cliInputFile,
+      //     nslib::Config::targetLabel,
+      //     nslib::Config::loadMorphologies,
+      //     nslib::Config::csvNeuronStatsFileName );
+      // }
+    }
+  }
+
+  nslib::PaneManager::splitter( widget );
 
   // First pane
-  neuroscheme::Log::log( NS_LOG_HEADER + "Creating first pane",
-                         neuroscheme::LOG_LEVEL_VERBOSE );
-  auto canvas = neuroscheme::PaneManager::newPane( );
+  nslib::Log::log( NS_LOG_HEADER + "Creating first pane",
+                         nslib::LOG_LEVEL_VERBOSE );
+  auto canvas = nslib::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
-  canvas->addLayout( new neuroscheme::GridLayout( ));
-  canvas->addLayout( new neuroscheme::CameraBasedLayout( ));
-  canvas->addLayout( new neuroscheme::ScatterPlotLayout( ));
-  canvas->addLayout( new neuroscheme::CircularLayout( ));
+  canvas->addLayout( new nslib::GridLayout( ));
+  canvas->addLayout( new nslib::CameraBasedLayout( ));
+  canvas->addLayout( new nslib::ScatterPlotLayout( ));
+  canvas->addLayout( new nslib::CircularLayout( ));
 
   canvas->displayEntities(
-    neuroscheme::DataManager::rootEntities( ), false, true );
-  neuroscheme::PaneManager::panes( ).insert( canvas );
+    nslib::DataManager::rootEntities( ), false, true );
+  nslib::PaneManager::panes( ).insert( canvas );
 
   // Layouts dock
   {
@@ -141,8 +153,8 @@ MainWindow::MainWindow( QWidget* parent_ )
     QWidget* dockWidget = new QWidget( );
     QGridLayout* layoutsConfigLayout = new QGridLayout( dockWidget );
     layoutsConfigLayout->setAlignment( Qt::AlignTop );
-    neuroscheme::PaneManager::layout( layoutsConfigLayout );
-    neuroscheme::PaneManager::activePane( canvas );
+    nslib::PaneManager::layout( layoutsConfigLayout );
+    nslib::PaneManager::activePane( canvas );
 
     // QWidget* dockWidget = new QWidget( );
     // dockWidget->setLayout( layoutsConfigLayout );
@@ -234,7 +246,7 @@ MainWindow::MainWindow( QWidget* parent_ )
 MainWindow::~MainWindow( void )
 {
   delete _ui;
-  for ( const auto& _canvas :  neuroscheme::PaneManager::panes( ))
+  for ( const auto& _canvas :  nslib::PaneManager::panes( ))
     delete _canvas;
 }
 
@@ -277,11 +289,11 @@ void MainWindow::storeSelection( void )
 {
 
   // In case selection is empty return
-  if ( neuroscheme::SelectionManager::activeSelectionSize( ) == 0 )
+  if ( nslib::SelectionManager::activeSelectionSize( ) == 0 )
   {
-    neuroscheme::Log::log( NS_LOG_HEADER +
+    nslib::Log::log( NS_LOG_HEADER +
                            "Tried to store an empty selection ",
-                           neuroscheme::LOG_LEVEL_VERBOSE );
+                           nslib::LOG_LEVEL_VERBOSE );
     return;
   }
 
@@ -297,11 +309,11 @@ void MainWindow::storeSelection( void )
     return;
 
   bool updateExistingRow =
-    neuroscheme::SelectionManager::existsStoredSelection( label.toStdString( ));
+    nslib::SelectionManager::existsStoredSelection( label.toStdString( ));
 
-  neuroscheme::SelectionManager::storeActiveSelection( label.toStdString( ));
+  nslib::SelectionManager::storeActiveSelection( label.toStdString( ));
   unsigned int numberOfSelectedEntities =
-    neuroscheme::SelectionManager::storedSelectionSize( label.toStdString( ));
+    nslib::SelectionManager::storedSelectionSize( label.toStdString( ));
 
   // Update counter just in case selection was saved and using the proposed name
   if ( label == automaticLabel )
@@ -316,9 +328,9 @@ void MainWindow::storeSelection( void )
     auto it = _storedSelections.tableWidgets.find( label.toStdString( ));
     if ( it == _storedSelections.tableWidgets.end( ))
     {
-      neuroscheme::Log::log( NS_LOG_HEADER +
+      nslib::Log::log( NS_LOG_HEADER +
                              "Stored selection row not found ",
-                             neuroscheme::LOG_LEVEL_ERROR );
+                             nslib::LOG_LEVEL_ERROR );
       return;
     }
 
@@ -365,10 +377,10 @@ void MainWindow::restoreSelection( void )
       _storedSelections.table->selectedItems( ).at( 0 );
     label = firstItem->text( );
 
-    neuroscheme::SelectionManager::restoreStoredSelection(
+    nslib::SelectionManager::restoreStoredSelection(
       label.toStdString( ));
     resizeEvent( nullptr );
-    for ( const auto& pane : neuroscheme::PaneManager( ).panes( ))
+    for ( const auto& pane : nslib::PaneManager( ).panes( ))
     {
       pane->resizeEvent( 0 );
     }
@@ -393,12 +405,12 @@ void MainWindow::deleteStoredSelection( void )
     _storedSelections.table->removeRow( row );
     _storedSelections.tableWidgets.erase( label.toStdString( ));
 
-    if ( !neuroscheme::SelectionManager::deleteStoredSelection(
+    if ( !nslib::SelectionManager::deleteStoredSelection(
            label.toStdString( )))
     {
-      neuroscheme::Log::log( NS_LOG_HEADER +
+      nslib::Log::log( NS_LOG_HEADER +
                              "Tried to delete a non existing saved selection ",
-                             neuroscheme::LOG_LEVEL_WARNING );
+                             nslib::LOG_LEVEL_WARNING );
 
     }
 // #ifdef NEUROSCHEME_USE_ZEROEQ
@@ -416,28 +428,28 @@ void MainWindow::sortStoredSelectionsTable( int column )
 
 void MainWindow::paneDivisionChanged( void )
 {
-  neuroscheme::PaneManager::paneDivision(
+  nslib::PaneManager::paneDivision(
     _ui->actionSplitVertically->isChecked( ) ?
-    neuroscheme::PaneManager::VERTICAL :
-    neuroscheme::PaneManager::HORIZONTAL );
+    nslib::PaneManager::VERTICAL :
+    nslib::PaneManager::HORIZONTAL );
 }
 
 
 void MainWindow::killActivePane( void )
 {
-  neuroscheme::PaneManager::killActivePane( );
+  nslib::PaneManager::killActivePane( );
 }
 
 void MainWindow::duplicateActivePane( void )
 {
-  neuroscheme::PaneManager::newPaneFromActivePane( );
+  nslib::PaneManager::newPaneFromActivePane( );
 
 }
 
 void MainWindow::home( void )
 {
-    neuroscheme::PaneManager::activePane( )->displayEntities(
-      neuroscheme::DataManager::rootEntities( ), false, true );
+    nslib::PaneManager::activePane( )->displayEntities(
+      nslib::DataManager::rootEntities( ), false, true );
 }
 
 void MainWindow::aboutDialog( void )
@@ -446,9 +458,9 @@ void MainWindow::aboutDialog( void )
     this, tr("About neuroscheme"),
     tr("<p><BIG><b>NeuroScheme</b></BIG><br><br>") +
     tr( "version " ) +
-    tr( neuroscheme::Version::getString( ).c_str( )) +
+    tr( nslib::Version::getString( ).c_str( )) +
     tr( " (" ) +
-    tr( std::to_string( neuroscheme::Version::getRevision( )).c_str( )) +
+    tr( std::to_string( nslib::Version::getRevision( )).c_str( )) +
     tr( ")" ) +
     tr ("<br><br>GMRV - Universidad Rey Juan Carlos<br><br>"
         "<a href=www.gmrv.es>www.gmrv.es</a><br>"
