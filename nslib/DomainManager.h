@@ -50,7 +50,7 @@ namespace nslib
     DataLoader* _dataLoader;
   };
 
-  class DomainManager
+  class NSLIB_API DomainManager
   {
   public:
 

@@ -21,6 +21,7 @@
  */
 #ifndef __NSLIB_CONFIG__
 #define __NSLIB_CONFIG__
+#include <nslib/api.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -43,7 +44,8 @@ namespace nslib
     //   CLI_BLUECONFIG,
     //   CLI_XMLSCENE
     // } TCliDataSource;
-
+    NSLIB_API
+    static NeuroSchemeInputArguments& inputArgs( void );
     // static TCliDataSource cliDataSource;
     // static std::string cliInputFile;
     // static std::string targetLabel;
@@ -53,8 +55,8 @@ namespace nslib
     // static std::string deflectHost;
     // static bool deflectExitOnClose;
     // static bool autoPublishSelection;
-
-    static NeuroSchemeInputArguments inputArgs;
+  protected:
+    static NeuroSchemeInputArguments _inputArgs;
   };
 
 }

@@ -35,27 +35,39 @@ namespace nslib
     virtual ~SelectableEntity( void ) {}
   };
 
-  class NSLIB_API SelectionManager
+  class SelectionManager
   {
   public:
     typedef std::unordered_map< shift::Entity*, SelectedState > TSelection;
     typedef std::unordered_map< std::string, TSelection > TSelections;
 
+    NSLIB_API
     static void setSelectedState( shift::Entity* entity,
                                   SelectedState state );
+    NSLIB_API
     static SelectedState getSelectedState( shift::Entity* entity );
+    NSLIB_API
     static void clearActiveSelection( void );
+    NSLIB_API
     static void clearStoredSelections( void );
+    NSLIB_API
     static unsigned int activeSelectionSize( void );
 
+    NSLIB_API
     static void storeActiveSelection( const std::string& selectionName );
+    NSLIB_API
     static void restoreStoredSelection( const std::string& selectionName );
+    NSLIB_API
     static unsigned int storedSelectionSize( const std::string& selectionName );
+    NSLIB_API
     static bool existsStoredSelection( const std::string& selectionName );
+    NSLIB_API
     static bool deleteStoredSelection( const std::string& selectionName );
 
+    NSLIB_API
     static void selectableEntitiesIds(
       std::vector< unsigned int >& selectableEntitiesIds );
+    NSLIB_API
     static void setSelectionFromSelectableEntitiesIds(
       const std::vector< unsigned int >& selectableEntitiesIds );
 

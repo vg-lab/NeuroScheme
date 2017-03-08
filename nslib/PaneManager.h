@@ -78,7 +78,7 @@ namespace nslib
     static QGridLayout* _layout;
     static unsigned int _paneNextNumber;
     //TODO this is just a PoC, not final
-    static unsigned int _nextRow, _nextColumn;
+    //static unsigned int _nextRow, _nextColumn;
 
     static Matrix4f _modelViewMatrix;
     static std::chrono::time_point< std::chrono::system_clock > lastMatrixClock;

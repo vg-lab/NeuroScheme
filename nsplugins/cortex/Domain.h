@@ -22,6 +22,7 @@
 #ifndef __NSLIB__CORTEX_DOMAIN_MANAGER__
 #define __NSLIB__CORTEX_DOMAIN_MANAGER__
 
+#include <nslibcortex/api.h>
 #include <nslib/DomainManager.h>
 #include "DataLoader.h"
 
@@ -30,7 +31,7 @@ namespace nslib
 
   namespace cortex
   {
-    class Domain
+    class NSLIBCORTEX_API Domain
       : public ::nslib::Domain
     {
 

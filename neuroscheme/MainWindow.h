@@ -23,7 +23,6 @@
 #define __NEUROSCHEME__MAINWINDOW__
 
 #include <ui_MainWindow.h>
-#include <neuroscheme/version.h>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QTableWidget>

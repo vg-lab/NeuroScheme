@@ -78,7 +78,7 @@ set( NSLIBCORTEX_LINK_LIBRARIES
   )
 
 # To generate own api.h and version.h
+set( NSLIBCORTEX_INCLUDE_NAME nslibcortex )
 set( NSLIBCORTEX_NAMESPACE  nslibcortex )
-set( NSLIBCORTEX_INCLUDENAME nslibcortex )
 
 common_library( nslibcortex )

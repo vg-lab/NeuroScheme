@@ -52,7 +52,7 @@ namespace nslib
     QGridLayout* _layout;
   };
 
-  class Layout : public QObject
+  class NSLIB_API Layout : public QObject
   {
     Q_OBJECT;
   public:

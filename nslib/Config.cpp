@@ -24,6 +24,10 @@
 namespace nslib
 {
 
+  NeuroSchemeInputArguments& Config::inputArgs( void )
+  {
+    return _inputArgs;
+  }
   // Config::TCliDataSource Config::cliDataSource = CLI_NODATA;
   // std::string Config::cliInputFile = std::string( );
   // std::string Config::targetLabel = std::string( );
@@ -33,6 +37,6 @@ namespace nslib
   // std::string Config::deflectHost = std::string( );
   // bool Config::deflectExitOnClose = true;
   // bool Config::autoPublishSelection = true;
-  NeuroSchemeInputArguments Config::inputArgs = NeuroSchemeInputArguments( );
+  NeuroSchemeInputArguments Config::_inputArgs = NeuroSchemeInputArguments( );
 
 }

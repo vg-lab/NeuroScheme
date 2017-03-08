@@ -36,8 +36,8 @@ namespace nslib
   PaneManager::TPanes PaneManager::_panes = PaneManager::TPanes( );
   QGridLayout* PaneManager::_layout = nullptr;
   unsigned int PaneManager::_paneNextNumber = 0;
-  unsigned int PaneManager::_nextRow = 0;
-  unsigned int PaneManager::_nextColumn = 0;
+  //unsigned int PaneManager::_nextRow = 0;
+  //unsigned int PaneManager::_nextColumn = 0;
   Eigen::Matrix4f PaneManager::_modelViewMatrix =
     Eigen::Matrix4f::Identity( );
   std::chrono::time_point< std::chrono::system_clock >

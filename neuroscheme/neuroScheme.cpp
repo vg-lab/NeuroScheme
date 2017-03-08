@@ -123,7 +123,7 @@ void parseArguments( int argc, char** argv,
 
 int main( int argc, char** argv )
 {
-  auto& args = nslib::Config::inputArgs;
+  auto& args = nslib::Config::inputArgs( );
   parseArguments( argc, argv, args );
   std::cout << args.size( ) << std::endl;
   // for ( const auto& a : args )
