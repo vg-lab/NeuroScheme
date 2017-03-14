@@ -25,6 +25,7 @@
 #include <nslib/ZeroEQManager.h>
 #include <nslib/reps/SelectableItem.h>
 #include <nslib/version.h>
+#include <nsplugins/cortex/Domain.h>
 #include "MainWindow.h"
 
 
@@ -36,7 +37,22 @@ bool atLeastTwo( bool a, bool b, bool c )
 void usageMessage( void )
 {
   std::cerr << std::endl;
-  std::cerr << "TODO" << std::endl;
+  std::cerr << "Usage: "
+            << "NeuroScheme" << std::endl;
+
+  std::cerr << "\t[ -d | --domain ] domainName "
+            << std::endl
+            << "\t[ --version ]"
+            << std::endl
+            << "\t[ --help ]";
+  std::cout << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "Domain options:" << std::endl;
+  std::cout << "\t - cortex:" << std::endl;
+  nslib::cortex::Domain::usageMessage( );
+
+  std::cout << std::endl;
   exit( -1 );
 }
 
@@ -125,7 +141,10 @@ int main( int argc, char** argv )
 {
   auto& args = nslib::Config::inputArgs( );
   parseArguments( argc, argv, args );
-  std::cout << args.size( ) << std::endl;
+
+  if ( args.count( "--help" ) == 1 )
+    usageMessage( );
+  // std::cout << args.size( ) << std::endl;
   // for ( const auto& a : args )
   // {
   //   std::cout << a.first << ": ";
@@ -175,128 +194,6 @@ int main( int argc, char** argv )
     fullscreen = true;
   }
 
-//     }
-//   for ( int i = 1; i < argc; i++ )
-//   {
-//     if ( strcmp( argv[i], "--version" ) == 0 )
-//     {
-//       dumpVersion( );
-//       return 0;
-//     }
-//     if (strcmp(argv[i],"--help") == 0)
-//     {
-//       usageMessage( );
-//       return 0;
-//     }
-//     if (strcmp(argv[i],"-bc") == 0)
-//     {
-//       neuroscheme::Config::cliDataSource = neuroscheme::Config::CLI_BLUECONFIG;
-//       if( ++i < argc )
-//         neuroscheme::Config::cliInputFile = std::string( argv[i] );
-//       else
-//         usageMessage( );
-
-//       bcInput = true;
-//     }
-//     if ( strcmp( argv[i], "-swc" ) == 0 )
-//     {
-//       neuroscheme::Config::cliDataSource = neuroscheme::Config::CLI_SWCLIST;
-//       neuroscheme::Config::cliInputFile = std::string(argv[++i]);
-//       swcInput = true;
-//     }
-//     if ( strcmp( argv[i], "-xml" ) == 0 )
-//     {
-//       neuroscheme::Config::cliDataSource = neuroscheme::Config::CLI_XMLSCENE;
-//       neuroscheme::Config::cliInputFile = std::string( argv[ ++i ] );
-//       xmlInput = true;
-//     }
-//     if ( strcmp( argv[i], "-target" ) == 0 )
-//     {
-//       neuroscheme::Config::targetLabel = std::string( argv[++i] );
-//     }
-//     if ( strcmp( argv[i], "-cns" ) == 0 ||
-//          strcmp( argv[i], "--csv-neuron-stats" ) == 0 )
-//     {
-//       if( ++i < argc )
-//         neuroscheme::Config::csvNeuronStatsFileName = std::string( argv[i] );
-//       else
-//         usageMessage( );
-//     }
-
-//     if ( strcmp( argv[i], "--fullscreen" ) == 0 ||
-//          strcmp( argv[i],"-fs") == 0 )
-//     {
-//       fullscreen = true;
-//     }
-//     if ( strcmp( argv[i], "--maximize-window" ) == 0 ||
-//          strcmp( argv[i],"-mw") == 0 )
-//     {
-//       initWindowMaximized = true;
-//     }
-//     if ( strcmp( argv[i], "--window-size" ) == 0 ||
-//          strcmp( argv[i],"-ws") == 0 )
-//     {
-//       initWindowSize = true;
-//       if ( i + 2 >= argc )
-//         usageMessage( );
-//       initWindowWidth = atoi( argv[ ++i ] );
-//       initWindowHeight = atoi( argv[ ++i ] );
-
-//     }
-//     if ( strcmp( argv[i], "--no-morphologies" ) == 0 ||
-//          strcmp( argv[i],"-nm") == 0 )
-//     {
-//       neuroscheme::Config::loadMorphologies = false;
-//     }
-
-
-//     if (strcmp( argv[i],"-zeroeq") == 0 )
-//     {
-// #ifndef NEUROSCHEME_USE_ZEROEQ
-//       std::cerr << "Error: ZeroEQ support not built-in" << std::endl;
-//       return -1;
-// #endif
-//       if ( i+1 >= argc )
-//         std::cout << "Using default ZeroEQ session" << std::endl;
-//       else
-//         neuroscheme::Config::zeroeqSession = std::string( argv[ ++i ] );
-//     }
-
-//     if ( strcmp( argv[i], "--deflect-host" ) == 0 ||
-//          strcmp( argv[i],"-dh") == 0 )
-//     {
-// #ifndef NEUROSCHEME_USE_DEFLECT
-//       std::cerr << "Error: Deflect support not built-in" << std::endl;
-//       return -1;
-// #endif
-//       if ( i+1 >= argc )
-//         usageMessage( );
-//       neuroscheme::Config::deflectHost = std::string( argv[ ++i ] );
-//     }
-
-//     if ( strcmp( argv[i], "--deflect-exit-on-close" ) == 0 )
-//     {
-// #ifndef NEUROSCHEME_USE_DEFLECT
-//       std::cerr << "Error: Deflect support not built-in" << std::endl;
-//       return -1;
-// #endif
-//       neuroscheme::Config::deflectExitOnClose = true;
-//     }
-
-//     if ( strcmp( argv[i], "--no-auto-publish-selection" ) == 0 ||
-//          strcmp( argv[i],"-naps") == 0 )
-//     {
-//       neuroscheme::Config::autoPublishSelection = false;
-//     }
-
-
-//   }
-
-//   if ( atLeastTwo( swcInput, bcInput, xmlInput ))
-//   {
-//     std::cerr << "Error: -swc and -bc options are exclusive" << std::endl;
-//     return -1;
-//   }
 
   QApplication app( argc, argv );
 

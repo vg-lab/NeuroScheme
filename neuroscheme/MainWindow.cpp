@@ -87,10 +87,11 @@ MainWindow::MainWindow( QWidget* parent_ )
   this->setCentralWidget( widget );
 
   // Active domain
-  if ( nslib::Config::inputArgs( ).count( "-domain" ) == 1 &&
-       nslib::Config::inputArgs( )["-domain"].size( ) == 1 )
+  auto domainArg = nslib::Config::isArgumentDefined( { "--domain", "-d"} );
+  if ( !domainArg.empty( ) &&
+       nslib::Config::inputArgs( )[ domainArg ].size( ) == 1 )
   {
-    if ( nslib::Config::inputArgs( )["-domain"][0] == "cortex" )
+    if ( nslib::Config::inputArgs( )[ domainArg ][0] == "cortex" )
     {
       nslib::Domain* domain = new nslib::cortex::Domain;
       nslib::DomainManager::setActiveDomain( domain );

@@ -28,15 +28,18 @@ namespace nslib
   {
     return _inputArgs;
   }
-  // Config::TCliDataSource Config::cliDataSource = CLI_NODATA;
-  // std::string Config::cliInputFile = std::string( );
-  // std::string Config::targetLabel = std::string( );
-  // bool Config::loadMorphologies = true;
-  // std::string Config::csvNeuronStatsFileName = std::string( );
-  // std::string Config::zeroeqSession = std::string( );
-  // std::string Config::deflectHost = std::string( );
-  // bool Config::deflectExitOnClose = true;
-  // bool Config::autoPublishSelection = true;
+
   NeuroSchemeInputArguments Config::_inputArgs = NeuroSchemeInputArguments( );
+
+  std::string Config::isArgumentDefined(
+      const std::vector< std::string >& argNames )
+  {
+    for ( const auto& arg : argNames )
+    {
+      if ( _inputArgs.count( arg ) > 0 )
+        return arg;
+    }
+    return std::string( );
+  }
 
 }

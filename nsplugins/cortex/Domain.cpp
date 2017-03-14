@@ -45,5 +45,19 @@ namespace nslib
       return entity->getProperty( "Position3D" ).value< Vector4f >( );
     }
 
+    void Domain::usageMessage( void )
+    {
+      std::cerr << "\t\t[ -bc blue_config_path | -swc swc_file_list "
+                << " | -xml scene_xml ] "
+                << std::endl
+                << "\t\t[ -target target_label ] "
+                << std::endl
+                << "\t\t[ --no-morphologies | -nm ] "
+                << std::endl
+                << "\t\t[ -cns | --csv-neuron-stats ] csv_file"
+                << std::endl;
+
+    }
+
   }
 }
