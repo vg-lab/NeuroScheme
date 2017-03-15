@@ -50,7 +50,7 @@ namespace nslib
       bool isSelectableEntity( shift::Entity* entity ) const;
       unsigned int selectableEntityId( shift::Entity* entity ) const;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const;
-
+      static void usageMessage( void );
     };
   }
 }

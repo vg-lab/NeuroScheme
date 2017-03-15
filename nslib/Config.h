@@ -36,27 +36,18 @@ namespace nslib
 
   class Config
   {
+
   public:
-    // typedef enum
-    // {
-    //   CLI_NODATA,
-    //   CLI_SWCLIST,
-    //   CLI_BLUECONFIG,
-    //   CLI_XMLSCENE
-    // } TCliDataSource;
     NSLIB_API
     static NeuroSchemeInputArguments& inputArgs( void );
-    // static TCliDataSource cliDataSource;
-    // static std::string cliInputFile;
-    // static std::string targetLabel;
-    // static bool loadMorphologies;
-    // static std::string csvNeuronStatsFileName;
-    // static std::string zeroeqSession;
-    // static std::string deflectHost;
-    // static bool deflectExitOnClose;
-    // static bool autoPublishSelection;
+
+    NSLIB_API
+    static std::string isArgumentDefined(
+      const std::vector< std::string >& argNames );
+
   protected:
     static NeuroSchemeInputArguments _inputArgs;
+
   };
 
 }
