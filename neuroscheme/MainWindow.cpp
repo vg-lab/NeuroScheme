@@ -33,6 +33,7 @@
 #include <nslib/layouts/LayoutManager.h>
 #include <nslib/layouts/ScatterPlotLayout.h>
 #include <cortex/Domain.h>
+#include <congen/Domain.h>
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -97,22 +98,16 @@ MainWindow::MainWindow( QWidget* parent_ )
       nslib::DomainManager::setActiveDomain( domain );
       if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
         exit( -1 );
-      // domain->
+    }
+    else if ( nslib::Config::inputArgs( )[ domainArg ][0] == "congen" )
+    {
+      nslib::Domain* domain = new nslib::congen::Domain;
+      nslib::DomainManager::setActiveDomain( domain );
+      if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+        exit( -1 );
 
-      // if ( nslib::Config::cliDataSource ==
-      //      nslib::Config::CLI_BLUECONFIG )
-      // {
-      //   nslib::Log::log( NS_LOG_HEADER + "Loading blue config",
-      //                          nslib::LOG_LEVEL_VERBOSE );
-      //   nslib::DataManager::loadBlueConfig(
-      //     nslib::Config::cliInputFile,
-      //     nslib::Config::targetLabel,
-      //     nslib::Config::loadMorphologies,
-      //     nslib::Config::csvNeuronStatsFileName );
-      // }
     }
   }
-
   nslib::PaneManager::splitter( widget );
 
   // First pane

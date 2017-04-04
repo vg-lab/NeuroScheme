@@ -264,7 +264,8 @@ namespace nslib
   void Canvas::displayEntities( shift::Entities& entities_,
                                 bool animate, bool refreshProperties_ )
   {
-    nslib::Log::log( NS_LOG_HEADER + "displayEntities",
+    nslib::Log::log( NS_LOG_HEADER + "displayEntities " +
+                     std::to_string( entities_.size( )),
                            nslib::LOG_LEVEL_VERBOSE );
 
     if ( refreshProperties_ )

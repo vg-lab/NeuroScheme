@@ -421,6 +421,9 @@ namespace nslib
     const shift::RelationshipOneToN& relAGroupOf,
     unsigned int entityGid )
   {
+    if ( relSuperEntityOf.count( entityGid ) < 1 )
+      return;
+
     for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
     {
       bool allGroupedSelected, noGroupedSelected;

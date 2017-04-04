@@ -1,0 +1,16 @@
+{
+    "reps": [
+        {
+            "name": "NeuronPopRep",
+            "includes" : [ "<nslib/Color.h>" ],
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "color",
+                    "type": "Color"
+                }
+            ],
+            "types": [ ]
+        }
+    ]
+}

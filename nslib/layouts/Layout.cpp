@@ -102,6 +102,11 @@ namespace nslib
                         shift::Representations& representations,
                         bool animate )
   {
+    nslib::Log::log( NS_LOG_HEADER + "display " +
+                     std::to_string( entities.size( )),
+                     nslib::LOG_LEVEL_VERBOSE );
+
+
     representations.clear( );
 
     bool doFiltering =
@@ -173,6 +178,11 @@ namespace nslib
       nslib::RepresentationCreatorManager::create(
        entities, representations,
         true, true );
+
+      nslib::Log::log( NS_LOG_HEADER + " created reps " +
+                       std::to_string( representations.size( )),
+                       nslib::LOG_LEVEL_VERBOSE );
+
     }
 
     if ( !animate )

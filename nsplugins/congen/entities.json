@@ -1,0 +1,21 @@
+{
+    "reps": [
+        {
+            "name": "NeuronPop",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [],
+            "properties": [
+                {
+                    "name": "Perc Inhibitory",
+                    "type": "float"
+                },
+                {
+                    "name": "hola",
+                    "type": "int"
+                }
+
+            ],
+            "types": []
+        }
+    ]
+}

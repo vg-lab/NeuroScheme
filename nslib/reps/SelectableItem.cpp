@@ -47,6 +47,18 @@ namespace  nslib
 
   void SelectableItem::init( void )
   {
+    char* scaleFactorString = getenv( "NEUROSCHEME_SCALE_FACTOR" );
+    if ( scaleFactorString )
+    {
+      auto scaleFactor = atof( scaleFactorString );
+      _selectedPen.setWidth( _selectedPen.width( ) * scaleFactor );
+      _hoverSelectedPen.setWidth( _hoverSelectedPen.width( ) * scaleFactor );
+      _partiallySelectedPen.setWidth( _partiallySelectedPen.width( ) * scaleFactor );
+      _hoverPartiallySelectedPen.setWidth( _hoverPartiallySelectedPen.width( ) *
+                                           scaleFactor );
+      _unselectedPen.setWidth( _unselectedPen.width( ) * scaleFactor );
+      _hoverUnselectedPen.setWidth( _hoverUnselectedPen.width( ) * scaleFactor );
+    }
     _selectedPen.setCosmetic( true );
     _hoverSelectedPen.setCosmetic( true );
     _partiallySelectedPen.setCosmetic( true );

@@ -1,0 +1,67 @@
+include( shift_generate_cxx )
+
+# Generate objects
+set( SHIFT_GENERATED_OBJECTS
+  NeuronPop )
+set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
+file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
+foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
+  shift_generate_cxx(
+    "Entity"
+    ${GENERATED_OBJECT}
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
+    ${SHIFT_GENERATED_DIR}
+    )
+  list( APPEND SHIFT_GENERATED_IMPL_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.cpp )
+  list( APPEND SHIFT_GENERATED_HEADER_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
+endforeach( )
+
+# Generate representations
+set( SHIFT_GENERATED_OBJECTS NeuronPopRep )
+set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
+file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
+foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
+  shift_generate_cxx(
+    "Representation"
+    ${GENERATED_OBJECT}
+    ${CMAKE_CURRENT_SOURCE_DIR}/reps.json
+    ${SHIFT_GENERATED_DIR}
+    )
+  list( APPEND SHIFT_GENERATED_IMPL_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.cpp )
+  list( APPEND SHIFT_GENERATED_HEADER_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
+endforeach( )
+
+message("  ${SHIFT_GENERATED_IMPL_FILES}")
+set( NSLIBCONGEN_SOURCES
+  ${SHIFT_GENERATED_IMPL_FILES}
+  DataLoader.cpp
+  Domain.cpp
+  NeuronPopRep.cpp
+  NeuronPopItem.cpp
+  RepresentationCreator.cpp
+  )
+
+set( NSLIBCONGEN_HEADERS
+  ${SHIFT_GENERATED_HEADERS_FILES}
+  DataLoader.h
+  Domain.h
+  NeuronPopRep.h
+  NeuronPopItem.h
+  RepresentationCreator.h
+  )
+
+include_directories( ${SHIFT_GENERATED_DIR} )
+
+set( NSLIBCONGEN_LINK_LIBRARIES
+  nslib
+  )
+
+# To generate own api.h and version.h
+set( NSLIBCONGEN_INCLUDE_NAME nslibcongen )
+set( NSLIBCONGEN_NAMESPACE  nslibcongen )
+
+common_library( nslibcongen )

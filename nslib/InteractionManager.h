@@ -29,7 +29,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 #include <QPen>
-#include <iostream> // Borrar
 namespace nslib
 {
   class NSLIB_API InteractionManager
@@ -49,16 +48,6 @@ namespace nslib
                                  QGraphicsSceneMouseEvent* event );
 
 
-    // static const QPen& getSelectedPen( ) { return _selectedPen; }
-    // static const QPen& getPartiallySelectedPen( )
-    // {
-    //   return _partiallySelectedPen;
-    // }
-    // static const QPen& getUnselectedPen( )
-    // {
-    //   return _unselectedPen;
-    // }
-
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
       const shift::RelationshipOneToN& relParentOf,
@@ -67,13 +56,6 @@ namespace nslib
       bool& noChildrenSelected );
 
   protected:
-
-
-  // void InteractionManager::_PropagateSelectedToChilds(
-  //   shift::Entities& entities,
-  //   shift::RelationshipOneToN& relParentOf,
-  //   unsigned int entityGid,
-  //   SelectedState state
 
     static void _propagateSelectedStateToChilds(
       const shift::Entities& entities,

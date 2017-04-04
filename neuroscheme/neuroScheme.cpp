@@ -196,6 +196,7 @@ int main( int argc, char** argv )
 
 
   QApplication app( argc, argv );
+  //QGuiApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   MainWindow mainWindow( 0 );
   mainWindow.setWindowTitle( "NeuroScheme" );
