@@ -67,6 +67,14 @@ void dumpVersion( void )
             << " (" << nslib::Version::getRevision( ) << ")"
             << std::endl << std::endl;
 
+  std::cerr << "Nsol support built-in: ";
+#ifdef NEUROSCHEME_USE_NSOL
+  std::cerr << "yes";
+#else
+  std::cerr << "no";
+#endif
+  std::cerr << std::endl;
+
   std::cerr << "Brion support built-in: ";
 #ifdef NSOL_USE_BRION
   std::cerr << "yes";
@@ -109,6 +117,7 @@ void dumpVersion( void )
 
   std::cerr << std::endl;
 
+  exit( 0 );
 
 }
 
@@ -144,16 +153,10 @@ int main( int argc, char** argv )
 
   if ( args.count( "--help" ) == 1 )
     usageMessage( );
-  // std::cout << args.size( ) << std::endl;
-  // for ( const auto& a : args )
-  // {
-  //   std::cout << a.first << ": ";
-  //   for ( const auto &b : a.second )
-  //     std::cout << b << ",";
-  //   std::cout << std::endl;
-  // }
 
-//   bool swcInput = false, bcInput = false, xmlInput = false;
+  if ( args.count( "--version" ) == 1 )
+    dumpVersion( );
+
   bool fullscreen = false;
   bool initWindowSize = false;
   bool initWindowMaximized = false;
