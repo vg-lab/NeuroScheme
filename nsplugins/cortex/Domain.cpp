@@ -47,15 +47,16 @@ namespace nslib
 
     void Domain::usageMessage( void )
     {
-      std::cerr << "\t\t[ -bc blue_config_path | -swc swc_file_list "
+      std::cerr << "\t\t[ -bc blue_config_path " // | " -swc swc_file_list "
                 << " | -xml scene_xml ] "
                 << std::endl
-                << "\t\t[ -target target_label ] "
+                << "\t\t[ -target target_label (*1) ] "
                 << std::endl
                 << "\t\t[ --no-morphologies | -nm ] "
                 << std::endl
                 << "\t\t[ -cns | --csv-neuron-stats ] csv_file"
-                << std::endl;
+                << std::endl << std::endl
+                << "\t\t(*1) only for BlueConfig files" << std::endl;
 
     }
 

@@ -44,11 +44,9 @@ namespace nslib
                                 const bool loadMorphologies,
                                 const std::string& csvNeuronStatsFileName );
 
+    static void loadNsolXmlScene( const std::string& xmlSceneFile );
+
 #ifdef NEUROSCHEME_USE_NSOL
-//     static void createEntitiesFromNsolColumns(
-//       const nsol::Columns& columns,
-//       bool withMorphologies,
-//       const std::string& csvNeuronStatsFileName );
     static nsol::DataSet& nsolDataSet( void ) { return _nsolDataSet; }
 #endif
 

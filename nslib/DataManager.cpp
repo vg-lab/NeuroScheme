@@ -146,5 +146,39 @@ namespace nslib
   }
 
 
+  void DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
+  {
+    #ifdef NSOL_USE_QT5CORE
+    auto errorMessage = new QErrorMessage;
+    try
+    {
+      // this->CloseData( );
+      _nsolDataSet.loadXmlScene<
+        nsol::NodeCached,
+        nsol::SectionCachedStats,
+        nsol::DendriteCachedStats,
+        nsol::AxonCachedStats,
+        nsol::SomaStats,
+        nsol::NeuronMorphologyCachedStats,
+        nsol::Neuron,
+        nsol::MiniColumnStats,
+        nsol::ColumnStats >( xmlSceneFile );
+    } catch ( std::exception& ex )
+    {
+      Log::log( std::string( "Error loading scene: " ) +
+                std::string( ex.what( )), LOG_LEVEL_ERROR );
+      errorMessage->showMessage( QString("Error loading scene") +
+                                 QString(ex.what( )));
+      return;
+    }
+
+    #else
+    (void) xmlSceneFile;
+    Log::log( "nsol not built or built without QtCore",
+              LOG_LEVEL_ERROR );
+
+    #endif
+  }
+
 
 } // namespace nslib

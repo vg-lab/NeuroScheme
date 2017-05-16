@@ -33,9 +33,16 @@ namespace nslib
     bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& args )
     {
 #ifdef NEUROSCHEME_USE_NSOL
-      std::cout << "Loading data" << std::endl;
+      // std::cout << "Loading data" << std::endl;
       if ( args.empty( ))
         Log::log( "No arguments provided", LOG_LEVEL_ERROR );
+
+      if ( args.count( "-bc" ) > 0 && args.count( "-xml" ) > 0 )
+      {
+        Log::log( "-bc and -xml arguments are exclusive",
+                  LOG_LEVEL_ERROR );
+        return false;
+      }
 
       if ( args.count( "-bc" ) == 1 )
       {
@@ -77,6 +84,25 @@ namespace nslib
           nslib::DataManager::nsolDataSet( ).columns( ),
           args.count( "-nm" ) == 0,
           ( args.count( "-cns" ) == 1 ? args.at( "cns" )[0] : std::string( )));
+
+      }
+
+      if ( args.count( "-xml" ) == 1 )
+      {
+        if ( args.at( "-xml" ).size( ) != 1 )
+        {
+          Log::log( "-xml provided with more or less that one filename",
+                    LOG_LEVEL_ERROR );
+          return false;
+        }
+
+        nslib::Log::log( NS_LOG_HEADER + "Loading nsol xml",
+                               nslib::LOG_LEVEL_VERBOSE );
+
+        nslib::DataManager::loadNsolXmlScene( args.at( "-xml" )[0] );
+
+        createEntitiesFromNsolColumns(
+          nslib::DataManager::nsolDataSet( ).columns( ));
 
       }
 
