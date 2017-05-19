@@ -20,7 +20,8 @@ endforeach( )
 
 # Generate representations
 set( SHIFT_GENERATED_OBJECTS
-  NeuronRep Ring LayerRep NeuronTypeAggregationRep NeuronAggregationRep )
+  NeuronRep Ring LayerRep NeuronTypeAggregationRep NeuronAggregationRep
+  ConnectionArrowRep )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -40,6 +41,8 @@ set( NSLIBCORTEX_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
   ColumnItem.cpp
   ColumnRep.cpp
+  # TODO: ConnectionArrowItem.cpp
+  ConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
   LayerRep.cpp
@@ -60,6 +63,8 @@ set( NSLIBCORTEX_HEADERS
   Neuron.h
   ColumnItem.h
   ColumnRep.h
+  ConnectionArrowItem.h
+  ConnectionArrowRep.h
   LayerRep.h
   MiniColumnItem.h
   MiniColumnRep.h
