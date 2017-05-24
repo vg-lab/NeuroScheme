@@ -41,6 +41,8 @@ namespace nslib
       shift::Representations& representations,
       shift::TEntitiesToReps& entitiesToReps,
       shift::TRepsToEntities& repsToEntities,
+      shift::TRelatedEntitiesReps& relatedEntities,
+      shift::TGidToEntitiesReps& gidsToEntitiesReps,
       bool linkEntitiesToReps,
       bool linkRepsToEntities
       )
@@ -176,6 +178,8 @@ namespace nslib
             entitiesToReps[ entity ].insert( neuronRep );
           if ( linkRepsToEntities )
             repsToEntities[ neuronRep ].insert( entity );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, neuronRep ));
         } // end if its Neuron entity
         else
         if ( dynamic_cast< Column* >( entity ))
@@ -213,6 +217,8 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ columnRep ].insert( entity );
 
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, columnRep ));
+
         } // it its MiniColumn entity
         else
         if ( dynamic_cast< MiniColumn* >( entity ))
@@ -241,6 +247,7 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ miniColumnRep ].insert( entity );
 
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, miniColumnRep ));
         } // if Column entity
         else
         if ( dynamic_cast< Layer* >( entity ))
@@ -259,7 +266,11 @@ namespace nslib
             entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
           if ( linkRepsToEntities )
             repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
-          representations.push_back( _layersMap[ layerKey ] );
+
+          auto layerRep = _layersMap[ layerKey ];
+          representations.push_back( layerRep );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, layerRep ));
         } // if Layer
         else
         if ( dynamic_cast< NeuronTypeAggregation* >( entity ))
@@ -293,15 +304,17 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ _neuronTypeAggsMap.at( neuronTypeAggregationKey ) ].
               insert( entity );
-          representations.push_back(
-            _neuronTypeAggsMap[ neuronTypeAggregationKey ] );
+
+          auto aggTypeAggRep = _neuronTypeAggsMap[ neuronTypeAggregationKey ];
+          representations.push_back( aggTypeAggRep );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, aggTypeAggRep ));
         } // if NeuronTypeAggregationRep
 
 
         // std::cout << ", end entity --> LayersMap size = "
         //           << _layersMap.size( ) << std::endl;
       } // for all entities
-
 
       // Create subentities
       const auto& relSuperEntityOf =
@@ -318,7 +331,31 @@ namespace nslib
       if ( subEntities.size( ) > 0 )
         this->create( subEntities, representations,
                       entitiesToReps, repsToEntities,
+                      relatedEntities, gidsToEntitiesReps,
                       linkEntitiesToReps, linkRepsToEntities );
+
+      const auto& relConnectsTo =
+          DataManager::entities( ).relationships( )[ "connectsTo" ]->asOneToN( );
+
+      for( auto& gidEntityRep : gidsToEntitiesReps )
+      {
+        auto it = relConnectsTo->find( gidEntityRep.first );
+
+        for( auto& relatedEntity : it->second )
+        {
+          auto related = gidsToEntitiesReps.find( relatedEntity );
+          if( related != gidsToEntitiesReps.end( ))
+          {
+            relatedEntities.push_back( std::make_tuple( gidEntityRep.second.first,
+                                                        related->second.first,
+                                                        gidEntityRep.second.second,
+                                                        related->second.second ));
+          }
+        }
+
+      }
+
+
     } // create
 
     void RepresentationCreator::_createColumnOrMiniColumn(

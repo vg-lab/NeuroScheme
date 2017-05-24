@@ -1111,7 +1111,7 @@ namespace nslib
         relConnectedBy[ postNeuron->entityGid( ) ].insert(
           preNeuron->entityGid( ));
       }
-  neuronEntitiesByGid.clear( );
+      neuronEntitiesByGid.clear( );
 
       auto repCretor = new RepresentationCreator( );
       repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,

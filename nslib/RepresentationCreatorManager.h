@@ -54,10 +54,12 @@ namespace nslib
 
     // static const shift::Representation& objectToRep(
   protected:
-    static std::map< unsigned int, shift::RepresentationCreator* > _repCreators;
-    static std::map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
-    static std::map< unsigned int, shift::TRepsToEntities > _repsToEntities;
+    static std::unordered_map< unsigned int, shift::RepresentationCreator* > _repCreators;
+    static std::unordered_map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
+    static std::unordered_map< unsigned int, shift::TRepsToEntities > _repsToEntities;
 
+    static std::unordered_map< unsigned int, shift::TRelatedEntitiesReps > _relatedEntities;
+    static std::unordered_map< unsigned int, shift::TGidToEntitiesReps > _gidsToEntitiesReps;
   };
 
 } // namespace nslib

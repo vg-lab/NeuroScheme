@@ -25,18 +25,25 @@
 namespace nslib
 {
 
-  std::map< unsigned int, shift::RepresentationCreator* >
+  std::unordered_map< unsigned int, shift::RepresentationCreator* >
   RepresentationCreatorManager::_repCreators =
-    std::map< unsigned int, shift::RepresentationCreator* >( );
+    std::unordered_map< unsigned int, shift::RepresentationCreator* >( );
 
-  std::map< unsigned int, shift::TEntitiesToReps >
+  std::unordered_map< unsigned int, shift::TEntitiesToReps >
   RepresentationCreatorManager::_entitiesToReps =
-    std::map< unsigned int, shift::TEntitiesToReps >( );
+    std::unordered_map< unsigned int, shift::TEntitiesToReps >( );
 
-  std::map< unsigned int, shift::TRepsToEntities>
+  std::unordered_map< unsigned int, shift::TRepsToEntities>
   RepresentationCreatorManager::_repsToEntities =
-    std::map< unsigned int, shift::TRepsToEntities>( );
+    std::unordered_map< unsigned int, shift::TRepsToEntities>( );
 
+  std::unordered_map< unsigned int, shift::TRelatedEntitiesReps >
+  RepresentationCreatorManager::_relatedEntities =
+    std::unordered_map< unsigned int, shift::TRelatedEntitiesReps >( );
+
+  std::unordered_map< unsigned int, shift::TGidToEntitiesReps >
+  RepresentationCreatorManager::_gidsToEntitiesReps =
+    std::unordered_map< unsigned int, shift::TGidToEntitiesReps >( );
 
   void RepresentationCreatorManager::addCreator(
     shift::RepresentationCreator* repCreator,
@@ -60,6 +67,8 @@ namespace nslib
       _repCreators[ repCreatorId ]->create( entities, representations,
                                             _entitiesToReps[ repCreatorId ],
                                             _repsToEntities[ repCreatorId ],
+                                            _relatedEntities[ repCreatorId ],
+                                            _gidsToEntitiesReps[ repCreatorId ],
                                             linkEntitiesToReps,
                                             linkRepsToObjs );
   }

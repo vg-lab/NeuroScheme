@@ -46,6 +46,8 @@ namespace nslib
         shift::Representations& representations,
         shift::TEntitiesToReps& entitiesToReps,
         shift::TRepsToEntities& repsToEntities,
+        shift::TRelatedEntitiesReps& relatedEntities,
+        shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false );
 
