@@ -82,6 +82,7 @@ namespace nslib
 
         createEntitiesFromNsolColumns(
           nslib::DataManager::nsolDataSet( ).columns( ),
+          nslib::DataManager::nsolDataSet( ).circuit( ),
           args.count( "-nm" ) == 0,
           ( args.count( "-cns" ) == 1 ? args.at( "cns" )[0] : std::string( )));
 
@@ -102,7 +103,8 @@ namespace nslib
         nslib::DataManager::loadNsolXmlScene( args.at( "-xml" )[0] );
 
         createEntitiesFromNsolColumns(
-          nslib::DataManager::nsolDataSet( ).columns( ));
+          nslib::DataManager::nsolDataSet( ).columns( ),
+          nslib::DataManager::nsolDataSet( ).circuit( ));
 
       }
 
@@ -224,6 +226,7 @@ namespace nslib
 
     void DataLoader::createEntitiesFromNsolColumns(
       const nsol::Columns& columns,
+      const nsol::Circuit& circuit,
       bool withMorphologies,
       const std::string& csvNeuronStatsFileName )
     {
@@ -247,6 +250,11 @@ namespace nslib
       _entities.relationships( )[ "isSubEntityOf" ] =
         new shift::RelationshipOneToOne;
 
+      _entities.relationships( )[ "connectsTo" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "connectedBy" ] =
+        new shift::RelationshipOneToN;
+
       auto& relParentOf =
         *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
       auto& relChildOf =
@@ -262,9 +270,15 @@ namespace nslib
       auto& relSubEntityOf =
         *( _entities.relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
 
+      auto& relConnectsTo =
+        *( _entities.relationships( )[ "connectsTo" ]->asOneToN( ));
+      auto& relConnectedBy =
+        *( _entities.relationships( )[ "connectedBy" ]->asOneToN( ));
+
       assert( DataManager::entities( ).
               relationships( ).count( "isSubEntityOf" ) == 1 );
       std::set< unsigned int > gids;
+      std::unordered_map< unsigned int, shift::Entity* > neuronEntitiesByGid;
       for ( const auto& col : columns )
         for ( const auto& mc : col->miniColumns( ))
           for ( const auto& neuron : mc->neurons( ))
@@ -1062,6 +1076,7 @@ namespace nslib
             // ( void ) relPartOf;
             // ( void ) relGroupOf;
 
+            neuronEntitiesByGid[ neuron->gid( )] = neuronEntity;
           } // for all neurons
 
           std::cout << "\r("
@@ -1082,6 +1097,21 @@ namespace nslib
       _rootEntities.clear( );
       for ( const auto& child : childrenIds )
         _rootEntities.add( nslib::DataManager::entities( ).at( child ));
+
+      for ( const auto& preSynapse:
+              circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
+      {
+        shift::Entity* preNeuron =
+          neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )];
+        shift::Entity* postNeuron =
+          neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )];
+
+        relConnectsTo[ preNeuron->entityGid( )].insert(
+          postNeuron->entityGid( ));
+        relConnectedBy[ postNeuron->entityGid( ) ].insert(
+          preNeuron->entityGid( ));
+      }
+  neuronEntitiesByGid.clear( );
 
       auto repCretor = new RepresentationCreator( );
       repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,

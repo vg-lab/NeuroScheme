@@ -6,4 +6,4 @@
 # git_subproject(Brion https://github.com/BlueBrain/Brion.git fe8974f)
 git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git 8e2c9e3)
 git_subproject(scoop git@gitlab.gmrv.es:gmrv/scoop.git 14349d5)
-# git_subproject(nsol git@gitlab.gmrv.es:nsviz/nsol.git b72a98c)
+# git_subproject(nsol git@gitlab.gmrv.es:nsviz/nsol.git c15cdb3)
