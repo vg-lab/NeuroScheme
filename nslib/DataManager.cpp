@@ -122,6 +122,7 @@ namespace nslib
                              targetLabel );
 
       if ( loadMorphologies )
+      {
         _nsolDataSet.loadAllMorphologies<
           nsol::Node,
           nsol::SectionStats,
@@ -133,9 +134,34 @@ namespace nslib
           nsol::MiniColumnStats,
           nsol::ColumnStats >( );
 
-    } catch ( ... )
+        _nsolDataSet.loadBlueConfigConnectivity<
+          nsol::Node,
+          nsol::SectionStats,
+          nsol::DendriteStats,
+          nsol::AxonStats,
+          nsol::SomaStats,
+          nsol::NeuronMorphologyCachedStats,
+          nsol::Neuron,
+          nsol::MiniColumnStats,
+          nsol::ColumnStats >( );
+      }
+      else
+      {
+        _nsolDataSet.loadBlueConfigBasicConnectivity<
+          nsol::Node,
+          nsol::SectionStats,
+          nsol::DendriteStats,
+          nsol::AxonStats,
+          nsol::SomaStats,
+          nsol::NeuronMorphologyCachedStats,
+          nsol::Neuron,
+          nsol::MiniColumnStats,
+          nsol::ColumnStats >( );
+      }
+    } catch ( std::exception& ex )
     {
-      std::cerr << "Error loading BlueConfig" << std::endl;
+      Log::log( std::string( "Error loading BlueConfig: " ) +
+                std::string( ex.what( )), LOG_LEVEL_ERROR );
       errorMessage->showMessage( "Error loading BlueConfig" );
       return;
     }
