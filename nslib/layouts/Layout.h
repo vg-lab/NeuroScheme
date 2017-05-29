@@ -83,6 +83,7 @@ namespace nslib
 
     virtual void display( shift::Entities& entities,
                           shift::Representations& representations,
+                          shift::TRelatedEntitiesReps& relatedEntities,
                           bool animate = true );
 
     void updateSelection( );

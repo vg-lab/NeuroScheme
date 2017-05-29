@@ -93,6 +93,7 @@ namespace nslib
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );
     shift::Entities& entities( void ) { return _entities; }
+    shift::TRelatedEntitiesReps& relEntitiesReps( void ){ return _relEntitiesReps; }
     const TProperties& properties( void ) { return _properties; }
     void refreshProperties( const shift::Entities& entities_ );
 
@@ -105,6 +106,7 @@ protected:
 
     shift::Representations _reps;
     shift::Entities _entities;
+    shift::TRelatedEntitiesReps _relEntitiesReps;
     TProperties _properties;
 
   public slots:

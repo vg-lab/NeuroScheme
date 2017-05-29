@@ -29,6 +29,7 @@
 #include "Neuron.h"
 #include "NeuronRep.h"
 #include "NeuronTypeAggregationRep.h"
+#include "ConnectionArrowRep.h"
 #include "RepresentationCreator.h"
 
 namespace nslib
@@ -41,7 +42,6 @@ namespace nslib
       shift::Representations& representations,
       shift::TEntitiesToReps& entitiesToReps,
       shift::TRepsToEntities& repsToEntities,
-      shift::TRelatedEntitiesReps& relatedEntities,
       shift::TGidToEntitiesReps& gidsToEntitiesReps,
       bool linkEntitiesToReps,
       bool linkRepsToEntities
@@ -330,33 +330,65 @@ namespace nslib
       }
       if ( subEntities.size( ) > 0 )
         this->create( subEntities, representations,
-                      entitiesToReps, repsToEntities,
-                      relatedEntities, gidsToEntitiesReps,
+                      entitiesToReps, repsToEntities, gidsToEntitiesReps,
                       linkEntitiesToReps, linkRepsToEntities );
+
+    } // create
+
+    void RepresentationCreator::generateRelations(
+      const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+      shift::TRelatedEntities& relatedEntities,
+      shift::TRelatedEntitiesReps& relatedEntitiesReps )
+    {
 
       const auto& relConnectsTo =
           DataManager::entities( ).relationships( )[ "connectsTo" ]->asOneToN( );
 
+      //
       for( auto& gidEntityRep : gidsToEntitiesReps )
       {
         auto it = relConnectsTo->find( gidEntityRep.first );
 
-        for( auto& relatedEntity : it->second )
-        {
-          auto related = gidsToEntitiesReps.find( relatedEntity );
-          if( related != gidsToEntitiesReps.end( ))
+        if( it != relConnectsTo->end( ))
+          for( auto& relatedEntity : it->second )
           {
-            relatedEntities.push_back( std::make_tuple( gidEntityRep.second.first,
-                                                        related->second.first,
-                                                        gidEntityRep.second.second,
-                                                        related->second.second ));
+            auto relEntities = relatedEntities.find( gidEntityRep.first );
+            if( relEntities == relatedEntities.end( ))
+            {
+              std::unordered_set< unsigned int > relSet;
+              auto ref = relatedEntities.insert(
+                  std::make_pair( gidEntityRep.first,
+                                  relSet ));
+
+              relEntities = ref.first;
+            }
+
+            auto related = gidsToEntitiesReps.find( relatedEntity );
+            if( related != gidsToEntitiesReps.end( ))
+            {
+              if( relEntities->second.find( relatedEntity ) != relEntities->second.end( ))
+                continue;
+
+              ConnectionArrowRep* relationRep = new ConnectionArrowRep( );
+
+              relEntities->second.insert( relatedEntity );
+
+              relatedEntitiesReps.push_back(
+                  std::make_tuple( relationRep,
+                                   gidEntityRep.second.first,
+                                   related->second.first,
+                                   gidEntityRep.second.second,
+                                   related->second.second ));
+
+            }
           }
-        }
 
       }
 
+      std::cout << "Created " << relatedEntitiesReps.size( )
+                << " relations." << std::endl;
 
-    } // create
+    } // generateRelations
 
     void RepresentationCreator::_createColumnOrMiniColumn(
       shift::Entity *entity,

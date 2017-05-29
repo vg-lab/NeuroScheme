@@ -38,12 +38,16 @@ namespace nslib
     std::unordered_map< unsigned int, shift::TRepsToEntities>( );
 
   std::unordered_map< unsigned int, shift::TRelatedEntitiesReps >
-  RepresentationCreatorManager::_relatedEntities =
+  RepresentationCreatorManager::_relatedEntitiesReps =
     std::unordered_map< unsigned int, shift::TRelatedEntitiesReps >( );
 
   std::unordered_map< unsigned int, shift::TGidToEntitiesReps >
   RepresentationCreatorManager::_gidsToEntitiesReps =
     std::unordered_map< unsigned int, shift::TGidToEntitiesReps >( );
+
+  std::unordered_map< unsigned int, shift::TRelatedEntities >
+    RepresentationCreatorManager::_relatedEntities =
+        std::unordered_map< unsigned int, shift::TRelatedEntities >( );
 
   void RepresentationCreatorManager::addCreator(
     shift::RepresentationCreator* repCreator,
@@ -67,10 +71,20 @@ namespace nslib
       _repCreators[ repCreatorId ]->create( entities, representations,
                                             _entitiesToReps[ repCreatorId ],
                                             _repsToEntities[ repCreatorId ],
-                                            _relatedEntities[ repCreatorId ],
                                             _gidsToEntitiesReps[ repCreatorId ],
                                             linkEntitiesToReps,
                                             linkRepsToObjs );
+  }
+
+
+  void RepresentationCreatorManager::generateRelations(
+      shift::TRelatedEntitiesReps& relationReps,
+      unsigned int repCreatorId )
+  {
+    if( _repCreators.count( repCreatorId ) == 1 )
+      _repCreators[ repCreatorId ]->generateRelations( _gidsToEntitiesReps[ repCreatorId],
+                                                       _relatedEntities[ repCreatorId ],
+                                                       relationReps );
   }
 
   const shift::TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(
@@ -82,6 +96,18 @@ namespace nslib
     unsigned int repCreatorId )
   {
     return _repsToEntities[ repCreatorId ];
+  }
+
+  const shift::TRelatedEntitiesReps& RepresentationCreatorManager::relatedEntities(
+    unsigned int repCreatorId )
+  {
+    return _relatedEntitiesReps[ repCreatorId ];
+  }
+
+  const shift::TGidToEntitiesReps& RepresentationCreatorManager::gidsToEntitiesReps(
+    unsigned int repCreatorId )
+  {
+    return _gidsToEntitiesReps[ repCreatorId ];
   }
 
   void RepresentationCreatorManager::deleteItemsOfCanvas( Canvas* canvas )

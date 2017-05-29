@@ -43,7 +43,8 @@ namespace nslib
 
   Layout::Layout( const std::string& name_,
                   unsigned int flags_ )
-    : _flags( flags_ )
+    : _canvas( nullptr )
+    , _flags( flags_ )
     , _optionsWidget( new LayoutOptionsWidget )
     , _name( name_ )
     , _toolbox( new QToolBox( _optionsWidget ))
@@ -95,11 +96,13 @@ namespace nslib
 
   void Layout::refresh( bool animate )
   {
-    display( _canvas->entities( ), _canvas->reps( ), animate );
+    display( _canvas->entities( ), _canvas->reps( ),
+             _canvas->relEntitiesReps( ), animate );
   }
 
   void Layout::display( shift::Entities& entities,
                         shift::Representations& representations,
+                        shift::TRelatedEntitiesReps& relatedEntities,
                         bool animate )
   {
     representations.clear( );
@@ -161,7 +164,6 @@ namespace nslib
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
-
     }
     else
     {
@@ -174,6 +176,9 @@ namespace nslib
        entities, representations,
         true, true );
     }
+
+    // Generate relationship representations
+    nslib::RepresentationCreatorManager::generateRelations( relatedEntities );
 
     if ( !animate )
     {
