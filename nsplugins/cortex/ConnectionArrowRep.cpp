@@ -56,5 +56,10 @@ namespace nslib
       return _items.at( scene );
     }
 
+    void ConnectionArrowRep::preRender( void )
+    {
+      // TO DO Arrow positioning
+    }
+
   } // namespace cortex
 } // namespace nslib

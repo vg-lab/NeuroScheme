@@ -45,6 +45,8 @@ namespace nslib
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );
 
+       void preRender( void );
+
     };
 
 
