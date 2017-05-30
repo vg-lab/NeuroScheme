@@ -30,12 +30,9 @@
 #include <nslib/reps/SelectableItem.h>
 #include "ConnectionArrowRep.h"
 
-//#include <QGraphicsEllipseItem>
-//#include <QPainterPath>
 #include <QGraphicsPolygonItem>
 
 #include <ctime>
-#include <math.h>
 
 namespace nslib
 {
@@ -44,12 +41,8 @@ namespace nslib
 
     class ConnectionArrowItem
       : public QObject
-      //TODO
-      //, public QGraphicsLineItem
       , public QGraphicsPolygonItem
-      //, public QPainterPath
       , public nslib::Item
-      //, public nslib::SelectableItem // (No render polygons!!!)
       , public nslib::InteractiveItem
     {
       Q_OBJECT
@@ -63,13 +56,6 @@ namespace nslib
       virtual ~ConnectionArrowItem( void ) {}
 
       void createArrow( const QPointF& origin, const QPointF& dest );
-
-    protected:
-
-      // QPolygonF arrowShape;
-
-      // float arrowWidht;
-      // float arrowLengh;
 
     };
   } // namespace cortex

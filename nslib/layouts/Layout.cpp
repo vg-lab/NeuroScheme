@@ -107,6 +107,7 @@ namespace nslib
   {
     representations.clear( );
 
+
     bool doFiltering =
       _filterWidget &&
       _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
@@ -178,6 +179,7 @@ namespace nslib
     }
 
     // Generate relationship representations
+    relatedEntities.clear( );
     nslib::RepresentationCreatorManager::generateRelations( relatedEntities );
     shift::Representations relationshipReps;
 
@@ -290,10 +292,12 @@ namespace nslib
   void Layout::_clearScene( void )
   {
     // Remove top items without destroying them
+    int count = 0;
     for ( auto& item : _canvas->scene( ).items( ))
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
+        count++;
         // std::cout << "remove " << item << std::endl;
         // for ( const auto c : item->childItems( ))
         // {
@@ -310,6 +314,7 @@ namespace nslib
         _canvas->scene( ).removeItem( item );
       }
     }
+    std::cout << "Se van a borrar: " << count << std::endl;
     // QList< QGraphicsItem* > items_ = _scene->items( );
     // for ( auto item = items_.begin( ); item != items_.end( ); ++item )
     // {

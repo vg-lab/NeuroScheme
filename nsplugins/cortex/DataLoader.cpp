@@ -705,9 +705,9 @@ namespace nslib
           layerEntity->registerProperty( "Parent Type", uint( 0 ));
           layerEntity->registerProperty( "Layer", uint( i+1 ));
           colLayerEntities[ i ] = layerEntity;
-          relSuperEntityOf[ colEntity->entityGid( ) ].insert(
+          relSuperEntityOf[ colEntity->entityGid( ) ].entities.insert(
             layerEntity->entityGid( ));
-          relSubEntityOf[ layerEntity->entityGid( ) ] =
+          relSubEntityOf[ layerEntity->entityGid( ) ].entity =
             colEntity->entityGid( );
           _entities.add( layerEntity );
 
@@ -751,8 +751,8 @@ namespace nslib
         //     colEntity, "Id", col->id( ));
 
         _entities.add( colEntity );
-        relParentOf[ 0 ].insert( colEntity->entityGid( ));
-        relChildOf[ colEntity->entityGid( ) ] = 0;
+        relParentOf[ 0 ].entities.insert( colEntity->entityGid( ));
+        relChildOf[ colEntity->entityGid( ) ].entity = 0;
 
         nsol::MiniColumns& miniCols = col->miniColumns( );
         int miniColumnsCounter = 0;
@@ -854,9 +854,9 @@ namespace nslib
             layerEntity->registerProperty( "Parent Type", uint( 1 ));
             layerEntity->registerProperty( "Layer", uint( i+1 ));
             mcLayerEntities[ i ] = layerEntity;
-            relSuperEntityOf[ mcEntity->entityGid( ) ].insert(
+            relSuperEntityOf[ mcEntity->entityGid( ) ].entities.insert(
               layerEntity->entityGid( ));
-            relSubEntityOf[ layerEntity->entityGid( ) ] =
+            relSubEntityOf[ layerEntity->entityGid( ) ].entity =
               mcEntity->entityGid( );
             _entities.add( layerEntity );
 
@@ -900,8 +900,9 @@ namespace nslib
           //   mcEntity, "Id", mc->id( ));
 
           _entities.add( mcEntity );
-          relChildOf[ mcEntity->entityGid( ) ] = colEntity->entityGid( );
-          relParentOf[ colEntity->entityGid( ) ].insert( mcEntity->entityGid( ));
+          relChildOf[ mcEntity->entityGid( ) ].entity = colEntity->entityGid( );
+          relParentOf[ colEntity->entityGid( ) ].entities.insert(
+            mcEntity->entityGid( ));
 
           ///////////////////////////////////////////
           // Neurons ////////////////////////////////
@@ -989,19 +990,19 @@ namespace nslib
 
 
             _entities.add( neuronEntity );
-            relChildOf[ neuronEntity->entityGid( ) ] =
+            relChildOf[ neuronEntity->entityGid( ) ].entity =
               mcEntity->entityGid( );
-            relParentOf[ mcEntity->entityGid( ) ].insert(
+            relParentOf[ mcEntity->entityGid( ) ].entities.insert(
               neuronEntity->entityGid( ));
 
-            relGroupOf[ mcEntity->entityGid( ) ].insert(
+            relGroupOf[ mcEntity->entityGid( ) ].entities.insert(
               neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].insert(
+            relPartOf[ neuronEntity->entityGid( ) ].entities.insert(
               mcEntity->entityGid( ));
 
-            relGroupOf[ colEntity->entityGid( ) ].insert(
+            relGroupOf[ colEntity->entityGid( ) ].entities.insert(
               neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].insert(
+            relPartOf[ neuronEntity->entityGid( ) ].entities.insert(
               colEntity->entityGid( ));
 
             for ( auto layer = 0; layer < 6; ++layer )
@@ -1093,7 +1094,7 @@ namespace nslib
 
       std::cout << "\n";
 
-      const auto& childrenIds = relParentOf[ 0 ];
+      const auto& childrenIds = relParentOf[ 0 ].entities;
       _rootEntities.clear( );
       for ( const auto& child : childrenIds )
         _rootEntities.add( nslib::DataManager::entities( ).at( child ));
@@ -1106,9 +1107,9 @@ namespace nslib
         shift::Entity* postNeuron =
           neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )];
 
-        relConnectsTo[ preNeuron->entityGid( )].insert(
+        relConnectsTo[ preNeuron->entityGid( )].entities.insert(
           postNeuron->entityGid( ));
-        relConnectedBy[ postNeuron->entityGid( ) ].insert(
+        relConnectedBy[ postNeuron->entityGid( ) ].entities.insert(
           preNeuron->entityGid( ));
       }
       neuronEntitiesByGid.clear( );

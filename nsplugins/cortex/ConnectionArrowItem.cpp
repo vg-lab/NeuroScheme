@@ -4,7 +4,8 @@
  *  Created on: 30/5/2017
  *      Author: juanpebm
  */
-
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 #include "ConnectionArrowItem.h"
 
@@ -13,11 +14,12 @@ namespace nslib
   namespace cortex
   {
 
-    const auto M_PI_3 = float( M_PI ) * 0.33f;
-	  ConnectionArrowItem::ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
-	  {
-		   this->_parentRep =
-           &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
+     const auto M_PI_3 = float( M_PI ) * 0.33f;
+
+    ConnectionArrowItem::ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
+    {
+      this->_parentRep =
+        &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
 
     void ConnectionArrowItem::createArrow( const QPointF& origin,
@@ -52,6 +54,6 @@ namespace nslib
                  << arrowInit;
 
 			this->setPolygon( arrowShape );
-  	  }
-   }
+    }
+  }
 }
