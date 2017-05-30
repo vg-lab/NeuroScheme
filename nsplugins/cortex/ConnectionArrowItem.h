@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ * 			Juan Pedro Brito <juanpedro.brito@upm.es>
  *
  * This file is part of NeuroScheme
  *
@@ -28,7 +29,13 @@
 #include <nslib/reps/Item.h>
 #include <nslib/reps/SelectableItem.h>
 #include "ConnectionArrowRep.h"
-#include <QGraphicsEllipseItem>
+
+//#include <QGraphicsEllipseItem>
+//#include <QPainterPath>
+#include <QGraphicsPolygonItem>
+
+#include <ctime>
+#include <math.h>
 
 namespace nslib
 {
@@ -37,9 +44,12 @@ namespace nslib
 
     class ConnectionArrowItem
       : public QObject
-      , public QGraphicsEllipseItem
+      //TODO
+      //, public QGraphicsLineItem
+      , public QGraphicsPolygonItem
+      //, public QPainterPath
       , public nslib::Item
-      , public nslib::SelectableItem
+      //, public nslib::SelectableItem // (No render polygons!!!)
       , public nslib::InteractiveItem
     {
       Q_OBJECT
@@ -52,15 +62,47 @@ namespace nslib
       {
         this->_parentRep =
           &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
+
+        //DONE
+        arrowWidht= //30;
+        arrowLengh=30;
+
+        QPoint mLineInit(rand()%800, rand()%600);
+        QPoint mLineEnd(rand()%800, rand()%600);
+        QLineF lAuxLine(mLineInit,mLineEnd);
+
+        double angle = ::acos(lAuxLine.dx() / lAuxLine. length());
+        if (lAuxLine.dy() >= 0) angle = (M_PI * 2) - angle;
+
+        QPointF arrowInit 	= lAuxLine.pointAt(1.0f - (arrowLengh/lAuxLine.length()));
+        QPointF arrowP1 	= arrowInit - QPointF(sin(angle + M_PI / 3) 		* arrowWidht
+        										  ,cos(angle + M_PI / 3) 		* arrowWidht);
+        QPointF arrowP2 	= arrowInit - QPointF(sin(angle + M_PI - M_PI / 3) 	* arrowWidht
+        										  ,cos(angle + M_PI - M_PI / 3) * arrowWidht);
+        arrowShape.clear();
+        arrowShape		<< lAuxLine.p1()
+        				<< arrowInit
+        				<< arrowP1
+        				<< lAuxLine.p2()
+        				<< arrowP2
+        				<< arrowInit
+        				;
+
+        this->setPolygon(arrowShape);
+
+        //this->addPolygon(arrowShape);
       }
 
       virtual ~ConnectionArrowItem( void ) {}
 
     protected:
 
+      QPolygonF arrowShape;
+
+      float arrowWidht;
+      float arrowLengh;
+
     };
-
-
   } // namespace cortex
 } // namespace nslib
 
