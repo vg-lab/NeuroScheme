@@ -12,37 +12,46 @@ namespace nslib
 {
   namespace cortex
   {
+
+    const auto M_PI_3 = float( M_PI ) * 0.33f;
 	  ConnectionArrowItem::ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
 	  {
 		   this->_parentRep =
            &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
+    }
 
-			//DONE
-			arrowWidht= //30;
-			arrowLengh=30;
+    void ConnectionArrowItem::createArrow( const QPointF& origin,
+                                           const QPointF& dest )
+    {
 
-			QPoint mLineInit(rand()%800, rand()%600);
-			QPoint mLineEnd(rand()%800, rand()%600);
-			QLineF lAuxLine(mLineInit,mLineEnd);
+      QPolygonF arrowShape;
+			float arrowWidth = 30;
+			float arrowLength = 30;
 
-			double angle = ::acos(lAuxLine.dx() / lAuxLine. length());
-			if (lAuxLine.dy() >= 0) angle = (M_PI * 2) - angle;
+			QLineF auxLine( origin, dest );
 
-			QPointF arrowInit 	= lAuxLine.pointAt(1.0f - (arrowLengh/lAuxLine.length()));
-			QPointF arrowP1 	= arrowInit - QPointF(sin(angle + M_PI / 3) 		* arrowWidht
-													  ,cos(angle + M_PI / 3) 		* arrowWidht);
-			QPointF arrowP2 	= arrowInit - QPointF(sin(angle + M_PI - M_PI / 3) 	* arrowWidht
-													  ,cos(angle + M_PI - M_PI / 3) * arrowWidht);
-			arrowShape.clear();
-			arrowShape		<< lAuxLine.p1()
-							<< arrowInit
-							<< arrowP1
-							<< lAuxLine.p2()
-							<< arrowP2
-							<< arrowInit
-							;
+			double angle = ::acos(auxLine.dx( ) / auxLine. length( ));
+			if ( auxLine.dy( ) >= 0 )
+        angle = ( M_PI * 2.0 ) - angle;
 
-			this->setPolygon(arrowShape);
+			QPointF arrowInit = auxLine.pointAt(
+        1.0f - (arrowLength / auxLine.length( )));
+      QPointF arrowP1 = arrowInit -
+        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
+                 cos( angle + M_PI_3 ) * arrowWidth );
+			QPointF arrowP2 = arrowInit -
+        QPointF(sin(angle + M_PI - M_PI_3) * arrowWidth,
+                cos( angle + M_PI - M_PI_3 ) * arrowWidth);
+
+			arrowShape.clear( );
+			arrowShape << auxLine.p1( )
+                 << arrowInit
+                 << arrowP1
+                 << auxLine.p2( )
+                 << arrowP2
+                 << arrowInit;
+
+			this->setPolygon( arrowShape );
   	  }
    }
 }

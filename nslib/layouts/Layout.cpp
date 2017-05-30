@@ -179,17 +179,20 @@ namespace nslib
 
     // Generate relationship representations
     nslib::RepresentationCreatorManager::generateRelations( relatedEntities );
+    shift::Representations relationshipReps;
 
     if ( !animate )
     {
       _clearScene( );
-    }
-    if ( !animate )
-    {
       if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
         _addRepresentations( preFilterRepresentations );
       else
         _addRepresentations( representations );
+
+      relatedEntities.reserve( relatedEntities.size( ));
+      for ( auto& relatedEntity : relatedEntities )
+        relationshipReps.push_back( std::get< 0 >( relatedEntity ));
+      _addRepresentations( relationshipReps );
     }
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
@@ -198,15 +201,12 @@ namespace nslib
     }
     else
     {
-      // std::cout << "Arranging " << _name <<  " [ ";
-      // for ( const auto& r : representations )
-      // {
-      //   fires::Object* o = *repsToEntities.at( r ).begin( );
-      //   std::cout << o->label( ) << " ";
-      // }
-      // std::cout << "]" << std::endl;
       _arrangeItems( representations, animate );
     }
+
+    OpConfig opConfig( &_canvas->scene( ));
+    for ( auto& relationshipRep : relationshipReps )
+      relationshipRep->preRender( &opConfig );
   }
 
    void Layout::refreshWidgetsProperties(
@@ -352,32 +352,36 @@ namespace nslib
         // and if so set its pen
         // const auto& repsToEntities =
         //   RepresentationCreatorManager::repsToEntities( );
-        const auto entities = repsToEntities.at( representation );
-        if ( entities.size( ) < 1 )
-          Log::log( NS_LOG_HEADER +
-                    "No entities associated to representation",
-                    LOG_LEVEL_ERROR );
 
-        auto selectableItem = dynamic_cast< SelectableItem* >( item );
-        if ( selectableItem )
+        if ( repsToEntities.count( representation ) > 0 )
         {
-          auto selectedState = SelectionManager::getSelectedState(
-            *entities.begin( ));
+          const auto entities = repsToEntities.at( representation );
+          if ( entities.size( ) < 1 )
+            Log::log( NS_LOG_HEADER +
+                      "No entities associated to representation",
+                      LOG_LEVEL_ERROR );
 
-          // if ( selectedState == selectedStateSelectedState::SELECTED )
-          selectableItem->setSelected( selectedState );
-
-
-          auto shapeItem =
-            dynamic_cast< QAbstractGraphicsShapeItem* >( item );
-          if ( shapeItem )
+          auto selectableItem = dynamic_cast< SelectableItem* >( item );
+          if ( selectableItem )
           {
-            if ( selectedState == SelectedState::SELECTED )
-              shapeItem->setPen( SelectableItem::selectedPen( ));
-            else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
-              shapeItem->setPen(
-                SelectableItem::partiallySelectedPen( ));
+            auto selectedState = SelectionManager::getSelectedState(
+              *entities.begin( ));
 
+            // if ( selectedState == selectedStateSelectedState::SELECTED )
+            selectableItem->setSelected( selectedState );
+
+
+            auto shapeItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+            if ( shapeItem )
+            {
+              if ( selectedState == SelectedState::SELECTED )
+                shapeItem->setPen( SelectableItem::selectedPen( ));
+              else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
+                shapeItem->setPen(
+                  SelectableItem::partiallySelectedPen( ));
+
+            }
           }
         }
         //std::cout << &scene << " add item " << std::endl;

@@ -38,15 +38,19 @@ namespace nslib
     {
     public:
 
-      ConnectionArrowRep( void );
+      ConnectionArrowRep( shift::Representation* originRep_,
+                          shift::Representation* destRep_ );
       ConnectionArrowRep( const ConnectionArrowRep& );
-      ConnectionArrowRep( const shiftgen::ConnectionArrowRep& );
+      // ConnectionArrowRep( const shiftgen::ConnectionArrowRep& );
       virtual ~ConnectionArrowRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );
 
-       void preRender( void );
+      void preRender( shift::OpConfig* opConfig = nullptr );
 
+    protected:
+      shift::Representation* _originRep;
+      shift::Representation* _destRep;
     };
 
 

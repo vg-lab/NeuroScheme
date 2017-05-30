@@ -369,7 +369,8 @@ namespace nslib
               if( relEntities->second.find( relatedEntity ) != relEntities->second.end( ))
                 continue;
 
-              ConnectionArrowRep* relationRep = new ConnectionArrowRep( );
+              ConnectionArrowRep* relationRep = new ConnectionArrowRep(
+                gidEntityRep.second.second, related->second.second );
 
               relEntities->second.insert( relatedEntity );
 

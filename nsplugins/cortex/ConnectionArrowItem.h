@@ -58,49 +58,18 @@ namespace nslib
 
     public:
 
-      ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
-      {
-        this->_parentRep =
-          &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
-
-        //DONE
-        arrowWidht= //30;
-        arrowLengh=30;
-
-        QPoint mLineInit(rand()%800, rand()%600);
-        QPoint mLineEnd(rand()%800, rand()%600);
-        QLineF lAuxLine(mLineInit,mLineEnd);
-
-        double angle = ::acos(lAuxLine.dx() / lAuxLine. length());
-        if (lAuxLine.dy() >= 0) angle = (M_PI * 2) - angle;
-
-        QPointF arrowInit 	= lAuxLine.pointAt(1.0f - (arrowLengh/lAuxLine.length()));
-        QPointF arrowP1 	= arrowInit - QPointF(sin(angle + M_PI / 3) 		* arrowWidht
-        										  ,cos(angle + M_PI / 3) 		* arrowWidht);
-        QPointF arrowP2 	= arrowInit - QPointF(sin(angle + M_PI - M_PI / 3) 	* arrowWidht
-        										  ,cos(angle + M_PI - M_PI / 3) * arrowWidht);
-        arrowShape.clear();
-        arrowShape		<< lAuxLine.p1()
-        				<< arrowInit
-        				<< arrowP1
-        				<< lAuxLine.p2()
-        				<< arrowP2
-        				<< arrowInit
-        				;
-
-        this->setPolygon(arrowShape);
-
-        //this->addPolygon(arrowShape);
-      }
+      ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep );
 
       virtual ~ConnectionArrowItem( void ) {}
 
+      void createArrow( const QPointF& origin, const QPointF& dest );
+
     protected:
 
-      QPolygonF arrowShape;
+      // QPolygonF arrowShape;
 
-      float arrowWidht;
-      float arrowLengh;
+      // float arrowWidht;
+      // float arrowLengh;
 
     };
   } // namespace cortex

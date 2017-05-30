@@ -40,6 +40,21 @@
 
 namespace nslib
 {
+
+  class GraphicsScene;
+  class OpConfig : public shift::OpConfig
+  {
+  public:
+    OpConfig( GraphicsScene* scene_ = nullptr )
+      : _scene( scene_ )
+    {}
+    virtual ~OpConfig( void ) {};
+    GraphicsScene* scene( void ) { return _scene; }
+
+  protected:
+    GraphicsScene* _scene;
+  };
+
   class Canvas;
 
   class NSLIB_API LayoutOptionsWidget : public QFrame

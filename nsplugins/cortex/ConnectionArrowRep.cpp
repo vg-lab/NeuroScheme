@@ -30,20 +30,25 @@ namespace nslib
   namespace cortex
   {
 
-    ConnectionArrowRep::ConnectionArrowRep( void )
+    ConnectionArrowRep::ConnectionArrowRep( shift::Representation* originRep_,
+                                            shift::Representation* destRep_ )
       : shiftgen::ConnectionArrowRep( )
+      , _originRep( originRep_ )
+      , _destRep( destRep_ )
     {
     }
 
     ConnectionArrowRep::ConnectionArrowRep( const ConnectionArrowRep& other )
       : shiftgen::ConnectionArrowRep( other )
+      , _originRep( other._originRep )
+      , _destRep( other._destRep )
     {
     }
 
-    ConnectionArrowRep::ConnectionArrowRep( const shiftgen::ConnectionArrowRep& other )
-      : shiftgen::ConnectionArrowRep( other )
-    {
-    }
+    // ConnectionArrowRep::ConnectionArrowRep( const shiftgen::ConnectionArrowRep& other )
+    //   : shiftgen::ConnectionArrowRep( other )
+    // {
+    // }
 
 
     QGraphicsItem* ConnectionArrowRep::item( QGraphicsScene* scene, bool create )
@@ -56,9 +61,21 @@ namespace nslib
       return _items.at( scene );
     }
 
-    void ConnectionArrowRep::preRender( void )
+    void ConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )
     {
-      // TO DO Arrow positioning
+      OpConfig* opConfig = dynamic_cast< OpConfig* >( opConfig_ );
+      if ( !opConfig )
+        return;
+      GraphicsScene* scene = opConfig->scene( );
+
+      auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
+        _originRep )->item( scene );
+      auto destItem = dynamic_cast< QGraphicsItemRepresentation* >(
+        _destRep )->item( scene );
+      auto arrowItem = this->item( scene );
+
+      dynamic_cast< ConnectionArrowItem* >( arrowItem )->createArrow(
+        originItem->pos( ), destItem->pos( ));
     }
 
   } // namespace cortex

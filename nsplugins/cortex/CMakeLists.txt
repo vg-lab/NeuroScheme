@@ -41,7 +41,7 @@ set( NSLIBCORTEX_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
   ColumnItem.cpp
   ColumnRep.cpp
-  # TODO: ConnectionArrowItem.cpp
+  ConnectionArrowItem.cpp
   ConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
