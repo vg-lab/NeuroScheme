@@ -296,6 +296,20 @@
             "types":
             [
             ]
+        },
+        {
+            "name": "ConnectsWith",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "count",
+                    "type": "uint"
+                }
+            ],
+            "types":
+            [ ]
         }
+
     ]
 }

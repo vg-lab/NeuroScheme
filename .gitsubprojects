@@ -4,6 +4,6 @@
 # git_subproject(Lexis https://github.com/HBPVis/Lexis.git c24dc07)
 # git_subproject(gmrvlex git@gitlab.gmrv.es:nsviz/gmrvlex.git c20b194)
 #git_subproject(Brion https://github.com/BlueBrain/Brion.git fe8974f)
-git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git 1714915)
+git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git d94ae1e)
 git_subproject(scoop git@gitlab.gmrv.es:gmrv/scoop.git 14349d5)
 #git_subproject(nsol git@gitlab.gmrv.es:nsviz/nsol.git c15cdb3)

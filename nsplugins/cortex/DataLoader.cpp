@@ -25,11 +25,15 @@
 #include <nslib/RepresentationCreatorManager.h>
 #include "Neuron.h"
 #include "RepresentationCreator.h"
+#include <shift_ConnectsWith.h>
 
 namespace nslib
 {
   namespace cortex
   {
+
+    using ConnectsWith = shiftgen::ConnectsWith;
+
     bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& args )
     {
 #ifdef NEUROSCHEME_USE_NSOL
@@ -1109,6 +1113,9 @@ namespace nslib
 
         relConnectsTo[ preNeuron->entityGid( )].entities.insert(
           postNeuron->entityGid( ));
+        //Example of properties
+        relConnectsTo[ preNeuron->entityGid( )].properties =
+          new ConnectsWith( 1 );
         relConnectedBy[ postNeuron->entityGid( ) ].entities.insert(
           preNeuron->entityGid( ));
       }
