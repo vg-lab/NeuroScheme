@@ -45,7 +45,9 @@ namespace nslib
                         bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 );
 
-    static void generateRelations( shift::TRelatedEntitiesReps& relationReps,
+    static void generateRelations( const shift::Entities& entities,
+                                   shift::Representations& representations,
+                                   const std::string& relationName,
                                    unsigned int repCreatorId = 0 );
 
     static const shift::TEntitiesToReps& entitiesToReps(
@@ -68,7 +70,6 @@ namespace nslib
     static std::unordered_map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
     static std::unordered_map< unsigned int, shift::TRepsToEntities > _repsToEntities;
 
-    static std::unordered_map< unsigned int, shift::TRelatedEntities > _relatedEntities;
     static std::unordered_map< unsigned int, shift::TRelatedEntitiesReps > _relatedEntitiesReps;
     static std::unordered_map< unsigned int, shift::TGidToEntitiesReps > _gidsToEntitiesReps;
   };

@@ -336,57 +336,68 @@ namespace nslib
     } // create
 
     void RepresentationCreator::generateRelations(
+      const shift::Entities& entities,
       const shift::TGidToEntitiesReps& gidsToEntitiesReps,
-      shift::TRelatedEntities& relatedEntities,
-      shift::TRelatedEntitiesReps& relatedEntitiesReps )
+      shift::TRelatedEntitiesReps& relatedEntitiesReps,
+      shift::Representations& relatedEntities,
+      const std::string& relationName )
     {
 
-      const auto& relConnectsTo =
-          DataManager::entities( ).relationships( )[ "connectsTo" ]->asOneToN( );
+      std::cout << "From " << entities.size( ) << " entities... " << std::endl;
+      const auto& relatedElements =
+          DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
-      //
-      for( auto& gidEntityRep : gidsToEntitiesReps )
+      for( auto& entity : entities.vector( ))
       {
-        auto it = relConnectsTo->find( gidEntityRep.first );
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
+          continue;
 
-        if( it != relConnectsTo->end( ))
-          for( auto& relatedEntity : it->second )
+        auto entityRelations = relatedElements->find( entity->entityGid( ));
+
+        if( entityRelations == relatedElements->end( ))
+          continue;
+
+        for( auto& other : entities.vector( ))
+        {
+          if( other->entityGid( ) == entity->entityGid( ))
+            continue;
+
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
+            continue;
+
+          // TODO: Change to equal_range whenever multiple relationships between
+          // the same elements are imported. Then, create a loop to iterate
+          // over the given results and create a new one if not found.
+          auto combinedKey = std::make_pair( entity->entityGid( ),
+                                             other->entityGid( ));
+          auto alreadyConnected =
+              relatedEntitiesReps.find( combinedKey );
+
+          if( alreadyConnected == relatedEntitiesReps.end( ))
           {
-            auto relEntities = relatedEntities.find( gidEntityRep.first );
-            if( relEntities == relatedEntities.end( ))
-            {
-              std::unordered_set< unsigned int > relSet;
-              auto ref = relatedEntities.insert(
-                  std::make_pair( gidEntityRep.first,
-                                  relSet ));
+            ConnectionArrowRep* relationRep =
+                new ConnectionArrowRep( srcEntityRep->second.second,
+                                        otherRep->second.second );
 
-              relEntities = ref.first;
-            }
-
-            auto related = gidsToEntitiesReps.find( relatedEntity );
-            if( related != gidsToEntitiesReps.end( ))
-            {
-              if( relEntities->second.find( relatedEntity ) != relEntities->second.end( ))
-                continue;
-
-              ConnectionArrowRep* relationRep = new ConnectionArrowRep(
-                gidEntityRep.second.second, related->second.second );
-
-              relEntities->second.insert( relatedEntity );
-
-              relatedEntitiesReps.push_back(
-                  std::make_tuple( relationRep,
-                                   gidEntityRep.second.first,
-                                   related->second.first,
-                                   gidEntityRep.second.second,
-                                   related->second.second ));
-
-            }
+            alreadyConnected = relatedEntitiesReps.insert(
+                std::make_pair( combinedKey,
+                                std::make_tuple( relationRep,
+                                                 entity,
+                                                 other,
+                                                 srcEntityRep->second.second,
+                                                 otherRep->second.second )));
           }
+
+          relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
+
+        }
+
 
       }
 
-      std::cout << "Created " << relatedEntitiesReps.size( )
+      std::cout << "Using " << relatedEntities.size( )
                 << " relations." << std::endl;
 
     } // generateRelations

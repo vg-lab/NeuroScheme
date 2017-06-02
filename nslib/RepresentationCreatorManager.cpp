@@ -45,9 +45,6 @@ namespace nslib
   RepresentationCreatorManager::_gidsToEntitiesReps =
     std::unordered_map< unsigned int, shift::TGidToEntitiesReps >( );
 
-  std::unordered_map< unsigned int, shift::TRelatedEntities >
-    RepresentationCreatorManager::_relatedEntities =
-        std::unordered_map< unsigned int, shift::TRelatedEntities >( );
 
   void RepresentationCreatorManager::addCreator(
     shift::RepresentationCreator* repCreator,
@@ -78,13 +75,17 @@ namespace nslib
 
 
   void RepresentationCreatorManager::generateRelations(
-      shift::TRelatedEntitiesReps& relationReps,
+      const shift::Entities& entities,
+      shift::Representations& representations,
+      const std::string& relationName,
       unsigned int repCreatorId )
   {
     if( _repCreators.count( repCreatorId ) == 1 )
-      _repCreators[ repCreatorId ]->generateRelations( _gidsToEntitiesReps[ repCreatorId],
-                                                       _relatedEntities[ repCreatorId ],
-                                                       relationReps );
+      _repCreators[ repCreatorId ]->generateRelations( entities,
+                                                       _gidsToEntitiesReps[ repCreatorId],
+                                                       _relatedEntitiesReps[ repCreatorId ],
+                                                       representations,
+                                                       relationName );
   }
 
   const shift::TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(
