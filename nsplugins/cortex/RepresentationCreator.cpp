@@ -325,7 +325,8 @@ namespace nslib
       {
         auto entityGid = entity->entityGid( );
         if ( relSuperEntityOf.count( entityGid ) > 0 )
-          for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
+          for ( const auto& subEntity :
+                  relSuperEntityOf.at( entityGid ).entities )
             subEntities.add( DataManager::entities( ).at( subEntity ));
       }
       if ( subEntities.size( ) > 0 )
@@ -350,7 +351,7 @@ namespace nslib
         auto it = relConnectsTo->find( gidEntityRep.first );
 
         if( it != relConnectsTo->end( ))
-          for( auto& relatedEntity : it->second )
+          for( auto& relatedEntity : it->second.entities )
           {
             auto relEntities = relatedEntities.find( gidEntityRep.first );
             if( relEntities == relatedEntities.end( ))

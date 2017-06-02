@@ -96,19 +96,20 @@ namespace nslib
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
-          const auto& children = relParentOf[ entityGid ];
+          const auto& children = relParentOf[ entityGid ].entities;
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
                                 [ "isChildOf" ]->asOneToOne( ));
-          const auto& parent = relChildOf[ entityGid ];
+          const auto& parent = relChildOf[ entityGid ].entity;
 
-          const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
+          const auto& grandParent =
+            relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
-          const auto& parentSiblings = relParentOf[ grandParent ];
+          const auto& parentSiblings = relParentOf[ grandParent ].entities;
 
           auto& relAGroupOf = *( DataManager::entities( ).relationships( )
                                 [ "isAGroupOf" ]->asOneToN( ));
-          const auto& groupedEntities = relAGroupOf[ entityGid ];
+          const auto& groupedEntities = relAGroupOf[ entityGid ].entities;
 
           QAction* levelUp = nullptr;
           QAction* levelDown = nullptr;
@@ -266,7 +267,7 @@ namespace nslib
               std::unordered_set< unsigned int > parentIds;
               if ( relAGroupOf.count( entityGid ) > 0 )
               {
-                const auto& groupedIds = relAGroupOf.at( entityGid );
+                const auto& groupedIds = relAGroupOf.at( entityGid ).entities;
                 // std::cout << " -- Parent of: ";
                 // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
                 for ( auto const& groupedId : groupedIds )
@@ -275,16 +276,16 @@ namespace nslib
                     allEntities.at( groupedId ), entityState );
                   // Save unique parent set for updating only once per parent
                   if ( relChildOf.count( groupedId ) > 0 )
-                    parentIds.insert( relChildOf.at( groupedId ));
+                    parentIds.insert( relChildOf.at( groupedId ).entity );
                 }
                 _updateSelectedStateOfSubEntities(
                   allEntities, relSuperEntityOf, relAGroupOf,
-                  relSubEntityOf.at( entityGid ));
+                  relSubEntityOf.at( entityGid ).entity );
                 std::unordered_set< unsigned int > uniqueParentChildIds;
                 for ( auto const& parentId : parentIds )
                 {
                   uniqueParentChildIds.insert(
-                    *relParentOf.at( parentId ).begin( ));
+                    *relParentOf.at( parentId ).entities.begin( ));
                 }
                 // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
                 for ( auto const& uniqueParentChildId : uniqueParentChildIds )
@@ -300,7 +301,8 @@ namespace nslib
             {
               if ( relSuperEntityOf.count( entityGid ) > 0 )
               {
-                const auto& subEntities = relSuperEntityOf.at( entityGid );
+                const auto& subEntities =
+                  relSuperEntityOf.at( entityGid ).entities;
                 for ( const auto& subEntity : subEntities )
                   SelectionManager::setSelectedState(
                     allEntities.at( subEntity ), entityState );
@@ -346,14 +348,14 @@ namespace nslib
   {
     if ( relParentOf.count( entityGid ) == 0 )
       return;
-    const auto& childrenIds = relParentOf.at( entityGid );
+    const auto& childrenIds = relParentOf.at( entityGid ).entities;
     // std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
       // std::cout << childId << " ";
       if ( relSuperEntityOf.count( childId ) > 0 )
       {
-        const auto& subEntities = relSuperEntityOf.at( childId );
+        const auto& subEntities = relSuperEntityOf.at( childId ).entities;
         for ( const auto& subEntity : subEntities )
           SelectionManager::setSelectedState(
             DataManager::entities( ).at( subEntity ), state );
@@ -377,7 +379,7 @@ namespace nslib
   {
     if ( relChildOf.count( entityGid ) == 0 )
       return;
-    const auto& parentId = relChildOf.at( entityGid );
+    const auto& parentId = relChildOf.at( entityGid ).entity;
 
     if ( parentId == 0 ) return;
 
@@ -421,7 +423,7 @@ namespace nslib
     const shift::RelationshipOneToN& relAGroupOf,
     unsigned int entityGid )
   {
-    for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
+    for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ).entities )
     {
       bool allGroupedSelected, noGroupedSelected;
       _queryGroupedSelectedState( entities, relAGroupOf, subEntityId,
@@ -449,7 +451,7 @@ namespace nslib
   {
     allChildrenSelected = true;
     noChildrenSelected = true;
-    const auto& childrenIds = relParentOf.at( entityGid );
+    const auto& childrenIds = relParentOf.at( entityGid ).entities;
     for ( auto const& childId : childrenIds )
     {
       if ( SelectionManager::getSelectedState( entities.at( childId )) !=
@@ -477,7 +479,7 @@ namespace nslib
       noGroupedSelected = true;
       return;
     }
-    const auto& groupedIds = relAGroupOf.at( entityGid );
+    const auto& groupedIds = relAGroupOf.at( entityGid ).entities;
     for ( auto const& groupedId : groupedIds )
     {
       if ( SelectionManager::getSelectedState( entities.at( groupedId )) !=
