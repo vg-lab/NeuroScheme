@@ -51,9 +51,11 @@ namespace nslib
         bool linkRepsToObjs = false );
 
       void generateRelations(
+        const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
-        shift::TRelatedEntities& relatedEntities,
-        shift::TRelatedEntitiesReps& relatedEntitiesReps );
+        shift::TRelatedEntitiesReps& relatedEntitiesReps,
+        shift::Representations& relatedEntities,
+        const std::string& relationName );
 
       void setMaximums( float maxNeuronSomaVolume_,
                         float maxNeuronSomaArea_,

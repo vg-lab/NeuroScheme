@@ -96,13 +96,11 @@ namespace nslib
 
   void Layout::refresh( bool animate )
   {
-    display( _canvas->entities( ), _canvas->reps( ),
-             _canvas->relEntitiesReps( ), animate );
+    display( _canvas->entities( ), _canvas->reps( ), animate );
   }
 
   void Layout::display( shift::Entities& entities,
                         shift::Representations& representations,
-                        shift::TRelatedEntitiesReps& relatedEntities,
                         bool animate )
   {
     representations.clear( );
@@ -178,10 +176,12 @@ namespace nslib
         true, true );
     }
 
-    // Generate relationship representations
-    relatedEntities.clear( );
-    nslib::RepresentationCreatorManager::generateRelations( relatedEntities );
     shift::Representations relationshipReps;
+    // Generate relationship representations
+    nslib::RepresentationCreatorManager::generateRelations( entities,
+                                                            relationshipReps,
+                                                            "connectsTo" );
+
 
     if ( !animate )
     {
@@ -191,9 +191,6 @@ namespace nslib
       else
         _addRepresentations( representations );
 
-      relatedEntities.reserve( relatedEntities.size( ));
-      for ( auto& relatedEntity : relatedEntities )
-        relationshipReps.push_back( std::get< 0 >( relatedEntity ));
       _addRepresentations( relationshipReps );
     }
 

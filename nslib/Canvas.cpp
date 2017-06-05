@@ -280,7 +280,6 @@ namespace nslib
     assert( _layouts.getLayout( _activeLayoutIndex ));
     _layouts.getLayout( _activeLayoutIndex )->display( entities_,
                                                        _reps,
-                                                       _relEntitiesReps,
                                                        animate );
 
   }
