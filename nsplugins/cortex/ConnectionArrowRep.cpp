@@ -66,17 +66,67 @@ namespace nslib
       OpConfig* opConfig = dynamic_cast< OpConfig* >( opConfig_ );
       if ( !opConfig )
         return;
+
       GraphicsScene* scene = opConfig->scene( );
 
-      auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
-        _originRep )->item( scene );
-      auto destItem = dynamic_cast< QGraphicsItemRepresentation* >(
-        _destRep )->item( scene );
-      auto arrowItem = this->item( scene );
+      auto  arrowItem   = this->item( scene );
+      float lThickness  = 2.0;
 
-      dynamic_cast< ConnectionArrowItem* >( arrowItem )->createArrow(
-        originItem->pos( ), destItem->pos( ));
+      if (opConfig->isAnimating())
+      {
+        //TODO: It needs to be changed in the future!
+        auto originItem = dynamic_cast< Item* > (
+                                dynamic_cast<QGraphicsItemRepresentation* >(
+                                _originRep )->item( scene ) );
+
+        auto destItem = dynamic_cast< Item* > (
+                          dynamic_cast< QGraphicsItemRepresentation* >(
+                              _destRep )->item( scene ));
+
+        if ( originItem == nullptr )
+          Log::log( "No successfully dynamic cast on originItem",
+                    LOG_LEVEL_ERROR );
+
+        if ( destItem == nullptr )
+          Log::log( "No successfully dynamic cast on destItem",
+                    LOG_LEVEL_ERROR );
+
+        auto originArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
+        auto& originAnim = originArrowItem->originAnim( );
+        originAnim.setPropertyName( "origin" );
+        originAnim.setTargetObject( originArrowItem );
+        originAnim.setDuration( ANIM_DURATION );
+        originAnim.setStartValue( originItem->posAnim( ).startValue( ).toPointF( ));
+        originAnim.setEndValue( originItem->posAnim( ).endValue( ).toPointF( ));
+        originAnim.start( );
+
+        auto destArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
+        auto& destAnim = destArrowItem->destAnim( );
+        destAnim.setPropertyName( "dest" );
+        destAnim.setTargetObject( destArrowItem );
+        destAnim.setDuration( ANIM_DURATION );
+        destAnim.setStartValue( destItem->posAnim( ).startValue( ).toPointF( ));
+        destAnim.setEndValue( destItem->posAnim( ).endValue( ).toPointF( ));
+        destAnim.start( );
+      }
+      else
+      {
+        auto originItem = dynamic_cast< QGraphicsItem* > (
+                                dynamic_cast<QGraphicsItemRepresentation* >(
+                                _originRep )->item( scene ) );
+
+        auto destItem = dynamic_cast< QGraphicsItem* > (
+                          dynamic_cast< QGraphicsItemRepresentation* >(
+                              _destRep )->item( scene ));
+
+        //destItem->boundingRect().bottom()
+
+        dynamic_cast< ConnectionArrowItem* >( arrowItem )
+                        ->createArrow( originItem->pos( ),
+                                       destItem->pos( ),
+                                       lThickness );
+
+      }
     }
-
   } // namespace cortex
 } // namespace nslib

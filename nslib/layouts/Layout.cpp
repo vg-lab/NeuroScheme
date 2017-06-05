@@ -116,6 +116,7 @@ namespace nslib
 
     fires::Objects objects;
     shift::Representations preFilterRepresentations;
+    shift::Representations relationshipReps;
 
     if ( doFiltering || doSorting )
     {
@@ -163,6 +164,10 @@ namespace nslib
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
+      // Generate relationship representations
+      nslib::RepresentationCreatorManager::generateRelations(
+        filteredAndSortedEntities, relationshipReps, "connectsTo" );
+
     }
     else
     {
@@ -174,14 +179,19 @@ namespace nslib
       nslib::RepresentationCreatorManager::create(
        entities, representations,
         true, true );
-    }
 
-    shift::Representations relationshipReps;
-    // Generate relationship representations
-    nslib::RepresentationCreatorManager::generateRelations( entities,
+      // Generate relationship representations
+      nslib::RepresentationCreatorManager::generateRelations( entities,
                                                             relationshipReps,
                                                             "connectsTo" );
 
+    }
+
+    // shift::Representations relationshipReps;
+    // // Generate relationship representations
+    // nslib::RepresentationCreatorManager::generateRelations( entities,
+    //                                                         relationshipReps,
+    //                                                         "connectsTo" );
 
     if ( !animate )
     {
@@ -190,9 +200,9 @@ namespace nslib
         _addRepresentations( preFilterRepresentations );
       else
         _addRepresentations( representations );
-
-      _addRepresentations( relationshipReps );
     }
+
+    _addRepresentations( relationshipReps );
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
@@ -203,7 +213,7 @@ namespace nslib
       _arrangeItems( representations, animate );
     }
 
-    OpConfig opConfig( &_canvas->scene( ));
+    OpConfig opConfig( &_canvas->scene( ), animate );
     for ( auto& relationshipRep : relationshipReps )
       relationshipRep->preRender( &opConfig );
   }
@@ -448,8 +458,6 @@ namespace nslib
   {
     auto obj = dynamic_cast< QObject* >( graphicsItem );
     auto item = dynamic_cast< Item* >( graphicsItem );
-
-#define ANIM_DURATION 500
 
     auto& scaleAnim = item->scaleAnim( );
     if ( scaleAnim.state( ) == QAbstractAnimation::Running )

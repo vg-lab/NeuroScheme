@@ -14,46 +14,86 @@ namespace nslib
   namespace cortex
   {
 
-     const auto M_PI_3 = float( M_PI ) * 0.33f;
+    const auto M_PI_3 = float( M_PI ) * 0.33f;
 
-    ConnectionArrowItem::ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
-    {
+	  ConnectionArrowItem::ConnectionArrowItem(
+      const ConnectionArrowRep& connectionArrowRep )
+      : QObject( )
+      , QGraphicsPolygonItem( )
+      , nslib::Item( )
+      , nslib::InteractiveItem( )
+      , _arrowOriItem( nullptr )
+      , _arrowThickness( 2.0f )
+	  {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
 
-    void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest )
+    void ConnectionArrowItem::setOrigin( const QPointF& origin_ )
     {
+      _arrowOrigin = origin_;
+      createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
+    }
+
+    void ConnectionArrowItem::setDest( const QPointF& dest_ )
+    {
+      _arrowDest = dest_;
+      createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
+    }
+
+    void ConnectionArrowItem::createArrow( const QPointF& origin,
+                                           const QPointF& dest,
+                                           float thickness )
+    {
+      _arrowOrigin = origin;
+      _arrowDest = dest;
+      _arrowThickness = thickness;
 
       QPolygonF arrowShape;
-			float arrowWidth = 30;
-			float arrowLength = 30;
 
-			QLineF auxLine( origin, dest );
+      float arrowWidth = 8;
+      float arrowLength = 8;
 
-			double angle = ::acos(auxLine.dx( ) / auxLine. length( ));
-			if ( auxLine.dy( ) >= 0 )
-        angle = ( M_PI * 2.0 ) - angle;
+      QLineF auxLine( origin, dest );
 
-			QPointF arrowInit = auxLine.pointAt(
-        1.0f - (arrowLength / auxLine.length( )));
+      auto lengthInv = 1.0f / auxLine.length( );
+
+      double angle = ::acos( auxLine.dx( ) * lengthInv );
+      if ( auxLine.dy( ) >= 0 )
+    	  angle = ( M_PI * 2.0 ) - angle;
+
+      QPointF arrowInit = auxLine.pointAt(
+        1.0f - (arrowLength * lengthInv ));
       QPointF arrowP1 = arrowInit -
         QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI_3 ) * arrowWidth );
-			QPointF arrowP2 = arrowInit -
-        QPointF(sin(angle + M_PI - M_PI_3) * arrowWidth,
-                cos( angle + M_PI - M_PI_3 ) * arrowWidth);
+                   cos( angle + M_PI_3 ) * arrowWidth );
+      QPointF arrowP2 = arrowInit -
+        QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
+                   cos( angle + M_PI - M_PI_3 ) * arrowWidth);
 
-			arrowShape.clear( );
-			arrowShape << auxLine.p1( )
-                 << arrowInit
-                 << arrowP1
-                 << auxLine.p2( )
-                 << arrowP2
-                 << arrowInit;
+      float size = arrowLength;
+      const Color baseColor( 0, 0, 0 );
 
-			this->setPolygon( arrowShape );
+      if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
+      _arrowOriItem = new QGraphicsEllipseItem( );
+      _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
+                              origin.y( ) - size * 0.5f,
+                              size,
+                              size );
+
+      _arrowOriItem->setPen( Qt::NoPen );
+      _arrowOriItem->setBrush( QBrush( baseColor ));
+      _arrowOriItem->setParentItem( this );
+
+      arrowShape.clear( );
+      arrowShape  << auxLine.p1( )
+                  << arrowInit
+                  << arrowP1
+                  << auxLine.p2( )
+                  << arrowP2
+                  << arrowInit;
+
+      this->setPolygon( arrowShape );
     }
   }
 }
