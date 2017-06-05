@@ -47,8 +47,7 @@ namespace nslib
       , public nslib::InteractiveItem
     {
       Q_OBJECT
-      Q_PROPERTY( QPointF origin READ origin WRITE setOrigin )
-      Q_PROPERTY( QPointF dest READ dest WRITE setDest )
+      Q_PROPERTY( QLineF line READ line WRITE setLine )
 
     public:
 
@@ -56,27 +55,26 @@ namespace nslib
 
       virtual ~ConnectionArrowItem( void ) {}
 
-      const QPointF& origin( void ) const { return _arrowOrigin; }
-      const QPointF& dest( void ) const { return _arrowDest; }
-
-      void setOrigin( const QPointF& origin_ );
-      void setDest( const QPointF& dest_ );
+      const QLineF& line( void ) const { return _line; }
+      void setLine( const QLineF& line_ )
+      {
+        _line = line_;
+        createArrow( _line.p1( ), _line.p2( ), _arrowThickness );
+      }
 
       void createArrow( const QPointF& origin, const QPointF& dest, float thickness );
 
-      QPropertyAnimation& originAnim( void ) { return _originAnim; }
-      QPropertyAnimation& destAnim( void ) { return _destAnim; }
-
+      QPropertyAnimation& lineAnim( void ) { return _lineAnim; }
 
     protected:
       QGraphicsEllipseItem* _arrowOriItem;
 
       float _arrowThickness;
+      QLineF _line;
       QPointF _arrowOrigin;
       QPointF _arrowDest;
 
-      QPropertyAnimation _originAnim;
-      QPropertyAnimation _destAnim;
+      QPropertyAnimation _lineAnim;
 
     };
   } // namespace cortex

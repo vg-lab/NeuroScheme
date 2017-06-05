@@ -92,22 +92,18 @@ namespace nslib
                     LOG_LEVEL_ERROR );
 
         auto originArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
-        auto& originAnim = originArrowItem->originAnim( );
-        originAnim.setPropertyName( "origin" );
-        originAnim.setTargetObject( originArrowItem );
-        originAnim.setDuration( ANIM_DURATION );
-        originAnim.setStartValue( originItem->posAnim( ).startValue( ).toPointF( ));
-        originAnim.setEndValue( originItem->posAnim( ).endValue( ).toPointF( ));
-        originAnim.start( );
+        auto& lineAnim = originArrowItem->lineAnim( );
+        lineAnim.setPropertyName( "line" );
+        lineAnim.setTargetObject( originArrowItem );
+        lineAnim.setDuration( ANIM_DURATION );
+        lineAnim.setStartValue(
+          QLineF( originItem->posAnim( ).startValue( ).toPointF( ),
+                  destItem->posAnim( ).startValue( ).toPointF( )));
+        lineAnim.setEndValue(
+          QLineF( originItem->posAnim( ).endValue( ).toPointF( ),
+                  destItem->posAnim( ).endValue( ).toPointF( )));
+        lineAnim.start( );
 
-        auto destArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
-        auto& destAnim = destArrowItem->destAnim( );
-        destAnim.setPropertyName( "dest" );
-        destAnim.setTargetObject( destArrowItem );
-        destAnim.setDuration( ANIM_DURATION );
-        destAnim.setStartValue( destItem->posAnim( ).startValue( ).toPointF( ));
-        destAnim.setEndValue( destItem->posAnim( ).endValue( ).toPointF( ));
-        destAnim.start( );
       }
       else
       {

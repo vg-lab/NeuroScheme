@@ -29,17 +29,17 @@ namespace nslib
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
 
-    void ConnectionArrowItem::setOrigin( const QPointF& origin_ )
-    {
-      _arrowOrigin = origin_;
-      createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
-    }
+    // void ConnectionArrowItem::setOrigin( const QPointF& origin_ )
+    // {
+    //   _arrowOrigin = origin_;
+    //   createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
+    // }
 
-    void ConnectionArrowItem::setDest( const QPointF& dest_ )
-    {
-      _arrowDest = dest_;
-      createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
-    }
+    // void ConnectionArrowItem::setDest( const QPointF& dest_ )
+    // {
+    //   _arrowDest = dest_;
+    //   createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
+    // }
 
     void ConnectionArrowItem::createArrow( const QPointF& origin,
                                            const QPointF& dest,
