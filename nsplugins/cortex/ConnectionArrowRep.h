@@ -30,8 +30,6 @@ namespace nslib
 {
   namespace cortex
   {
-
-
     class ConnectionArrowRep
       : public shiftgen::ConnectionArrowRep
       , public QGraphicsItemRepresentation
@@ -52,8 +50,6 @@ namespace nslib
       shift::Representation* _originRep;
       shift::Representation* _destRep;
     };
-
-
   } // namespace cortex
 } // namespace nslib
 

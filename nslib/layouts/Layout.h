@@ -38,6 +38,8 @@
 #include "../SortWidget.h"
 #include "../Properties.h"
 
+#define ANIM_DURATION 500
+
 namespace nslib
 {
 
@@ -45,14 +47,16 @@ namespace nslib
   class OpConfig : public shift::OpConfig
   {
   public:
-    OpConfig( GraphicsScene* scene_ = nullptr )
-      : _scene( scene_ )
+    OpConfig( GraphicsScene* scene_ = nullptr, bool animating_=false )
+      : _scene( scene_ ), _animating(animating_)
     {}
     virtual ~OpConfig( void ) {};
-    GraphicsScene* scene( void ) { return _scene; }
+    GraphicsScene* scene( void ) { return _scene; };
+    bool isAnimating(){ return _animating; };
 
   protected:
-    GraphicsScene* _scene;
+    GraphicsScene*  _scene;
+    bool            _animating;
   };
 
   class Canvas;

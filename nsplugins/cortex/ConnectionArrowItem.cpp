@@ -20,38 +20,54 @@ namespace nslib
            &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
 
-    void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest )
+    void ConnectionArrowItem::setOrigin( const QPointF& origin_ )
     {
+      _arrowOrigin = origin_;
+      createArrow(_arrowOrigin, _arrowDest, _arrowThickness);
+    }
+
+    void ConnectionArrowItem::setDest( const QPointF& dest_ )
+    {
+      _arrowDest = dest_;
+      createArrow(_arrowOrigin, _arrowDest, _arrowThickness);
+    }
+
+    void ConnectionArrowItem::createArrow( const QPointF& origin,
+                                           const QPointF& dest,
+                                           float thickness)
+    {
+      _arrowOrigin     = origin;
+      _arrowDest       = dest;
+      _arrowThickness  = thickness;
 
       QPolygonF arrowShape;
-			float arrowWidth = 30;
-			float arrowLength = 30;
+      float arrowWidth 	= 8;
+      float arrowLength = 8;
 
-			QLineF auxLine( origin, dest );
+      QLineF auxLine( origin, dest );
 
-			double angle = ::acos(auxLine.dx( ) / auxLine. length( ));
-			if ( auxLine.dy( ) >= 0 )
-        angle = ( M_PI * 2.0 ) - angle;
+      double angle = ::acos(auxLine.dx( ) / auxLine. length( ));
+      if ( auxLine.dy( ) >= 0 )
+    	  angle = ( M_PI * 2.0 ) - angle;
 
-			QPointF arrowInit = auxLine.pointAt(
-        1.0f - (arrowLength / auxLine.length( )));
-      QPointF arrowP1 = arrowInit -
-        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI_3 ) * arrowWidth );
-			QPointF arrowP2 = arrowInit -
-        QPointF(sin(angle + M_PI - M_PI_3) * arrowWidth,
-                cos( angle + M_PI - M_PI_3 ) * arrowWidth);
+      QPointF arrowInit = auxLine.pointAt(1.0f
+    		  	  	  	  	  	  	  	      - (arrowLength / auxLine.length( )));
+      QPointF arrowP1 = arrowInit
+    		  	  	  	    - QPointF( sin( angle + M_PI_3 ) * arrowWidth,
+    		  	  	  	               cos( angle + M_PI_3 ) * arrowWidth );
+      QPointF arrowP2 = arrowInit
+    		  	  	  	    - QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
+    		  	  	  	               cos( angle + M_PI - M_PI_3 ) * arrowWidth);
 
-			arrowShape.clear( );
-			arrowShape << auxLine.p1( )
-                 << arrowInit
-                 << arrowP1
-                 << auxLine.p2( )
-                 << arrowP2
-                 << arrowInit;
+      arrowShape.clear( );
+      arrowShape  << auxLine.p1( )
+                  << arrowInit
+                  << arrowP1
+                  << auxLine.p2( )
+                  << arrowP2
+                  << arrowInit;
 
-			this->setPolygon( arrowShape );
-  	  }
+	   this->setPolygon( arrowShape );
+     }
    }
 }

@@ -188,12 +188,12 @@ namespace nslib
         _addRepresentations( preFilterRepresentations );
       else
         _addRepresentations( representations );
-
-      relatedEntities.reserve( relatedEntities.size( ));
-      for ( auto& relatedEntity : relatedEntities )
-        relationshipReps.push_back( std::get< 0 >( relatedEntity ));
-      _addRepresentations( relationshipReps );
     }
+
+    relatedEntities.reserve( relatedEntities.size( ));
+    for ( auto& relatedEntity : relatedEntities )
+      relationshipReps.push_back( std::get< 0 >( relatedEntity ));
+    _addRepresentations( relationshipReps );
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
@@ -204,7 +204,7 @@ namespace nslib
       _arrangeItems( representations, animate );
     }
 
-    OpConfig opConfig( &_canvas->scene( ));
+    OpConfig opConfig( &_canvas->scene( ), animate);
     for ( auto& relationshipRep : relationshipReps )
       relationshipRep->preRender( &opConfig );
   }
@@ -446,8 +446,6 @@ namespace nslib
   {
     auto obj = dynamic_cast< QObject* >( graphicsItem );
     auto item = dynamic_cast< Item* >( graphicsItem );
-
-#define ANIM_DURATION 500
 
     auto& scaleAnim = item->scaleAnim( );
     if ( scaleAnim.state( ) == QAbstractAnimation::Running )

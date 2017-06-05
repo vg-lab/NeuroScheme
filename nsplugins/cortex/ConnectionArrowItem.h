@@ -33,6 +33,7 @@
 //#include <QGraphicsEllipseItem>
 //#include <QPainterPath>
 #include <QGraphicsPolygonItem>
+#include <QPropertyAnimation>
 
 #include <ctime>
 #include <math.h>
@@ -53,8 +54,8 @@ namespace nslib
       , public nslib::InteractiveItem
     {
       Q_OBJECT
-      Q_PROPERTY( QPointF pos READ pos WRITE setPos )
-      Q_PROPERTY( qreal scale READ scale WRITE setScale )
+      Q_PROPERTY( QPointF origin READ origin WRITE setOrigin )
+      Q_PROPERTY( QPointF dest READ dest WRITE setDest )
 
     public:
 
@@ -62,14 +63,26 @@ namespace nslib
 
       virtual ~ConnectionArrowItem( void ) {}
 
-      void createArrow( const QPointF& origin, const QPointF& dest );
+      const QPointF& origin( void ) const { return _arrowOrigin; }
+      const QPointF& dest( void ) const { return _arrowDest; }
+
+      void setOrigin( const QPointF& origin_ );
+
+      void setDest( const QPointF& dest_ );
+
+      void createArrow( const QPointF& origin, const QPointF& dest, float thickness );
+
+      QPropertyAnimation& originAnim( void ) { return _originAnim; }
+      QPropertyAnimation& destAnim( void ) { return _destAnim; }
+
 
     protected:
+      float _arrowThickness;
+      QPointF _arrowOrigin;
+      QPointF _arrowDest;
 
-      // QPolygonF arrowShape;
-
-      // float arrowWidht;
-      // float arrowLengh;
+      QPropertyAnimation _originAnim;
+      QPropertyAnimation _destAnim;
 
     };
   } // namespace cortex
