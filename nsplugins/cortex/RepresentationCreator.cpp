@@ -367,6 +367,12 @@ namespace nslib
           if( otherRep == gidsToEntitiesReps.end( ))
             continue;
 
+          auto numberOfConnections =
+              entityRelations->second.count( other->entityGid( ));
+
+          if( numberOfConnections == 0 )
+            continue;
+
           // TODO: Change to equal_range whenever multiple relationships between
           // the same elements are imported. Then, create a loop to iterate
           // over the given results and create a new one if not found.
