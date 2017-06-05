@@ -16,6 +16,7 @@ namespace nslib
     const auto M_PI_3 = float( M_PI ) * 0.33f;
 	  ConnectionArrowItem::ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep )
 	  {
+	     arrowOriItem=nullptr;
 		   this->_parentRep =
            &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
@@ -59,6 +60,20 @@ namespace nslib
     		  	  	  	    - QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
     		  	  	  	               cos( angle + M_PI - M_PI_3 ) * arrowWidth);
 
+      float size = arrowLength;
+      const Color baseColor(0,0,0);
+
+      if (arrowOriItem!=nullptr) delete arrowOriItem;
+      arrowOriItem = new QGraphicsEllipseItem( );
+      arrowOriItem->setRect( origin.x() - size/2.0,
+                             origin.y() - size/2.0,
+                             size,
+                             size );
+
+      arrowOriItem->setPen( Qt::NoPen );
+      arrowOriItem->setBrush( QBrush( baseColor ));
+      arrowOriItem->setParentItem( this );
+
       arrowShape.clear( );
       arrowShape  << auxLine.p1( )
                   << arrowInit
@@ -67,7 +82,7 @@ namespace nslib
                   << arrowP2
                   << arrowInit;
 
-	   this->setPolygon( arrowShape );
+      this->setPolygon( arrowShape );
      }
    }
 }

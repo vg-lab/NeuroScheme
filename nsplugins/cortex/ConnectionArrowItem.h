@@ -77,6 +77,8 @@ namespace nslib
 
 
     protected:
+      QGraphicsEllipseItem* arrowOriItem;
+
       float _arrowThickness;
       QPointF _arrowOrigin;
       QPointF _arrowDest;

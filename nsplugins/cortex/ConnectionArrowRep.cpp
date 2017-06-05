@@ -119,6 +119,8 @@ namespace nslib
                           dynamic_cast< QGraphicsItemRepresentation* >(
                               _destRep )->item( scene ));
 
+        //destItem->boundingRect().bottom()
+
         dynamic_cast< ConnectionArrowItem* >( arrowItem )
                         ->createArrow( originItem->pos( ),
                                        destItem->pos( ),
