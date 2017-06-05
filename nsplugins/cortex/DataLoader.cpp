@@ -709,8 +709,8 @@ namespace nslib
           layerEntity->registerProperty( "Parent Type", uint( 0 ));
           layerEntity->registerProperty( "Layer", uint( i+1 ));
           colLayerEntities[ i ] = layerEntity;
-          relSuperEntityOf[ colEntity->entityGid( ) ].entities.insert(
-            layerEntity->entityGid( ));
+          relSuperEntityOf[ colEntity->entityGid( ) ].insert(
+            std::make_pair( layerEntity->entityGid( ), nullptr ));
           relSubEntityOf[ layerEntity->entityGid( ) ].entity =
             colEntity->entityGid( );
           _entities.add( layerEntity );
@@ -755,8 +755,9 @@ namespace nslib
         //     colEntity, "Id", col->id( ));
 
         _entities.add( colEntity );
-        relParentOf[ 0 ].entities.insert( colEntity->entityGid( ));
-        relChildOf[ colEntity->entityGid( ) ].entity = 0;
+        relParentOf[ 0 ].insert( std::make_pair( colEntity->entityGid( ),
+                                                 nullptr));
+        relChildOf[ colEntity->entityGid( ) ].entity = 0 ;
 
         nsol::MiniColumns& miniCols = col->miniColumns( );
         int miniColumnsCounter = 0;
@@ -858,8 +859,8 @@ namespace nslib
             layerEntity->registerProperty( "Parent Type", uint( 1 ));
             layerEntity->registerProperty( "Layer", uint( i+1 ));
             mcLayerEntities[ i ] = layerEntity;
-            relSuperEntityOf[ mcEntity->entityGid( ) ].entities.insert(
-              layerEntity->entityGid( ));
+            relSuperEntityOf[ mcEntity->entityGid( ) ].insert(
+              std::make_pair( layerEntity->entityGid( ), nullptr ));
             relSubEntityOf[ layerEntity->entityGid( ) ].entity =
               mcEntity->entityGid( );
             _entities.add( layerEntity );
@@ -905,8 +906,8 @@ namespace nslib
 
           _entities.add( mcEntity );
           relChildOf[ mcEntity->entityGid( ) ].entity = colEntity->entityGid( );
-          relParentOf[ colEntity->entityGid( ) ].entities.insert(
-            mcEntity->entityGid( ));
+          relParentOf[ colEntity->entityGid( ) ].insert(
+            std::make_pair( mcEntity->entityGid( ), nullptr ));
 
           ///////////////////////////////////////////
           // Neurons ////////////////////////////////
@@ -996,18 +997,18 @@ namespace nslib
             _entities.add( neuronEntity );
             relChildOf[ neuronEntity->entityGid( ) ].entity =
               mcEntity->entityGid( );
-            relParentOf[ mcEntity->entityGid( ) ].entities.insert(
-              neuronEntity->entityGid( ));
+            relParentOf[ mcEntity->entityGid( ) ].insert(
+              std::make_pair( neuronEntity->entityGid( ), nullptr ));
 
-            relGroupOf[ mcEntity->entityGid( ) ].entities.insert(
-              neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].entities.insert(
-              mcEntity->entityGid( ));
+            relGroupOf[ mcEntity->entityGid( ) ].insert(
+              std::make_pair( neuronEntity->entityGid( ), nullptr ));
+            relPartOf[ neuronEntity->entityGid( ) ].insert(
+              std::make_pair( mcEntity->entityGid( ), nullptr ));
 
-            relGroupOf[ colEntity->entityGid( ) ].entities.insert(
-              neuronEntity->entityGid( ));
-            relPartOf[ neuronEntity->entityGid( ) ].entities.insert(
-              colEntity->entityGid( ));
+            relGroupOf[ colEntity->entityGid( ) ].insert(
+              std::make_pair( neuronEntity->entityGid( ), nullptr ));
+            relPartOf[ neuronEntity->entityGid( ) ].insert(
+              std::make_pair( colEntity->entityGid( ), nullptr ));
 
             for ( auto layer = 0; layer < 6; ++layer )
             {
@@ -1098,10 +1099,10 @@ namespace nslib
 
       std::cout << "\n";
 
-      const auto& childrenIds = relParentOf[ 0 ].entities;
+      const auto& childrenIds = relParentOf[ 0 ];
       _rootEntities.clear( );
       for ( const auto& child : childrenIds )
-        _rootEntities.add( nslib::DataManager::entities( ).at( child ));
+        _rootEntities.add( nslib::DataManager::entities( ).at( child.first ));
 
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
@@ -1111,13 +1112,10 @@ namespace nslib
         shift::Entity* postNeuron =
           neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )];
 
-        relConnectsTo[ preNeuron->entityGid( )].entities.insert(
-          postNeuron->entityGid( ));
-        //Example of properties
-        relConnectsTo[ preNeuron->entityGid( )].properties =
-          new ConnectsWith( 1 );
-        relConnectedBy[ postNeuron->entityGid( ) ].entities.insert(
-          preNeuron->entityGid( ));
+        relConnectsTo[ preNeuron->entityGid( )].insert(
+          std::make_pair( postNeuron->entityGid( ), new ConnectsWith( 1 )));
+        relConnectedBy[ postNeuron->entityGid( ) ].insert(
+          std::make_pair( preNeuron->entityGid( ), nullptr ));
       }
       neuronEntitiesByGid.clear( );
 

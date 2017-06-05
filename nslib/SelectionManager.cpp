@@ -139,12 +139,12 @@ namespace nslib
   {
     if ( relParentOf.find( entityGid ) == relParentOf.end( ))
       return;
-    const auto& childrenIds = relParentOf.at( entityGid ).entities;
+    const auto& childrenIds = relParentOf.at( entityGid );
     for ( auto const& childId : childrenIds )
     {
       SelectionManager::setSelectedState(
-        entities.at( childId ), SelectedState::SELECTED );
-      propagateSelectedToChilds( entities, relParentOf, childId );
+        entities.at( childId.first ), SelectedState::SELECTED );
+      propagateSelectedToChilds( entities, relParentOf, childId.first );
     }
 
   }

@@ -325,9 +325,8 @@ namespace nslib
       {
         auto entityGid = entity->entityGid( );
         if ( relSuperEntityOf.count( entityGid ) > 0 )
-          for ( const auto& subEntity :
-                  relSuperEntityOf.at( entityGid ).entities )
-            subEntities.add( DataManager::entities( ).at( subEntity ));
+          for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
+            subEntities.add( DataManager::entities( ).at( subEntity.first ));
       }
       if ( subEntities.size( ) > 0 )
         this->create( subEntities, representations,
@@ -351,7 +350,7 @@ namespace nslib
         auto it = relConnectsTo->find( gidEntityRep.first );
 
         if( it != relConnectsTo->end( ))
-          for( auto& relatedEntity : it->second.entities )
+          for( auto& relatedEntity : it->second )
           {
             auto relEntities = relatedEntities.find( gidEntityRep.first );
             if( relEntities == relatedEntities.end( ))
@@ -364,16 +363,16 @@ namespace nslib
               relEntities = ref.first;
             }
 
-            auto related = gidsToEntitiesReps.find( relatedEntity );
+            auto related = gidsToEntitiesReps.find( relatedEntity.first );
             if( related != gidsToEntitiesReps.end( ))
             {
-              if( relEntities->second.find( relatedEntity ) != relEntities->second.end( ))
+              if( relEntities->second.find( relatedEntity.first ) != relEntities->second.end( ))
                 continue;
 
               ConnectionArrowRep* relationRep = new ConnectionArrowRep(
                 gidEntityRep.second.second, related->second.second );
 
-              relEntities->second.insert( relatedEntity );
+              relEntities->second.insert( relatedEntity.first );
 
               relatedEntitiesReps.push_back(
                   std::make_tuple( relationRep,
