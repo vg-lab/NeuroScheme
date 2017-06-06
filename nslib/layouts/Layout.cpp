@@ -20,6 +20,7 @@
  *
  */
 #include "../error.h"
+#include "../Config.h"
 #include "../DataManager.h"
 #include "Layout.h"
 #include "../reps/Item.h"
@@ -202,7 +203,8 @@ namespace nslib
         _addRepresentations( representations );
     }
 
-    _addRepresentations( relationshipReps );
+    if ( Config::showConnectivity( ))
+      _addRepresentations( relationshipReps );
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {

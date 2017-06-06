@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>37</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPanes">
@@ -43,7 +43,14 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShowConnectivity"/>
+   </widget>
    <addaction name="menuPanes"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -61,6 +68,7 @@
    <addaction name="separator"/>
    <addaction name="actionLayouts"/>
    <addaction name="actionStoredSelections"/>
+   <addaction name="actionShowConnectivity"/>
   </widget>
   <action name="actionLayouts">
    <property name="checkable">
@@ -142,6 +150,24 @@
   <action name="actionAbout">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="actionShowConnectivity">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/connectivity.png</normaloff>:/icons/connectivity.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show connectivity</string>
+   </property>
+   <property name="toolTip">
+    <string>Show connectivity</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
    </property>
   </action>
  </widget>

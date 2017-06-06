@@ -1,5 +1,6 @@
 <RCC>
-  <qresource prefix="">
+  <qresource>
+    <file>icons/connectivity.png</file>
     <file>icons/ns_icon.png</file>
     <file>icons/savedselections.png</file>
     <file>icons/fullscreen.png</file>

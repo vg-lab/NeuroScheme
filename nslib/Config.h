@@ -45,8 +45,15 @@ namespace nslib
     static std::string isArgumentDefined(
       const std::vector< std::string >& argNames );
 
+    NSLIB_API
+    static bool showConnectivity( void );
+
+    NSLIB_API
+    static void showConnectivity( bool showConnectivity_ );
+
   protected:
     static NeuroSchemeInputArguments _inputArgs;
+    static bool _showConnectivity;
 
   };
 
