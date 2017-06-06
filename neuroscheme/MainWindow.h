@@ -77,6 +77,7 @@ public slots:
   void killActivePane( void );
   void duplicateActivePane( void );
   void home( void );
+  void toggleShowConnectivity( void );
 
 protected:
 

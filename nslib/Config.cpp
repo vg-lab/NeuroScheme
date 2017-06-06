@@ -30,6 +30,7 @@ namespace nslib
   }
 
   NeuroSchemeInputArguments Config::_inputArgs = NeuroSchemeInputArguments( );
+  bool Config::_showConnectivity = false;
 
   std::string Config::isArgumentDefined(
       const std::vector< std::string >& argNames )
@@ -42,4 +43,13 @@ namespace nslib
     return std::string( );
   }
 
+  bool Config::showConnectivity( void )
+  {
+    return _showConnectivity;
+  }
+
+  void Config::showConnectivity( bool showConnectivity_ )
+  {
+    _showConnectivity = showConnectivity_;
+  }
 }
