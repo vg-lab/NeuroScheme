@@ -40,7 +40,7 @@ namespace nslib
 //else
       //     std::cout << "No events" << std::endl;
 
-      int size_2 = ceil( float( size ) / 1.3f );
+      int size_2 = ceil( float( size ) / 1.9f );
       this->setRect ( -size_2, -size_2,
                       size_2 * 2 , size_2 * 2 );
       this->setPen( QPen( Qt::NoPen ));

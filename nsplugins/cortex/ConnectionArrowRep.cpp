@@ -24,6 +24,7 @@
 #include <nslib/Color.h>
 #include <stdint.h>
 
+#include <QVector2D>
 
 namespace nslib
 {
@@ -71,17 +72,16 @@ namespace nslib
 
       auto  arrowItem   = this->item( scene );
       float lThickness  = 2.0;
+      //float lAdjustedParam = 5.0f;
 
       if (opConfig->isAnimating())
       {
         //TODO: It needs to be changed in the future!
-        auto originItem = dynamic_cast< Item* > (
-                                dynamic_cast<QGraphicsItemRepresentation* >(
-                                _originRep )->item( scene ) );
+        auto originRep = dynamic_cast<QGraphicsItemRepresentation* >( _originRep );
+        auto destRep = dynamic_cast<QGraphicsItemRepresentation* >( _destRep );
 
-        auto destItem = dynamic_cast< Item* > (
-                          dynamic_cast< QGraphicsItemRepresentation* >(
-                              _destRep )->item( scene ));
+        auto originItem = dynamic_cast< Item* >( originRep->item( scene ));
+        auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
 
         if ( originItem == nullptr )
           Log::log( "No successfully dynamic cast on originItem",
@@ -96,12 +96,53 @@ namespace nslib
         lineAnim.setPropertyName( "line" );
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
+
+        auto destIniOri =
+            QVector2D( originItem->posAnim( ).startValue( ).toPointF( ) )
+                       +
+                       ( (originRep->item( scene )->boundingRect().width() * 0.5f * originItem->scaleAnim().startValue().toDouble())
+                       * QVector2D(destItem->posAnim( ).startValue( ).toPointF( )
+                                   - originItem->posAnim( ).startValue( ).toPointF( ) )
+                                   .normalized());
+
+        auto destIniDest =
+            QVector2D( destItem->posAnim( ).startValue( ).toPointF( ) )
+                       -
+                       ( (destRep->item( scene )->boundingRect().width() * 0.5f * destItem->scaleAnim().startValue().toDouble())
+                       * QVector2D(destItem->posAnim( ).startValue( ).toPointF( )
+                                   - originItem->posAnim( ).startValue( ).toPointF( ) )
+                                   .normalized());
+
+        auto destEndOri =
+            QVector2D( originItem->posAnim( ).endValue( ).toPointF( ) )
+                       +
+                       ( (originRep->item( scene )->boundingRect().width() * 0.5f * originItem->scaleAnim().endValue().toDouble())
+                       * QVector2D(destItem->posAnim( ).endValue( ).toPointF( )
+                                   - originItem->posAnim( ).endValue( ).toPointF( ) )
+                                   .normalized());
+
+        auto destEndDest =
+            QVector2D( destItem->posAnim( ).endValue( ).toPointF( ) )
+                       -
+                       ( (destRep->item( scene )->boundingRect().width() * 0.5f * destItem->scaleAnim().endValue().toDouble())
+                       * QVector2D(destItem->posAnim( ).endValue( ).toPointF( )
+                                   - originItem->posAnim( ).endValue( ).toPointF( ) )
+                                   .normalized());
+
         lineAnim.setStartValue(
-          QLineF( originItem->posAnim( ).startValue( ).toPointF( ),
-                  destItem->posAnim( ).startValue( ).toPointF( )));
+          QLineF( QPointF(destIniOri.x(),destIniOri.y()) ,
+              QPointF(destIniDest.x(), destIniDest.y()) ) );
         lineAnim.setEndValue(
-          QLineF( originItem->posAnim( ).endValue( ).toPointF( ),
-                  destItem->posAnim( ).endValue( ).toPointF( )));
+          QLineF( QPointF(destEndOri.x(), destEndOri.y()),
+                  QPointF(destEndDest.x(), destEndDest.y() ) ) );
+
+//        lineAnim.setStartValue(
+//          QLineF( originItem->posAnim( ).startValue( ).toPointF( ),
+//                  destItem->posAnim( ).startValue( ).toPointF( )));
+//        lineAnim.setEndValue(
+//          QLineF( originItem->posAnim( ).endValue( ).toPointF( ),
+//                  destItem->posAnim( ).endValue( ).toPointF( )));
+
         lineAnim.start( );
 
       }
@@ -115,11 +156,19 @@ namespace nslib
                           dynamic_cast< QGraphicsItemRepresentation* >(
                               _destRep )->item( scene ));
 
-        //destItem->boundingRect().bottom()
+        //std::cout<<"Scala"<<originItem->scale()<<std::endl;
+        auto destOri =  QVector2D( originItem->pos( ) )
+                        + ( (originItem->boundingRect().width() * 0.5f * originItem->scale() )
+                        * QVector2D(destItem->pos( ) - originItem->pos( ) ).normalized());
+
+        auto destDest =  QVector2D( destItem->pos( ) )
+                        - ( (destItem->boundingRect().width() * 0.5f * originItem->scale()  )
+                        * QVector2D(destItem->pos( ) - originItem->pos( ) ).normalized())
+                        ;
 
         dynamic_cast< ConnectionArrowItem* >( arrowItem )
-                        ->createArrow( originItem->pos( ),
-                                       destItem->pos( ),
+                        ->createArrow( QPointF(destOri.x(), destOri.y( ) ),
+                                       QPointF(destDest.x(), destDest.y( ) ),
                                        lThickness );
 
       }

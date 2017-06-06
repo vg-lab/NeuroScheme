@@ -73,6 +73,7 @@ namespace nslib
 
       float size = arrowLength;
       const Color baseColor( 0, 0, 0 );
+      auto color = QColor( 100,100,100, 255 );
 
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
       _arrowOriItem = new QGraphicsEllipseItem( );
@@ -82,10 +83,11 @@ namespace nslib
                               size );
 
       _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( baseColor ));
+      _arrowOriItem->setBrush( QBrush( color ));
       _arrowOriItem->setParentItem( this );
 
       arrowShape.clear( );
+
       arrowShape  << auxLine.p1( )
                   << arrowInit
                   << arrowP1
@@ -93,7 +95,11 @@ namespace nslib
                   << arrowP2
                   << arrowInit;
 
+      this->setBrush( QBrush( color ));
+      this->setPen( QPen( color ));
       this->setPolygon( arrowShape );
+      this->setZValue(-100.0f);
+
     }
   }
 }
