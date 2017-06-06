@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2016 GMRV/URJC/UPM.
+ * Copyright (c) 2017 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
- * 			Juan Pedro Brito <juanpedro.brito@upm.es>
+ * 			    Juan Pedro Brito <juanpedro.brito@upm.es>
  *
  * This file is part of NeuroScheme
  *
