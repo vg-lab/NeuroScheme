@@ -1107,15 +1107,38 @@ namespace nslib
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
       {
-        shift::Entity* preNeuron =
-          neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )];
-        shift::Entity* postNeuron =
-          neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )];
+        shift::Entity::EntityGid preNeuronGid =
+          neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )]->entityGid( );
+        shift::Entity::EntityGid postNeuronGid =
+          neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )]->entityGid( );
 
-        relConnectsTo[ preNeuron->entityGid( )].insert(
-          std::make_pair( postNeuron->entityGid( ), new ConnectsWith( 1 )));
-        relConnectedBy[ postNeuron->entityGid( ) ].insert(
-          std::make_pair( preNeuron->entityGid( ), nullptr ));
+        auto connectsToIt = relConnectsTo.find( preNeuronGid );
+        if( connectsToIt != relConnectsTo.end( ))
+        {
+          auto connectsToMMIt = connectsToIt->second.find( postNeuronGid );
+          if( connectsToMMIt != connectsToIt->second.end( ))
+          {
+            auto connectsToProperty =
+              connectsToMMIt->second->getProperty( "count" );
+
+            unsigned int value = connectsToProperty.value< unsigned int >() + 1;
+            connectsToProperty.set< unsigned int >( value );
+          }
+          else
+          {
+            relConnectsTo[ preNeuronGid ].insert(
+              std::make_pair( postNeuronGid, new ConnectsWith( 1 )));
+            relConnectedBy[ postNeuronGid ].insert(
+              std::make_pair( preNeuronGid, nullptr ));
+          }
+        }
+        else
+        {
+          relConnectsTo[ preNeuronGid ].insert(
+            std::make_pair( postNeuronGid, new ConnectsWith( 1 )));
+          relConnectedBy[ postNeuronGid ].insert(
+            std::make_pair( preNeuronGid, nullptr ));
+        }
       }
       neuronEntitiesByGid.clear( );
 
