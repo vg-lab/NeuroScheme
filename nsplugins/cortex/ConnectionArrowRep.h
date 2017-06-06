@@ -39,7 +39,6 @@ namespace nslib
       ConnectionArrowRep( shift::Representation* originRep_,
                           shift::Representation* destRep_ );
       ConnectionArrowRep( const ConnectionArrowRep& );
-      // ConnectionArrowRep( const shiftgen::ConnectionArrowRep& );
       virtual ~ConnectionArrowRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );

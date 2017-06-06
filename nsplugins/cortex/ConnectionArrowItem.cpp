@@ -1,8 +1,24 @@
 /*
- * ConnectionArrowItem.cpp
+ * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- *  Created on: 30/5/2017
- *      Author: juanpebm
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ * 			    Juan Pedro Brito <juanpedro.brito@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
  */
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -29,18 +45,6 @@ namespace nslib
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
     }
 
-    // void ConnectionArrowItem::setOrigin( const QPointF& origin_ )
-    // {
-    //   _arrowOrigin = origin_;
-    //   createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
-    // }
-
-    // void ConnectionArrowItem::setDest( const QPointF& dest_ )
-    // {
-    //   _arrowDest = dest_;
-    //   createArrow( _arrowOrigin, _arrowDest, _arrowThickness );
-    // }
-
     void ConnectionArrowItem::createArrow( const QPointF& origin,
                                            const QPointF& dest,
                                            float thickness )
@@ -66,10 +70,10 @@ namespace nslib
         1.0f - (arrowLength * lengthInv ));
       QPointF arrowP1 = arrowInit -
         QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                   cos( angle + M_PI_3 ) * arrowWidth );
+                 cos( angle + M_PI_3 ) * arrowWidth );
       QPointF arrowP2 = arrowInit -
         QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
-                   cos( angle + M_PI - M_PI_3 ) * arrowWidth);
+                 cos( angle + M_PI - M_PI_3 ) * arrowWidth );
 
       float size = arrowLength;
       const Color baseColor( 0, 0, 0 );
@@ -98,7 +102,7 @@ namespace nslib
       this->setBrush( QBrush( color ));
       this->setPen( QPen( color ));
       this->setPolygon( arrowShape );
-      this->setZValue(-100.0f);
+      this->setZValue( -100.0f );
 
     }
   }
