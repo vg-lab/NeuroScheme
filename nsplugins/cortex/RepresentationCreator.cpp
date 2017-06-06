@@ -347,6 +347,10 @@ namespace nslib
       const auto& relatedElements =
           DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
+      MapperFloatToFloat nbConnectionsToWidth(
+        0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
+        1, 10 );
+
       for( auto& entity : entities.vector( ))
       {
         auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
@@ -386,6 +390,32 @@ namespace nslib
             ConnectionArrowRep* relationRep =
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
+
+            // std::cout << numberOfConnections << " --> " <<
+            //   nbConnectionsToWidth.map(
+            //     numberOfConnections ) << std::endl;
+            std::unordered_multimap< shift::Entity::EntityGid,
+                                     shift::RelationshipProperties* > relMMap =
+              ( *relatedElements )[ entity->entityGid( ) ];
+            auto relMMapIt = relMMap.find( other->entityGid( ));
+            if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
+            {
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                  nbConnectionsToWidth.map(
+                    relMMapIt->second->getProperty( "count" ).value< unsigned int >( ))));
+            }
+            else
+            {
+            }
+            // relationRep->setProperty(
+            //   "width", ( unsigned int )
+            //   roundf( nbConnectionsToWidth.map(
+            //             properties->getProperty( "count" ).value< unsigned int >( ))
+            // ));
+            //relationRep->setProperty(
+              // "width", ( unsigned int ) roundf( nbConnectionsToWidth.map(
+              //                                     numberOfConnections )));
 
             alreadyConnected = relatedEntitiesReps.insert(
               std::make_pair( combinedKey,

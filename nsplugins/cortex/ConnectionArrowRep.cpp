@@ -65,7 +65,6 @@ namespace nslib
       GraphicsScene* scene = opConfig->scene( );
 
       auto  arrowItem   = this->item( scene );
-      float lThickness  = 2.0;
 
       if (opConfig->isAnimating())
       {
@@ -155,10 +154,9 @@ namespace nslib
           ((destItem->boundingRect().width() * 0.5f * originItem->scale( )) *
            QVector2D(destItem->pos( ) - originItem->pos( )).normalized());
 
-        dynamic_cast< ConnectionArrowItem* >( arrowItem )
-                        ->createArrow( QPointF(destOri.x( ), destOri.y( ) ),
-                                       QPointF(destDest.x( ), destDest.y( ) ),
-                                       lThickness );
+        dynamic_cast< ConnectionArrowItem* >( arrowItem )->
+          createArrow( QPointF(destOri.x( ), destOri.y( ) ),
+                       QPointF(destDest.x( ), destDest.y( ) ));
 
       }
     }

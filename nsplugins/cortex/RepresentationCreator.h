@@ -63,7 +63,8 @@ namespace nslib
                         float maxNeuronDendsArea_,
                         unsigned int maxNeurons_,
                         unsigned int maxNeuronsPerColumn_,
-                        unsigned int maxNeuronsPerMiniColumn_ )
+                        unsigned int maxNeuronsPerMiniColumn_,
+                        unsigned int maxConnectionsPerEntity_ )
       {
         _maxNeuronSomaVolume = maxNeuronSomaVolume_;
         _maxNeuronSomaArea = maxNeuronSomaArea_;
@@ -72,6 +73,7 @@ namespace nslib
         _maxNeurons = maxNeurons_;
         _maxNeuronsPerColumn = maxNeuronsPerColumn_;
         _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+        _maxConnectionsPerEntity = maxConnectionsPerEntity_;
       }
 
     protected:
@@ -112,6 +114,7 @@ namespace nslib
       unsigned int _maxNeurons;
       unsigned int _maxNeuronsPerColumn;
       unsigned int _maxNeuronsPerMiniColumn;
+      unsigned int _maxConnectionsPerEntity;
       LayersMap _layersMap;
       NeuronTypeAggsMaps _neuronTypeAggsMap;
     };

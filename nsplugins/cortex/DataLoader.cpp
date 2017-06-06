@@ -1104,6 +1104,7 @@ namespace nslib
       for ( const auto& child : childrenIds )
         _rootEntities.add( nslib::DataManager::entities( ).at( child.first ));
 
+      unsigned int maxConnectionsPerNeuron = 0;
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
       {
@@ -1118,10 +1119,12 @@ namespace nslib
           auto connectsToMMIt = connectsToIt->second.find( postNeuronGid );
           if( connectsToMMIt != connectsToIt->second.end( ))
           {
-            auto connectsToProperty =
+            auto& connectsToProperty =
               connectsToMMIt->second->getProperty( "count" );
 
-            unsigned int value = connectsToProperty.value< unsigned int >() + 1;
+            unsigned int value = connectsToProperty.value< unsigned int >( ) + 1;
+            if ( value > maxConnectionsPerNeuron )
+              maxConnectionsPerNeuron = value;
             connectsToProperty.set< unsigned int >( value );
           }
           else
@@ -1147,8 +1150,10 @@ namespace nslib
                               maxNeuronDendVolume, maxNeuronDendArea,
                               gids.size( ),
                               maxNeuronsPerColumnLayer,
-                              maxNeuronsPerMiniColumnLayer );
+                              maxNeuronsPerMiniColumnLayer,
+                              maxConnectionsPerNeuron );
 
+      std::cout << "maxConnectionsPerNeuron: " << maxConnectionsPerNeuron << std::endl;
       nslib::RepresentationCreatorManager::addCreator( repCretor );
 
     }

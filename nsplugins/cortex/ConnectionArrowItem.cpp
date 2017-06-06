@@ -39,19 +39,19 @@ namespace nslib
       , nslib::Item( )
       , nslib::InteractiveItem( )
       , _arrowOriItem( nullptr )
-      , _arrowThickness( 2.0f )
 	  {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
+
+      _arrowThickness =
+        connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
     }
 
     void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest,
-                                           float thickness )
+                                           const QPointF& dest )
     {
       _arrowOrigin = origin;
       _arrowDest = dest;
-      _arrowThickness = thickness;
 
       QPolygonF arrowShape;
 
@@ -76,7 +76,7 @@ namespace nslib
                  cos( angle + M_PI - M_PI_3 ) * arrowWidth );
 
       float size = arrowLength;
-      const Color baseColor( 0, 0, 0 );
+
       auto color = QColor( 100,100,100, 255 );
 
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
@@ -88,6 +88,7 @@ namespace nslib
 
       _arrowOriItem->setPen( Qt::NoPen );
       _arrowOriItem->setBrush( QBrush( color ));
+      _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
       _arrowOriItem->setParentItem( this );
 
       arrowShape.clear( );
@@ -100,7 +101,8 @@ namespace nslib
                   << arrowInit;
 
       this->setBrush( QBrush( color ));
-      this->setPen( QPen( color ));
+      // this->setPen( QPen( color ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
       this->setPolygon( arrowShape );
       this->setZValue( -100.0f );
 
