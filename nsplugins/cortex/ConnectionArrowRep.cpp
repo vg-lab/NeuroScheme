@@ -160,5 +160,27 @@ namespace nslib
 
       }
     }
+
+
+    void ConnectionArrowRep::hoverEnterEvent( QGraphicsSceneHoverEvent*  )
+    {
+      for ( auto item : _items )
+      {
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        if ( arrowItem )
+          arrowItem->hoverEnter( );
+      }
+    }
+
+    void ConnectionArrowRep::hoverLeaveEvent( QGraphicsSceneHoverEvent*  )
+    {
+      for ( auto item : _items )
+      {
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        if ( arrowItem )
+          arrowItem->hoverLeave( );
+      }
+    }
+
   } // namespace cortex
 } // namespace nslib

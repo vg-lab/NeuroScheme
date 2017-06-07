@@ -66,6 +66,39 @@ namespace nslib
 
       QPropertyAnimation& lineAnim( void ) { return _lineAnim; }
 
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+      {
+        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+        if ( rep )
+          rep->hoverEnterEvent( event_ );
+      }
+
+      virtual void hoverEnter( void )
+      {
+        this->setBrush( QBrush( hoverColor ));
+        this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowOriItem->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowOriItem->setBrush( QBrush( hoverColor ));
+      }
+
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+      {
+        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+        if ( rep )
+          rep->hoverLeaveEvent( event_ );
+      }
+
+      virtual void hoverLeave( void )
+      {
+        this->setBrush( QBrush( color ));
+        this->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowOriItem->setBrush( QBrush( color ));
+      }
+
+      static QColor color;
+      static QColor hoverColor;
+
     protected:
       QGraphicsEllipseItem* _arrowOriItem;
 

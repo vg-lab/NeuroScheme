@@ -36,7 +36,7 @@ namespace nslib
       {
         //std::cout << "Hover events" << std::endl;
         this->setAcceptHoverEvents( true );
-      } 
+      }
 //else
       //     std::cout << "No events" << std::endl;
 

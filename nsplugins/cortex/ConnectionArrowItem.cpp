@@ -32,6 +32,9 @@ namespace nslib
 
     const auto M_PI_3 = float( M_PI ) * 0.33f;
 
+    QColor ConnectionArrowItem::color = QColor( 100,100,100, 255 );
+    QColor ConnectionArrowItem::hoverColor = QColor( 255,100,100, 255 );
+
 	  ConnectionArrowItem::ConnectionArrowItem(
       const ConnectionArrowRep& connectionArrowRep )
       : QObject( )
@@ -42,6 +45,9 @@ namespace nslib
 	  {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
+
+
+      this->setAcceptHoverEvents( true );
 
       _arrowThickness =
         connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
@@ -77,7 +83,6 @@ namespace nslib
 
       float size = arrowLength;
 
-      auto color = QColor( 100,100,100, 255 );
 
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
       _arrowOriItem = new QGraphicsEllipseItem( );

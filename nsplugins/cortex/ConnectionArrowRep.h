@@ -45,6 +45,9 @@ namespace nslib
 
       void preRender( shift::OpConfig* opConfig = nullptr );
 
+      void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+      void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
+
     protected:
       shift::Representation* _originRep;
       shift::Representation* _destRep;
