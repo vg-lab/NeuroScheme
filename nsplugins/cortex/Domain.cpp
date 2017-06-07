@@ -55,6 +55,8 @@ namespace nslib
                 << "\t\t[ --no-morphologies | -nm ] "
                 << std::endl
                 << "\t\t[ -cns | --csv-neuron-stats ] csv_file"
+                << std::endl
+                << "\t\t[ -lc | --load-connectivity ] "
                 << std::endl << std::endl
                 << "\t\t(*1) only for BlueConfig files" << std::endl;
 

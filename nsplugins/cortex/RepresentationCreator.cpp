@@ -343,7 +343,6 @@ namespace nslib
       const std::string& relationName )
     {
 
-      std::cout << "From " << entities.size( ) << " entities... " << std::endl;
       const auto& relatedElements =
           DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
@@ -391,9 +390,6 @@ namespace nslib
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
 
-            // std::cout << numberOfConnections << " --> " <<
-            //   nbConnectionsToWidth.map(
-            //     numberOfConnections ) << std::endl;
             std::unordered_multimap< shift::Entity::EntityGid,
                                      shift::RelationshipProperties* > relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
@@ -405,17 +401,6 @@ namespace nslib
                   nbConnectionsToWidth.map(
                     relMMapIt->second->getProperty( "count" ).value< unsigned int >( ))));
             }
-            else
-            {
-            }
-            // relationRep->setProperty(
-            //   "width", ( unsigned int )
-            //   roundf( nbConnectionsToWidth.map(
-            //             properties->getProperty( "count" ).value< unsigned int >( ))
-            // ));
-            //relationRep->setProperty(
-              // "width", ( unsigned int ) roundf( nbConnectionsToWidth.map(
-              //                                     numberOfConnections )));
 
             alreadyConnected = relatedEntitiesReps.insert(
               std::make_pair( combinedKey,
@@ -432,9 +417,6 @@ namespace nslib
 
 
       }
-
-      std::cout << "Using " << relatedEntities.size( )
-                << " relations." << std::endl;
 
     } // generateRelations
 

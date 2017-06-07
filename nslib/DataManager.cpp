@@ -93,7 +93,8 @@ namespace nslib
   void DataManager::loadBlueConfig( const std::string& blueConfig,
                                     const std::string& targetLabel,
                                     const bool loadMorphologies,
-                                    const std::string& csvNeuronStatsFileName )
+                                    const std::string& csvNeuronStatsFileName,
+                                    const bool loadConnectivity )
   {
     auto  errorMessage = new QErrorMessage;
 #ifndef NSOL_USE_BRION
@@ -101,6 +102,7 @@ namespace nslib
     ( void ) targetLabel;
     ( void ) loadMorphologies;
     ( void ) csvNeuronStatsFileName;
+    ( void ) loadConnectivity;
     errorMessage->showMessage( "Brion support not built-in" );
     return;
 #else
@@ -133,7 +135,9 @@ namespace nslib
           nsol::Neuron,
           nsol::MiniColumnStats,
           nsol::ColumnStats >( );
-
+      }
+      if ( loadConnectivity )
+      {
         _nsolDataSet.loadBlueConfigConnectivity<
           nsol::Node,
           nsol::SectionStats,
@@ -147,7 +151,7 @@ namespace nslib
       }
       else
       {
-        _nsolDataSet.loadBlueConfigBasicConnectivity<
+        _nsolDataSet.loadBlueConfigHierarchy<
           nsol::Node,
           nsol::SectionStats,
           nsol::DendriteStats,
@@ -156,7 +160,9 @@ namespace nslib
           nsol::NeuronMorphologyCachedStats,
           nsol::Neuron,
           nsol::MiniColumnStats,
-          nsol::ColumnStats >( );
+          nsol::ColumnStats >( blueConfig,
+                               targetLabel );
+
       }
     } catch ( std::exception& ex )
     {

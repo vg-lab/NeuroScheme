@@ -75,6 +75,7 @@ namespace nslib
 
       virtual void hoverEnter( void )
       {
+        this->setZValue( 100 );
         this->setBrush( QBrush( hoverColor ));
         this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
         _arrowOriItem->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
@@ -90,6 +91,7 @@ namespace nslib
 
       virtual void hoverLeave( void )
       {
+        this->setZValue( -100 );
         this->setBrush( QBrush( color ));
         this->setPen( QPen( QBrush( color ), _arrowThickness ));
         _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));

@@ -307,30 +307,9 @@ namespace nslib
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
         count++;
-        // std::cout << "remove " << item << std::endl;
-        // for ( const auto c : item->childItems( ))
-        // {
-          // std::cout << "remove child " << c << std::endl;
-          // std::cout << " " << dynamic_cast< CollapseButtonItem* >( c ) << std::endl;
-          //   for ( const auto cc : c->childItems( ))
-          // {
-          //   std::cout << "remove child2 " << cc;
-          //   std::cout << " " << dynamic_cast< LayerItem* >( cc ) << std::endl;
-          //   std::cout << " " << cc->boundingRect( ).width( ) << " "
-          //             << cc->boundingRect( ).height( ) << std::endl;
-          // }
-        // }
         _canvas->scene( ).removeItem( item );
       }
     }
-    std::cout << "Se van a borrar: " << count << std::endl;
-    // QList< QGraphicsItem* > items_ = _scene->items( );
-    // for ( auto item = items_.begin( ); item != items_.end( ); ++item )
-    // {
-    //   // auto item_ = dynamic_cast< Item* >( *item );
-    //   // if ( item_ ) // && item_->parentRep( ))
-    //     _scene->removeItem( *item );
-    // }
 
     // Remove the rest
     _canvas->scene( ).clear( );
@@ -341,8 +320,6 @@ namespace nslib
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    // std::cout << "+++ Layout::_addRepresentations "
-    //           << reps.size( ) << std::endl;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
