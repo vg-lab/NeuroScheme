@@ -93,7 +93,8 @@ namespace nslib
   void DataManager::loadBlueConfig( const std::string& blueConfig,
                                     const std::string& targetLabel,
                                     const bool loadMorphologies,
-                                    const std::string& csvNeuronStatsFileName )
+                                    const std::string& csvNeuronStatsFileName,
+                                    const bool loadConnectivity )
   {
     auto  errorMessage = new QErrorMessage;
 #ifndef NSOL_USE_BRION
@@ -101,6 +102,7 @@ namespace nslib
     ( void ) targetLabel;
     ( void ) loadMorphologies;
     ( void ) csvNeuronStatsFileName;
+    ( void ) loadConnectivity;
     errorMessage->showMessage( "Brion support not built-in" );
     return;
 #else
@@ -122,6 +124,7 @@ namespace nslib
                              targetLabel );
 
       if ( loadMorphologies )
+      {
         _nsolDataSet.loadAllMorphologies<
           nsol::Node,
           nsol::SectionStats,
@@ -132,10 +135,39 @@ namespace nslib
           nsol::Neuron,
           nsol::MiniColumnStats,
           nsol::ColumnStats >( );
+      }
+      if ( loadConnectivity )
+      {
+        _nsolDataSet.loadBlueConfigConnectivity<
+          nsol::Node,
+          nsol::SectionStats,
+          nsol::DendriteStats,
+          nsol::AxonStats,
+          nsol::SomaStats,
+          nsol::NeuronMorphologyCachedStats,
+          nsol::Neuron,
+          nsol::MiniColumnStats,
+          nsol::ColumnStats >( );
+      }
+      else
+      {
+        _nsolDataSet.loadBlueConfigHierarchy<
+          nsol::Node,
+          nsol::SectionStats,
+          nsol::DendriteStats,
+          nsol::AxonStats,
+          nsol::SomaStats,
+          nsol::NeuronMorphologyCachedStats,
+          nsol::Neuron,
+          nsol::MiniColumnStats,
+          nsol::ColumnStats >( blueConfig,
+                               targetLabel );
 
-    } catch ( ... )
+      }
+    } catch ( std::exception& ex )
     {
-      std::cerr << "Error loading BlueConfig" << std::endl;
+      Log::log( std::string( "Error loading BlueConfig: " ) +
+                std::string( ex.what( )), LOG_LEVEL_ERROR );
       errorMessage->showMessage( "Error loading BlueConfig" );
       return;
     }

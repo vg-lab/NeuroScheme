@@ -100,9 +100,10 @@ namespace nslib
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
                                 [ "isChildOf" ]->asOneToOne( ));
-          const auto& parent = relChildOf[ entityGid ];
+          const auto& parent = relChildOf[ entityGid ].entity;
 
-          const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
+          const auto& grandParent =
+            relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
           const auto& parentSiblings = relParentOf[ grandParent ];
 
@@ -161,7 +162,7 @@ namespace nslib
               if ( parentSiblings.size( ) > 0 )
                 for ( const auto& parentSibling : parentSiblings )
                   targetEntities.add(
-                    DataManager::entities( ).at( parentSibling ));
+                    DataManager::entities( ).at( parentSibling.first ));
               else
                 targetEntities.add( DataManager::entities( ).at( parent ));
             }
@@ -170,7 +171,7 @@ namespace nslib
                 ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
             {
               for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child ));
+                targetEntities.add( DataManager::entities( ).at( child.first ));
             }
 
             if (( expandGroup && expandGroup == selectedAction ) ||
@@ -179,7 +180,7 @@ namespace nslib
             {
               for ( const auto& groupedEntity : groupedEntities )
                 targetEntities.add(
-                  DataManager::entities( ).at( groupedEntity ));
+                  DataManager::entities( ).at( groupedEntity.first ));
             }
             if ( targetEntities.size( ) > 0 )
             {
@@ -272,19 +273,19 @@ namespace nslib
                 for ( auto const& groupedId : groupedIds )
                 {
                   SelectionManager::setSelectedState(
-                    allEntities.at( groupedId ), entityState );
+                    allEntities.at( groupedId.first ), entityState );
                   // Save unique parent set for updating only once per parent
-                  if ( relChildOf.count( groupedId ) > 0 )
-                    parentIds.insert( relChildOf.at( groupedId ));
+                  if ( relChildOf.count( groupedId.first ) > 0 )
+                    parentIds.insert( relChildOf.at( groupedId.first ).entity );
                 }
                 _updateSelectedStateOfSubEntities(
                   allEntities, relSuperEntityOf, relAGroupOf,
-                  relSubEntityOf.at( entityGid ));
+                  relSubEntityOf.at( entityGid ).entity );
                 std::unordered_set< unsigned int > uniqueParentChildIds;
                 for ( auto const& parentId : parentIds )
                 {
                   uniqueParentChildIds.insert(
-                    *relParentOf.at( parentId ).begin( ));
+                    relParentOf.at( parentId ).begin( )->first );
                 }
                 // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
                 for ( auto const& uniqueParentChildId : uniqueParentChildIds )
@@ -300,10 +301,11 @@ namespace nslib
             {
               if ( relSuperEntityOf.count( entityGid ) > 0 )
               {
-                const auto& subEntities = relSuperEntityOf.at( entityGid );
+                const auto& subEntities =
+                  relSuperEntityOf.at( entityGid );
                 for ( const auto& subEntity : subEntities )
                   SelectionManager::setSelectedState(
-                    allEntities.at( subEntity ), entityState );
+                    allEntities.at( subEntity.first ), entityState );
               }
 
               // std::cout << "Propagate to children of " << entityGid << std::endl;
@@ -351,17 +353,17 @@ namespace nslib
     for ( auto const& childId : childrenIds )
     {
       // std::cout << childId << " ";
-      if ( relSuperEntityOf.count( childId ) > 0 )
+      if ( relSuperEntityOf.count( childId.first ) > 0 )
       {
-        const auto& subEntities = relSuperEntityOf.at( childId );
+        const auto& subEntities = relSuperEntityOf.at( childId.first );
         for ( const auto& subEntity : subEntities )
           SelectionManager::setSelectedState(
-            DataManager::entities( ).at( subEntity ), state );
+            DataManager::entities( ).at( subEntity.first ), state );
       }
       SelectionManager::setSelectedState(
-        entities.at( childId ), state );
+        entities.at( childId.first ), state );
       _propagateSelectedStateToChilds( entities, relParentOf, relSuperEntityOf,
-                                       childId, state );
+                                       childId.first, state );
     }
 
   }
@@ -377,7 +379,7 @@ namespace nslib
   {
     if ( relChildOf.count( entityGid ) == 0 )
       return;
-    const auto& parentId = relChildOf.at( entityGid );
+    const auto& parentId = relChildOf.at( entityGid ).entity;
 
     if ( parentId == 0 ) return;
 
@@ -424,7 +426,7 @@ namespace nslib
     for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
     {
       bool allGroupedSelected, noGroupedSelected;
-      _queryGroupedSelectedState( entities, relAGroupOf, subEntityId,
+      _queryGroupedSelectedState( entities, relAGroupOf, subEntityId.first,
                                   allGroupedSelected, noGroupedSelected );
       SelectedState groupedState;
       if ( noGroupedSelected )
@@ -435,7 +437,7 @@ namespace nslib
         groupedState = SelectedState::PARTIALLY_SELECTED;
 
       SelectionManager::setSelectedState(
-        entities.at( subEntityId ), groupedState );
+        entities.at( subEntityId.first ), groupedState );
 
     }
   }
@@ -452,10 +454,10 @@ namespace nslib
     const auto& childrenIds = relParentOf.at( entityGid );
     for ( auto const& childId : childrenIds )
     {
-      if ( SelectionManager::getSelectedState( entities.at( childId )) !=
+      if ( SelectionManager::getSelectedState( entities.at( childId.first )) !=
            SelectedState::SELECTED )
         allChildrenSelected = false;
-      if ( SelectionManager::getSelectedState( entities.at( childId )) ==
+      if ( SelectionManager::getSelectedState( entities.at( childId.first )) ==
            SelectedState::SELECTED )
         noChildrenSelected = false;
     }
@@ -480,10 +482,10 @@ namespace nslib
     const auto& groupedIds = relAGroupOf.at( entityGid );
     for ( auto const& groupedId : groupedIds )
     {
-      if ( SelectionManager::getSelectedState( entities.at( groupedId )) !=
+      if ( SelectionManager::getSelectedState( entities.at( groupedId.first )) !=
            SelectedState::SELECTED )
         allGroupedSelected = false;
-      if ( SelectionManager::getSelectedState( entities.at( groupedId )) ==
+      if ( SelectionManager::getSelectedState( entities.at( groupedId.first )) ==
            SelectedState::SELECTED )
         noGroupedSelected = false;
     }

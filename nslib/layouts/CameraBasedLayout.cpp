@@ -108,7 +108,8 @@ namespace nslib
           auto zValue = -distance;
 
 
-#define ANIM_DURATION 1200
+//#define ANIM_DURATION 1200
+
           if ( obj && animate )
           {
             if ( behindCamera )

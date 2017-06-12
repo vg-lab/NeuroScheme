@@ -46,9 +46,16 @@ namespace nslib
         shift::Representations& representations,
         shift::TEntitiesToReps& entitiesToReps,
         shift::TRepsToEntities& repsToEntities,
+        shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false );
 
+      void generateRelations(
+        const shift::Entities& entities,
+        const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+        shift::TRelatedEntitiesReps& relatedEntitiesReps,
+        shift::Representations& relatedEntities,
+        const std::string& relationName );
 
       void setMaximums( float maxNeuronSomaVolume_,
                         float maxNeuronSomaArea_,
@@ -56,7 +63,8 @@ namespace nslib
                         float maxNeuronDendsArea_,
                         unsigned int maxNeurons_,
                         unsigned int maxNeuronsPerColumn_,
-                        unsigned int maxNeuronsPerMiniColumn_ )
+                        unsigned int maxNeuronsPerMiniColumn_,
+                        unsigned int maxConnectionsPerEntity_ )
       {
         _maxNeuronSomaVolume = maxNeuronSomaVolume_;
         _maxNeuronSomaArea = maxNeuronSomaArea_;
@@ -65,6 +73,7 @@ namespace nslib
         _maxNeurons = maxNeurons_;
         _maxNeuronsPerColumn = maxNeuronsPerColumn_;
         _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+        _maxConnectionsPerEntity = maxConnectionsPerEntity_;
       }
 
     protected:
@@ -105,6 +114,7 @@ namespace nslib
       unsigned int _maxNeurons;
       unsigned int _maxNeuronsPerColumn;
       unsigned int _maxNeuronsPerMiniColumn;
+      unsigned int _maxConnectionsPerEntity;
       LayersMap _layersMap;
       NeuronTypeAggsMaps _neuronTypeAggsMap;
     };

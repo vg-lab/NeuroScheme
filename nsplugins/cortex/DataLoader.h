@@ -49,6 +49,7 @@ namespace nslib
 #ifdef NEUROSCHEME_USE_NSOL
       void createEntitiesFromNsolColumns(
         const nsol::Columns& columns,
+        const nsol::Circuit& circuit,
         bool withMorphologies = true,
         const std::string& csvNeuronStatsFileName = "" );
 #endif

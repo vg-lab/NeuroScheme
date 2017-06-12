@@ -62,6 +62,9 @@ MainWindow::MainWindow( QWidget* parent_ )
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
+  connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
+           this, SLOT( toggleShowConnectivity( )));
+
 
 
   QActionGroup* splitTypeGroup = new QActionGroup( this );
@@ -471,4 +474,18 @@ void MainWindow::aboutDialog( void )
         "<img src=':/icons/logoURJC.png' >"
         "</p>"
         ""));
+}
+
+void MainWindow::toggleShowConnectivity( void )
+{
+
+  nslib::Config::showConnectivity( _ui->actionShowConnectivity->isChecked( ));
+  // WAR to force repaint
+  resizeEvent( 0 );
+  for ( auto canvas : nslib::PaneManager::panes( ))
+  {
+    canvas->resizeEvent( nullptr );
+    // canvas->layouts( ).getLayout(
+    //   canvas->activeLayoutIndex( ))->refresh( false );
+  }
 }

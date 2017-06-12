@@ -20,6 +20,7 @@
  *
  */
 #include "../error.h"
+#include "../Config.h"
 #include "../DataManager.h"
 #include "Layout.h"
 #include "../reps/Item.h"
@@ -43,7 +44,8 @@ namespace nslib
 
   Layout::Layout( const std::string& name_,
                   unsigned int flags_ )
-    : _flags( flags_ )
+    : _canvas( nullptr )
+    , _flags( flags_ )
     , _optionsWidget( new LayoutOptionsWidget )
     , _name( name_ )
     , _toolbox( new QToolBox( _optionsWidget ))
@@ -104,6 +106,7 @@ namespace nslib
   {
     representations.clear( );
 
+
     bool doFiltering =
       _filterWidget &&
       _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
@@ -114,6 +117,7 @@ namespace nslib
 
     fires::Objects objects;
     shift::Representations preFilterRepresentations;
+    shift::Representations relationshipReps;
 
     if ( doFiltering || doSorting )
     {
@@ -161,6 +165,9 @@ namespace nslib
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
+      // Generate relationship representations
+      nslib::RepresentationCreatorManager::generateRelations(
+        filteredAndSortedEntities, relationshipReps, "connectsTo" );
 
     }
     else
@@ -173,19 +180,31 @@ namespace nslib
       nslib::RepresentationCreatorManager::create(
        entities, representations,
         true, true );
+
+      // Generate relationship representations
+      nslib::RepresentationCreatorManager::generateRelations( entities,
+                                                            relationshipReps,
+                                                            "connectsTo" );
+
     }
+
+    // shift::Representations relationshipReps;
+    // // Generate relationship representations
+    // nslib::RepresentationCreatorManager::generateRelations( entities,
+    //                                                         relationshipReps,
+    //                                                         "connectsTo" );
 
     if ( !animate )
     {
       _clearScene( );
-    }
-    if ( !animate )
-    {
       if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
         _addRepresentations( preFilterRepresentations );
       else
         _addRepresentations( representations );
     }
+
+    if ( Config::showConnectivity( ))
+      _addRepresentations( relationshipReps );
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
@@ -193,15 +212,12 @@ namespace nslib
     }
     else
     {
-      // std::cout << "Arranging " << _name <<  " [ ";
-      // for ( const auto& r : representations )
-      // {
-      //   fires::Object* o = *repsToEntities.at( r ).begin( );
-      //   std::cout << o->label( ) << " ";
-      // }
-      // std::cout << "]" << std::endl;
       _arrangeItems( representations, animate );
     }
+
+    OpConfig opConfig( &_canvas->scene( ), animate );
+    for ( auto& relationshipRep : relationshipReps )
+      relationshipRep->preRender( &opConfig );
   }
 
    void Layout::refreshWidgetsProperties(
@@ -285,33 +301,15 @@ namespace nslib
   void Layout::_clearScene( void )
   {
     // Remove top items without destroying them
+    int count = 0;
     for ( auto& item : _canvas->scene( ).items( ))
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
-        // std::cout << "remove " << item << std::endl;
-        // for ( const auto c : item->childItems( ))
-        // {
-          // std::cout << "remove child " << c << std::endl;
-          // std::cout << " " << dynamic_cast< CollapseButtonItem* >( c ) << std::endl;
-          //   for ( const auto cc : c->childItems( ))
-          // {
-          //   std::cout << "remove child2 " << cc;
-          //   std::cout << " " << dynamic_cast< LayerItem* >( cc ) << std::endl;
-          //   std::cout << " " << cc->boundingRect( ).width( ) << " "
-          //             << cc->boundingRect( ).height( ) << std::endl;
-          // }
-        // }
+        count++;
         _canvas->scene( ).removeItem( item );
       }
     }
-    // QList< QGraphicsItem* > items_ = _scene->items( );
-    // for ( auto item = items_.begin( ); item != items_.end( ); ++item )
-    // {
-    //   // auto item_ = dynamic_cast< Item* >( *item );
-    //   // if ( item_ ) // && item_->parentRep( ))
-    //     _scene->removeItem( *item );
-    // }
 
     // Remove the rest
     _canvas->scene( ).clear( );
@@ -322,8 +320,6 @@ namespace nslib
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    // std::cout << "+++ Layout::_addRepresentations "
-    //           << reps.size( ) << std::endl;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -347,32 +343,36 @@ namespace nslib
         // and if so set its pen
         // const auto& repsToEntities =
         //   RepresentationCreatorManager::repsToEntities( );
-        const auto entities = repsToEntities.at( representation );
-        if ( entities.size( ) < 1 )
-          Log::log( NS_LOG_HEADER +
-                    "No entities associated to representation",
-                    LOG_LEVEL_ERROR );
 
-        auto selectableItem = dynamic_cast< SelectableItem* >( item );
-        if ( selectableItem )
+        if ( repsToEntities.count( representation ) > 0 )
         {
-          auto selectedState = SelectionManager::getSelectedState(
-            *entities.begin( ));
+          const auto entities = repsToEntities.at( representation );
+          if ( entities.size( ) < 1 )
+            Log::log( NS_LOG_HEADER +
+                      "No entities associated to representation",
+                      LOG_LEVEL_ERROR );
 
-          // if ( selectedState == selectedStateSelectedState::SELECTED )
-          selectableItem->setSelected( selectedState );
-
-
-          auto shapeItem =
-            dynamic_cast< QAbstractGraphicsShapeItem* >( item );
-          if ( shapeItem )
+          auto selectableItem = dynamic_cast< SelectableItem* >( item );
+          if ( selectableItem )
           {
-            if ( selectedState == SelectedState::SELECTED )
-              shapeItem->setPen( SelectableItem::selectedPen( ));
-            else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
-              shapeItem->setPen(
-                SelectableItem::partiallySelectedPen( ));
+            auto selectedState = SelectionManager::getSelectedState(
+              *entities.begin( ));
 
+            // if ( selectedState == selectedStateSelectedState::SELECTED )
+            selectableItem->setSelected( selectedState );
+
+
+            auto shapeItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+            if ( shapeItem )
+            {
+              if ( selectedState == SelectedState::SELECTED )
+                shapeItem->setPen( SelectableItem::selectedPen( ));
+              else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
+                shapeItem->setPen(
+                  SelectableItem::partiallySelectedPen( ));
+
+            }
           }
         }
         //std::cout << &scene << " add item " << std::endl;
@@ -437,8 +437,6 @@ namespace nslib
   {
     auto obj = dynamic_cast< QObject* >( graphicsItem );
     auto item = dynamic_cast< Item* >( graphicsItem );
-
-#define ANIM_DURATION 500
 
     auto& scaleAnim = item->scaleAnim( );
     if ( scaleAnim.state( ) == QAbstractAnimation::Running )

@@ -1,6 +1,6 @@
 include( shift_generate_cxx )
 
-# Generate objects
+# Generate entities
 set( SHIFT_GENERATED_OBJECTS
   Neuron Column MiniColumn Layer NeuronTypeAggregation )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
@@ -18,9 +18,27 @@ foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
     ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
 endforeach( )
 
+# Generate relationships
+set( SHIFT_GENERATED_OBJECTS ConnectsWith )
+set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
+file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
+foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
+  shift_generate_cxx(
+    "Relationship"
+    ${GENERATED_OBJECT}
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
+    ${SHIFT_GENERATED_DIR}
+    )
+  list( APPEND SHIFT_GENERATED_IMPL_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.cpp )
+  list( APPEND SHIFT_GENERATED_HEADER_FILES
+    ${SHIFT_GENERATED_DIR}/shift_${GENERATED_OBJECT}.h )
+endforeach( )
+
 # Generate representations
 set( SHIFT_GENERATED_OBJECTS
-  NeuronRep Ring LayerRep NeuronTypeAggregationRep NeuronAggregationRep )
+  NeuronRep Ring LayerRep NeuronTypeAggregationRep NeuronAggregationRep
+  ConnectionArrowRep )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -40,6 +58,8 @@ set( NSLIBCORTEX_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
   ColumnItem.cpp
   ColumnRep.cpp
+  ConnectionArrowItem.cpp
+  ConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
   LayerRep.cpp
@@ -60,6 +80,8 @@ set( NSLIBCORTEX_HEADERS
   Neuron.h
   ColumnItem.h
   ColumnRep.h
+  ConnectionArrowItem.h
+  ConnectionArrowRep.h
   LayerRep.h
   MiniColumnItem.h
   MiniColumnRep.h

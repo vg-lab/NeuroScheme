@@ -121,6 +121,17 @@
                     "name": "NeuronTypeAggregations"
                 }
             ]
+        },
+        {
+            "name": "ConnectionArrowRep",
+            "namespace": "nslib::cortex::shiftgen",
+            "properties": [
+                {
+                    "name": "width",
+                    "type": "uint"
+                }
+            ],
+            "types": [ ]
         }
     ]
 }

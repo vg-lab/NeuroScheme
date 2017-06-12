@@ -42,7 +42,8 @@ namespace nslib
     static void loadBlueConfig( const std::string& blueConfig,
                                 const std::string& targetLabel,
                                 const bool loadMorphologies,
-                                const std::string& csvNeuronStatsFileName );
+                                const std::string& csvNeuronStatsFileName,
+                                const bool loadConnectivity );
 
     static void loadNsolXmlScene( const std::string& xmlSceneFile );
 

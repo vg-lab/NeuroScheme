@@ -45,19 +45,33 @@ namespace nslib
                         bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 );
 
+    static void generateRelations( const shift::Entities& entities,
+                                   shift::Representations& representations,
+                                   const std::string& relationName,
+                                   unsigned int repCreatorId = 0 );
+
     static const shift::TEntitiesToReps& entitiesToReps(
-      unsigned int repCreatorId = 0 );
+        unsigned int repCreatorId = 0 );
+
     static const shift::TRepsToEntities& repsToEntities(
-      unsigned int repCreatorId = 0 );
+        unsigned int repCreatorId = 0 );
+
+    static const shift::TRelatedEntitiesReps& relatedEntities(
+        unsigned int repCreatorID = 0 );
+
+    static const shift::TGidToEntitiesReps& gidsToEntitiesReps(
+        unsigned int repCreatorID = 0 );
 
     static void deleteItemsOfCanvas( Canvas* canvas );
 
     // static const shift::Representation& objectToRep(
   protected:
-    static std::map< unsigned int, shift::RepresentationCreator* > _repCreators;
-    static std::map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
-    static std::map< unsigned int, shift::TRepsToEntities > _repsToEntities;
+    static std::unordered_map< unsigned int, shift::RepresentationCreator* > _repCreators;
+    static std::unordered_map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
+    static std::unordered_map< unsigned int, shift::TRepsToEntities > _repsToEntities;
 
+    static std::unordered_map< unsigned int, shift::TRelatedEntitiesReps > _relatedEntitiesReps;
+    static std::unordered_map< unsigned int, shift::TGidToEntitiesReps > _gidsToEntitiesReps;
   };
 
 } // namespace nslib

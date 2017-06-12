@@ -29,6 +29,7 @@
 #include "Neuron.h"
 #include "NeuronRep.h"
 #include "NeuronTypeAggregationRep.h"
+#include "ConnectionArrowRep.h"
 #include "RepresentationCreator.h"
 
 namespace nslib
@@ -41,6 +42,7 @@ namespace nslib
       shift::Representations& representations,
       shift::TEntitiesToReps& entitiesToReps,
       shift::TRepsToEntities& repsToEntities,
+      shift::TGidToEntitiesReps& gidsToEntitiesReps,
       bool linkEntitiesToReps,
       bool linkRepsToEntities
       )
@@ -176,6 +178,8 @@ namespace nslib
             entitiesToReps[ entity ].insert( neuronRep );
           if ( linkRepsToEntities )
             repsToEntities[ neuronRep ].insert( entity );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, neuronRep ));
         } // end if its Neuron entity
         else
         if ( dynamic_cast< Column* >( entity ))
@@ -213,6 +217,8 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ columnRep ].insert( entity );
 
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, columnRep ));
+
         } // it its MiniColumn entity
         else
         if ( dynamic_cast< MiniColumn* >( entity ))
@@ -241,6 +247,7 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ miniColumnRep ].insert( entity );
 
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, miniColumnRep ));
         } // if Column entity
         else
         if ( dynamic_cast< Layer* >( entity ))
@@ -259,7 +266,11 @@ namespace nslib
             entitiesToReps[ entity ].insert( _layersMap.at( layerKey ));
           if ( linkRepsToEntities )
             repsToEntities[ _layersMap.at( layerKey ) ].insert( entity );
-          representations.push_back( _layersMap[ layerKey ] );
+
+          auto layerRep = _layersMap[ layerKey ];
+          representations.push_back( layerRep );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, layerRep ));
         } // if Layer
         else
         if ( dynamic_cast< NeuronTypeAggregation* >( entity ))
@@ -293,15 +304,17 @@ namespace nslib
           if ( linkRepsToEntities )
             repsToEntities[ _neuronTypeAggsMap.at( neuronTypeAggregationKey ) ].
               insert( entity );
-          representations.push_back(
-            _neuronTypeAggsMap[ neuronTypeAggregationKey ] );
+
+          auto aggTypeAggRep = _neuronTypeAggsMap[ neuronTypeAggregationKey ];
+          representations.push_back( aggTypeAggRep );
+
+          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, aggTypeAggRep ));
         } // if NeuronTypeAggregationRep
 
 
         // std::cout << ", end entity --> LayersMap size = "
         //           << _layersMap.size( ) << std::endl;
       } // for all entities
-
 
       // Create subentities
       const auto& relSuperEntityOf =
@@ -313,13 +326,99 @@ namespace nslib
         auto entityGid = entity->entityGid( );
         if ( relSuperEntityOf.count( entityGid ) > 0 )
           for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
-            subEntities.add( DataManager::entities( ).at( subEntity ));
+            subEntities.add( DataManager::entities( ).at( subEntity.first ));
       }
       if ( subEntities.size( ) > 0 )
         this->create( subEntities, representations,
-                      entitiesToReps, repsToEntities,
+                      entitiesToReps, repsToEntities, gidsToEntitiesReps,
                       linkEntitiesToReps, linkRepsToEntities );
+
     } // create
+
+    void RepresentationCreator::generateRelations(
+      const shift::Entities& entities,
+      const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+      shift::TRelatedEntitiesReps& relatedEntitiesReps,
+      shift::Representations& relatedEntities,
+      const std::string& relationName )
+    {
+
+      const auto& relatedElements =
+          DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
+
+      MapperFloatToFloat nbConnectionsToWidth(
+        0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
+        1, 10 );
+
+      for( auto& entity : entities.vector( ))
+      {
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
+          continue;
+
+        auto entityRelations = relatedElements->find( entity->entityGid( ));
+
+        if( entityRelations == relatedElements->end( ))
+          continue;
+
+        for( auto& other : entities.vector( ))
+        {
+          if( other->entityGid( ) == entity->entityGid( ))
+            continue;
+
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
+            continue;
+
+          auto numberOfConnections =
+              entityRelations->second.count( other->entityGid( ));
+
+          if( numberOfConnections == 0 )
+            continue;
+
+          // TODO: Change to equal_range whenever multiple relationships between
+          // the same elements are imported. Then, create a loop to iterate
+          // over the given results and create a new one if not found.
+          auto combinedKey = std::make_pair( entity->entityGid( ),
+                                             other->entityGid( ));
+          auto alreadyConnected =
+              relatedEntitiesReps.find( combinedKey );
+
+          if( alreadyConnected == relatedEntitiesReps.end( ))
+          {
+            ConnectionArrowRep* relationRep =
+              new ConnectionArrowRep( srcEntityRep->second.second,
+                                      otherRep->second.second );
+
+            std::unordered_multimap< shift::Entity::EntityGid,
+                                     shift::RelationshipProperties* > relMMap =
+              ( *relatedElements )[ entity->entityGid( ) ];
+            auto relMMapIt = relMMap.find( other->entityGid( ));
+            if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
+            {
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                  nbConnectionsToWidth.map(
+                    relMMapIt->second->getProperty( "count" ).value< unsigned int >( ))));
+            }
+
+            alreadyConnected = relatedEntitiesReps.insert(
+              std::make_pair( combinedKey,
+                              std::make_tuple( relationRep,
+                                               entity,
+                                               other,
+                                               srcEntityRep->second.second,
+                                               otherRep->second.second )));
+          }
+
+          relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
+
+        }
+
+
+      }
+
+    } // generateRelations
 
     void RepresentationCreator::_createColumnOrMiniColumn(
       shift::Entity *entity,

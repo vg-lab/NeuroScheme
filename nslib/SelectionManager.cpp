@@ -143,8 +143,8 @@ namespace nslib
     for ( auto const& childId : childrenIds )
     {
       SelectionManager::setSelectedState(
-        entities.at( childId ), SelectedState::SELECTED );
-      propagateSelectedToChilds( entities, relParentOf, childId );
+        entities.at( childId.first ), SelectedState::SELECTED );
+      propagateSelectedToChilds( entities, relParentOf, childId.first );
     }
 
   }
@@ -186,7 +186,7 @@ namespace nslib
       //   relParentOf[ idToEntity[ entityId ]->entityGid( ) ];
       shift::Entity* entity = idToEntity[ entityId ];
       postCheckParentEntities.insert(
-        entities.at( relChildOf[ entity->entityGid( ) ]));
+        entities.at( relChildOf[ entity->entityGid( ) ].entity ));
 
     }
 
@@ -216,7 +216,7 @@ namespace nslib
           setSelectedState( entity, SelectedState::SELECTED );
 
         if ( relChildOf.find( entityGid ) != relChildOf.end( ) &&
-             entities.map( ).find( relChildOf[ entityGid ] ) !=
+             entities.map( ).find( relChildOf[ entityGid ].entity ) !=
              entities.map( ).end( ))
         {
           // std::cout << entity->entityGid( ) << " child of " <<
@@ -226,7 +226,7 @@ namespace nslib
         // can be an optimization
 
           postCheckParentEntities.insert(
-            entities.at( relChildOf[ entityGid ]));
+            entities.at( relChildOf[ entityGid ].entity ));
         }
       }
     }
