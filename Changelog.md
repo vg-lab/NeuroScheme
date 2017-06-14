@@ -1,6 +1,8 @@
 # NeuroScheme
 
 ## git master
+* [!22] Connectivity highlight and multi-pane synced hover.
+* [!21] Basic representation of connectivity
 * [!11] Added nsol Xml scene loading via CLI.
 * [!9] Added CLI help message.
 * [!8] Enabled building in Windows without console. Separate lib, GUI app and plugins.

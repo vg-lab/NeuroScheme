@@ -182,5 +182,15 @@ namespace nslib
       }
     }
 
+    void ConnectionArrowRep::highlight( const scoop::Color& color )
+    {
+      for ( auto item : _items )
+      {
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        if ( arrowItem )
+          arrowItem->highlight( color );
+      }
+    }
+
   } // namespace cortex
 } // namespace nslib

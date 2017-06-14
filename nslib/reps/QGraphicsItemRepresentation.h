@@ -63,6 +63,16 @@ namespace nslib
         delete it->second;
     }
 
+    const std::map< QGraphicsScene*, QGraphicsItem* >& items( void ) const
+    {
+      return _items;
+    }
+
+    std::map< QGraphicsScene*, QGraphicsItem* >& items( void )
+    {
+      return _items;
+    }
+
   protected:
 
     std::map< QGraphicsScene*, QGraphicsItem* > _items;

@@ -26,6 +26,7 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
+#include "reps/ConnectivityRep.h"
 #include "SelectionManager.h"
 #include "ZeroEQManager.h"
 //#include "domains/domains.h"
@@ -35,6 +36,68 @@ namespace nslib
 {
 
   QMenu* InteractionManager::_contextMenu = nullptr;
+
+  void InteractionManager::highlightConnectivity(
+    QAbstractGraphicsShapeItem* shapeItem, bool highlight )
+  {
+    auto& relConnectsTo = *( DataManager::entities( ).
+                             relationships( )[ "connectsTo" ]->asOneToN( ));
+    auto& relConnectedBy = *( DataManager::entities( ).
+                              relationships( )[ "connectedBy" ]->asOneToN( ));
+
+    // Third parameter indicates if the relationship has to be inverted
+    enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
+    std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
+    rels.reserve( 2 );
+    rels.push_back(
+      std::make_tuple( &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+    rels.push_back(
+      std::make_tuple( &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+
+    const auto& repsToEntities =
+      RepresentationCreatorManager::repsToEntities( );
+    const auto& relatedEntities =
+      RepresentationCreatorManager::relatedEntities( );
+
+    auto item = dynamic_cast< Item* >( shapeItem );
+    if ( item )
+    {
+      assert( item->parentRep( ));
+
+      const auto& entities = repsToEntities.find( item->parentRep( ));
+      if ( entities != repsToEntities.end( ))
+      {
+        auto entityGid = ( *entities->second.begin( ))->entityGid( );
+        for ( const auto& relPair : rels )
+        {
+          auto& rel = *( std::get< HLC_RELATIONSHIP >( relPair ));
+          auto& connectingEntities = rel[ entityGid ];
+          for ( auto& connectingEntity : connectingEntities )
+          {
+            const auto& relationRep = relatedEntities.find(
+              ( std::get< HLC_INVERT >( relPair ) ?
+                std::make_pair( connectingEntity.first, entityGid ) :
+                std::make_pair( entityGid, connectingEntity.first )));
+            if ( relationRep != relatedEntities.end( ))
+            {
+              shift::Representation* rep = std::get< 0 >( relationRep->second );
+              auto* connRep = dynamic_cast< ConnectivityRep* >( rep );
+              if ( connRep )
+              {
+                if ( highlight )
+                  connRep->highlight( std::get< HLC_COLOR >( relPair ));
+                else
+                  connRep->unHighlight( );
+              }
+            }
+          } // for all connectinf entities
+        }
+      }
+    }
+  }
+
+
+
 
 
   void InteractionManager::hoverEnterEvent(

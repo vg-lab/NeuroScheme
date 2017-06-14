@@ -62,7 +62,6 @@ namespace nslib
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
       {
-        std::cout << "NeuronTypeAggregationItem::hover" << std::endl;
         InteractionManager::hoverEnterEvent( this, event_ );
       }
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )

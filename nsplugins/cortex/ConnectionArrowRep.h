@@ -22,6 +22,7 @@
 #ifndef __NSLIB__CONNECTION_ARROW_REP__
 #define __NSLIB__CONNECTION_ARROW_REP__
 
+#include <nslib/reps/ConnectivityRep.h>
 #include <nslib/reps/QGraphicsItemRepresentation.h>
 #include <shift/shift.h>
 #include <shift_ConnectionArrowRep.h>
@@ -33,6 +34,7 @@ namespace nslib
     class ConnectionArrowRep
       : public shiftgen::ConnectionArrowRep
       , public QGraphicsItemRepresentation
+      , public ConnectivityRep
     {
     public:
 
@@ -47,6 +49,10 @@ namespace nslib
 
       void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
       void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
+
+      virtual void highlight(
+        const scoop::Color& color = scoop::Color( 255, 0, 0 ));
+      virtual void unHighlight( void ) final { hoverLeaveEvent( nullptr ); }
 
     protected:
       shift::Representation* _originRep;
