@@ -75,11 +75,29 @@ namespace nslib
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
       {
-        InteractionManager::hoverEnterEvent( this, event_ );
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+              InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
+          }
       }
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
       {
-        InteractionManager::hoverLeaveEvent( this, event_ );
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+              InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
+          }
       }
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
       {
@@ -133,11 +151,29 @@ namespace nslib
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
       {
-        InteractionManager::hoverEnterEvent( this, event_ );
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+              InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
+          }
       }
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
       {
-        InteractionManager::hoverLeaveEvent( this, event_ );
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+              InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
+          }
       }
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
       {

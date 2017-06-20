@@ -32,9 +32,13 @@
 #include <iostream> // Borrar
 namespace nslib
 {
+
   class NSLIB_API InteractionManager
   {
   public:
+    static void highlightConnectivity( QAbstractGraphicsShapeItem* item,
+                                       bool highlight = true );
+
 
     static void hoverEnterEvent( QAbstractGraphicsShapeItem* item,
                                  QGraphicsSceneHoverEvent* event );

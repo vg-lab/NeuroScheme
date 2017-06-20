@@ -82,6 +82,15 @@ namespace nslib
         _arrowOriItem->setBrush( QBrush( hoverColor ));
       }
 
+      virtual void highlight( scoop::Color color_ )
+      {
+        this->setZValue( 100 );
+        this->setBrush( QBrush( color_ ));
+        this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowOriItem->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowOriItem->setBrush( QBrush( color_ ));
+      }
+
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
       {
         auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
