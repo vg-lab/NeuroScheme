@@ -54,13 +54,13 @@ OSX-Subproject:
  tags:
   - osx
 
-Win7-Subproject:
+Win7-Subproject-vs14:
   stage: build
   script:
-  - call %ENVFILESDIR%\Qt-5.4.bat
-  - call %ENVFILESDIR%\Boost-1.56-vs12-x64.bat
+  - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
+  - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
-  - set BUILD_GENERATOR=Visual Studio 12 Win64
+  - set BUILD_GENERATOR=Visual Studio 14 Win64
   - set GENERATOR_EXTRA_OPTIONS=
   - '"c:\Program Files (x86)\Git\bin\bash.exe" --login  .gitlab-ci.sh'
   - set PATH=%PATH%;"c:\Program Files (x86)\Git\bin"
