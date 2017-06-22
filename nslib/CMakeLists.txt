@@ -22,6 +22,7 @@ set( NSLIB_SOURCES
   reps/RingItem.cpp
   reps/SelectableItem.cpp
   qxt/qxtspanslider.cpp
+  CreationDialog.cpp 
   )
 
 set( NSLIB_HEADERS
@@ -58,6 +59,7 @@ set( NSLIB_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
+  CreationDialog.h  
   )
 
 set( NSLIB_LINK_LIBRARIES

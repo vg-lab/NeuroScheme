@@ -32,6 +32,9 @@
 //#include "domains/domains.h"
 #include <unordered_set>
 
+#include <QGuiApplication>
+#include "CreationDialog.h"
+
 namespace nslib
 {
 
@@ -145,6 +148,29 @@ namespace nslib
     else
       _contextMenu->clear( );
 
+    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+    {
+      QAction* createNewEPopulation = nullptr;
+      QAction* createNewIPopulation = nullptr;
+
+      createNewEPopulation = _contextMenu->addAction( QString( "Create new excitatory population" ));
+      createNewIPopulation = _contextMenu->addAction( QString( "Create new inhibitory population" ));
+
+      QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
+
+      if ( createNewEPopulation && createNewEPopulation == selectedAction )
+      {
+        //std::cout<<std::endl<<std::endl<<"--------->>>>>Creating excitatory populations"<<std::endl;
+        CreationDialog * lCreationDialog = new CreationDialog();
+        lCreationDialog->show();
+      }
+
+      if ( createNewIPopulation && createNewIPopulation == selectedAction )
+      {
+        std::cout<<std::endl<<std::endl<<"--------->>>>>Creating inhibitory populations"<<std::endl;
+      }
+    }
+    else
     {
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
