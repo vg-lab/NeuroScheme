@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!23] Bump ShiFT (and thus FiReS) and moved Windows CI to VS14.
 * [!22] Connectivity highlight and multi-pane synced hover.
 * [!21] Basic representation of connectivity
 * [!11] Added nsol Xml scene loading via CLI.
