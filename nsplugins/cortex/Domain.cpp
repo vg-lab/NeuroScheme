@@ -22,11 +22,18 @@
 
 #include "Domain.h"
 #include "Neuron.h"
+#include <shift_cortex_entities.h>
 
 namespace nslib
 {
   namespace cortex
   {
+    Domain::Domain( void )
+    {
+      this->_dataLoader = new DataLoader;
+      this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
+    }
+
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
     {
       return dynamic_cast< Neuron* >( entity );

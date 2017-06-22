@@ -21,6 +21,7 @@
  */
 #include "Canvas.h"
 #include "DataManager.h"
+#include "DomainManager.h"
 #include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
@@ -36,6 +37,54 @@ namespace nslib
 
   void GraphicsView::mousePressEvent( QMouseEvent* event_ )
   {
+    auto domain = DomainManager::getActiveDomain( );
+    if ( domain )
+    {
+      const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
+      for ( auto type : entitiesTypes )
+      {
+        std::cout << "Entitiy: "
+                  << std::get< shift::EntitiesTypes::ENTITY_NAME >( type ) << " "
+                  << std::get< shift::EntitiesTypes::IS_SUBENTITY >( type )
+                  << std::endl;
+
+        if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
+          continue;
+
+        std::cout << "Properties: \n";
+        const auto& origEntity = std::get< shift::EntitiesTypes::OBJECT >( type );
+        auto newEntity = origEntity->create( );
+
+        for ( auto entity : { origEntity, newEntity } )
+        {
+          for ( const auto& propPair : entity->properties( ))
+          {
+            const auto prop = propPair.first;
+            auto caster =
+              fires::PropertyManager::getPropertyCaster( prop );
+            if ( caster )
+            {
+              std::cout << "\t" << fires::PropertyGIDsManager::getPropertyLabel( prop ) << " ";
+
+              // Esta linea da error envezencuando
+              // std::cout << caster->toString( propPair.second ) ;
+
+              const auto& categories = caster->categories( );
+              if ( categories.size( ) > 0 )
+              {
+                std::cout << "[";
+                for ( const auto value : categories )
+                  std::cout << value << " ";
+                std::cout << "]";
+              }
+              std::cout << std::endl;
+            }
+          }
+            std::cout << std::endl;
+        }
+      }
+    }
+
     if ( this->parentWidget( ) &&
          dynamic_cast< Canvas* >( this->parentWidget( )))
       PaneManager::activePane(

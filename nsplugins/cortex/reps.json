@@ -1,4 +1,6 @@
 {
+    "name": "cortex",
+    "namespace": "nslib::cortex::shiftgen",
     "reps": [
         {
             "name": "Ring",
