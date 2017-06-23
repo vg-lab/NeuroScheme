@@ -19,7 +19,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
+#include "CreationDialog.h"
 #include "DataManager.h"
+#include "DomainManager.h"
 #include "InteractionManager.h"
 #include "layouts/LayoutManager.h"
 #include "Log.h"
@@ -33,7 +36,8 @@
 #include <unordered_set>
 
 #include <QGuiApplication>
-#include "CreationDialog.h"
+
+
 
 namespace nslib
 {
@@ -148,8 +152,50 @@ namespace nslib
     else
       _contextMenu->clear( );
 
+    //Pasrlo a otro metodo
     if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
     {
+      auto domain = DomainManager::getActiveDomain( );
+      if ( domain )
+      {
+        const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
+
+        std::unordered_map<QAction*, unsigned int> actionToIdx;
+        unsigned int entityIdx=0;
+
+        //Rellenar el menu
+        for ( auto type : entitiesTypes )
+        {
+          QAction* action = nullptr;
+
+          if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
+            continue;
+
+          action = _contextMenu->addAction( QString( "Add "  )
+                + QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
+
+          actionToIdx[action]=entityIdx;
+          ++entityIdx;
+
+        }
+        QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
+        if (selectedAction)
+        {
+          std::cout<<"Selected:"<<std::get< shift::EntitiesTypes::ENTITY_NAME >(
+              entitiesTypes[actionToIdx[selectedAction]])<<std::endl;
+
+          CreationDialog * lCreationDialog = new CreationDialog(std::get< shift::EntitiesTypes::OBJECT >(
+              entitiesTypes[actionToIdx[selectedAction]]));
+          lCreationDialog->show();
+
+        }
+
+
+
+
+      }
+
+      /*
       QAction* createNewEPopulation = nullptr;
       QAction* createNewIPopulation = nullptr;
 
@@ -169,6 +215,7 @@ namespace nslib
       {
         std::cout<<std::endl<<std::endl<<"--------->>>>>Creating inhibitory populations"<<std::endl;
       }
+      */
     }
     else
     {

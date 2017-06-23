@@ -41,6 +41,8 @@ namespace nslib
     if ( domain )
     {
       const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
+
+      //Rellenar el menu
       for ( auto type : entitiesTypes )
       {
         std::cout << "Entitiy: "
@@ -50,6 +52,9 @@ namespace nslib
 
         if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
           continue;
+
+        ///////////////////
+
 
         std::cout << "Properties: \n";
         const auto& origEntity = std::get< shift::EntitiesTypes::OBJECT >( type );

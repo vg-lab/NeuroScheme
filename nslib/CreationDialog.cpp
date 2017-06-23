@@ -18,13 +18,16 @@
 #include <QMessageBox>
 //#include "dialog.h"
 
+
+
 #define MESSAGE \
     CreationDialog::tr("<p>Message boxes have a caption, a text, " \
                "and any number of buttons, each with standard or custom texts." \
                "<p>Click a button to close the message box. Pressing the Esc button " \
                "will activate the detected escape button (if any).")
 
-CreationDialog::CreationDialog(QWidget *parent)
+//shift::Entity* entity,
+CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
     : QWidget(parent)
 {
     errorMessageDialog = new QErrorMessage(this);
@@ -129,8 +132,86 @@ CreationDialog::CreationDialog(QWidget *parent)
     QGridLayout *layout = new QGridLayout;
     layout->setColumnStretch(1, 1);
     layout->setColumnMinimumWidth(1, 250);
-    layout->addWidget(integerButton, 0, 0);
-    layout->addWidget(integerLabel, 0, 1);
+
+    /*
+    populationType = new QLabel;
+    populationType->setFrameStyle(frameStyle);
+    populationType->setText("Population type");
+
+    selPopulationType=new QComboBox();
+    selPopulationType->addItem("Excitatory");
+    selPopulationType->addItem("Inhibitory");
+    selPopulationType->addItem("Both");
+
+    //layout->addWidget(populationType, 0, 0);
+    //layout->addWidget(selPopulationType, 0, 1);
+  */
+
+    unsigned int element=0;
+    unsigned int pos    =0;
+
+    //Edit mode
+    if (entity!=nullptr)
+    {
+      for ( const auto& propPair : entity->properties( ))
+      {
+        const auto prop = propPair.first;
+        auto caster     = fires::PropertyManager::getPropertyCaster( prop );
+        if ( caster )
+        {
+          //std::cout << "\t" << fires::PropertyGIDsManager::getPropertyLabel( prop ) << " ";
+          // Esta linea da error envezencuando
+          // std::cout << caster->toString( propPair.second ) ;
+
+          //fires::ScalarPropertyCaster< int > spci;
+          //std::string str = spci.toString(( obj.getProperty( "p2" )));
+
+          entityParamLabelCont.push_back( new QLabel(
+              QString::fromStdString(fires::PropertyGIDsManager::getPropertyLabel( prop ) ) ) );
+
+          layout->addWidget( entityParamLabelCont.back(), element, pos%2 );
+          ++element;
+          ++pos;
+
+          const auto& categories = caster->categories( );
+
+          //If is there any category, fill the combo
+          if ( categories.size( ) > 0 )
+          {
+            entityParamCategoricalCont.push_back( new QComboBox );
+            for ( const auto value : categories )
+            {
+              entityParamCategoricalCont.back( )->addItem( QString::fromStdString( value ) );
+            }
+            layout->addWidget( entityParamCategoricalCont.back(), element, pos%2 );
+            ++element;
+            ++pos;
+          }
+          //Simple QEdit
+          else
+          {
+            entityParamEditStringCont.push_back(new QLineEdit);
+            layout->addWidget( entityParamEditStringCont.back(), element, pos%2 );
+            ++element;
+            ++pos;
+          }
+        }
+      }
+    }
+    //Creation mode
+    else
+    {
+      entityParamLabelCont.push_back( new QLabel(
+                    QString::fromStdString( "Population type" ) ) );
+      //*entityParamLabelCont.end()->setFrameStyle(frameStyle);
+
+      entityParamCategoricalCont.push_back( new QComboBox );
+      entityParamCategoricalCont.back( )->addItem( "Excitatory" );
+      entityParamCategoricalCont.back( )->addItem( "Inhibitory" );
+      entityParamCategoricalCont.back( )->addItem( "Both" );
+    }
+
+
     layout->addWidget(doubleButton, 1, 0);
     layout->addWidget(doubleLabel, 1, 1);
     layout->addWidget(itemButton, 2, 0);
@@ -160,6 +241,7 @@ CreationDialog::CreationDialog(QWidget *parent)
     layout->addWidget(errorButton, 14, 0);
     layout->addWidget(errorLabel, 14, 1);
     layout->addWidget(native, 15, 0);
+
 #if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5) || defined(Q_WS_SIMULATOR)
     QWidget *widget = new QWidget;
     widget->setLayout(layout);

@@ -9,17 +9,22 @@
 #define CREATIONDIALOG_H_
 
 #include <QWidget>
-
 #include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
 #include <QLabel>
 #include <QErrorMessage>
+
+#include <shift/shift.h>
+
 
 class CreationDialog : public QWidget
 {
     Q_OBJECT
 
 public:
-    CreationDialog (QWidget *parent = 0);
+    CreationDialog (shift::Entity* entity, QWidget *parent = 0);
 
 private slots:
     void setInteger();
@@ -39,7 +44,15 @@ private slots:
     void errorMessage();
 
 private:
-    QCheckBox *native;
+    QCheckBox*  native;
+
+    std::vector<QLabel*>          entityParamLabelCont;
+    std::vector<QLineEdit*>       entityParamEditStringCont;
+    std::vector<QDoubleSpinBox*>  entityParamEditDoubleCont;
+    std::vector<QSpinBox*>        entityParamEditIntCont;
+    std::vector<QComboBox*>       entityParamCategoricalCont;
+
+    //Delete this
     QLabel *integerLabel;
     QLabel *doubleLabel;
     QLabel *itemLabel;
