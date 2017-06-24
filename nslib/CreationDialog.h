@@ -26,51 +26,16 @@ class CreationDialog : public QWidget
 public:
     CreationDialog (shift::Entity* entity, QWidget *parent = 0);
 
-private slots:
-    void setInteger();
-    void setDouble();
-    void setItem();
-    void setText();
-    void setColor();
-    void setFont();
-    void setExistingDirectory();
-    void setOpenFileName();
-    void setOpenFileNames();
-    void setSaveFileName();
-    void criticalMessage();
-    void informationMessage();
-    void questionMessage();
-    void warningMessage();
-    void errorMessage();
+signals:
+    //Connect this signal with the slot to create/modify entities
+    void validateDialog();
 
 private:
-    QCheckBox*  native;
-
     std::vector<QLabel*>          entityParamLabelCont;
     std::vector<QLineEdit*>       entityParamEditStringCont;
     std::vector<QDoubleSpinBox*>  entityParamEditDoubleCont;
     std::vector<QSpinBox*>        entityParamEditIntCont;
     std::vector<QComboBox*>       entityParamCategoricalCont;
-
-    //Delete this
-    QLabel *integerLabel;
-    QLabel *doubleLabel;
-    QLabel *itemLabel;
-    QLabel *textLabel;
-    QLabel *colorLabel;
-    QLabel *fontLabel;
-    QLabel *directoryLabel;
-    QLabel *openFileNameLabel;
-    QLabel *openFileNamesLabel;
-    QLabel *saveFileNameLabel;
-    QLabel *criticalLabel;
-    QLabel *informationLabel;
-    QLabel *questionLabel;
-    QLabel *warningLabel;
-    QLabel *errorLabel;
-    QErrorMessage *errorMessageDialog;
-
-    QString openFilesPath;
 };
 
 #endif /* CREATIONDIALOG_H_ */

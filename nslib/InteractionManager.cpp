@@ -20,7 +20,6 @@
  *
  */
 
-#include "CreationDialog.h"
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "InteractionManager.h"
@@ -37,12 +36,10 @@
 
 #include <QGuiApplication>
 
-
-
 namespace nslib
 {
-
   QMenu* InteractionManager::_contextMenu = nullptr;
+  CreationDialog* InteractionManager::_creationDialog = nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -184,38 +181,13 @@ namespace nslib
           std::cout<<"Selected:"<<std::get< shift::EntitiesTypes::ENTITY_NAME >(
               entitiesTypes[actionToIdx[selectedAction]])<<std::endl;
 
-          CreationDialog * lCreationDialog = new CreationDialog(std::get< shift::EntitiesTypes::OBJECT >(
+          if ( _creationDialog != nullptr ) delete _creationDialog;
+
+          _creationDialog = new CreationDialog(std::get< shift::EntitiesTypes::OBJECT >(
               entitiesTypes[actionToIdx[selectedAction]]));
-          lCreationDialog->show();
-
+          _creationDialog->show();
         }
-
-
-
-
       }
-
-      /*
-      QAction* createNewEPopulation = nullptr;
-      QAction* createNewIPopulation = nullptr;
-
-      createNewEPopulation = _contextMenu->addAction( QString( "Create new excitatory population" ));
-      createNewIPopulation = _contextMenu->addAction( QString( "Create new inhibitory population" ));
-
-      QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
-
-      if ( createNewEPopulation && createNewEPopulation == selectedAction )
-      {
-        //std::cout<<std::endl<<std::endl<<"--------->>>>>Creating excitatory populations"<<std::endl;
-        CreationDialog * lCreationDialog = new CreationDialog();
-        lCreationDialog->show();
-      }
-
-      if ( createNewIPopulation && createNewIPopulation == selectedAction )
-      {
-        std::cout<<std::endl<<std::endl<<"--------->>>>>Creating inhibitory populations"<<std::endl;
-      }
-      */
     }
     else
     {
