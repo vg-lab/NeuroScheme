@@ -26,9 +26,10 @@ class CreationDialog : public QWidget
 public:
     CreationDialog (shift::Entity* entity, QWidget *parent = 0);
 
-signals:
-    //Connect this signal with the slot to create/modify entities
+public slots:
+    //Connect this signal with the slot to create/modify entities (must be in the creation/modifying point)
     void validateDialog();
+    void cancelDialog();
 
 private:
     std::vector<QLabel*>          entityParamLabelCont;

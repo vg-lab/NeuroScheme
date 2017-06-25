@@ -238,7 +238,7 @@ namespace nslib
     {
       auto& _entities = nslib::DataManager::entities( );
       auto& _rootEntities = nslib::DataManager::rootEntities( );
-      fires::PropertyManager::clear( );
+      //###fires::PropertyManager::clear( );
       _entities.clear( );
 
       _entities.relationships( )[ "isParentOf" ] =

@@ -27,6 +27,7 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
     unsigned int element=0;
     unsigned int pos    =0;
 
+    //Editing mode
     if ( entity!=nullptr )
     {
       for ( const auto& propPair : entity->properties( ) )
@@ -35,12 +36,6 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
         auto caster     = fires::PropertyManager::getPropertyCaster( prop );
         if ( caster )
         {
-          // Esta linea da error envezencuando
-          // std::cout << caster->toString( propPair.second ) ;
-
-          //fires::ScalarPropertyCaster< int > spci;
-          //std::string str = spci.toString(( obj.getProperty( "p2" )));
-
           entityParamLabelCont.push_back( new QLabel(
               QString::fromStdString(
                   fires::PropertyGIDsManager::getPropertyLabel( prop ) ) ) );
@@ -53,7 +48,7 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
           if ( categories.size( ) > 0 )
           {
             entityParamCategoricalCont.push_back( new QComboBox );
-            for ( const auto value : categories )
+            for ( const auto & value : categories )
             {
               entityParamCategoricalCont.back( )->addItem(
                   QString::fromStdString( value ) );
@@ -64,17 +59,8 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
           else
           {
             //TODO: Recover the values from the entities
-            std::string valueType =
-                //caster-> toString
-                (
-                "42.42"
-                //int( 42 )
-                //propPair.second
-                //propPair.first
-                //entity->getProperty ( prop )
-                //entity->getProperty( fires::PropertyGIDsManager::getPropertyLabel( prop ). )//.value< int >( )
-                );
-
+            const auto value = caster->toString(propPair.second);
+            std::string valueType = value;
             entityParamEditStringCont.push_back( new QLineEdit );
             entityParamEditStringCont.back()->setText(
                 QString::fromStdString( valueType ) );
@@ -85,6 +71,7 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
         }
       }
     }
+    //New entities to add.
     else
     {
       //Only for testing purposes
@@ -92,16 +79,25 @@ CreationDialog::CreationDialog(shift::Entity* entity, QWidget *parent)
                     QString::fromStdString( "<--..:)..--->" ) ) );
     }
 
+    QPushButton* cancelButton = new QPushButton(tr( "Cancel" ) );
+    layout->addWidget( cancelButton, element, 0 );
+
     QPushButton* validationButton = new QPushButton(tr( "Validate" ) );
     layout->addWidget( validationButton, element, 1 );
 
+    connect(cancelButton, SIGNAL( clicked( ) ), this, SLOT( cancelDialog( ) ) );
     connect(validationButton, SIGNAL( clicked( ) ), this, SLOT( validateDialog( ) ) );
 
     setLayout( layout );
     setWindowTitle( tr( "Entity management dialog" ) );
 }
 
-//void CreationDialog::validateDialog()
-//{
-//  //do something here;
-//}
+void CreationDialog::validateDialog()
+{
+  //do something here;
+}
+
+void CreationDialog::cancelDialog()
+{
+  this->hide();
+}
