@@ -39,7 +39,7 @@
 namespace nslib
 {
   QMenu* InteractionManager::_contextMenu = nullptr;
-  CreationDialog* InteractionManager::_creationDialog = nullptr;
+  EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -149,27 +149,47 @@ namespace nslib
     else
       _contextMenu->clear( );
 
-    //Pasrlo a otro metodo
-    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+    // If clicking outside item, new item menu is showed
+    if ( !shapeItem )
     {
       auto domain = DomainManager::getActiveDomain( );
       if ( domain )
       {
         const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
 
-        std::unordered_map<QAction*, unsigned int> actionToIdx;
-        unsigned int entityIdx=0;
+        std::unordered_map< QAction*, unsigned int > actionToIdx;
+        unsigned int entityIdx = 0;
 
-        //Rellenar el menu
-        for ( auto type : entitiesTypes )
+        // //Rellenar el menu
+        // auto item = dynamic_cast< Item* >( shapeItem );
+        // if ( item )
+        // {
+        //   assert( item->parentRep( ));
+        //   const auto& repsToEntities =
+        //     RepresentationCreatorManager::repsToEntities( );
+        //   if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        //   {
+        //     const auto entities = repsToEntities.at( item->parentRep( ));
+        //     auto entityGid = ( *entities.begin( ))->entityGid( );
+
+        //     if ( _entityEditWidget != nullptr )
+        //       delete _entityEditWidget;
+
+        //     _entityEditWidget = new EntityEditWidget(
+        //       DataManager::entities( ).at( entityGid ));
+        //     _entityEditWidget->show();
+
+        //   }
+        for ( const auto& type : entitiesTypes )
         {
           QAction* action = nullptr;
 
           if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
             continue;
 
-          action = _contextMenu->addAction( QString( "Add "  )
-                + QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
+          action = _contextMenu->addAction(
+            QString( "Add "  ) +
+            QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
 
           actionToIdx[action]=entityIdx;
           ++entityIdx;
@@ -181,13 +201,16 @@ namespace nslib
           std::cout<<"Selected:"<<std::get< shift::EntitiesTypes::ENTITY_NAME >(
               entitiesTypes[actionToIdx[selectedAction]])<<std::endl;
 
-          if ( _creationDialog != nullptr ) delete _creationDialog;
+          if ( _entityEditWidget != nullptr )
+            delete _entityEditWidget;
 
-          _creationDialog = new CreationDialog(std::get< shift::EntitiesTypes::OBJECT >(
-              entitiesTypes[actionToIdx[selectedAction]]));
-          _creationDialog->show();
+          _entityEditWidget = new EntityEditWidget(
+            std::get< shift::EntitiesTypes::OBJECT >(
+              entitiesTypes[actionToIdx[selectedAction]]),
+            EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY );
+          _entityEditWidget->show();
         }
-      }
+      } // if ( domain )
     }
     else
     {
@@ -219,6 +242,17 @@ namespace nslib
                                 [ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
 
+          QAction* editEntity = nullptr;
+          QAction* dupEntity = nullptr;
+          auto entity = DataManager::entities( ).at( entityGid );
+          if ( !entity->isSubEntity( ))
+          {
+            editEntity = _contextMenu->addAction( QString( "Edit" ));
+            dupEntity = _contextMenu->addAction( QString( "Duplicate" ));
+          }
+          if ( editEntity || dupEntity )
+            _contextMenu->addSeparator( );
+
           QAction* levelUp = nullptr;
           QAction* levelDown = nullptr;
           QAction* expandGroup = nullptr;
@@ -247,53 +281,80 @@ namespace nslib
               QString( "Expand group [new pane]" ));
 
           if ( levelUp || levelDown || expandGroup ||
-               levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane )
+               levelUpToNewPane || levelDownToNewPane ||
+               expandGroupToNewPane || editEntity )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
 
-            if (( levelUpToNewPane &&
-                  levelUpToNewPane == selectedAction ) ||
-                ( levelDownToNewPane &&
-                  levelDownToNewPane == selectedAction ) ||
-                ( expandGroupToNewPane &&
-                  expandGroupToNewPane == selectedAction ))
+            if ( editEntity && editEntity == selectedAction )
             {
-              nslib::PaneManager::activePane(
-                nslib::PaneManager::newPaneFromActivePane( ));
-            }
+              if ( _entityEditWidget != nullptr )
+                delete _entityEditWidget;
 
-            if (( levelUp && levelUp == selectedAction ) ||
-                ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
+              _entityEditWidget = new EntityEditWidget(
+                DataManager::entities( ).at( entityGid ),
+                EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+              _entityEditWidget->show();
+
+            }
+            else if ( dupEntity && dupEntity == selectedAction )
             {
-              if ( parentSiblings.size( ) > 0 )
-                for ( const auto& parentSibling : parentSiblings )
+              if ( _entityEditWidget != nullptr )
+                delete _entityEditWidget;
+
+              _entityEditWidget = new EntityEditWidget(
+                DataManager::entities( ).at( entityGid ),
+                EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
+              _entityEditWidget->show();
+
+            }
+            else
+            {
+
+              if (( levelUpToNewPane &&
+                    levelUpToNewPane == selectedAction ) ||
+                  ( levelDownToNewPane &&
+                    levelDownToNewPane == selectedAction ) ||
+                  ( expandGroupToNewPane &&
+                    expandGroupToNewPane == selectedAction ))
+              {
+                nslib::PaneManager::activePane(
+                  nslib::PaneManager::newPaneFromActivePane( ));
+              }
+
+              if (( levelUp && levelUp == selectedAction ) ||
+                  ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
+              {
+                if ( parentSiblings.size( ) > 0 )
+                  for ( const auto& parentSibling : parentSiblings )
+                    targetEntities.add(
+                      DataManager::entities( ).at( parentSibling.first ));
+                else
+                  targetEntities.add( DataManager::entities( ).at( parent ));
+              }
+
+              if (( levelDown && levelDown == selectedAction ) ||
+                  ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
+              {
+                for ( const auto& child : children )
+                  targetEntities.add( DataManager::entities( ).at( child.first ));
+              }
+
+              if (( expandGroup && expandGroup == selectedAction ) ||
+                  ( expandGroupToNewPane &&
+                    expandGroupToNewPane == selectedAction ))
+              {
+                for ( const auto& groupedEntity : groupedEntities )
                   targetEntities.add(
-                    DataManager::entities( ).at( parentSibling.first ));
-              else
-                targetEntities.add( DataManager::entities( ).at( parent ));
-            }
-
-            if (( levelDown && levelDown == selectedAction ) ||
-                ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
-            {
-              for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child.first ));
-            }
-
-            if (( expandGroup && expandGroup == selectedAction ) ||
-                ( expandGroupToNewPane &&
-                  expandGroupToNewPane == selectedAction ))
-            {
-              for ( const auto& groupedEntity : groupedEntities )
-                targetEntities.add(
-                  DataManager::entities( ).at( groupedEntity.first ));
-            }
-            if ( targetEntities.size( ) > 0 )
-            {
-              auto canvas = PaneManager::activePane( );
-              canvas->displayEntities( targetEntities, false, true );
+                    DataManager::entities( ).at( groupedEntity.first ));
+              }
+              if ( targetEntities.size( ) > 0 )
+              {
+                auto canvas = PaneManager::activePane( );
+                canvas->displayEntities( targetEntities, false, true );
+              }
             }
           }
         }

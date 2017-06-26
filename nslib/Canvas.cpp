@@ -22,9 +22,11 @@
 #include "Canvas.h"
 #include "DataManager.h"
 #include "DomainManager.h"
+#include "InteractionManager.h"
 #include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "reps/Item.h"
 #include <QHBoxLayout>
 
 namespace nslib
@@ -37,59 +39,6 @@ namespace nslib
 
   void GraphicsView::mousePressEvent( QMouseEvent* event_ )
   {
-    auto domain = DomainManager::getActiveDomain( );
-    if ( domain )
-    {
-      const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
-
-      //Rellenar el menu
-      for ( auto type : entitiesTypes )
-      {
-        std::cout << "Entitiy: "
-                  << std::get< shift::EntitiesTypes::ENTITY_NAME >( type ) << " "
-                  << std::get< shift::EntitiesTypes::IS_SUBENTITY >( type )
-                  << std::endl;
-
-        if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
-          continue;
-
-        ///////////////////
-
-
-        std::cout << "Properties: \n";
-        const auto& origEntity = std::get< shift::EntitiesTypes::OBJECT >( type );
-        auto newEntity = origEntity->create( );
-
-        for ( auto entity : { origEntity, newEntity } )
-        {
-          for ( const auto& propPair : entity->properties( ))
-          {
-            const auto prop = propPair.first;
-            auto caster =
-              fires::PropertyManager::getPropertyCaster( prop );
-            if ( caster )
-            {
-              std::cout << "\t" << fires::PropertyGIDsManager::getPropertyLabel( prop ) << " ";
-
-              // Esta linea da error envezencuando
-              // std::cout << caster->toString( propPair.second ) ;
-
-              const auto& categories = caster->categories( );
-              if ( categories.size( ) > 0 )
-              {
-                std::cout << "[";
-                for ( const auto value : categories )
-                  std::cout << value << " ";
-                std::cout << "]";
-              }
-              std::cout << std::endl;
-            }
-          }
-            std::cout << std::endl;
-        }
-      }
-    }
-
     if ( this->parentWidget( ) &&
          dynamic_cast< Canvas* >( this->parentWidget( )))
       PaneManager::activePane(
@@ -114,11 +63,23 @@ namespace nslib
     else if ( delta < 0 )
     {
       // Zooming out
-      this->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+      this->scale( scaleFactor * .1f , scaleFactor * .1f );
     }
 
     // Don't call superclass handler here
     // as wheel is normally used for moving scrollbars
+  }
+
+  void GraphicsScene::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+  {
+    QPointF mousePoint = event->scenePos( );
+    // If not clicked in an item
+    if ( !this->itemAt( mousePoint, QTransform( )))
+    {
+      InteractionManager::contextMenuEvent( nullptr, event );
+    }
+    else
+      QGraphicsScene::contextMenuEvent( event );
   }
 
   Canvas::Canvas( QWidget * parent_ )
@@ -152,6 +113,7 @@ namespace nslib
     if ( _graphicsView ) delete _graphicsView;
     if ( _graphicsScene ) delete _graphicsScene;
   }
+
 
   void Canvas::connectLayoutSelector( void )
   {

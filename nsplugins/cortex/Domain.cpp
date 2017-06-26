@@ -22,6 +22,9 @@
 
 #include "Domain.h"
 #include "Neuron.h"
+#include <nslib/RepresentationCreatorManager.h>
+#include <nslib/DataManager.h>
+#include "RepresentationCreator.h"
 #include <shift_cortex_entities.h>
 
 namespace nslib
@@ -32,6 +35,32 @@ namespace nslib
     {
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
+      auto repCreator = new RepresentationCreator( );
+      nslib::RepresentationCreatorManager::addCreator( repCreator );
+      auto& _entities = nslib::DataManager::entities( );
+      //fires::PropertyManager::clear( );
+      _entities.clear( );
+
+      _entities.relationships( )[ "isParentOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isChildOf" ] =
+        new shift::RelationshipOneToOne;
+
+      _entities.relationships( )[ "isAGroupOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isPartOf" ] =
+        new shift::RelationshipOneToN;
+
+      _entities.relationships( )[ "isSuperEntityOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isSubEntityOf" ] =
+        new shift::RelationshipOneToOne;
+
+      _entities.relationships( )[ "connectsTo" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "connectedBy" ] =
+        new shift::RelationshipOneToN;
+
     }
 
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
