@@ -24,6 +24,7 @@
 
 #include <nslib/api.h>
 #include "reps/SelectableItem.h"
+#include "ConnectionRelationshipEditWidget.h"
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
@@ -52,6 +53,7 @@ namespace nslib
     static void mousePressEvent( QAbstractGraphicsShapeItem* item,
                                  QGraphicsSceneMouseEvent* event );
 
+    static void createConnectionRelationship( void );
 
     // static const QPen& getSelectedPen( ) { return _selectedPen; }
     // static const QPen& getPartiallySelectedPen( )
@@ -109,6 +111,7 @@ namespace nslib
       bool& noGroupedSelected );
 
     static QMenu* _contextMenu;
+    static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
 
 
   };

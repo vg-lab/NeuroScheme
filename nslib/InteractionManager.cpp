@@ -36,6 +36,8 @@ namespace nslib
 {
 
   QMenu* InteractionManager::_contextMenu = nullptr;
+  ConnectionRelationshipEditWidget*
+    InteractionManager::_conRelationshipEditWidget = nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -400,6 +402,21 @@ namespace nslib
       ZeroEQManager::publishSelection( ids );
 
     } // selection event
+  }
+
+  void InteractionManager::createConnectionRelationship( void )
+  {
+    const auto selectedEntities = SelectionManager::getActiveSelection( );
+
+    if ( selectedEntities.size() < 2 )
+      return;
+
+    if ( _conRelationshipEditWidget != nullptr )
+      delete _conRelationshipEditWidget;
+
+    _conRelationshipEditWidget =
+      new ConnectionRelationshipEditWidget( selectedEntities );
+    _conRelationshipEditWidget->show( );
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
