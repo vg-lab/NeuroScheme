@@ -62,7 +62,7 @@ EntityEditWidget::EntityEditWidget(
 
         const auto& categories = caster->categories( );
 
-        bool is_editable = entity->hasPropertyFlag( 
+        bool isEditable = entity->hasPropertyFlag(
           propName, shift::Entity::TPropertyFlag::EDITABLE );
 
         TWidgetType widgetType;
@@ -84,7 +84,7 @@ EntityEditWidget::EntityEditWidget(
               break;
           }
           comboBoxWidget->setCurrentIndex( index );
-          comboBoxWidget->setEnabled( is_editable );
+          comboBoxWidget->setEnabled( isEditable );
         }
         else
         {
@@ -94,7 +94,7 @@ EntityEditWidget::EntityEditWidget(
           lineEditwidget->setText( QString::fromStdString(
                                      caster->toString( propPair.second )));
 
-          lineEditwidget->setEnabled( is_editable );
+          lineEditwidget->setEnabled( isEditable );
         }
         layout->addWidget( widget, element, 1 );
         ++element;
@@ -129,10 +129,6 @@ void EntityEditWidget::validateDialog( void )
 
   if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
     _entity = _entity->create( );
-
-  for ( const auto& p : _entity->properties( ))
-    std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
-  std::cout << std::endl;
 
   assert ( _entity );
   for ( const auto& entityParam: _entityParamCont )
