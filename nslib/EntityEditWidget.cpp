@@ -46,7 +46,6 @@ EntityEditWidget::EntityEditWidget(
 
   unsigned int element = 0;
 
-  //Editing mode
   if ( entity )
   {
     for ( const auto& propPair : entity->properties( ))
@@ -93,6 +92,7 @@ EntityEditWidget::EntityEditWidget(
         }
         layout->addWidget( widget, element, 1 );
         ++element;
+
 
         _entityParamCont.push_back(
           std::make_tuple( widgetType, label, widget ));

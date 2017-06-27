@@ -10,31 +10,39 @@
             "properties": [
                 {
                     "name": "gid",
-                    "type": "uint"
+                    "type": "uint",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
                     "name": "Morpho Type",
-                    "type": "TMorphologicalType"
+                    "type": "TMorphologicalType",
+                    "flags": [ "EDITABLE" ]
+
                 },
                 {
                     "name": "Funct Type",
-                    "type": "TFunctionalType"
+                    "type": "TFunctionalType",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Soma Volume",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Soma Surface",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Dendritic Volume",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Dendritic Surface",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Position3D",
@@ -70,7 +78,8 @@
             "properties": [
                 {
                     "name": "Id",
-                    "type": "uint"
+                    "type": "uint",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
                     "name": "Num Neurons",
