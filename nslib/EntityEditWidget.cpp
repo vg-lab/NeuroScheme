@@ -54,17 +54,20 @@ EntityEditWidget::EntityEditWidget(
       auto caster = fires::PropertyManager::getPropertyCaster( prop );
       if ( caster )
       {
+        auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
         auto label = new QLabel(
-          QString::fromStdString(
-            fires::PropertyGIDsManager::getPropertyLabel( prop )));
+          QString::fromStdString( propName ));
 
         layout->addWidget( label, element, 0 );
 
         const auto& categories = caster->categories( );
 
+        bool is_editable = entity->hasPropertyFlag( 
+          propName, shift::Entity::TPropertyFlag::EDITABLE );
+
         TWidgetType widgetType;
         QWidget* widget;
-        if ( categories.size( ) > 0 )
+        if ( !categories.empty( ) )
         {
           widgetType = TWidgetType::COMBO;
           auto comboBoxWidget = new QComboBox;
@@ -81,6 +84,7 @@ EntityEditWidget::EntityEditWidget(
               break;
           }
           comboBoxWidget->setCurrentIndex( index );
+          comboBoxWidget->setEnabled( is_editable );
         }
         else
         {
@@ -88,7 +92,9 @@ EntityEditWidget::EntityEditWidget(
           auto lineEditwidget = new QLineEdit;
           widget = lineEditwidget;
           lineEditwidget->setText( QString::fromStdString(
-                                     caster->toString(propPair.second )));
+                                     caster->toString( propPair.second )));
+
+          lineEditwidget->setEnabled( is_editable );
         }
         layout->addWidget( widget, element, 1 );
         ++element;
