@@ -22,7 +22,9 @@
 #ifndef __NSLIB__INTERACTION_MANAGER__
 #define __NSLIB__INTERACTION_MANAGER__
 
+
 #include <nslib/api.h>
+#include "EntityEditWidget.h"
 #include "reps/SelectableItem.h"
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
@@ -109,7 +111,7 @@ namespace nslib
       bool& noGroupedSelected );
 
     static QMenu* _contextMenu;
-
+    static EntityEditWidget* _entityEditWidget;
 
   };
 }

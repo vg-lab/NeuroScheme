@@ -1,9 +1,12 @@
 {
+    "name": "cortex",
+    "namespace": "nslib::cortex::shiftgen",
     "reps": [
         {
             "name": "Neuron",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "gid",
@@ -63,6 +66,7 @@
             "name": "Column",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "Id",
@@ -158,6 +162,7 @@
             "name": "MiniColumn",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "Id",
@@ -253,6 +258,7 @@
             "name": "Layer",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],
+            "flags" : [ "subentity" ],
             "properties": [
                 {
                     "name": "Parent Id",
@@ -275,6 +281,7 @@
             "name": "NeuronTypeAggregation",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<shift_Neuron.h>" ],
+            "flags" : [ "subentity" ],
             "properties": [
                 {
                     "name": "Parent Id",

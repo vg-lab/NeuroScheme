@@ -27,6 +27,7 @@
 #include "Properties.h"
 #include <QWidget>
 #include <QGraphicsView>
+#include <QGraphicsSceneEvent>
 #include <QMouseEvent>
 #include <iostream>
 
@@ -49,6 +50,8 @@ namespace nslib
 
   class GraphicsScene : public QGraphicsScene
   {
+    void contextMenuEvent( QGraphicsSceneContextMenuEvent* event );
+
     // void mousePressEvent( QMouseEvent* /* event */ )
     // {
     //   PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));

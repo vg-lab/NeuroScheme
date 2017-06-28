@@ -80,8 +80,9 @@ namespace nslib
       for ( const auto entity : entities.vector( ))
       {
         // std::cout << ", new entity " << entity->entityGid( )
-        //           << " --> LayersMap size = "
-        //             << _layersMap.size( ) << std::endl;
+                  // << " --> LayersMap size = "
+                  //   << _layersMap.size( ) 
+                  //<< std::endl;
         // if the entity has already a rep(s) don't create it
         if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
         {

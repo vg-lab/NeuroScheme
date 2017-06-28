@@ -38,6 +38,7 @@ namespace nslib
   public:
     Domain( void )
       : _dataLoader( nullptr )
+      , _entitiesTypes( nullptr )
     {
     }
     virtual ~Domain( void ) {}
@@ -45,9 +46,11 @@ namespace nslib
     virtual unsigned int selectableEntityId( shift::Entity* entity ) const = 0;
     virtual const Vector4f entity3DPosition ( shift::Entity* entity ) const = 0;
     DataLoader* dataLoader( void ) { return _dataLoader; }
+    const shift::EntitiesTypes& entitiesTypes( void ) const { return *_entitiesTypes; }
 
   protected:
     DataLoader* _dataLoader;
+    shift::EntitiesTypes* _entitiesTypes;
   };
 
   class NSLIB_API DomainManager

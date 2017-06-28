@@ -54,6 +54,15 @@ namespace nslib
     _repCreators[ repCreatorId ] = repCreator;
   }
 
+  shift::RepresentationCreator* RepresentationCreatorManager::getCreator(
+    unsigned int idx )
+  {
+    if ( _repCreators.count( idx ) == 1 )
+      return _repCreators[ idx ];
+    else
+      return nullptr;
+  }
+
   void RepresentationCreatorManager::create(
     const shift::Entities& entities,
     shift::Representations& representations,
