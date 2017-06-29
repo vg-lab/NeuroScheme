@@ -64,7 +64,7 @@ EntityEditWidget::EntityEditWidget(
 
         bool isEditable = entity->hasPropertyFlag(
           propName, shift::Entity::TPropertyFlag::EDITABLE );
-
+        
         TWidgetType widgetType;
         QWidget* widget;
         if ( !categories.empty( ) )
@@ -130,11 +130,27 @@ void EntityEditWidget::validateDialog( void )
   if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
     _entity = _entity->create( );
 
+  for ( const auto& p : _entity->properties( ))
+    std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
+  std::cout << std::endl;
+
+  QList< QString > errorMessages;
+
   assert ( _entity );
   for ( const auto& entityParam: _entityParamCont )
   {
-    const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
     const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
+    const auto& label = labelWidget->text( ).toStdString( );
+
+    bool isEditable = origEntity->hasPropertyFlag(
+      label, shift::Entity::TPropertyFlag::EDITABLE );
+
+    if ( !isEditable )
+    {
+      continue;
+    }
+
+    const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
     const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
     QString paramString;
     if ( editType ==  TWidgetType::COMBO )
@@ -150,7 +166,6 @@ void EntityEditWidget::validateDialog( void )
     else
       assert( false );
 
-    const auto& label = labelWidget->text( ).toStdString( );
     auto caster = fires::PropertyManager::getPropertyCaster( label );
     if ( !_entity->hasProperty( label ))
     {
@@ -159,10 +174,57 @@ void EntityEditWidget::validateDialog( void )
     }
     auto& prop = _entity->getProperty( label );
     assert ( caster );
-    caster->fromString( prop, paramString.toStdString( ));
 
+    bool isUnique = _entity->hasPropertyFlag( label, 
+      shift::Entity::TPropertyFlag::UNIQUE );
+
+    bool saveNewPropValue = true;
+
+    if (isUnique)
+    {
+      std::string pStr = paramString.toStdString( );
+      if ( caster->toString( prop ) != pStr ) // If value changed
+      {
+        auto entities = nslib::DataManager::entities( ).vector( );
+        for( const auto& e: entities )
+        {
+          if (e->hasProperty( label ) )
+          {
+            if ( caster->toString( e->getProperty( label ) ) == pStr )
+            {
+              errorMessages.push_back( QString( "Property '" )
+                                       + QString( QString::fromStdString( label )
+                                       + QString( "' is repeated" ) ));
+              saveNewPropValue = false;
+              break;
+            }
+          }
+        }
+
+      }
+    }
+
+    if (saveNewPropValue )
+    {
+      caster->fromString( prop, paramString.toStdString( ));
+    }
   }
-  this->hide( );
+
+  if ( !errorMessages.empty( ) )
+  {
+    QString errors = "<p><strong>Errors: </strong></p><ul>";
+    for( const auto& err: errorMessages )
+    {
+      errors += QString( "<li>" ) + err + QString( "</li>" );
+    }
+    errors += "</ul>";
+    QMessageBox::warning( this, "Errors", errors );
+  }
+  else
+  {
+    this->hide( );
+  }
+
 
   if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
   {
