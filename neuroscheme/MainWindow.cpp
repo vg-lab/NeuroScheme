@@ -32,6 +32,7 @@
 #include <nslib/layouts/CameraBasedLayout.h>
 #include <nslib/layouts/LayoutManager.h>
 #include <nslib/layouts/ScatterPlotLayout.h>
+#include <nslib/EntityEditWidget.h>
 #include <cortex/Domain.h>
 
 #include <QGridLayout>
@@ -243,6 +244,23 @@ MainWindow::MainWindow( QWidget* parent_ )
 
     _storedSelections.dock->setWidget( dockWidget );
   } // END selection dock
+
+  {
+    _entityEditDock = new QDockWidget;
+    EntityEditWidget::parentDock( _entityEditDock );
+    _entityEditDock->setWindowTitle( QString( "Edit Entity" ));
+    _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
+                                           QSizePolicy::MinimumExpanding );
+
+    _entityEditDock->setFeatures( QDockWidget::DockWidgetClosable |
+                                         QDockWidget::DockWidgetMovable |
+                                         QDockWidget::DockWidgetFloatable);
+    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
+                         _entityEditDock,
+                         Qt::Vertical );
+    _entityEditDock->close( );
+  }
+
 
   resizeEvent( 0 );
 }

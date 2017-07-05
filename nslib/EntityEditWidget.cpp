@@ -34,6 +34,10 @@
 #include <QColorDialog>
 #include <QMessageBox>
 
+
+
+QDockWidget* EntityEditWidget::_parentDock = nullptr;
+
 EntityEditWidget::EntityEditWidget(
   shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent )
   : QWidget( parent )
@@ -188,9 +192,10 @@ void EntityEditWidget::validateDialog( void )
         auto entities = nslib::DataManager::entities( ).vector( );
         for( const auto& e: entities )
         {
-          if (e->hasProperty( label ) )
+
+          if ( e->isSameEntityType( _entity ) &&  e->hasProperty( label ))
           {
-            if ( caster->toString( e->getProperty( label ) ) == pStr )
+            if ( caster->toString( e->getProperty( label )) == pStr )
             {
               errorMessages.push_back( QString( "Property '" )
                                        + QString( QString::fromStdString( label )
@@ -219,10 +224,12 @@ void EntityEditWidget::validateDialog( void )
     }
     errors += "</ul>";
     QMessageBox::warning( this, "Errors", errors );
+    return;
   }
   else
   {
     this->hide( );
+    _parentDock->close( );
   }
 
 
@@ -253,4 +260,16 @@ void EntityEditWidget::validateDialog( void )
 void EntityEditWidget::cancelDialog( void )
 {
   this->hide( );
+  _parentDock->close( );
 }
+
+void EntityEditWidget::parentDock( QDockWidget* parentDock_ )
+{
+  _parentDock = parentDock_;
+}
+
+QDockWidget* EntityEditWidget::parentDock( void )
+{
+  return _parentDock;
+}
+

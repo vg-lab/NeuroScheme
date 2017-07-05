@@ -29,6 +29,7 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QErrorMessage>
+#include <QDockWidget>
 
 #include <shift/shift.h>
 
@@ -45,10 +46,14 @@ public:
   EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
                     QWidget *parent = 0 );
 
+  static void parentDock( QDockWidget* parentDock_ );
+  static QDockWidget* parentDock( void );
+
 public slots:
 
   void validateDialog( );
   void cancelDialog( );
+
 
 private:
   typedef enum { COMBO, LINE_EDIT } TWidgetType;
@@ -56,6 +61,8 @@ private:
   std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
   shift::Entity* _entity;
   TEntityEditWidgetAction _action;
+  static QDockWidget* _parentDock;
+
 };
 
 #endif /* CREATIONDIALOG_H_ */
