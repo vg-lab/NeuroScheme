@@ -296,8 +296,9 @@ namespace nslib
               _entityEditWidget = new EntityEditWidget(
                 DataManager::entities( ).at( entityGid ),
                 EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
-              _entityEditWidget->show();
-
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show( );
             }
             else if ( dupEntity && dupEntity == selectedAction )
             {
@@ -307,7 +308,9 @@ namespace nslib
               _entityEditWidget = new EntityEditWidget(
                 DataManager::entities( ).at( entityGid ),
                 EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
-              _entityEditWidget->show();
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show( );
 
             }
             else

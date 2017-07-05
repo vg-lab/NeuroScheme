@@ -22,6 +22,7 @@
 #ifndef __NSLIB__ENTITY_EDIT_WIDGET__
 #define __NSLIB__ENTITY_EDIT_WIDGET__
 
+#include <nslib/api.h>
 #include <QWidget>
 #include <QCheckBox>
 #include <QComboBox>
@@ -29,33 +30,42 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QErrorMessage>
+#include <QDockWidget>
 
 #include <shift/shift.h>
 
-
-class EntityEditWidget : public QWidget
+namespace nslib
 {
-  Q_OBJECT
+  class NSLIB_API EntityEditWidget : public QWidget
+  {
+    Q_OBJECT
 
-public:
+  public:
 
-  typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
-    TEntityEditWidgetAction;
+    typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
+      TEntityEditWidgetAction;
 
-  EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-                    QWidget *parent = 0 );
+    EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
+                      QWidget *parent = 0 );
 
-public slots:
+    static void parentDock( QDockWidget* parentDock_ );
+    static QDockWidget* parentDock( void );
 
-  void validateDialog( );
-  void cancelDialog( );
+  public slots:
 
-private:
-  typedef enum { COMBO, LINE_EDIT } TWidgetType;
-  typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
-  std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
-  shift::Entity* _entity;
-  TEntityEditWidgetAction _action;
-};
+    void validateDialog( );
+    void cancelDialog( );
+
+
+  private:
+    typedef enum { COMBO, LINE_EDIT } TWidgetType;
+    typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
+    shift::Entity* _entity;
+    TEntityEditWidgetAction _action;
+    static QDockWidget* _parentDock;
+
+  };
+}
 
 #endif /* CREATIONDIALOG_H_ */
