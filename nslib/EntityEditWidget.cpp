@@ -104,8 +104,10 @@ namespace nslib
           layout->addWidget( widget, element, 1 );
           ++element;
 
+
           _entityParamCont.push_back(
             std::make_tuple( widgetType, label, widget ));
+
         }
       }
       //Add n entities

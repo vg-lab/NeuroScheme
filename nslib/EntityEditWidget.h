@@ -40,31 +40,29 @@ namespace nslib
   {
     Q_OBJECT
 
-  public:
+    public:
 
-    typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
-      TEntityEditWidgetAction;
+      typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
+        TEntityEditWidgetAction;
 
-    EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-                      QWidget *parent = 0 );
+      EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
+                        QWidget *parent = 0 );
 
-    static void parentDock( QDockWidget* parentDock_ );
-    static QDockWidget* parentDock( void );
+      static void parentDock( QDockWidget* parentDock_ );
+      static QDockWidget* parentDock( void );
 
-  public slots:
+    public slots:
 
-    void validateDialog( );
-    void cancelDialog( );
+      void validateDialog( );
+      void cancelDialog( );
 
-
-  private:
-    typedef enum { COMBO, LINE_EDIT } TWidgetType;
-    typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
-    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
-    shift::Entity* _entity;
-    TEntityEditWidgetAction _action;
-    static QDockWidget* _parentDock;
-
+      private:
+        typedef enum { COMBO, LINE_EDIT } TWidgetType;
+        typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+        std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
+        shift::Entity* _entity;
+        TEntityEditWidgetAction _action;
+        static QDockWidget* _parentDock;
   };
 }
 

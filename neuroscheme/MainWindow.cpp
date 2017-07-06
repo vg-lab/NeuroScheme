@@ -245,6 +245,7 @@ MainWindow::MainWindow( QWidget* parent_ )
     _storedSelections.dock->setWidget( dockWidget );
   } // END selection dock
 
+
   {
     _entityEditDock = new QDockWidget;
     nslib::EntityEditWidget::parentDock( _entityEditDock );
@@ -260,8 +261,7 @@ MainWindow::MainWindow( QWidget* parent_ )
                          Qt::Vertical );
     _entityEditDock->close( );
   }
-
-
+  
   resizeEvent( 0 );
 }
 
