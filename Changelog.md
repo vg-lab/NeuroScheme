@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!26] Added scale CLI input parameter for hdpi scaling.
 * [!25] Checking unique values on editor.
 * [!24] Added loading entity types in domain. Added first version of editing and creating capabilities for entities
 * [!23] Bump ShiFT (and thus FiReS) and moved Windows CI to VS14.
