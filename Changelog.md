@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!27] Added loading relationship properties types in domain.
 * [!26] Added scale CLI input parameter for hdpi scaling.
 * [!25] Checking unique values on editor.
 * [!24] Added loading entity types in domain. Added first version of editing and creating capabilities for entities
