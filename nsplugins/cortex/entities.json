@@ -315,6 +315,7 @@
         },
         {
             "name": "ConnectsWith",
+            "relationship": "connectsTo",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],
             "properties": [

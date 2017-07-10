@@ -113,12 +113,8 @@ namespace nslib
       bool& noGroupedSelected );
 
     static QMenu* _contextMenu;
-<<<<<<< HEAD
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
-
-=======
     static EntityEditWidget* _entityEditWidget;
->>>>>>> master
 
   };
 }

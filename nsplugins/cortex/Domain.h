@@ -42,6 +42,7 @@ namespace nslib
       {
         delete this->_dataLoader;
         delete this->_entitiesTypes;
+        delete this->_relationshipPropertiesTypes;
       }
 
       bool isSelectableEntity( shift::Entity* entity ) const;

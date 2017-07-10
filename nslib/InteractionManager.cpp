@@ -39,12 +39,9 @@
 namespace nslib
 {
   QMenu* InteractionManager::_contextMenu = nullptr;
-<<<<<<< HEAD
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
-=======
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
->>>>>>> master
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )

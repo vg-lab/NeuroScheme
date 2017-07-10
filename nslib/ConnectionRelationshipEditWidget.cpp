@@ -22,6 +22,7 @@
 
 #include "ConnectionRelationshipEditWidget.h"
 #include "DataManager.h"
+#include "DomainManager.h"
 #include "PaneManager.h"
 
 #include <QPushButton>
@@ -92,6 +93,8 @@ namespace nslib
     auto& relConnectedBy =
       *( DataManager::entities( ).relationships( )["connectedBy"]->asOneToN( ));
 
+    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+      ->relationshipPropertiesTypes( );
     auto connectsToIt = relConnectsTo.find( originEntity );
     if( connectsToIt != relConnectsTo.end( ))
     {
@@ -106,8 +109,11 @@ namespace nslib
       }
       else
       {
-        auto connectsWith = new shift::RelationshipProperties;
-        connectsWith->registerProperty( "count", ( unsigned int ) 1 );
+        auto relationshipProperties = relationshipPropertiesTypes.
+          getRelationshipProperties( "connectsTo" );
+        auto connectsWith = relationshipProperties->create( );
+        connectsWith->getProperty( "count" ).set< unsigned int >(
+          (unsigned int ) 1 );
         relConnectsTo[ originEntity ].insert(
           std::make_pair( destinationEntity, connectsWith ));
         relConnectedBy[ destinationEntity ].insert(
@@ -116,8 +122,11 @@ namespace nslib
     }
     else
     {
-      auto connectsWith = new shift::RelationshipProperties;
-      connectsWith->registerProperty( "count", ( unsigned int ) 1);
+      auto relationshipProperties = relationshipPropertiesTypes.
+          getRelationshipProperties( "connectsTo" );
+        auto connectsWith = relationshipProperties->create( );
+        connectsWith->getProperty( "count" ).set< unsigned int >(
+          (unsigned int ) 1 );
       relConnectsTo[ originEntity ].insert(
         std::make_pair( destinationEntity, connectsWith ));
       relConnectedBy[ destinationEntity ].insert(
@@ -129,9 +138,6 @@ namespace nslib
       pane->resizeEvent( nullptr );
     }
 
-    std::cout << "Creando relacion de conectividad entre origen: "
-              << originEntity << " destino: "
-              << destinationEntity << std::endl;
     this->hide( );
   }
 
