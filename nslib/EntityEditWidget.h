@@ -56,6 +56,8 @@ private:
   std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
   shift::Entity* _entity;
   TEntityEditWidgetAction _action;
+
+  bool _isNew;
 };
 
 #endif /* CREATIONDIALOG_H_ */
