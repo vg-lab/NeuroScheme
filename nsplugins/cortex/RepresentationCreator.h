@@ -76,6 +76,12 @@ namespace nslib
         _maxConnectionsPerEntity = maxConnectionsPerEntity_;
       }
 
+      virtual void clear( void ) final
+      {
+        _layersMap.clear( );
+        _neuronTypeAggsMap.clear( );
+      }
+
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
       typedef std::map<

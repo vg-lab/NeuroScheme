@@ -1,6 +1,8 @@
 # NeuroScheme
 
 ## git master
+* [!25] Checking unique values on editor.
+* [!24] Added loading entity types in domain. Added first version of editing and creating capabilities for entities
 * [!23] Bump ShiFT (and thus FiReS) and moved Windows CI to VS14.
 * [!22] Connectivity highlight and multi-pane synced hover.
 * [!21] Basic representation of connectivity

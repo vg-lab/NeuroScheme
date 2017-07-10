@@ -21,9 +21,12 @@
  */
 #include "Canvas.h"
 #include "DataManager.h"
+#include "DomainManager.h"
+#include "InteractionManager.h"
 #include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "reps/Item.h"
 #include <QHBoxLayout>
 
 namespace nslib
@@ -60,11 +63,23 @@ namespace nslib
     else if ( delta < 0 )
     {
       // Zooming out
-      this->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+      this->scale( scaleFactor * .1f , scaleFactor * .1f );
     }
 
     // Don't call superclass handler here
     // as wheel is normally used for moving scrollbars
+  }
+
+  void GraphicsScene::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+  {
+    QPointF mousePoint = event->scenePos( );
+    // If not clicked in an item
+    if ( !this->itemAt( mousePoint, QTransform( )))
+    {
+      InteractionManager::contextMenuEvent( nullptr, event );
+    }
+    else
+      QGraphicsScene::contextMenuEvent( event );
   }
 
   Canvas::Canvas( QWidget * parent_ )
@@ -98,6 +113,7 @@ namespace nslib
     if ( _graphicsView ) delete _graphicsView;
     if ( _graphicsScene ) delete _graphicsScene;
   }
+
 
   void Canvas::connectLayoutSelector( void )
   {

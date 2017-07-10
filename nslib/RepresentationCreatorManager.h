@@ -56,6 +56,13 @@ namespace nslib
     static const shift::TRepsToEntities& repsToEntities(
         unsigned int repCreatorId = 0 );
 
+    static void clearEntitiesToReps( unsigned int repCreatorId = 0 )
+    {
+      _repCreators[ repCreatorId ]->clear( );
+      _entitiesToReps[ repCreatorId ].clear( );
+      _repsToEntities[ repCreatorId ].clear( );
+    }
+
     static const shift::TRelatedEntitiesReps& relatedEntities(
         unsigned int repCreatorID = 0 );
 
@@ -63,6 +70,8 @@ namespace nslib
         unsigned int repCreatorID = 0 );
 
     static void deleteItemsOfCanvas( Canvas* canvas );
+
+    static shift::RepresentationCreator* getCreator( unsigned int idx = 0 );
 
     // static const shift::Representation& objectToRep(
   protected:

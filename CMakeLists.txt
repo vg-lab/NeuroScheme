@@ -7,8 +7,8 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
-project( NeuroScheme VERSION 0.1.3 )
-set( NeuroScheme_VERSION_ABI 4 )
+project( NeuroScheme VERSION 0.1.5 )
+set( NeuroScheme_VERSION_ABI 5 )
 
 # Disable in source building
 if( "${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}" )

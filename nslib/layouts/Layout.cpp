@@ -181,6 +181,7 @@ namespace nslib
        entities, representations,
         true, true );
 
+      // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
       // Generate relationship representations
       nslib::RepresentationCreatorManager::generateRelations( entities,
                                                             relationshipReps,

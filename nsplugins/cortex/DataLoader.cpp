@@ -238,7 +238,7 @@ namespace nslib
     {
       auto& _entities = nslib::DataManager::entities( );
       auto& _rootEntities = nslib::DataManager::rootEntities( );
-      fires::PropertyManager::clear( );
+      //fires::PropertyManager::clear( );
       _entities.clear( );
 
       _entities.relationships( )[ "isParentOf" ] =
@@ -1147,15 +1147,19 @@ namespace nslib
       }
       neuronEntitiesByGid.clear( );
 
-      auto repCretor = new RepresentationCreator( );
-      repCretor->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
-                              maxNeuronDendVolume, maxNeuronDendArea,
-                              gids.size( ),
-                              maxNeuronsPerColumnLayer,
-                              maxNeuronsPerMiniColumnLayer,
-                              maxConnectionsPerNeuron );
+      // auto repCretor = new RepresentationCreator( );
+      auto repCreator = RepresentationCreatorManager::getCreator( );
+      assert( repCreator );
+      auto cortexRepCreator = dynamic_cast< RepresentationCreator* >( repCreator );
+      assert( cortexRepCreator );
+      cortexRepCreator->setMaximums( maxNeuronSomaVolume, maxNeuronSomaArea,
+                                     maxNeuronDendVolume, maxNeuronDendArea,
+                                     gids.size( ),
+                                     maxNeuronsPerColumnLayer,
+                                     maxNeuronsPerMiniColumnLayer,
+                                     maxConnectionsPerNeuron );
 
-      nslib::RepresentationCreatorManager::addCreator( repCretor );
+      // nslib::RepresentationCreatorManager::addCreator( repCretor );
 
     }
 #endif

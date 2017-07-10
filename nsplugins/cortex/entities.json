@@ -1,37 +1,48 @@
 {
+    "name": "cortex",
+    "namespace": "nslib::cortex::shiftgen",
     "reps": [
         {
             "name": "Neuron",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "gid",
-                    "type": "uint"
+                    "type": "uint",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
                     "name": "Morpho Type",
-                    "type": "TMorphologicalType"
+                    "type": "TMorphologicalType",
+                    "flags": [ "EDITABLE" ]
+
                 },
                 {
                     "name": "Funct Type",
-                    "type": "TFunctionalType"
+                    "type": "TFunctionalType",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Soma Volume",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Soma Surface",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Dendritic Volume",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Dendritic Surface",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Position3D",
@@ -63,10 +74,12 @@
             "name": "Column",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "Id",
-                    "type": "uint"
+                    "type": "uint",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
                     "name": "Num Neurons",
@@ -158,6 +171,7 @@
             "name": "MiniColumn",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
+            "flags" : [],
             "properties": [
                 {
                     "name": "Id",
@@ -253,6 +267,7 @@
             "name": "Layer",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],
+            "flags" : [ "subentity" ],
             "properties": [
                 {
                     "name": "Parent Id",
@@ -275,6 +290,7 @@
             "name": "NeuronTypeAggregation",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<shift_Neuron.h>" ],
+            "flags" : [ "subentity" ],
             "properties": [
                 {
                     "name": "Parent Id",
