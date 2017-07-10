@@ -31,6 +31,7 @@ namespace nslib
 
   NeuroSchemeInputArguments Config::_inputArgs = NeuroSchemeInputArguments( );
   bool Config::_showConnectivity = false;
+  float Config::_scale = 1.f;
 
   std::string Config::isArgumentDefined(
       const std::vector< std::string >& argNames )
@@ -52,4 +53,15 @@ namespace nslib
   {
     _showConnectivity = showConnectivity_;
   }
+
+  float Config::scale( void )
+  {
+    return _scale;
+  }
+
+  void Config::scale( float scale_ )
+  {
+    _scale = scale_;
+  }
+
 }

@@ -39,6 +39,7 @@ EntityEditWidget::EntityEditWidget(
   : QWidget( parent )
   , _entity( nullptr )
   , _action( action )
+  , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
 {
   QGridLayout* layout = new QGridLayout;
   layout->setColumnStretch( 1, 1 );
@@ -183,12 +184,12 @@ void EntityEditWidget::validateDialog( void )
     if (isUnique)
     {
       std::string pStr = paramString.toStdString( );
-      if ( caster->toString( prop ) != pStr ) // If value changed
+      if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
       {
-        auto entities = nslib::DataManager::entities( ).vector( );
-        for( const auto& e: entities )
+        auto& entities = nslib::DataManager::entities( ).vector( );
+        for( const /* shift::Entity*  */ auto e: entities )
         {
-          if (e->hasProperty( label ) )
+          if ( e->isSameEntityType(_entity) && e->hasProperty( label ) )
           {
             if ( caster->toString( e->getProperty( label ) ) == pStr )
             {
@@ -219,6 +220,7 @@ void EntityEditWidget::validateDialog( void )
     }
     errors += "</ul>";
     QMessageBox::warning( this, "Errors", errors );
+    return;
   }
   else
   {

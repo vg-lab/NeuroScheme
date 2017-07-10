@@ -63,7 +63,7 @@ namespace nslib
     else if ( delta < 0 )
     {
       // Zooming out
-      this->scale( scaleFactor * .1f , scaleFactor * .1f );
+      this->scale( 1.0f / scaleFactor, 1.0f / scaleFactor );
     }
 
     // Don't call superclass handler here

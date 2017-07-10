@@ -349,7 +349,7 @@ namespace nslib
 
       MapperFloatToFloat nbConnectionsToWidth(
         0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
-        1, 10 );
+        1.0f, 3.0f );
 
       for( auto& entity : entities.vector( ))
       {
