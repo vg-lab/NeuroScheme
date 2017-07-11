@@ -34,6 +34,8 @@
 #include <QColorDialog>
 #include <QMessageBox>
 
+//TODO?: Add relations to entities (parentOf, childOf ...)
+
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
@@ -43,6 +45,7 @@ namespace nslib
     : QWidget( parent )
     , _entity( nullptr )
     , _action( action )
+    , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
   {
     QGridLayout* layout = new QGridLayout;
     layout->setColumnStretch( 1, 1 );
@@ -54,6 +57,33 @@ namespace nslib
     {
       TWidgetType widgetType;
       QWidget* widget;
+
+      {
+        auto label = new QLabel( "Entity label" );
+        layout->addWidget( label, element, 0 );
+
+        widgetType = TWidgetType::LINE_EDIT;
+        auto lineEditwidget = new QLineEdit;
+        widget = lineEditwidget;
+        QString propName( QString::fromStdString( entity->label( )));
+        lineEditwidget->setText( propName );
+
+        lineEditwidget->setEnabled( false );
+        layout->addWidget( widget, element, 1 );
+        ++element;
+
+        //_entityParamCont.push_back(
+        //  std::make_tuple( widgetType, label, widget ));
+      }
+
+      QFrame* sep1 = new QFrame( );
+      QFrame* sep2 = new QFrame( );
+      sep1->setFrameShape( QFrame::HLine );
+      sep2->setFrameShape( QFrame::HLine );
+
+      layout->addWidget( sep1,element,0 );
+      layout->addWidget( sep2,element,1 );
+      ++element;
 
       for ( const auto& propPair : entity->properties( ))
       {
@@ -74,7 +104,7 @@ namespace nslib
 
           if ( !categories.empty( ) )
           {
-            //widgetType = TWidgetType::COMBO;
+            widgetType = TWidgetType::COMBO;
             auto comboBoxWidget = new QComboBox;
             widget = comboBoxWidget;
             auto currentCategory = caster->toString( propPair.second );
@@ -104,29 +134,37 @@ namespace nslib
           layout->addWidget( widget, element, 1 );
           ++element;
 
-
           _entityParamCont.push_back(
             std::make_tuple( widgetType, label, widget ));
-
         }
       }
-      //Add n entities
+
+      //To add n entities
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
+        QFrame* sep3 = new QFrame( );
+        QFrame* sep4 = new QFrame( );
+        sep3->setFrameShape( QFrame::HLine );
+        sep4->setFrameShape( QFrame::HLine );
+
+        layout->addWidget( sep3,element,0 );
+        layout->addWidget( sep4,element,1 );
+        ++element;
+
         widgetType = TWidgetType::LINE_EDIT;
         auto label = new QLabel(
           QString::fromStdString( "Number of entities" ));
         layout->addWidget( label, element, 0 );
 
-        auto lineEditwidget = new QLineEdit;
-        widget = lineEditwidget;
-        lineEditwidget->setText( "1");
+        _numNewEntities = new QLineEdit;
+        widget = _numNewEntities;
+        _numNewEntities->setText( "1" );
 
-        lineEditwidget->setEnabled( true );
+        _numNewEntities->setEnabled( true );
         layout->addWidget( widget, element, 1 );
 
-        _entityParamCont.push_back(
-          std::make_tuple( widgetType, label, widget ));
+        //_entityParamCont.push_back(
+        //  std::make_tuple( widgetType, label, widget ));
       }
       ++element;
     }
@@ -154,13 +192,15 @@ namespace nslib
 
     if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
     {
-      const auto& numElesWidget = std::get< TEditTuple::WIDGET >( _entityParamCont.back() );
-      numEles = dynamic_cast< QLineEdit* >( numElesWidget )->text( ).toInt( );
+      numEles = _numNewEntities->text( ).toInt( );
     }
 
     for (unsigned int i=0;i<numEles;++i)
     {
-      _entity = _entity->create( );
+      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      {
+        _entity = _entity->create( );
+      }
 
       for ( const auto& p : _entity->properties( ))
         std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
@@ -177,7 +217,8 @@ namespace nslib
         bool isEditable = origEntity->hasPropertyFlag(
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
-        if ( !isEditable )
+        if ( ( _action == EDIT_ENTITY ) &&
+            !isEditable )
         {
           continue;
         }
@@ -215,10 +256,10 @@ namespace nslib
         if (isUnique)
         {
           std::string pStr = paramString.toStdString( );
-          if ( caster->toString( prop ) != pStr ) // If value changed
+          if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
           {
-            auto entities = nslib::DataManager::entities( ).vector( );
-            for( const auto& e: entities )
+            auto &entities = nslib::DataManager::entities( ).vector( );
+            for( const auto e: entities )
             {
 
               if ( e->isSameEntityType( _entity ) &&  e->hasProperty( label ))
@@ -233,7 +274,6 @@ namespace nslib
                 }
               }
             }
-
           }
         }
 
@@ -260,13 +300,12 @@ namespace nslib
         _parentDock->close( );
       }
 
-
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
         nslib::DataManager::entities( ).add( _entity );
         nslib::PaneManager::activePane( )->entities( ).add( _entity );
         nslib::PaneManager::activePane( )->refreshProperties(
-        nslib::PaneManager::activePane( )->entities( ));
+          nslib::PaneManager::activePane( )->entities( ));
         nslib::PaneManager::activePane( )->resizeEvent( nullptr );
       }
       if ( _action == EDIT_ENTITY )

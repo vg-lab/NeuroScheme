@@ -63,6 +63,9 @@ namespace nslib
         shift::Entity* _entity;
         TEntityEditWidgetAction _action;
         static QDockWidget* _parentDock;
+
+        QLineEdit*  _numNewEntities;
+        bool        _isNew;
   };
 }
 
