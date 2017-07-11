@@ -24,6 +24,7 @@
 #include <cmath>
 
 #include "ConnectionArrowItem.h"
+#include <nslib/Config.h>
 
 namespace nslib
 {
@@ -49,7 +50,7 @@ namespace nslib
 
       this->setAcceptHoverEvents( true );
 
-      _arrowThickness =
+      _arrowThickness = nslib::Config::scale( ) *
         connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
     }
 
@@ -61,8 +62,8 @@ namespace nslib
 
       QPolygonF arrowShape;
 
-      float arrowWidth = 8;
-      float arrowLength = 8;
+      float arrowWidth = 3 * nslib::Config::scale( );
+      float arrowLength = 3 * nslib::Config::scale( );
 
       QLineF auxLine( origin, dest );
 
