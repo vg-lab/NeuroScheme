@@ -65,6 +65,8 @@ namespace nslib
         static QDockWidget* _parentDock;
 
         QLineEdit*  _numNewEntities;
+        QLineEdit*  _entityLabel;
+
         bool        _isNew;
   };
 }

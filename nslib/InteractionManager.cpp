@@ -160,26 +160,6 @@ namespace nslib
         std::unordered_map< QAction*, unsigned int > actionToIdx;
         unsigned int entityIdx = 0;
 
-        // //Rellenar el menu
-        // auto item = dynamic_cast< Item* >( shapeItem );
-        // if ( item )
-        // {
-        //   assert( item->parentRep( ));
-        //   const auto& repsToEntities =
-        //     RepresentationCreatorManager::repsToEntities( );
-        //   if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
-        //   {
-        //     const auto entities = repsToEntities.at( item->parentRep( ));
-        //     auto entityGid = ( *entities.begin( ))->entityGid( );
-
-        //     if ( _entityEditWidget != nullptr )
-        //       delete _entityEditWidget;
-
-        //     _entityEditWidget = new EntityEditWidget(
-        //       DataManager::entities( ).at( entityGid ));
-        //     _entityEditWidget->show();
-
-        //   }
         for ( const auto& type : entitiesTypes )
         {
           QAction* action = nullptr;
@@ -208,6 +188,8 @@ namespace nslib
             std::get< shift::EntitiesTypes::OBJECT >(
               entitiesTypes[actionToIdx[selectedAction]]),
             EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY );
+          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+          EntityEditWidget::parentDock( )->show( );
           _entityEditWidget->show();
         }
       } // if ( domain )

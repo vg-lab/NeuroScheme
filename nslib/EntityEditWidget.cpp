@@ -63,27 +63,14 @@ namespace nslib
         layout->addWidget( label, element, 0 );
 
         widgetType = TWidgetType::LINE_EDIT;
-        auto lineEditwidget = new QLineEdit;
-        widget = lineEditwidget;
+        _entityLabel = new QLineEdit;
+        widget = _entityLabel;
         QString propName( QString::fromStdString( entity->label( )));
-        lineEditwidget->setText( propName );
-
-        lineEditwidget->setEnabled( false );
+        _entityLabel->setText( propName );
+        _entityLabel->setEnabled( true );
         layout->addWidget( widget, element, 1 );
         ++element;
-
-        //_entityParamCont.push_back(
-        //  std::make_tuple( widgetType, label, widget ));
       }
-
-      QFrame* sep1 = new QFrame( );
-      QFrame* sep2 = new QFrame( );
-      sep1->setFrameShape( QFrame::HLine );
-      sep2->setFrameShape( QFrame::HLine );
-
-      layout->addWidget( sep1,element,0 );
-      layout->addWidget( sep2,element,1 );
-      ++element;
 
       for ( const auto& propPair : entity->properties( ))
       {
@@ -128,7 +115,6 @@ namespace nslib
             widget = lineEditwidget;
             lineEditwidget->setText( QString::fromStdString(
                                        caster->toString( propPair.second )));
-
             lineEditwidget->setEnabled( isEditable );
           }
           layout->addWidget( widget, element, 1 );
@@ -139,7 +125,6 @@ namespace nslib
         }
       }
 
-      //To add n entities
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
         QFrame* sep3 = new QFrame( );
@@ -162,9 +147,6 @@ namespace nslib
 
         _numNewEntities->setEnabled( true );
         layout->addWidget( widget, element, 1 );
-
-        //_entityParamCont.push_back(
-        //  std::make_tuple( widgetType, label, widget ));
       }
       ++element;
     }
@@ -209,6 +191,17 @@ namespace nslib
       QList< QString > errorMessages;
 
       assert ( _entity );
+
+      if (numEles>1)
+      {
+        _entity->label()=QString(_entityLabel->text( )+"_"+
+            QString::number(i) ).toStdString();
+      }
+      else
+      {
+        _entity->label()=_entityLabel->text( ).toStdString();
+      }
+
       for ( const auto& entityParam: _entityParamCont )
       {
         const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
@@ -248,10 +241,10 @@ namespace nslib
         auto& prop = _entity->getProperty( label );
         assert ( caster );
 
+        bool saveNewPropValue = true;
+        /*
         bool isUnique = _entity->hasPropertyFlag( label,
           shift::Entity::TPropertyFlag::UNIQUE );
-
-        bool saveNewPropValue = true;
 
         if (isUnique)
         {
@@ -276,6 +269,7 @@ namespace nslib
             }
           }
         }
+        */
 
         if (saveNewPropValue )
         {
