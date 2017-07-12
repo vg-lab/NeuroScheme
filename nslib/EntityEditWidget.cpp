@@ -34,11 +34,15 @@
 #include <QColorDialog>
 #include <QMessageBox>
 
+#include <memory>
+
 //TODO?: Add relations to entities (parentOf, childOf ...)
 
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
+  bool EntityEditWidget::_autoCloseChecked = false;
+  bool EntityEditWidget::_checkUniquenessChecked = false;
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent )
@@ -46,6 +50,8 @@ namespace nslib
     , _entity( nullptr )
     , _action( action )
     , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
+    , _autoCloseCheck( new QCheckBox )
+    , _checkUniquenessCheck( new QCheckBox )
   {
     QGridLayout* layout = new QGridLayout;
     layout->setColumnStretch( 1, 1 );
@@ -63,8 +69,8 @@ namespace nslib
         layout->addWidget( label, element, 0 );
 
         widgetType = TWidgetType::LINE_EDIT;
-        _entityLabel = new QLineEdit;
-        widget = _entityLabel;
+        _entityLabel.reset( new QLineEdit( ));
+        widget = _entityLabel.get( );
         QString propName( QString::fromStdString( entity->label( )));
         _entityLabel->setText( propName );
         _entityLabel->setEnabled( true );
@@ -141,8 +147,8 @@ namespace nslib
           QString::fromStdString( "Number of entities" ));
         layout->addWidget( label, element, 0 );
 
-        _numNewEntities = new QLineEdit;
-        widget = _numNewEntities;
+        _numNewEntities.reset( new QLineEdit );
+        widget = _numNewEntities.get( );
         _numNewEntities->setText( "1" );
 
         _numNewEntities->setEnabled( true );
@@ -151,18 +157,41 @@ namespace nslib
       ++element;
     }
 
-    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ));
+    QPushButton* cancelButton = new QPushButton( tr( "Close" ));
     layout->addWidget( cancelButton, element, 0 );
 
-    QPushButton* validationButton = new QPushButton(tr( "Save" ));
+    QPushButton* validationButton = new QPushButton(
+      ( _isNew ? tr( "New" ) : tr( "Save" )));
     layout->addWidget( validationButton, element, 1 );
 
-    connect(cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
-    connect(validationButton, SIGNAL( clicked( )),
-            this, SLOT( validateDialog( )));
+    ++element;
+    auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
+    layout->addWidget( autoCloseLabel, element, 0 );
+
+    std::cout << _autoCloseCheck.get( ) << std::endl;
+    //_autoCloseCheck = std::make_unique< QCheckBox >( new QCheckBox( ));
+    std::cout << _autoCloseCheck.get( ) << std::endl;
+    _autoCloseCheck->setChecked( _autoCloseChecked );
+    connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
+             this, SLOT( toggleAutoClose( )));
+    layout->addWidget( _autoCloseCheck.get( ), element, 1 );
+
+    ++element;
+    auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
+    layout->addWidget( checkUniquenessLabel, element, 0 );
+
+    //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
+    _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
+    connect( _checkUniquenessCheck.get( ), SIGNAL( clicked( )),
+             this, SLOT( toggleCheckUniqueness( )));
+    layout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
+
+    connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
+    connect( validationButton, SIGNAL( clicked( )),
+             this, SLOT( validateDialog( )));
 
     setLayout( layout );
-    setWindowTitle( tr( "Edit entity" ));
+    setWindowTitle( tr( "Entity inspector" ));
 
     _entity = entity;
   }
@@ -184,23 +213,19 @@ namespace nslib
         _entity = _entity->create( );
       }
 
-      for ( const auto& p : _entity->properties( ))
-        std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
-      std::cout << std::endl;
+      // for ( const auto& p : _entity->properties( ))
+      //   std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
+      // std::cout << std::endl;
 
       QList< QString > errorMessages;
 
       assert ( _entity );
 
-      if (numEles>1)
-      {
-        _entity->label()=QString(_entityLabel->text( )+"_"+
-            QString::number(i) ).toStdString();
-      }
+      if ( numEles > 1 )
+        _entity->label( ) = QString( _entityLabel->text( ) + "_" +
+                                     QString::number( i )).toStdString( );
       else
-      {
-        _entity->label()=_entityLabel->text( ).toStdString();
-      }
+        _entity->label( ) = _entityLabel->text( ).toStdString( );
 
       for ( const auto& entityParam: _entityParamCont )
       {
@@ -211,7 +236,7 @@ namespace nslib
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
         if ( ( _action == EDIT_ENTITY ) &&
-            !isEditable )
+             !isEditable )
         {
           continue;
         }
@@ -235,49 +260,52 @@ namespace nslib
         auto caster = fires::PropertyManager::getPropertyCaster( label );
         if ( !_entity->hasProperty( label ))
         {
-          auto prop = origEntity ->getProperty( label );
+          // WAR: This is to force create/copy properties not defined in the JSON
+          // but defined in when loading data, but does not solve all cases
+          auto prop = origEntity->getProperty( label );
           _entity->registerProperty( label, prop );
         }
         auto& prop = _entity->getProperty( label );
-        assert ( caster );
+        assert( caster );
 
         bool saveNewPropValue = true;
-        /*
-        bool isUnique = _entity->hasPropertyFlag( label,
-          shift::Entity::TPropertyFlag::UNIQUE );
 
-        if (isUnique)
+        if ( _checkUniquenessCheck->isChecked( ))
         {
-          std::string pStr = paramString.toStdString( );
-          if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
+          bool isUnique = _entity->hasPropertyFlag(
+            label, shift::Entity::TPropertyFlag::UNIQUE );
+          if ( isUnique )
           {
-            auto &entities = nslib::DataManager::entities( ).vector( );
-            for( const auto e: entities )
+            std::string pStr = paramString.toStdString( );
+            if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
             {
-
-              if ( e->isSameEntityType( _entity ) &&  e->hasProperty( label ))
+              const auto &entities = nslib::DataManager::entities( ).vector( );
+              for( const auto entity: entities )
               {
-                if ( caster->toString( e->getProperty( label )) == pStr )
+                if ( entity->isSameEntityType( _entity ) &&
+                     entity->hasProperty( label ))
                 {
-                  errorMessages.push_back( QString( "Property '" )
-                                           + QString( QString::fromStdString( label )
-                                           + QString( "' is repeated" ) ));
-                  saveNewPropValue = false;
-                  break;
+                  if ( caster->toString( entity->getProperty( label )) == pStr )
+                  {
+                    errorMessages.push_back(
+                      QString( "Property '" ) + QString::fromStdString( label ) +
+                      QString( "' is repeated" ));
+                    saveNewPropValue = false;
+                    break;
+                  }
                 }
               }
             }
           }
         }
-        */
 
-        if (saveNewPropValue )
+        if ( saveNewPropValue )
         {
           caster->fromString( prop, paramString.toStdString( ));
         }
       }
 
-      if ( !errorMessages.empty( ) )
+      if ( !errorMessages.empty( ))
       {
         QString errors = "<p><strong>Errors: </strong></p><ul>";
         for( const auto& err: errorMessages )
@@ -290,8 +318,11 @@ namespace nslib
       }
       else
       {
-        this->hide( );
-        _parentDock->close( );
+        if ( _autoCloseCheck->isChecked( ))
+        {
+          this->hide( );
+          _parentDock->close( );
+        }
       }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
@@ -335,4 +366,19 @@ namespace nslib
   {
     return _parentDock;
   }
-}
+
+  void EntityEditWidget::toggleAutoClose( void )
+  {
+    _autoCloseChecked = _autoCloseCheck->isChecked( );
+  }
+
+  void EntityEditWidget::toggleCheckUniqueness( void )
+  {
+    _checkUniquenessChecked = _checkUniquenessCheck->isChecked( );
+  }
+
+  EntityEditWidget::~EntityEditWidget( void )
+  {
+  }
+
+} // namespace

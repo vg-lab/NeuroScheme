@@ -176,10 +176,8 @@ namespace nslib
 
         }
         QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
-        if (selectedAction)
+        if ( selectedAction )
         {
-          std::cout<<"Selected:"<<std::get< shift::EntitiesTypes::ENTITY_NAME >(
-              entitiesTypes[actionToIdx[selectedAction]])<<std::endl;
 
           if ( _entityEditWidget != nullptr )
             delete _entityEditWidget;

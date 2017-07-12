@@ -40,34 +40,44 @@ namespace nslib
   {
     Q_OBJECT
 
-    public:
+  public:
 
-      typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
-        TEntityEditWidgetAction;
+    typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
+    TEntityEditWidgetAction;
 
-      EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-                        QWidget *parent = 0 );
+    EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
+                      QWidget *parent = 0 );
 
-      static void parentDock( QDockWidget* parentDock_ );
-      static QDockWidget* parentDock( void );
+    ~EntityEditWidget( void );
 
-    public slots:
+    static void parentDock( QDockWidget* parentDock_ );
+    static QDockWidget* parentDock( void );
 
-      void validateDialog( );
-      void cancelDialog( );
+  public slots:
 
-      private:
-        typedef enum { COMBO, LINE_EDIT } TWidgetType;
-        typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
-        std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
-        shift::Entity* _entity;
-        TEntityEditWidgetAction _action;
-        static QDockWidget* _parentDock;
+    void validateDialog( void );
+    void cancelDialog( void );
+    void toggleAutoClose( void );
+    void toggleCheckUniqueness( void );
 
-        QLineEdit*  _numNewEntities;
-        QLineEdit*  _entityLabel;
+  private:
+    typedef enum { COMBO, LINE_EDIT } TWidgetType;
+    typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
+    shift::Entity* _entity;
+    TEntityEditWidgetAction _action;
 
-        bool        _isNew;
+    std::unique_ptr< QLineEdit > _numNewEntities;
+    std::unique_ptr< QLineEdit > _entityLabel;
+
+    bool _isNew;
+
+    std::unique_ptr< QCheckBox > _autoCloseCheck;
+    std::unique_ptr< QCheckBox > _checkUniquenessCheck;
+
+    static QDockWidget* _parentDock;
+    static bool _autoCloseChecked;
+    static bool _checkUniquenessChecked;
   };
 }
 
