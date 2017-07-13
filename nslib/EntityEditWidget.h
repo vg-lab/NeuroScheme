@@ -22,6 +22,7 @@
 #ifndef __NSLIB__ENTITY_EDIT_WIDGET__
 #define __NSLIB__ENTITY_EDIT_WIDGET__
 
+#include <nslib/api.h>
 #include <QWidget>
 #include <QCheckBox>
 #include <QComboBox>
@@ -29,35 +30,55 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QErrorMessage>
+#include <QDockWidget>
 
 #include <shift/shift.h>
 
-
-class EntityEditWidget : public QWidget
+namespace nslib
 {
-  Q_OBJECT
+  class NSLIB_API EntityEditWidget : public QWidget
+  {
+    Q_OBJECT
 
-public:
+  public:
 
-  typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
+    typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
     TEntityEditWidgetAction;
 
-  EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-                    QWidget *parent = 0 );
+    EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
+                      QWidget *parent = 0 );
 
-public slots:
+    ~EntityEditWidget( void );
 
-  void validateDialog( );
-  void cancelDialog( );
+    static void parentDock( QDockWidget* parentDock_ );
+    static QDockWidget* parentDock( void );
 
-private:
-  typedef enum { COMBO, LINE_EDIT } TWidgetType;
-  typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
-  std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
-  shift::Entity* _entity;
-  TEntityEditWidgetAction _action;
+  public slots:
 
-  bool _isNew;
-};
+    void validateDialog( void );
+    void cancelDialog( void );
+    void toggleAutoClose( void );
+    void toggleCheckUniqueness( void );
+
+  private:
+    typedef enum { COMBO, LINE_EDIT } TWidgetType;
+    typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
+    shift::Entity* _entity;
+    TEntityEditWidgetAction _action;
+
+    std::unique_ptr< QLineEdit > _numNewEntities;
+    std::unique_ptr< QLineEdit > _entityLabel;
+
+    bool _isNew;
+
+    std::unique_ptr< QCheckBox > _autoCloseCheck;
+    std::unique_ptr< QCheckBox > _checkUniquenessCheck;
+
+    static QDockWidget* _parentDock;
+    static bool _autoCloseChecked;
+    static bool _checkUniquenessChecked;
+  };
+}
 
 #endif /* CREATIONDIALOG_H_ */

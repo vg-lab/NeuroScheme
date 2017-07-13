@@ -47,6 +47,12 @@
                 {
                     "name": "Position3D",
                     "type": "Eigen::Vector4f"
+                },
+                {
+                    "name": "Layer",
+                    "type": "uint",
+                    "flags": [ "EDITABLE" ]
+
                 }
             ],
             "types": [

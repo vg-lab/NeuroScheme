@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!27] Entity edit widget into a new dock. Create or copy N entities at the same time. Added label to the EntityEditWidget.
 * [!26] Added scale CLI input parameter for hdpi scaling.
 * [!25] Checking unique values on editor.
 * [!24] Added loading entity types in domain. Added first version of editing and creating capabilities for entities
