@@ -104,12 +104,6 @@ namespace nslib
         InteractionManager::contextMenuEvent( this, event_ );
       }
 
-      virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      {
-        InteractionManager::mousePressEvent( this, event_ );
-      }
-
-
     public slots:
 
       void disable( void )
@@ -178,11 +172,6 @@ namespace nslib
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
       {
         InteractionManager::contextMenuEvent( this, event_ );
-      }
-
-      virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      {
-        InteractionManager::mousePressEvent( this, event_ );
       }
 
 

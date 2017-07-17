@@ -42,6 +42,8 @@ namespace nslib
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
+  QGraphicsItem* InteractionManager::_item = nullptr;
+  Qt::MouseButtons InteractionManager::_buttons = 0;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -375,153 +377,216 @@ namespace nslib
   }
 
 
-  void InteractionManager::mousePressEvent(
-    QAbstractGraphicsShapeItem* shapeItem,
-    QGraphicsSceneMouseEvent* event )
+  void InteractionManager::mousePressEvent( QGraphicsItem* item,
+                                            QMouseEvent* event )
   {
-    // Selection event
-    if ( event->buttons( ) & Qt::LeftButton )
+    if ( item )
     {
-      auto item = dynamic_cast< Item* >( shapeItem );
-
-      auto selectableItem = dynamic_cast< SelectableItem* >( item );
-      if ( selectableItem )
+      auto parentItem = item->parentItem( );
+      while ( parentItem )
       {
-        const auto& repsToEntities =
-          RepresentationCreatorManager::repsToEntities( );
-        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        auto selectableItem = dynamic_cast< SelectableItem*>( item );
+        if (selectableItem)
+          break;
+        item = parentItem;
+        parentItem = item->parentItem( );
+      }
+      _item = item;
+      _buttons = event->buttons( );
+    }
+    else
+    {
+      _item = nullptr;
+      _buttons = 0;
+    }
+  }
+
+  void InteractionManager::mouseReleaseEvent( QGraphicsItem* item_,
+                                              QMouseEvent* /*event*/ )
+  {
+    if( item_ && _item )
+    {
+      auto parentItem = item_->parentItem( );
+      while ( parentItem )
+      {
+        auto selectableItem = dynamic_cast< SelectableItem*>( item_ );
+        if (selectableItem)
+          break;
+        item_ = parentItem;
+        parentItem = item_->parentItem( );
+      }
+
+
+      if ( _item == item_ )
+      {
+        // Selection event
+        if ( _buttons & Qt::LeftButton )
         {
-          const auto entities = repsToEntities.at( item->parentRep( ));
-          if ( selectableItem->partiallySelected( ))
-            selectableItem->setSelected( );
-          else
-            selectableItem->toggleSelected( );
+          auto item = dynamic_cast< Item* >( item_ );
 
-          // std::cout << "-------- Selecting entities "
-          //           << entities.size( ) << std::endl;
-          for ( const auto& entity : entities )
+          auto selectableItem = dynamic_cast< SelectableItem* >( item );
+          if ( selectableItem )
           {
-            // std::cout << "-------- " << entity->entityGid( ) << std::endl;
-            // std::cout << "-- ShiFT gid: "
-            //           << int( entity->entityGid( )) << std::endl;
-
-            if ( selectableItem->selected( ))
+            const auto& repsToEntities =
+              RepresentationCreatorManager::repsToEntities( );
+            if ( repsToEntities.find( item->parentRep( )) !=
+                 repsToEntities.end( ))
             {
-              SelectionManager::setSelectedState(
-                entity, SelectedState::SELECTED );
-            }
-            else
-            {
-              SelectionManager::setSelectedState(
-                entity, SelectedState::UNSELECTED );
-            }
+              const auto entities = repsToEntities.at( item->parentRep( ));
+              if ( selectableItem->partiallySelected( ))
+                selectableItem->setSelected( );
+              else
+                selectableItem->toggleSelected( );
 
-            auto entityState = SelectionManager::getSelectedState( entity );
-            // auto entityGid = ( *entities.begin( ))->entityGid( );
-            auto entityGid = entity->entityGid( );
-
-            const auto& allEntities = DataManager::entities( );
-            const auto& relationships = allEntities.relationships( );
-            const auto& relChildOf =
-              *( relationships.at( "isChildOf" )->asOneToOne( ));
-            const auto& relParentOf =
-              *( relationships.at( "isParentOf" )->asOneToN( ));
-            const auto& relSubEntityOf =
-              *( relationships.at( "isSubEntityOf" )->asOneToOne( ));
-            const auto& relSuperEntityOf =
-              *( relationships.at( "isSuperEntityOf" )->asOneToN( ));
-            const auto& relAGroupOf =
-              *( relationships.at( "isAGroupOf" )->asOneToN( ));
-
-            if ( relSubEntityOf.count( entityGid ) > 0 )
-            {
-              std::unordered_set< unsigned int > parentIds;
-              if ( relAGroupOf.count( entityGid ) > 0 )
+// std::cout << "-------- Selecting entities "
+//           << entities.size( ) << std::endl;
+              for ( const auto& entity : entities )
               {
-                const auto& groupedIds = relAGroupOf.at( entityGid );
-                // std::cout << " -- Parent of: ";
-                // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
-                for ( auto const& groupedId : groupedIds )
+// std::cout << "-------- " << entity->entityGid( ) << std::endl;
+// std::cout << "-- ShiFT gid: "
+//           << int( entity->entityGid( )) << std::endl;
+
+                if ( selectableItem->selected( ))
                 {
                   SelectionManager::setSelectedState(
-                    allEntities.at( groupedId.first ), entityState );
-                  // Save unique parent set for updating only once per parent
-                  if ( relChildOf.count( groupedId.first ) > 0 )
-                    parentIds.insert( relChildOf.at( groupedId.first ).entity );
+                    entity, SelectedState::SELECTED );
                 }
-                _updateSelectedStateOfSubEntities(
-                  allEntities, relSuperEntityOf, relAGroupOf,
-                  relSubEntityOf.at( entityGid ).entity );
-                std::unordered_set< unsigned int > uniqueParentChildIds;
-                for ( auto const& parentId : parentIds )
+                else
                 {
-                  uniqueParentChildIds.insert(
-                    relParentOf.at( parentId ).begin( )->first );
+                  SelectionManager::setSelectedState(
+                    entity, SelectedState::UNSELECTED );
                 }
-                // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
-                for ( auto const& uniqueParentChildId : uniqueParentChildIds )
+
+                auto entityState = SelectionManager::getSelectedState( entity );
+                // auto entityGid = ( *entities.begin( ))->entityGid( );
+                auto entityGid = entity->entityGid( );
+
+                const auto& allEntities = DataManager::entities( );
+                const auto& relationships = allEntities.relationships( );
+                const auto& relChildOf =
+                  *( relationships.at( "isChildOf" )->asOneToOne( ));
+                const auto& relParentOf =
+                  *( relationships.at( "isParentOf" )->asOneToN( ));
+                const auto& relSubEntityOf =
+                  *( relationships.at( "isSubEntityOf" )->asOneToOne( ));
+                const auto& relSuperEntityOf =
+                  *( relationships.at( "isSuperEntityOf" )->asOneToN( ));
+                const auto& relAGroupOf =
+                  *( relationships.at( "isAGroupOf" )->asOneToN( ));
+
+                if ( relSubEntityOf.count( entityGid ) > 0 )
                 {
+                  std::unordered_set< unsigned int > parentIds;
+                  if ( relAGroupOf.count( entityGid ) > 0 )
+                  {
+                    const auto& groupedIds = relAGroupOf.at( entityGid );
+                    // std::cout << " -- Parent of: ";
+                    // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
+                    for ( auto const& groupedId : groupedIds )
+                    {
+                      SelectionManager::setSelectedState(
+                        allEntities.at( groupedId.first ), entityState );
+                      // Save unique parent set for updating only once per parent
+                      if ( relChildOf.count( groupedId.first ) > 0 )
+                        parentIds.insert( relChildOf.at(
+                                            groupedId.first ).entity );
+                    }
+                    _updateSelectedStateOfSubEntities(
+                      allEntities, relSuperEntityOf, relAGroupOf,
+                      relSubEntityOf.at( entityGid ).entity );
+                    std::unordered_set< unsigned int > uniqueParentChildIds;
+                    for ( auto const& parentId : parentIds )
+                    {
+                      uniqueParentChildIds.insert(
+                        relParentOf.at( parentId ).begin( )->first );
+                    }
+                    // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
+                    for ( auto const& uniqueParentChildId : uniqueParentChildIds )
+                    {
+                      _propagateSelectedStateToParent(
+                        allEntities, relChildOf, relParentOf,
+                        relSuperEntityOf, relAGroupOf,
+                        uniqueParentChildId, entityState );
+                    }
+                  }
+                } // if subentity
+                else
+                {
+                  if ( relSuperEntityOf.count( entityGid ) > 0 )
+                  {
+                    const auto& subEntities =
+                      relSuperEntityOf.at( entityGid );
+                    for ( const auto& subEntity : subEntities )
+                      SelectionManager::setSelectedState(
+                        allEntities.at( subEntity.first ), entityState );
+                  }
+
+                  // std::cout << "Propagate to children of " << entityGid << std::endl;
+                  _propagateSelectedStateToChilds(
+                    allEntities, relParentOf, relSuperEntityOf,
+                    entityGid, entityState );
+
                   _propagateSelectedStateToParent(
                     allEntities, relChildOf, relParentOf,
                     relSuperEntityOf, relAGroupOf,
-                    uniqueParentChildId, entityState );
+                    entityGid, entityState );
+                  //std::cout << std::endl;
                 }
+                //LayoutManager::updateAllScenesSelection( );
+                PaneManager::updateSelection( );
               }
-            } // if subentity
+            }
             else
             {
-              if ( relSuperEntityOf.count( entityGid ) > 0 )
-              {
-                const auto& subEntities =
-                  relSuperEntityOf.at( entityGid );
-                for ( const auto& subEntity : subEntities )
-                  SelectionManager::setSelectedState(
-                    allEntities.at( subEntity.first ), entityState );
-              }
-
-              // std::cout << "Propagate to children of " << entityGid << std::endl;
-              _propagateSelectedStateToChilds(
-                allEntities, relParentOf, relSuperEntityOf,
-                entityGid, entityState );
-
-              _propagateSelectedStateToParent(
-                allEntities, relChildOf, relParentOf,
-                relSuperEntityOf, relAGroupOf,
-                entityGid, entityState );
-            //std::cout << std::endl;
+              Log::log( NS_LOG_HEADER + "item without entity",
+                        LOG_LEVEL_ERROR );
+              return;
             }
-            //LayoutManager::updateAllScenesSelection( );
-            PaneManager::updateSelection( );
+          }
+
+          // Publish selection
+          std::vector< unsigned int > ids;
+          SelectionManager::selectableEntitiesIds( ids );
+          ZeroEQManager::publishSelection( ids );
+        } // selection event
+      }
+      else
+      {
+        // drag and drop
+        if ( _buttons & Qt::LeftButton )
+        {
+          auto originItem = dynamic_cast< Item* >( _item );
+          auto destinationItem = dynamic_cast< Item* >( item_ );
+
+          const auto& repsToEntities =
+            RepresentationCreatorManager::repsToEntities( );
+          if (( repsToEntities.find( originItem->parentRep( )) !=
+                repsToEntities.end( )) &&
+              ( repsToEntities.find( destinationItem->parentRep( )) !=
+                repsToEntities.end( )))
+          {
+            const auto originEntity =
+              *( repsToEntities.at( originItem->parentRep( )).begin( ));
+            const auto destinationEntity =
+              *( repsToEntities.at( destinationItem->parentRep( )).begin( ));
+
+            createConnectionRelationship( originEntity, destinationEntity );
           }
         }
-        else
-        {
-          Log::log( NS_LOG_HEADER + "item without entity",
-                    LOG_LEVEL_ERROR );
-          return;
-        }
       }
-
-      // Publish selection
-      std::vector< unsigned int > ids;
-      SelectionManager::selectableEntitiesIds( ids );
-      ZeroEQManager::publishSelection( ids );
-
-    } // selection event
+    }
+    _item = nullptr;
+    _buttons = 0;
   }
 
-  void InteractionManager::createConnectionRelationship( void )
+  void InteractionManager::createConnectionRelationship(
+    shift::Entity* originEntity_, shift::Entity* destinationEntity_ )
   {
-    const auto selectedEntities = SelectionManager::getActiveSelection( );
-
-    if ( selectedEntities.size() < 2 )
-      return;
-
     if ( _conRelationshipEditWidget != nullptr )
       delete _conRelationshipEditWidget;
 
     _conRelationshipEditWidget =
-      new ConnectionRelationshipEditWidget( selectedEntities );
+      new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_ );
     _conRelationshipEditWidget->show( );
   }
 

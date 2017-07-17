@@ -28,50 +28,103 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 
 
 namespace nslib
 {
 
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
-    std::vector< shift::Entity* > entities_, QWidget* parent )
+    shift::Entity* originEntity_,
+    shift::Entity* destinationEntity_,
+    QWidget* parent )
     : QWidget( parent )
-    , _entities( entities_ )
+    , _originEntity( originEntity_ )
+    , _destinationEntity( destinationEntity_ )
   {
+    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+      ->relationshipPropertiesTypes( );
+    fires::Object* propObject;
+
+    auto& relConnectsTo =
+      *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
+    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
+    if( connectsToIt != relConnectsTo.end( ))
+    {
+      auto connectsToMMIt =
+        connectsToIt->second.find( _destinationEntity->entityGid( ));
+      if( connectsToMMIt != connectsToIt->second.end( ))
+      {
+        propObject = connectsToMMIt->second;
+      }
+      else
+        propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" );
+    }
+    else
+      propObject = relationshipPropertiesTypes.getRelationshipProperties(
+        "connectsTo" );
+
     QGridLayout* layout = new QGridLayout;
 
-    _originEntityComboBox = new QComboBox( );
-    _destinationEntityComboBox = new QComboBox( );
+    auto labelRel = new QLabel( QString( "Relationship Parameters" ));
+    layout->addWidget( labelRel, 0, 0, 1, 0 );
 
-    for ( auto entity: _entities )
+    unsigned int numProp = 1;
+    for( const auto& propPair: propObject->properties( ))
     {
-      _originEntityComboBox->addItem(
-        QString::fromStdString( std::to_string( entity->entityGid( ))));
-      _destinationEntityComboBox->addItem(
-        QString::fromStdString( std::to_string( entity->entityGid( ))));
+      const auto prop = propPair.first;
+      auto caster = fires::PropertyManager::getPropertyCaster( prop );
+      if ( caster )
+      {
+        auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
+        auto label = new QLabel( QString::fromStdString( propName ));
+        layout->addWidget( label, numProp, 0 );
+
+        const auto& categories = caster->categories( );
+
+        TWidgetType widgetType;
+        QWidget* widget;
+        if ( !categories.empty( ) )
+        {
+          widgetType = TWidgetType::COMBO;
+          auto comboBoxWidget = new QComboBox;
+          widget = comboBoxWidget;
+          auto currentCategory = caster->toString( propPair.second );
+          unsigned int index = 0;
+          for ( const auto& category : categories )
+            comboBoxWidget->addItem( QString::fromStdString( category ));
+          for ( const auto& category : categories )
+          {
+            if ( category != currentCategory )
+              ++index;
+            else
+              break;
+          }
+          comboBoxWidget->setCurrentIndex( index );
+          comboBoxWidget->setEnabled( true );
+        }
+        else
+        {
+          widgetType = TWidgetType::LINE_EDIT;
+          auto lineEditwidget = new QLineEdit;
+          widget = lineEditwidget;
+          lineEditwidget->setText( QString::fromStdString(
+                                     caster->toString( propPair.second )));
+
+          lineEditwidget->setEnabled( true );
+        }
+        layout->addWidget( widget, numProp, 1 );
+        numProp++;
+
+        _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
+      }
     }
 
-    _originEntityComboBox->setCurrentIndex( 0 );
-    _destinationEntityComboBox->setCurrentIndex( 1 );
-
-    connect( _originEntityComboBox, SIGNAL( currentIndexChanged( int )),
-             this, SLOT( originEntityComboBoxChanged( int )));
-    connect( _destinationEntityComboBox, SIGNAL( currentIndexChanged( int )),
-             this, SLOT( destinationEntityComboBoxChanged( int  )));
-
-    auto label = new QLabel( QString( "Origin Entity Id" ));
-    layout->addWidget( label, 0, 0 );
-    layout->addWidget( _originEntityComboBox, 0, 1 );
-
-    label = new QLabel( QString( "Destination Entity Id" ));
-    layout->addWidget( label, 1, 0 );
-    layout->addWidget( _destinationEntityComboBox, 1, 1 );
-
-    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ));
-    layout->addWidget( cancelButton, 2, 0 );
-
-    QPushButton* validationButton = new QPushButton( tr( "Save" ));
-    layout->addWidget( validationButton, 2, 1 );
+    QPushButton* cancelButton = new QPushButton( QString( "Cancel" ));
+    layout->addWidget( cancelButton, numProp, 0 );
+    QPushButton* validationButton = new QPushButton( QString( "Create" ));
+    layout->addWidget( validationButton, numProp, 1 );
 
     connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( validationButton, SIGNAL( clicked( )),
@@ -83,10 +136,7 @@ namespace nslib
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    auto originEntity =
-      _entities[_originEntityComboBox->currentIndex( )]->entityGid( );
-    auto destinationEntity =
-      _entities[ _destinationEntityComboBox->currentIndex( )]->entityGid( );
+    shift::RelationshipProperties* propObject;
 
     auto& relConnectsTo =
       *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
@@ -95,42 +145,62 @@ namespace nslib
 
     auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
-    auto connectsToIt = relConnectsTo.find( originEntity );
-    if( connectsToIt != relConnectsTo.end( ))
+    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
+    if( !( connectsToIt != relConnectsTo.end( )))
     {
-      auto connectsToMMIt = connectsToIt->second.find( destinationEntity );
-      if( connectsToMMIt != connectsToIt->second.end( ))
-      {
-        auto& connectsToProperty =
-          connectsToMMIt->second->getProperty( "count" );
-
-        unsigned int value = connectsToProperty.value< unsigned int >( ) + 1;
-        connectsToProperty.set< unsigned int >( value );
-      }
-      else
-      {
-        auto relationshipProperties = relationshipPropertiesTypes.
-          getRelationshipProperties( "connectsTo" );
-        auto connectsWith = relationshipProperties->create( );
-        connectsWith->getProperty( "count" ).set< unsigned int >(
-          (unsigned int ) 1 );
-        relConnectsTo[ originEntity ].insert(
-          std::make_pair( destinationEntity, connectsWith ));
-        relConnectedBy[ destinationEntity ].insert(
-          std::make_pair( originEntity, nullptr ));
-      }
+      propObject = relationshipPropertiesTypes.getRelationshipProperties(
+        "connectsTo" )->create( );
+      relConnectsTo[ _originEntity->entityGid( )].insert(
+        std::make_pair( _destinationEntity->entityGid( ), propObject ));
+      relConnectedBy[ _destinationEntity->entityGid( )].insert(
+        std::make_pair( _originEntity->entityGid( ), nullptr ));
     }
     else
     {
-      auto relationshipProperties = relationshipPropertiesTypes.
-          getRelationshipProperties( "connectsTo" );
-        auto connectsWith = relationshipProperties->create( );
-        connectsWith->getProperty( "count" ).set< unsigned int >(
-          (unsigned int ) 1 );
-      relConnectsTo[ originEntity ].insert(
-        std::make_pair( destinationEntity, connectsWith ));
-      relConnectedBy[ destinationEntity ].insert(
-        std::make_pair( originEntity, nullptr ));
+      auto connectsToMMIt =
+        connectsToIt->second.find( _destinationEntity->entityGid( ));
+      if( !( connectsToMMIt != connectsToIt->second.end( )))
+      {
+        propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" )->create( );
+        relConnectsTo[ _originEntity->entityGid( )].insert(
+          std::make_pair( _destinationEntity->entityGid( ), propObject ));
+        relConnectedBy[ _destinationEntity->entityGid( )].insert(
+          std::make_pair( _originEntity->entityGid( ), nullptr ));
+      }
+      else
+      {
+        propObject = connectsToMMIt->second;
+      }
+    }
+
+
+    for ( const auto& propParam: _propParamCont )
+    {
+      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
+      const auto& label = labelWidget->text( ).toStdString( );
+
+      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
+      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
+      QString paramString;
+      if ( editType ==  TWidgetType::COMBO )
+      {
+        auto comboWidget = dynamic_cast< QComboBox* >( widget );
+        paramString = comboWidget->currentText( );
+      }
+      else if ( editType == TWidgetType::LINE_EDIT )
+      {
+        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
+        paramString = lineEditwidget->text( );
+      }
+      else
+        assert( false );
+
+      auto caster = fires::PropertyManager::getPropertyCaster( label );
+      auto& prop = propObject->getProperty( label );
+      assert ( caster );
+
+      caster->fromString( prop, paramString.toStdString( ));
     }
 
     for ( auto pane : nslib::PaneManager::panes( ))
@@ -144,30 +214,6 @@ namespace nslib
   void ConnectionRelationshipEditWidget::cancelDialog(  )
   {
     this->hide( );
-  }
-
-  void ConnectionRelationshipEditWidget::originEntityComboBoxChanged( int )
-  {
-    int originIndex = _originEntityComboBox->currentIndex( );
-    int destinationIndex = _destinationEntityComboBox->currentIndex( );
-    if( originIndex == destinationIndex )
-    {
-      destinationIndex ++;
-      destinationIndex %= _entities.size( );
-      _destinationEntityComboBox->setCurrentIndex( destinationIndex );
-    }
-  }
-
-  void ConnectionRelationshipEditWidget::destinationEntityComboBoxChanged( int )
-  {
-    int originIndex = _originEntityComboBox->currentIndex( );
-    int destinationIndex = _destinationEntityComboBox->currentIndex( );
-    if( originIndex == destinationIndex )
-    {
-      originIndex ++;
-      originIndex %= _entities.size( );
-      _originEntityComboBox->setCurrentIndex( originIndex );
-    }
   }
 
 }

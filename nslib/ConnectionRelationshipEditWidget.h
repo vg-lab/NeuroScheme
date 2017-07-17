@@ -25,6 +25,8 @@
 
 #include <QWidget>
 #include <QComboBox>
+#include <QCheckBox>
+#include <QLabel>
 
 #include <shift/shift.h>
 
@@ -36,21 +38,20 @@ namespace nslib
     Q_OBJECT
 
   public:
-    ConnectionRelationshipEditWidget( std::vector< shift::Entity* > entities_,
+    ConnectionRelationshipEditWidget( shift::Entity*  originEntity_,
+                                      shift::Entity* destinationEntity_,
                                       QWidget* parent = 0);
 
   public slots:
     void validateDialog( );
     void cancelDialog( );
 
-    void originEntityComboBoxChanged( int index );
-    void destinationEntityComboBoxChanged( int index );
-
   private:
-    std::vector< shift::Entity* > _entities;
-    QComboBox* _originEntityComboBox;
-    QComboBox* _destinationEntityComboBox;
-
+    shift::Entity* _originEntity;
+    shift::Entity* _destinationEntity;
+    typedef enum { COMBO, LINE_EDIT } TWidgetType;
+    typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
   };
 }
 #endif

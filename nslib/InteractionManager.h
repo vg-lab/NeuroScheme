@@ -52,10 +52,14 @@ namespace nslib
     static void contextMenuEvent( QAbstractGraphicsShapeItem* item,
                                   QGraphicsSceneContextMenuEvent* event );
 
-    static void mousePressEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneMouseEvent* event );
+    static void mousePressEvent( QGraphicsItem* item,
+                                 QMouseEvent* event );
 
-    static void createConnectionRelationship( void );
+    static void mouseReleaseEvent( QGraphicsItem* item,
+                                   QMouseEvent* event );
+
+    static void createConnectionRelationship(
+      shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
 
     // static const QPen& getSelectedPen( ) { return _selectedPen; }
     // static const QPen& getPartiallySelectedPen( )
@@ -115,6 +119,8 @@ namespace nslib
     static QMenu* _contextMenu;
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
     static EntityEditWidget* _entityEditWidget;
+    static QGraphicsItem* _item;
+    static Qt::MouseButtons _buttons;
 
   };
 }

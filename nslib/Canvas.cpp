@@ -43,7 +43,25 @@ namespace nslib
          dynamic_cast< Canvas* >( this->parentWidget( )))
       PaneManager::activePane(
         dynamic_cast< Canvas* >( this->parentWidget( )));
+
+    auto item = itemAt( event_->pos( ));
+    if ( item )
+      InteractionManager::mousePressEvent( item, event_ );
+    else
+      InteractionManager::mousePressEvent( nullptr, event_ );
+
     QGraphicsView::mousePressEvent( event_ );
+  }
+
+  void GraphicsView::mouseReleaseEvent( QMouseEvent* event_ )
+  {
+    auto item = itemAt( event_->pos( ));
+    if ( item )
+      InteractionManager::mouseReleaseEvent( item, event_ );
+    else
+      InteractionManager::mouseReleaseEvent( nullptr, event_ );
+
+    QGraphicsView::mouseReleaseEvent( event_ );
   }
 
   void GraphicsView::wheelEvent( QWheelEvent* event_ )
