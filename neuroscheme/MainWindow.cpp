@@ -248,7 +248,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   {
     _entityEditDock = new QDockWidget;
     nslib::EntityEditWidget::parentDock( _entityEditDock );
-    _entityEditDock->setWindowTitle( QString( "Edit Entity" ));
+    _entityEditDock->setWindowTitle( QString( "Entity Inspector" ));
     _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
                                     QSizePolicy::MinimumExpanding );
 

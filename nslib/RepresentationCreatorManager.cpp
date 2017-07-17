@@ -63,6 +63,12 @@ namespace nslib
       return nullptr;
   }
 
+  RepresentationCreatorManager::TCreatorsMap&
+  RepresentationCreatorManager::creators( void )
+  {
+    return _repCreators;
+  }
+
   void RepresentationCreatorManager::create(
     const shift::Entities& entities,
     shift::Representations& representations,
