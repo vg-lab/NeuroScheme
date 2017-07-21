@@ -707,8 +707,10 @@ namespace nslib
         for ( auto i = 0; i < 6; ++i )
         {
           auto layerEntity = new Layer;
+          layerEntity->registerProperty( "Parent gid", uint( colEntity->entityGid( )));
           layerEntity->registerProperty( "Parent Id", uint( col->id( )));
-          layerEntity->registerProperty( "Parent Type", uint( 0 ));
+          layerEntity->registerProperty( "Parent Type",
+                                         Layer::TLayerParentType::COLUMN);
           layerEntity->registerProperty( "Layer", uint( i+1 ));
           colLayerEntities[ i ] = layerEntity;
           relSuperEntityOf[ colEntity->entityGid( ) ].insert(
@@ -728,8 +730,9 @@ namespace nslib
         {
           auto neuronTypeAggregationEntity =
             new NeuronTypeAggregation(
-              uint( col->id( )), uint( 0 ), uint( i ),
-              Neuron::PYRAMIDAL );
+              colEntity->entityGid( ), uint( col->id( )),
+              Layer::TLayerParentType::COLUMN, uint( i ),
+              Neuron::TMorphologicalType::PYRAMIDAL );
           colNeuronTypeAggregationEntities[ i ] = neuronTypeAggregationEntity;
           shift::Relationship::Establish(
             relSuperEntityOf, relSubEntityOf,
@@ -741,7 +744,8 @@ namespace nslib
 
           neuronTypeAggregationEntity =
             new NeuronTypeAggregation(
-              uint( col->id( )), uint( 0 ), uint( i ),
+              colEntity->entityGid( ), uint( col->id( )),
+              Layer::TLayerParentType::COLUMN, uint( i ),
               Neuron::INTERNEURON );
           colNeuronTypeAggregationEntities[ i + 7 ] = neuronTypeAggregationEntity;
           shift::Relationship::Establish(
@@ -857,8 +861,11 @@ namespace nslib
           for ( auto i = 0; i < 6; ++i )
           {
             auto layerEntity = new Layer;
+            layerEntity->registerProperty( "Parent gid",
+                                           uint( mcEntity->entityGid( )));
             layerEntity->registerProperty( "Parent Id", uint( mc->id( )));
-            layerEntity->registerProperty( "Parent Type", uint( 1 ));
+            layerEntity->registerProperty( "Parent Type",
+                                           Layer::TLayerParentType::MINICOLUMN );
             layerEntity->registerProperty( "Layer", uint( i+1 ));
             mcLayerEntities[ i ] = layerEntity;
             relSuperEntityOf[ mcEntity->entityGid( ) ].insert(
@@ -877,8 +884,9 @@ namespace nslib
           {
             auto neuronTypeAggregationEntity =
               new NeuronTypeAggregation(
-                uint( mc->id( )), uint( 1 ), uint( i ),
-                Neuron::PYRAMIDAL );
+                mcEntity->entityGid( ), uint( mc->id( )),
+                Layer::TLayerParentType::MINICOLUMN, uint( i ),
+                Neuron::TMorphologicalType::PYRAMIDAL );
             mcNeuronTypeAggregationEntities[ i ] = neuronTypeAggregationEntity;
             shift::Relationship::Establish(
               relSuperEntityOf, relSubEntityOf,
@@ -890,7 +898,8 @@ namespace nslib
 
             neuronTypeAggregationEntity =
               new NeuronTypeAggregation(
-                uint( mc->id( )), uint( 1 ), uint( i ),
+                mcEntity->entityGid( ), uint( mc->id( )),
+                Layer::TLayerParentType::MINICOLUMN, uint( i ),
                 Neuron::INTERNEURON );
             mcNeuronTypeAggregationEntities[ i + 7 ] =
               neuronTypeAggregationEntity;

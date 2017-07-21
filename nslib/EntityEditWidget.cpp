@@ -168,9 +168,6 @@ namespace nslib
     auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
     layout->addWidget( autoCloseLabel, element, 0 );
 
-    std::cout << _autoCloseCheck.get( ) << std::endl;
-    //_autoCloseCheck = std::make_unique< QCheckBox >( new QCheckBox( ));
-    std::cout << _autoCloseCheck.get( ) << std::endl;
     _autoCloseCheck->setChecked( _autoCloseChecked );
     connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
              this, SLOT( toggleAutoClose( )));
@@ -212,10 +209,6 @@ namespace nslib
       {
         _entity = _entity->create( );
       }
-
-      // for ( const auto& p : _entity->properties( ))
-      //   std::cout << fires::PropertyGIDsManager::getPropertyLabel( p.first ) << " ";
-      // std::cout << std::endl;
 
       QList< QString > errorMessages;
 
@@ -335,6 +328,26 @@ namespace nslib
       {
         nslib::DataManager::entities( ).add( _entity );
         nslib::PaneManager::activePane( )->entities( ).add( _entity );
+
+        std::vector< shift::Entity* > subentities;
+        _entity->createSubEntities( subentities );
+
+        auto& _entities = nslib::DataManager::entities( );
+        auto& relSuperEntityOf =
+          *( _entities.relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+        auto& relSubEntityOf =
+          *( _entities.relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+
+        //TODO: improve this set of adds which will do push_backs
+        for ( const auto& subentity : subentities )
+        {
+          shift::Relationship::Establish(
+            relSuperEntityOf, relSubEntityOf,
+            _entity, subentity );
+          nslib::DataManager::entities( ).add( subentity );
+          nslib::PaneManager::activePane( )->entities( ).add( subentity );
+        }
+
         // nslib::PaneManager::activePane( )->refreshProperties(
         //   nslib::PaneManager::activePane( )->entities( ));
         // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
