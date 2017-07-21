@@ -325,17 +325,27 @@ namespace nslib
         }
       }
 
+      for ( const auto& creatorPair :
+              nslib::RepresentationCreatorManager::creators( ))
+      {
+        creatorPair.second->entityUpdatedOrCreated( _entity );
+      }
+
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
         nslib::DataManager::entities( ).add( _entity );
         nslib::PaneManager::activePane( )->entities( ).add( _entity );
-        nslib::PaneManager::activePane( )->refreshProperties(
-          nslib::PaneManager::activePane( )->entities( ));
-        nslib::PaneManager::activePane( )->resizeEvent( nullptr );
+        // nslib::PaneManager::activePane( )->refreshProperties(
+        //   nslib::PaneManager::activePane( )->entities( ));
+        // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
+        nslib::PaneManager::activePane( )->displayEntities(
+          nslib::PaneManager::activePane( )->entities( ),
+          false, true );
       }
       if ( _action == EDIT_ENTITY )
       {
-        for ( auto repPair : nslib::RepresentationCreatorManager::repsToEntities( ))
+        for ( const auto& repPair :
+                nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;
@@ -344,7 +354,10 @@ namespace nslib
         for ( auto pane : nslib::PaneManager::panes( ))
         {
           pane->reps( ).clear( );
-          pane->resizeEvent( nullptr );
+          // pane->resizeEvent( nullptr );
+          nslib::PaneManager::activePane( )->displayEntities(
+            nslib::PaneManager::activePane( )->entities( ),
+            false, true );
         }
       }
     }

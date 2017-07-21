@@ -34,6 +34,9 @@ namespace nslib
   class NSLIB_API RepresentationCreatorManager
   {
   public:
+    typedef std::unordered_map< unsigned int, shift::RepresentationCreator* >
+      TCreatorsMap;
+
     static void addCreator( shift::RepresentationCreator* repCreator,
                             unsigned int repCreatorId = 0 );
 
@@ -73,9 +76,13 @@ namespace nslib
 
     static shift::RepresentationCreator* getCreator( unsigned int idx = 0 );
 
+    static TCreatorsMap& creators( void );
+
     // static const shift::Representation& objectToRep(
+
   protected:
-    static std::unordered_map< unsigned int, shift::RepresentationCreator* > _repCreators;
+
+    static TCreatorsMap _repCreators;
     static std::unordered_map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
     static std::unordered_map< unsigned int, shift::TRepsToEntities > _repsToEntities;
 

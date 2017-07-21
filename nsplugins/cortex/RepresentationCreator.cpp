@@ -577,5 +577,34 @@ namespace nslib
     }
 
 
+    void RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    {
+      if ( dynamic_cast< Neuron* >( entity ))
+      {
+        auto maxNeuronSomaVolume =
+          entity->getProperty( "Soma Volume" ).value< float >( );
+        auto maxNeuronSomaArea =
+          entity->getProperty( "Soma Surface" ).value< float >( );
+        auto maxNeuronDendsVolume =
+          entity->getProperty( "Dendritic Volume" ).value< float >( );
+        auto maxNeuronDendsArea =
+          entity->getProperty( "Dendritic Surface" ).value< float >( );
+
+        _maxNeuronSomaVolume = std::max( maxNeuronSomaVolume, _maxNeuronSomaVolume );
+        _maxNeuronSomaArea = std::max( maxNeuronSomaArea, _maxNeuronSomaArea );
+        _maxNeuronDendsVolume = std::max( maxNeuronDendsVolume, _maxNeuronDendsVolume );
+        _maxNeuronDendsArea = std::max( maxNeuronDendsArea, _maxNeuronDendsArea );
+
+        _maxNeurons++;
+
+        this->clear( );
+        // TODO
+        // _maxNeuronsPerColumn = maxNeuronsPerColumn_;
+        // _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+        // _maxConnectionsPerEntity = maxConnectionsPerEntity_;
+      }
+    }
+
+
   } // namespace cortex
 } // namespace nslib

@@ -346,6 +346,7 @@ namespace nslib
 
     _properties.clear( );
 
+    std::cout << "Refresh properties " << entities_.size( ) << std::endl;
     for ( const auto& entity : entities_.vector( ))
     {
       if ( DataManager::entities( ).
