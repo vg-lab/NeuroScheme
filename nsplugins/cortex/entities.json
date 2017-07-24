@@ -81,6 +81,54 @@
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
             "flags" : [],
+            "subentities" : [
+                {
+                    "name": "Layer",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "1", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::COLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" }
+                    ]
+                },
+                {
+                    "name": "NeuronTypeAggregation",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "0", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::COLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" },
+                        { "type": "fixed", "value": "Neuron::TMorphologicalType::INTERNEURON",
+                          "property": "Morpho Type" }
+                    ]
+                },
+                {
+                    "name": "NeuronTypeAggregation",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "0", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::COLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" },
+                        { "type": "fixed", "value": "Neuron::TMorphologicalType::PYRAMIDAL",
+                          "property": "Morpho Type" }
+                    ]
+                }
+            ],
             "properties": [
                 {
                     "name": "Id",
@@ -178,6 +226,54 @@
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ "<Eigen/Dense>" ],
             "flags" : [],
+            "subentities" : [
+                {
+                    "name": "Layer",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "1", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::MINICOLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" }
+                    ]
+                },
+                {
+                    "name": "NeuronTypeAggregation",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "0", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::MINICOLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" },
+                        { "type": "fixed", "value": "Neuron::TMorphologicalType::INTERNEURON",
+                          "property": "Morpho Type" }
+                    ]
+                },
+                {
+                    "name": "NeuronTypeAggregation",
+                    "repeat": { "type": "range", "name": "layerIdx",
+                                "init" : "0", "end": "6", "inc": "1" },
+                    "properties": [
+                        { "type": "fixed", "value": "this->entityGid( )",
+                          "property": "Parent gid" },
+                        { "type": "linked", "origin": "Id", "property": "Parent Id" },
+                        { "type": "fixed",
+                          "value": "Layer::TLayerParentType::MINICOLUMN", "property": "Parent Type" },
+                        { "type": "fixed",
+                          "value": " ( uint ) layerIdx", "property": "Layer" },
+                        { "type": "fixed", "value": "Neuron::TMorphologicalType::PYRAMIDAL",
+                          "property": "Morpho Type" }
+                    ]
+                }
+            ],
             "properties": [
                 {
                     "name": "Id",
@@ -276,12 +372,16 @@
             "flags" : [ "subentity" ],
             "properties": [
                 {
+                    "name": "Parent gid",
+                    "type": "uint"
+                },
+                {
                     "name": "Parent Id",
                     "type": "uint"
                 },
                 {
                     "name": "Parent Type",
-                    "type": "uint"
+                    "type": "TLayerParentType"
                 },
                 {
                     "name": "Layer",
@@ -290,21 +390,33 @@
             ],
             "types":
             [
+                {
+                    "class": "enum",
+                    "name": "TLayerParentType",
+                    "values": [
+                        "COLUMN",
+                        "MINICOLUMN"
+                    ]
+                }
             ]
         },
         {
             "name": "NeuronTypeAggregation",
             "namespace": "nslib::cortex::shiftgen",
-            "includes" : [ "<shift_Neuron.h>" ],
+            "includes" : [ "<shift_Neuron.h>", "<shift_Layer.h>" ],
             "flags" : [ "subentity" ],
             "properties": [
+                {
+                    "name": "Parent gid",
+                    "type": "uint"
+                },
                 {
                     "name": "Parent Id",
                     "type": "uint"
                 },
                 {
                     "name": "Parent Type",
-                    "type": "uint"
+                    "type": "Layer::TLayerParentType"
                 },
                 {
                     "name": "Layer",

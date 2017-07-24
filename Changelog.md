@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!31] Added subentities creation
 * [!30] In cortex added update of maximums when new neuron is added or edited.
 * [!29] Added edit or new entiy update virtual method
 * [!27] Entity edit widget into a new dock. Create or copy N entities at the same time. Added label to the EntityEditWidget.

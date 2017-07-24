@@ -87,20 +87,29 @@ namespace nslib
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
       typedef std::map<
-      std::pair< unsigned int, std::pair< unsigned int, unsigned int>>,
+        std::pair< shift::Entity::EntityGid,
+                   std::pair< unsigned int,
+                              std::pair< unsigned int, unsigned int>>>,
       LayerRep* > LayersMap;
+
 #define QuadKey( x, y, z, w )                                         \
       std::make_pair( x, std::make_pair( y, std::make_pair( z, w )))
+#define PentaKey( a, b, c, d, e )                                       \
+      std::make_pair( a, std::make_pair( b, std::make_pair(             \
+                                         c, std::make_pair( d, e ))))
+
       typedef std::map<
-        std::pair< unsigned int,
+        std::pair< shift::Entity::EntityGid,
                    std::pair< unsigned int,
                               std::pair< unsigned int,
-                                         unsigned int>>>,
+                                         std::pair< unsigned int,
+                                                    unsigned int >>>>,
         NeuronTypeAggregationRep* > NeuronTypeAggsMaps;
 
       void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
+        shift::Entity::EntityGid entityGid,
         unsigned int id,
         unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
