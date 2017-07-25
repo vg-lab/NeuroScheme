@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!32] Bump CMake/common and use it as a submodule
 * [!31] Added subentities creation
 * [!30] In cortex added update of maximums when new neuron is added or edited.
 * [!29] Added edit or new entiy update virtual method

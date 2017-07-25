@@ -7,7 +7,7 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
-project( NeuroScheme VERSION 0.1.9 )
+project( NeuroScheme VERSION 0.1.10 )
 set( NeuroScheme_VERSION_ABI 9 )
 
 # Disable in source building
@@ -18,6 +18,10 @@ endif()
 list( APPEND CMAKE_MODULE_PATH
   ${PROJECT_SOURCE_DIR}/CMake
   ${CMAKE_SOURCE_DIR}/CMake/common )
+
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
+  message(FATAL_ERROR "CMake/common missing, run: git submodule update --init")
+endif()
 
 # Default build type is Debug
 if( NOT CMAKE_BUILD_TYPE )
@@ -39,8 +43,6 @@ else()
   set( NEUROSCHEME_OPTS_FIND_ARGS "" )
 endif()
 
-
-include( GitExternal )
 
 # description
 set( NEUROSCHEME_DESCRIPTION "NeuroScheme" )
