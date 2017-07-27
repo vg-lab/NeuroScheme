@@ -7,7 +7,6 @@ doc/latex
 .*.swp
 #*
 *#*
-CMake/common
 FiReS
 ShiFT
 *compile_commands.json*
