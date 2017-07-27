@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!33] Fixed bug that crashes loading morphologies with out connectivity
 * [!32] Bump CMake/common and use it as a submodule
 * [!31] Added subentities creation
 * [!30] In cortex added update of maximums when new neuron is added or edited.
