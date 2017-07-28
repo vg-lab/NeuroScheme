@@ -197,6 +197,7 @@ namespace nslib
        // std::cout << ", RepresentationCreator::_createColumnOrMiniColumn" << std::endl;
          _createColumnOrMiniColumn(
             column, columnRep,
+            entity->entityGid( ),
             entity->getProperty( "Id" ).value< uint >( ),
             0,
             somaAreaToAngle,
@@ -229,6 +230,7 @@ namespace nslib
           auto miniColumnRep = new MiniColumnRep( );
           _createColumnOrMiniColumn(
             miniColumn, miniColumnRep,
+            entity->entityGid( ),
             entity->getProperty( "Id" ).value< unsigned int >( ),
             1,
             somaAreaToAngle,
@@ -253,11 +255,10 @@ namespace nslib
         else
         if ( dynamic_cast< Layer* >( entity ))
         {
-          // std::cout << ", RepresentationCreator::Layer "
-          //           << _layersMap.size( ) << std::endl;
-          auto layerKey = TripleKey(
+          auto layerKey = QuadKey(
+              entity->getProperty( "Parent gid" ).value< unsigned int >( ),
               entity->getProperty( "Parent Id" ).value< unsigned int >( ),
-              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< Layer::TLayerParentType >( ),
               entity->getProperty( "Layer" ).value< unsigned int >( ));
           if ( _layersMap.count( layerKey ) == 0 )
           {
@@ -278,9 +279,10 @@ namespace nslib
         {
           // std::cout << ", RepresentationCreator "
           //           << _neuronTypeAggsMap.size( ) << std::endl;
-          auto neuronTypeAggregationKey = QuadKey(
+          auto neuronTypeAggregationKey = PentaKey(
+              entity->getProperty( "Parent gid" ).value< unsigned int >( ),
               entity->getProperty( "Parent Id" ).value< unsigned int >( ),
-              entity->getProperty( "Parent Type" ).value< unsigned int >( ),
+              entity->getProperty( "Parent Type" ).value< Layer::TLayerParentType >( ),
               entity->getProperty( "Layer" ).value< unsigned int >( ),
               uint( entity->getProperty( "Morpho Type" ).value<
                     Neuron::TMorphologicalType >( )));
@@ -424,6 +426,7 @@ namespace nslib
     void RepresentationCreator::_createColumnOrMiniColumn(
       shift::Entity *entity,
       shift::Representation* rep,
+      unsigned int entityGid,
       unsigned int id,
       unsigned int columnOrMiniColumn,
       MapperFloatToFloat& somaAreaToAngle,
@@ -511,7 +514,8 @@ namespace nslib
 
       for ( unsigned int layer = 1; layer <= 6; ++layer )
       {
-        auto layerKey = TripleKey(
+        auto layerKey = QuadKey(
+          entityGid,
           id,
           columnOrMiniColumn,
           layer );
@@ -556,7 +560,7 @@ namespace nslib
       {
         for ( unsigned int layer = 0; layer <= 6; ++layer )
         {
-          auto neuronTypeAggKey = QuadKey(
+          auto neuronTypeAggKey = PentaKey( entityGid,
             id, columnOrMiniColumn, layer, uint( neuronType ));
 
           if ( _neuronTypeAggsMap.count( neuronTypeAggKey ) == 0 )
@@ -574,6 +578,35 @@ namespace nslib
         }
       }
       rep->registerProperty( "neuronTypeAggregations", neuronTypeAggsReps );
+    }
+
+
+    void RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    {
+      if ( dynamic_cast< Neuron* >( entity ))
+      {
+        auto maxNeuronSomaVolume =
+          entity->getProperty( "Soma Volume" ).value< float >( );
+        auto maxNeuronSomaArea =
+          entity->getProperty( "Soma Surface" ).value< float >( );
+        auto maxNeuronDendsVolume =
+          entity->getProperty( "Dendritic Volume" ).value< float >( );
+        auto maxNeuronDendsArea =
+          entity->getProperty( "Dendritic Surface" ).value< float >( );
+
+        _maxNeuronSomaVolume = std::max( maxNeuronSomaVolume, _maxNeuronSomaVolume );
+        _maxNeuronSomaArea = std::max( maxNeuronSomaArea, _maxNeuronSomaArea );
+        _maxNeuronDendsVolume = std::max( maxNeuronDendsVolume, _maxNeuronDendsVolume );
+        _maxNeuronDendsArea = std::max( maxNeuronDendsArea, _maxNeuronDendsArea );
+
+        _maxNeurons++;
+
+        this->clear( );
+        // TODO
+        // _maxNeuronsPerColumn = maxNeuronsPerColumn_;
+        // _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+        // _maxConnectionsPerEntity = maxConnectionsPerEntity_;
+      }
     }
 
 

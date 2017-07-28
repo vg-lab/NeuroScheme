@@ -83,6 +83,7 @@ protected:
   QString _tableColumnToString( TTableColumns column );
   StoredSelections _storedSelections;
   QDockWidget* _layoutsDock;
+  QDockWidget* _entityEditDock;
 
 private:
 
