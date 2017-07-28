@@ -22,11 +22,47 @@
 
 #include "Domain.h"
 #include "Neuron.h"
+#include <nslib/RepresentationCreatorManager.h>
+#include <nslib/DataManager.h>
+#include "RepresentationCreator.h"
+#include <shift_cortex_entities.h>
 
 namespace nslib
 {
   namespace cortex
   {
+    Domain::Domain( void )
+    {
+      this->_dataLoader = new DataLoader;
+      this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
+      auto repCreator = new RepresentationCreator( );
+      nslib::RepresentationCreatorManager::addCreator( repCreator );
+      auto& _entities = nslib::DataManager::entities( );
+      //fires::PropertyManager::clear( );
+      _entities.clear( );
+
+      _entities.relationships( )[ "isParentOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isChildOf" ] =
+        new shift::RelationshipOneToOne;
+
+      _entities.relationships( )[ "isAGroupOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isPartOf" ] =
+        new shift::RelationshipOneToN;
+
+      _entities.relationships( )[ "isSuperEntityOf" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "isSubEntityOf" ] =
+        new shift::RelationshipOneToOne;
+
+      _entities.relationships( )[ "connectsTo" ] =
+        new shift::RelationshipOneToN;
+      _entities.relationships( )[ "connectedBy" ] =
+        new shift::RelationshipOneToN;
+
+    }
+
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
     {
       return dynamic_cast< Neuron* >( entity );
@@ -47,15 +83,18 @@ namespace nslib
 
     void Domain::usageMessage( void )
     {
-      std::cerr << "\t\t[ -bc blue_config_path | -swc swc_file_list "
+      std::cerr << "\t\t[ -bc blue_config_path " // | " -swc swc_file_list "
                 << " | -xml scene_xml ] "
                 << std::endl
-                << "\t\t[ -target target_label ] "
+                << "\t\t[ -target target_label (*1) ] "
                 << std::endl
                 << "\t\t[ --no-morphologies | -nm ] "
                 << std::endl
                 << "\t\t[ -cns | --csv-neuron-stats ] csv_file"
-                << std::endl;
+                << std::endl
+                << "\t\t[ -lc | --load-connectivity ] "
+                << std::endl << std::endl
+                << "\t\t(*1) only for BlueConfig files" << std::endl;
 
     }
 

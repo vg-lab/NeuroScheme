@@ -42,13 +42,12 @@ namespace nslib
     static void loadBlueConfig( const std::string& blueConfig,
                                 const std::string& targetLabel,
                                 const bool loadMorphologies,
-                                const std::string& csvNeuronStatsFileName );
+                                const std::string& csvNeuronStatsFileName,
+                                const bool loadConnectivity );
+
+    static void loadNsolXmlScene( const std::string& xmlSceneFile );
 
 #ifdef NEUROSCHEME_USE_NSOL
-//     static void createEntitiesFromNsolColumns(
-//       const nsol::Columns& columns,
-//       bool withMorphologies,
-//       const std::string& csvNeuronStatsFileName );
     static nsol::DataSet& nsolDataSet( void ) { return _nsolDataSet; }
 #endif
 

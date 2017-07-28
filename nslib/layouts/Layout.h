@@ -38,8 +38,27 @@
 #include "../SortWidget.h"
 #include "../Properties.h"
 
+#define ANIM_DURATION 500
+
 namespace nslib
 {
+
+  class GraphicsScene;
+  class OpConfig : public shift::OpConfig
+  {
+  public:
+    OpConfig( GraphicsScene* scene_ = nullptr, bool animating_=false )
+      : _scene( scene_ ), _animating(animating_)
+    {}
+    virtual ~OpConfig( void ) {};
+    GraphicsScene* scene( void ) { return _scene; };
+    bool isAnimating(){ return _animating; };
+
+  protected:
+    GraphicsScene*  _scene;
+    bool            _animating;
+  };
+
   class Canvas;
 
   class NSLIB_API LayoutOptionsWidget : public QFrame

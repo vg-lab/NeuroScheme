@@ -34,6 +34,9 @@ namespace nslib
   class NSLIB_API RepresentationCreatorManager
   {
   public:
+    typedef std::unordered_map< unsigned int, shift::RepresentationCreator* >
+      TCreatorsMap;
+
     static void addCreator( shift::RepresentationCreator* repCreator,
                             unsigned int repCreatorId = 0 );
 
@@ -45,19 +48,46 @@ namespace nslib
                         bool linkRepsToObjs = false,
                         unsigned int repCreatorId = 0 );
 
+    static void generateRelations( const shift::Entities& entities,
+                                   shift::Representations& representations,
+                                   const std::string& relationName,
+                                   unsigned int repCreatorId = 0 );
+
     static const shift::TEntitiesToReps& entitiesToReps(
-      unsigned int repCreatorId = 0 );
+        unsigned int repCreatorId = 0 );
+
     static const shift::TRepsToEntities& repsToEntities(
-      unsigned int repCreatorId = 0 );
+        unsigned int repCreatorId = 0 );
+
+    static void clearEntitiesToReps( unsigned int repCreatorId = 0 )
+    {
+      _repCreators[ repCreatorId ]->clear( );
+      _entitiesToReps[ repCreatorId ].clear( );
+      _repsToEntities[ repCreatorId ].clear( );
+    }
+
+    static const shift::TRelatedEntitiesReps& relatedEntities(
+        unsigned int repCreatorID = 0 );
+
+    static const shift::TGidToEntitiesReps& gidsToEntitiesReps(
+        unsigned int repCreatorID = 0 );
 
     static void deleteItemsOfCanvas( Canvas* canvas );
 
-    // static const shift::Representation& objectToRep(
-  protected:
-    static std::map< unsigned int, shift::RepresentationCreator* > _repCreators;
-    static std::map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
-    static std::map< unsigned int, shift::TRepsToEntities > _repsToEntities;
+    static shift::RepresentationCreator* getCreator( unsigned int idx = 0 );
 
+    static TCreatorsMap& creators( void );
+
+    // static const shift::Representation& objectToRep(
+
+  protected:
+
+    static TCreatorsMap _repCreators;
+    static std::unordered_map< unsigned int, shift::TEntitiesToReps > _entitiesToReps;
+    static std::unordered_map< unsigned int, shift::TRepsToEntities > _repsToEntities;
+
+    static std::unordered_map< unsigned int, shift::TRelatedEntitiesReps > _relatedEntitiesReps;
+    static std::unordered_map< unsigned int, shift::TGidToEntitiesReps > _gidsToEntitiesReps;
   };
 
 } // namespace nslib

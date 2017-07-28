@@ -35,8 +35,8 @@ command can be used:
 
 ## Building
 
-NeuroScheme has been succesfully built and used on Ubuntu 16.04, Mac OSX
-Yosemite and Windows 7/8/10 Visual Studio 2013 Win64. The following steps should be
+NeuroScheme has been succesfully built and used on Ubuntu 16.04/17.04, Mac OSX
+Yosemite and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
 enough to build it just with the required dependencies.
 
 ```bash

@@ -19,42 +19,20 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__CORTEX_DATA_LOADER__
-#define __NSLIB__CORTEX_DATA_LOADER__
+#ifndef __NSLIB__CONNECTIVITY_REP__
+#define __NSLIB__CONNECTIVITY_REP__
 
-#include <nslib/Config.h>
-#include <nslib/DataLoader.h>
-#include <nslib/Log.h>
-#include <unordered_map>
-#include <string>
-
-#ifdef NEUROSCHEME_USE_NSOL
-#include <nsol/nsol.h>
-#endif
+#include <scoop/scoop.h>
 
 namespace nslib
 {
-  namespace cortex
+  class ConnectivityRep
   {
-    class DataLoader
-      : public ::nslib::DataLoader
-    {
-    public:
-
-      virtual ~DataLoader( void ) {}
-
-      virtual bool loadData(
-        const ::nslib::NeuroSchemeInputArguments& arguments ) final;
-
-#ifdef NEUROSCHEME_USE_NSOL
-      void createEntitiesFromNsolColumns(
-        const nsol::Columns& columns,
-        const nsol::Circuit& circuit,
-        bool withMorphologies = true,
-        const std::string& csvNeuronStatsFileName = "" );
-#endif
-    };
-  }
+  public:
+    virtual ~ConnectivityRep( void ) {}
+    virtual void highlight( const scoop::Color& color = scoop::Color( 255, 0, 0 ))
+    { ( void ) color; }
+    virtual void unHighlight( void ) {}
+  };
 }
-
 #endif

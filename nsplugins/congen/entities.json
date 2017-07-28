@@ -1,9 +1,12 @@
 {
+    "name": "congen",
+    "namespace": "nslib::congen::shiftgen",
     "reps": [
         {
             "name": "NeuronPop",
             "namespace": "nslib::congen::shiftgen",
             "includes" : [],
+            "flags" : [],
             "properties": [
                 {
                     "name": "Perc Inhibitory",
@@ -13,9 +16,22 @@
                     "name": "hola",
                     "type": "int"
                 }
-
             ],
             "types": []
+        },
+        {
+            "name": "ConnectsWith",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "count",
+                    "type": "uint"
+                }
+            ],
+            "types":
+            [ ]
         }
+
     ]
 }

@@ -77,12 +77,14 @@ public slots:
   void killActivePane( void );
   void duplicateActivePane( void );
   void home( void );
+  void toggleShowConnectivity( void );
 
 protected:
 
   QString _tableColumnToString( TTableColumns column );
   StoredSelections _storedSelections;
   QDockWidget* _layoutsDock;
+  QDockWidget* _entityEditDock;
 
 private:
 

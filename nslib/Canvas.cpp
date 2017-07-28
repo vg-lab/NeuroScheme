@@ -21,9 +21,12 @@
  */
 #include "Canvas.h"
 #include "DataManager.h"
+#include "DomainManager.h"
+#include "InteractionManager.h"
 #include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "reps/Item.h"
 #include <QHBoxLayout>
 
 namespace nslib
@@ -60,11 +63,23 @@ namespace nslib
     else if ( delta < 0 )
     {
       // Zooming out
-      this->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+      this->scale( 1.0f / scaleFactor, 1.0f / scaleFactor );
     }
 
     // Don't call superclass handler here
     // as wheel is normally used for moving scrollbars
+  }
+
+  void GraphicsScene::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+  {
+    QPointF mousePoint = event->scenePos( );
+    // If not clicked in an item
+    if ( !this->itemAt( mousePoint, QTransform( )))
+    {
+      InteractionManager::contextMenuEvent( nullptr, event );
+    }
+    else
+      QGraphicsScene::contextMenuEvent( event );
   }
 
   Canvas::Canvas( QWidget * parent_ )
@@ -98,6 +113,7 @@ namespace nslib
     if ( _graphicsView ) delete _graphicsView;
     if ( _graphicsScene ) delete _graphicsScene;
   }
+
 
   void Canvas::connectLayoutSelector( void )
   {
@@ -279,9 +295,9 @@ namespace nslib
 
     _entities = entities_;
     assert( _layouts.getLayout( _activeLayoutIndex ));
-    _layouts.getLayout( _activeLayoutIndex )->display(
-      entities_, _reps, animate// , refreshProperties
-      );
+    _layouts.getLayout( _activeLayoutIndex )->display( entities_,
+                                                       _reps,
+                                                       animate );
 
   }
 
@@ -354,12 +370,14 @@ namespace nslib
         objs.push_back( entity );
       }
 
-      for ( const auto& property_ : entity->properties( ))
+      for ( const auto& propertyGid_ : entity->properties( ))
       {
-        if ( fires::PropertyManager::getAggregator( property_.first ))
+        const auto& property = fires::PropertyGIDsManager::getPropertyLabel(
+          propertyGid_.first );
+        if ( fires::PropertyManager::getAggregator( propertyGid_.first ))
         {
-          if ( _properties.find( property_.first ) == _properties.end( ))
-            _properties[ property_.first  ] = TPropertyData{ 0, 0 };
+          if ( _properties.find( property ) == _properties.end( ))
+            _properties[ property  ] = TPropertyData{ 0, 0 };
         }
       }
     }

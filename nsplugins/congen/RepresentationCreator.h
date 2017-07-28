@@ -43,11 +43,24 @@ namespace nslib
         shift::Representations& representations,
         shift::TEntitiesToReps& entitiesToReps,
         shift::TRepsToEntities& repsToEntities,
+        shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false ) final;
 
+      void generateRelations(
+        const shift::Entities& entities,
+        const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+        shift::TRelatedEntitiesReps& relatedEntitiesReps,
+        shift::Representations& relatedEntities,
+        const std::string& relationName );
+
+#define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
+
+
     protected:
-    };
+
+      unsigned int _maxConnectionsPerEntity;
+};
 
   } // namespace congen
 } // namespace nslib

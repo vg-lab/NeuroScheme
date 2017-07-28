@@ -32,6 +32,7 @@
 #include <nslib/layouts/CameraBasedLayout.h>
 #include <nslib/layouts/LayoutManager.h>
 #include <nslib/layouts/ScatterPlotLayout.h>
+#include <nslib/EntityEditWidget.h>
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
 
@@ -62,6 +63,9 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
+
+  connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
+           this, SLOT( toggleShowConnectivity( )));
 
 
 
@@ -236,6 +240,23 @@ MainWindow::MainWindow( QWidget* parent_ )
     _storedSelections.dock->setWidget( dockWidget );
   } // END selection dock
 
+  {
+    _entityEditDock = new QDockWidget;
+    nslib::EntityEditWidget::parentDock( _entityEditDock );
+    _entityEditDock->setWindowTitle( QString( "Entity Inspector" ));
+    _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
+                                    QSizePolicy::MinimumExpanding );
+
+    _entityEditDock->setFeatures( QDockWidget::DockWidgetClosable |
+                                  QDockWidget::DockWidgetMovable |
+                                  QDockWidget::DockWidgetFloatable );
+
+    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
+                         _entityEditDock,
+                         Qt::Vertical );
+    _entityEditDock->close( );
+  }
+  
   resizeEvent( 0 );
 }
 
@@ -466,4 +487,18 @@ void MainWindow::aboutDialog( void )
         "<img src=':/icons/logoURJC.png' >"
         "</p>"
         ""));
+}
+
+void MainWindow::toggleShowConnectivity( void )
+{
+
+  nslib::Config::showConnectivity( _ui->actionShowConnectivity->isChecked( ));
+  // WAR to force repaint
+  resizeEvent( 0 );
+  for ( auto canvas : nslib::PaneManager::panes( ))
+  {
+    canvas->resizeEvent( nullptr );
+    // canvas->layouts( ).getLayout(
+    //   canvas->activeLayoutIndex( ))->refresh( false );
+  }
 }

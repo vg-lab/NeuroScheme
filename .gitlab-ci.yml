@@ -9,7 +9,7 @@ Ubuntu-Optional-Deps:
   - uname -a
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
-  - export CMAKE_EXTRA_ARGS=-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON
+  - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON"
   - export BUILD_GENERATOR="Ninja"
   - bash .gitlab-ci.sh
  tags:
@@ -22,6 +22,7 @@ Ubuntu-Subproject:
   - hostname
   - uname -a
   - export BUILD_GENERATOR="Ninja";
+  - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - bash .gitlab-ci.sh
  tags:
   - ubuntu
@@ -34,7 +35,7 @@ OSX-Optional-Deps:
   - uname -a
   - module load Qt-5.4
   - export BUILD_OPTIONALS_SUBPROJECTS=1
-  - export CMAKE_EXTRA_ARGS="-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DLibJpegTurbo_INCLUDE_DIR=/usr/local/opt/jpeg-turbo/include -DLibJpegTurbo_LIBRARY=/usr/local/opt/jpeg-turbo/lib/libturbojpeg.dylib"
+  - export CMAKE_EXTRA_ARGS="-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DLibJpegTurbo_INCLUDE_DIR=/usr/local/opt/jpeg-turbo/include -DLibJpegTurbo_LIBRARY=/usr/local/opt/jpeg-turbo/lib/libturbojpeg.dylib -DCLONE_SUBPROJECTS=ON"
   - export BUILD_GENERATOR="Ninja"
   - export CMAKE_OSX_ARCHITECTURES=x86_64
   - bash .gitlab-ci.sh
@@ -48,19 +49,21 @@ OSX-Subproject:
   - hostname
   - uname -a
   - module load Qt-5.4
+  - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - export BUILD_GENERATOR="Ninja";
   - export CMAKE_OSX_ARCHITECTURES=x86_64
   - bash .gitlab-ci.sh
  tags:
   - osx
 
-Win7-Subproject:
+Win7-Subproject-vs14:
   stage: build
   script:
-  - call %ENVFILESDIR%\Qt-5.4.bat
-  - call %ENVFILESDIR%\Boost-1.56-vs12-x64.bat
+  - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
+  - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
-  - set BUILD_GENERATOR=Visual Studio 12 Win64
+  - set BUILD_GENERATOR=Visual Studio 14 Win64
+  - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON
   - set GENERATOR_EXTRA_OPTIONS=
   - '"c:\Program Files (x86)\Git\bin\bash.exe" --login  .gitlab-ci.sh'
   - set PATH=%PATH%;"c:\Program Files (x86)\Git\bin"

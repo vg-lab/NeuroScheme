@@ -25,7 +25,6 @@
 #include <nslibcortex/api.h>
 #include <nslib/DomainManager.h>
 #include "DataLoader.h"
-
 namespace nslib
 {
 
@@ -37,14 +36,12 @@ namespace nslib
 
     public:
 
-      Domain( void )
-      {
-        this->_dataLoader = new DataLoader;
-      }
+      Domain( void );
 
       virtual ~Domain( void )
       {
-        delete _dataLoader;
+        delete this->_dataLoader;
+        delete this->_entitiesTypes;
       }
 
       bool isSelectableEntity( shift::Entity* entity ) const;

@@ -38,10 +38,7 @@ namespace nslib
 
     public:
 
-      Domain( void )
-      {
-        this->_dataLoader = new DataLoader;
-      }
+      Domain( void );
 
       virtual ~Domain( void )
       {

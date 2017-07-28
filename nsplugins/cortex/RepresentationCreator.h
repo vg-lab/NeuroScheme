@@ -46,9 +46,16 @@ namespace nslib
         shift::Representations& representations,
         shift::TEntitiesToReps& entitiesToReps,
         shift::TRepsToEntities& repsToEntities,
+        shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false );
 
+      void generateRelations(
+        const shift::Entities& entities,
+        const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+        shift::TRelatedEntitiesReps& relatedEntitiesReps,
+        shift::Representations& relatedEntities,
+        const std::string& relationName );
 
       void setMaximums( float maxNeuronSomaVolume_,
                         float maxNeuronSomaArea_,
@@ -56,7 +63,8 @@ namespace nslib
                         float maxNeuronDendsArea_,
                         unsigned int maxNeurons_,
                         unsigned int maxNeuronsPerColumn_,
-                        unsigned int maxNeuronsPerMiniColumn_ )
+                        unsigned int maxNeuronsPerMiniColumn_,
+                        unsigned int maxConnectionsPerEntity_ )
       {
         _maxNeuronSomaVolume = maxNeuronSomaVolume_;
         _maxNeuronSomaArea = maxNeuronSomaArea_;
@@ -65,25 +73,43 @@ namespace nslib
         _maxNeurons = maxNeurons_;
         _maxNeuronsPerColumn = maxNeuronsPerColumn_;
         _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+        _maxConnectionsPerEntity = maxConnectionsPerEntity_;
       }
+
+      virtual void clear( void ) final
+      {
+        _layersMap.clear( );
+        _neuronTypeAggsMap.clear( );
+      }
+
+      void entityUpdatedOrCreated( shift::Entity* entity ) override;
 
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
       typedef std::map<
-      std::pair< unsigned int, std::pair< unsigned int, unsigned int>>,
+        std::pair< shift::Entity::EntityGid,
+                   std::pair< unsigned int,
+                              std::pair< unsigned int, unsigned int>>>,
       LayerRep* > LayersMap;
+
 #define QuadKey( x, y, z, w )                                         \
       std::make_pair( x, std::make_pair( y, std::make_pair( z, w )))
+#define PentaKey( a, b, c, d, e )                                       \
+      std::make_pair( a, std::make_pair( b, std::make_pair(             \
+                                         c, std::make_pair( d, e ))))
+
       typedef std::map<
-        std::pair< unsigned int,
+        std::pair< shift::Entity::EntityGid,
                    std::pair< unsigned int,
                               std::pair< unsigned int,
-                                         unsigned int>>>,
+                                         std::pair< unsigned int,
+                                                    unsigned int >>>>,
         NeuronTypeAggregationRep* > NeuronTypeAggsMaps;
 
       void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
+        shift::Entity::EntityGid entityGid,
         unsigned int id,
         unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
@@ -105,6 +131,7 @@ namespace nslib
       unsigned int _maxNeurons;
       unsigned int _maxNeuronsPerColumn;
       unsigned int _maxNeuronsPerMiniColumn;
+      unsigned int _maxConnectionsPerEntity;
       LayersMap _layersMap;
       NeuronTypeAggsMaps _neuronTypeAggsMap;
     };

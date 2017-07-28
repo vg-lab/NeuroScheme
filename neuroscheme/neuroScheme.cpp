@@ -34,8 +34,12 @@ bool atLeastTwo( bool a, bool b, bool c )
   return a ^ b ? c : a;
 }
 
-void usageMessage( void )
+void usageMessage( const std::string& errorMsg = "" )
 {
+  if ( !errorMsg.empty( ))
+    std::cerr << std::endl << "Error: " << errorMsg
+              << std::endl << std::endl;
+
   std::cerr << std::endl;
   std::cerr << "Usage: "
             << "NeuroScheme" << std::endl;
@@ -44,7 +48,9 @@ void usageMessage( void )
             << std::endl
             << "\t[ --version ]"
             << std::endl
-            << "\t[ --help ]";
+            << "\t[ --help ]"
+            << std::endl
+            << "\t[ [ --scale | -sc ] scaleFactor = 1.0f ]";
   std::cout << std::endl;
   std::cout << std::endl;
 
@@ -66,6 +72,14 @@ void dumpVersion( void )
             << nslib::Version::getPatch( )
             << " (" << nslib::Version::getRevision( ) << ")"
             << std::endl << std::endl;
+
+  std::cerr << "Nsol support built-in: ";
+#ifdef NEUROSCHEME_USE_NSOL
+  std::cerr << "yes";
+#else
+  std::cerr << "no";
+#endif
+  std::cerr << std::endl;
 
   std::cerr << "Brion support built-in: ";
 #ifdef NSOL_USE_BRION
@@ -109,9 +123,37 @@ void dumpVersion( void )
 
   std::cerr << std::endl;
 
+  exit( 0 );
 
 }
 
+
+std::string checkArg( const std::vector< std::string >& args,
+                      unsigned int nbArgParams )
+{
+
+  auto& allArgs = nslib::Config::inputArgs( );
+  unsigned int numArgs;
+  auto foundArg = allArgs.checkIfOnlyOne( args, numArgs );
+  if ( numArgs > 1 )
+  {
+    std::string errorMsg;
+    for( const auto& arg : args )
+      errorMsg += arg + std::string( " " );
+    usageMessage( "Incompatible arguments: " + errorMsg );
+  }
+  if ( !foundArg.empty( ))
+  {
+    if ( allArgs[ foundArg ].size( ) != nbArgParams )
+      usageMessage( foundArg + " specified with " +
+                    std::to_string( allArgs[ foundArg ].size( )) + " value/s, " +
+                    std::to_string( nbArgParams ) + " expected" );
+    else
+      return foundArg;
+  }
+
+  return std::string( );
+}
 
 void parseArguments( int argc, char** argv,
                      nslib::NeuroSchemeInputArguments& args )
@@ -144,55 +186,33 @@ int main( int argc, char** argv )
 
   if ( args.count( "--help" ) == 1 )
     usageMessage( );
-  // std::cout << args.size( ) << std::endl;
-  // for ( const auto& a : args )
-  // {
-  //   std::cout << a.first << ": ";
-  //   for ( const auto &b : a.second )
-  //     std::cout << b << ",";
-  //   std::cout << std::endl;
-  // }
 
-//   bool swcInput = false, bcInput = false, xmlInput = false;
+  if ( args.count( "--version" ) == 1 )
+    dumpVersion( );
+
   bool fullscreen = false;
   bool initWindowSize = false;
   bool initWindowMaximized = false;
   int initWindowWidth;
   int initWindowHeight;
 
-  std::string windowSizeArg;
+  std::string foundArg;
 
-  if ( args.count( "--window-size" ) == 1 )
-    windowSizeArg = "--window-size";
-
-  if ( args.count( "--ws" ) == 1 )
-  {
-    if ( !windowSizeArg.empty( ))
-    {
-      std::cerr << "--windows-size and -ws are non compatible" << std::endl;
-      usageMessage( );
-    }
-    windowSizeArg = "-ws";
-  }
-  if ( !windowSizeArg.empty( ))
+  foundArg = checkArg( { "--window-size", "-ws" }, 2 );
+  if ( !foundArg.empty( ))
   {
     initWindowSize = true;
-    if ( args[ windowSizeArg ].size( ) != 2 )
-    {
-      std::cerr << "--windows-size or -ws require two arguments" << std::endl;
-      usageMessage( );
-      exit( -1 );
-
-    }
-    initWindowWidth = atoi( args[ windowSizeArg ][0].c_str( ));
-    initWindowHeight = atoi( args[ windowSizeArg ][1].c_str( ) );
+    initWindowWidth = std::stoi( args[ foundArg ][0] );
+    initWindowHeight = std::stoi( args[ foundArg ][1] );
   }
 
-  if ( args.count( "--fullscreen" ) == 1 ||
-       args.count( "-fs" ) == 1 )
-  {
+  foundArg = checkArg( { "--fullscreen", "-fs" }, 0 );
+  if ( !foundArg.empty( ))
     fullscreen = true;
-  }
+
+  foundArg = checkArg( { "--scale", "-sc" }, 1 );
+  if ( !foundArg.empty( ))
+    nslib::Config::scale( std::stof( args[ foundArg ][ 0 ] ));
 
 
   QApplication app( argc, argv );

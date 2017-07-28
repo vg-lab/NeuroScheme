@@ -1,4 +1,6 @@
 {
+    "name": "congen",
+    "namespace": "nslib::congen::shiftgen",
     "reps": [
         {
             "name": "NeuronPopRep",
@@ -11,6 +13,18 @@
                 }
             ],
             "types": [ ]
+        },
+        {
+            "name": "ConnectionArrowRep",
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "width",
+                    "type": "uint"
+                }
+            ],
+            "types": [ ]
         }
+
     ]
 }

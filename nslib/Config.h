@@ -30,8 +30,46 @@
 namespace nslib
 {
 
-  typedef std::unordered_map< std::string, std::vector< std::string >>
-  NeuroSchemeInputArguments;
+  class NeuroSchemeInputArguments
+    : public std::unordered_map< std::string, std::vector< std::string >>
+  {
+  public:
+    bool has( const std::string& arg )
+    {
+      return this->count( arg ) == 1;
+    }
+
+    bool hasOne( const std::vector< std::string >& args )
+    {
+      for ( const auto& arg : args )
+      {
+        auto found = ( this->count( arg ) == 1 );
+        if ( found )
+          return true;
+      }
+      return false;
+    }
+
+    std::string checkIfOnlyOne( const std::vector< std::string >& args,
+                                unsigned int& numArgsFound )
+    {
+      std::string argFound( "" );
+      numArgsFound = 0;
+      for ( const auto& arg : args )
+      {
+        auto found = ( this->count( arg ) == 1 );
+        if ( found )
+        {
+          ++numArgsFound;
+          argFound = arg;
+        }
+      }
+      if ( numArgsFound > 1 )
+        return std::string( );
+      return argFound;
+    }
+
+  };
 
 
   class Config
@@ -45,9 +83,22 @@ namespace nslib
     static std::string isArgumentDefined(
       const std::vector< std::string >& argNames );
 
+    NSLIB_API
+    static bool showConnectivity( void );
+
+    NSLIB_API
+    static void showConnectivity( bool showConnectivity_ );
+
+    NSLIB_API
+    static float scale( void );
+
+    NSLIB_API
+    static void scale( float scale );
+
   protected:
     static NeuroSchemeInputArguments _inputArgs;
-
+    static bool _showConnectivity;
+    static float _scale;
   };
 
 }

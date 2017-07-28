@@ -19,22 +19,89 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "DataManager.h"
+#include "DomainManager.h"
 #include "InteractionManager.h"
 #include "layouts/LayoutManager.h"
 #include "Log.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
+#include "reps/ConnectivityRep.h"
 #include "SelectionManager.h"
 #include "ZeroEQManager.h"
 //#include "domains/domains.h"
 #include <unordered_set>
 
+#include <QGuiApplication>
+
 namespace nslib
 {
-
   QMenu* InteractionManager::_contextMenu = nullptr;
+  EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
+
+  void InteractionManager::highlightConnectivity(
+    QAbstractGraphicsShapeItem* shapeItem, bool highlight )
+  {
+    auto& relConnectsTo = *( DataManager::entities( ).
+                             relationships( )[ "connectsTo" ]->asOneToN( ));
+    auto& relConnectedBy = *( DataManager::entities( ).
+                              relationships( )[ "connectedBy" ]->asOneToN( ));
+
+    // Third parameter indicates if the relationship has to be inverted
+    enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
+    std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
+    rels.reserve( 2 );
+    rels.push_back(
+      std::make_tuple( &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+    rels.push_back(
+      std::make_tuple( &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+
+    const auto& repsToEntities =
+      RepresentationCreatorManager::repsToEntities( );
+    const auto& relatedEntities =
+      RepresentationCreatorManager::relatedEntities( );
+
+    auto item = dynamic_cast< Item* >( shapeItem );
+    if ( item )
+    {
+      assert( item->parentRep( ));
+
+      const auto& entities = repsToEntities.find( item->parentRep( ));
+      if ( entities != repsToEntities.end( ))
+      {
+        auto entityGid = ( *entities->second.begin( ))->entityGid( );
+        for ( const auto& relPair : rels )
+        {
+          auto& rel = *( std::get< HLC_RELATIONSHIP >( relPair ));
+          auto& connectingEntities = rel[ entityGid ];
+          for ( auto& connectingEntity : connectingEntities )
+          {
+            const auto& relationRep = relatedEntities.find(
+              ( std::get< HLC_INVERT >( relPair ) ?
+                std::make_pair( connectingEntity.first, entityGid ) :
+                std::make_pair( entityGid, connectingEntity.first )));
+            if ( relationRep != relatedEntities.end( ))
+            {
+              shift::Representation* rep = std::get< 0 >( relationRep->second );
+              auto* connRep = dynamic_cast< ConnectivityRep* >( rep );
+              if ( connRep )
+              {
+                if ( highlight )
+                  connRep->highlight( std::get< HLC_COLOR >( relPair ));
+                else
+                  connRep->unHighlight( );
+              }
+            }
+          } // for all connectinf entities
+        }
+      }
+    }
+  }
+
+
+
 
 
   void InteractionManager::hoverEnterEvent(
@@ -82,6 +149,50 @@ namespace nslib
     else
       _contextMenu->clear( );
 
+    // If clicking outside item, new item menu is showed
+    if ( !shapeItem )
+    {
+      auto domain = DomainManager::getActiveDomain( );
+      if ( domain )
+      {
+        const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
+
+        std::unordered_map< QAction*, unsigned int > actionToIdx;
+        unsigned int entityIdx = 0;
+
+        for ( const auto& type : entitiesTypes )
+        {
+          QAction* action = nullptr;
+
+          if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
+            continue;
+
+          action = _contextMenu->addAction(
+            QString( "Add "  ) +
+            QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
+
+          actionToIdx[action]=entityIdx;
+          ++entityIdx;
+
+        }
+        QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
+        if ( selectedAction )
+        {
+
+          if ( _entityEditWidget != nullptr )
+            delete _entityEditWidget;
+
+          _entityEditWidget = new EntityEditWidget(
+            std::get< shift::EntitiesTypes::OBJECT >(
+              entitiesTypes[actionToIdx[selectedAction]]),
+            EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY );
+          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+          EntityEditWidget::parentDock( )->show( );
+          _entityEditWidget->show();
+        }
+      } // if ( domain )
+    }
+    else
     {
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
@@ -100,15 +211,27 @@ namespace nslib
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
                                 [ "isChildOf" ]->asOneToOne( ));
-          const auto& parent = relChildOf[ entityGid ];
+          const auto& parent = relChildOf[ entityGid ].entity;
 
-          const auto& grandParent = relChildOf[ relChildOf[ entityGid ]];
+          const auto& grandParent =
+            relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
           const auto& parentSiblings = relParentOf[ grandParent ];
 
           auto& relAGroupOf = *( DataManager::entities( ).relationships( )
                                 [ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
+
+          QAction* editEntity = nullptr;
+          QAction* dupEntity = nullptr;
+          auto entity = DataManager::entities( ).at( entityGid );
+          if ( !entity->isSubEntity( ))
+          {
+            editEntity = _contextMenu->addAction( QString( "Edit" ));
+            dupEntity = _contextMenu->addAction( QString( "Duplicate" ));
+          }
+          if ( editEntity || dupEntity )
+            _contextMenu->addSeparator( );
 
           QAction* levelUp = nullptr;
           QAction* levelDown = nullptr;
@@ -138,53 +261,83 @@ namespace nslib
               QString( "Expand group [new pane]" ));
 
           if ( levelUp || levelDown || expandGroup ||
-               levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane )
+               levelUpToNewPane || levelDownToNewPane ||
+               expandGroupToNewPane || editEntity )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
 
-            if (( levelUpToNewPane &&
-                  levelUpToNewPane == selectedAction ) ||
-                ( levelDownToNewPane &&
-                  levelDownToNewPane == selectedAction ) ||
-                ( expandGroupToNewPane &&
-                  expandGroupToNewPane == selectedAction ))
+            if ( editEntity && editEntity == selectedAction )
             {
-              nslib::PaneManager::activePane(
-                nslib::PaneManager::newPaneFromActivePane( ));
-            }
+              if ( _entityEditWidget != nullptr )
+                delete _entityEditWidget;
 
-            if (( levelUp && levelUp == selectedAction ) ||
-                ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
+              _entityEditWidget = new EntityEditWidget(
+                DataManager::entities( ).at( entityGid ),
+                EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show( );
+            }
+            else if ( dupEntity && dupEntity == selectedAction )
             {
-              if ( parentSiblings.size( ) > 0 )
-                for ( const auto& parentSibling : parentSiblings )
+              if ( _entityEditWidget != nullptr )
+                delete _entityEditWidget;
+
+              _entityEditWidget = new EntityEditWidget(
+                DataManager::entities( ).at( entityGid ),
+                EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show( );
+
+            }
+            else
+            {
+
+              if (( levelUpToNewPane &&
+                    levelUpToNewPane == selectedAction ) ||
+                  ( levelDownToNewPane &&
+                    levelDownToNewPane == selectedAction ) ||
+                  ( expandGroupToNewPane &&
+                    expandGroupToNewPane == selectedAction ))
+              {
+                nslib::PaneManager::activePane(
+                  nslib::PaneManager::newPaneFromActivePane( ));
+              }
+
+              if (( levelUp && levelUp == selectedAction ) ||
+                  ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
+              {
+                if ( parentSiblings.size( ) > 0 )
+                  for ( const auto& parentSibling : parentSiblings )
+                    targetEntities.add(
+                      DataManager::entities( ).at( parentSibling.first ));
+                else
+                  targetEntities.add( DataManager::entities( ).at( parent ));
+              }
+
+              if (( levelDown && levelDown == selectedAction ) ||
+                  ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
+              {
+                for ( const auto& child : children )
+                  targetEntities.add( DataManager::entities( ).at( child.first ));
+              }
+
+              if (( expandGroup && expandGroup == selectedAction ) ||
+                  ( expandGroupToNewPane &&
+                    expandGroupToNewPane == selectedAction ))
+              {
+                for ( const auto& groupedEntity : groupedEntities )
                   targetEntities.add(
-                    DataManager::entities( ).at( parentSibling ));
-              else
-                targetEntities.add( DataManager::entities( ).at( parent ));
-            }
-
-            if (( levelDown && levelDown == selectedAction ) ||
-                ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
-            {
-              for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child ));
-            }
-
-            if (( expandGroup && expandGroup == selectedAction ) ||
-                ( expandGroupToNewPane &&
-                  expandGroupToNewPane == selectedAction ))
-            {
-              for ( const auto& groupedEntity : groupedEntities )
-                targetEntities.add(
-                  DataManager::entities( ).at( groupedEntity ));
-            }
-            if ( targetEntities.size( ) > 0 )
-            {
-              auto canvas = PaneManager::activePane( );
-              canvas->displayEntities( targetEntities, false, true );
+                    DataManager::entities( ).at( groupedEntity.first ));
+              }
+              if ( targetEntities.size( ) > 0 )
+              {
+                auto canvas = PaneManager::activePane( );
+                canvas->displayEntities( targetEntities, false, true );
+              }
             }
           }
         }
@@ -272,19 +425,19 @@ namespace nslib
                 for ( auto const& groupedId : groupedIds )
                 {
                   SelectionManager::setSelectedState(
-                    allEntities.at( groupedId ), entityState );
+                    allEntities.at( groupedId.first ), entityState );
                   // Save unique parent set for updating only once per parent
-                  if ( relChildOf.count( groupedId ) > 0 )
-                    parentIds.insert( relChildOf.at( groupedId ));
+                  if ( relChildOf.count( groupedId.first ) > 0 )
+                    parentIds.insert( relChildOf.at( groupedId.first ).entity );
                 }
                 _updateSelectedStateOfSubEntities(
                   allEntities, relSuperEntityOf, relAGroupOf,
-                  relSubEntityOf.at( entityGid ));
+                  relSubEntityOf.at( entityGid ).entity );
                 std::unordered_set< unsigned int > uniqueParentChildIds;
                 for ( auto const& parentId : parentIds )
                 {
                   uniqueParentChildIds.insert(
-                    *relParentOf.at( parentId ).begin( ));
+                    relParentOf.at( parentId ).begin( )->first );
                 }
                 // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
                 for ( auto const& uniqueParentChildId : uniqueParentChildIds )
@@ -300,10 +453,11 @@ namespace nslib
             {
               if ( relSuperEntityOf.count( entityGid ) > 0 )
               {
-                const auto& subEntities = relSuperEntityOf.at( entityGid );
+                const auto& subEntities =
+                  relSuperEntityOf.at( entityGid );
                 for ( const auto& subEntity : subEntities )
                   SelectionManager::setSelectedState(
-                    allEntities.at( subEntity ), entityState );
+                    allEntities.at( subEntity.first ), entityState );
               }
 
               // std::cout << "Propagate to children of " << entityGid << std::endl;
@@ -351,17 +505,17 @@ namespace nslib
     for ( auto const& childId : childrenIds )
     {
       // std::cout << childId << " ";
-      if ( relSuperEntityOf.count( childId ) > 0 )
+      if ( relSuperEntityOf.count( childId.first ) > 0 )
       {
-        const auto& subEntities = relSuperEntityOf.at( childId );
+        const auto& subEntities = relSuperEntityOf.at( childId.first );
         for ( const auto& subEntity : subEntities )
           SelectionManager::setSelectedState(
-            DataManager::entities( ).at( subEntity ), state );
+            DataManager::entities( ).at( subEntity.first ), state );
       }
       SelectionManager::setSelectedState(
-        entities.at( childId ), state );
+        entities.at( childId.first ), state );
       _propagateSelectedStateToChilds( entities, relParentOf, relSuperEntityOf,
-                                       childId, state );
+                                       childId.first, state );
     }
 
   }
@@ -377,7 +531,7 @@ namespace nslib
   {
     if ( relChildOf.count( entityGid ) == 0 )
       return;
-    const auto& parentId = relChildOf.at( entityGid );
+    const auto& parentId = relChildOf.at( entityGid ).entity;
 
     if ( parentId == 0 ) return;
 
@@ -427,7 +581,7 @@ namespace nslib
     for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
     {
       bool allGroupedSelected, noGroupedSelected;
-      _queryGroupedSelectedState( entities, relAGroupOf, subEntityId,
+      _queryGroupedSelectedState( entities, relAGroupOf, subEntityId.first,
                                   allGroupedSelected, noGroupedSelected );
       SelectedState groupedState;
       if ( noGroupedSelected )
@@ -438,7 +592,7 @@ namespace nslib
         groupedState = SelectedState::PARTIALLY_SELECTED;
 
       SelectionManager::setSelectedState(
-        entities.at( subEntityId ), groupedState );
+        entities.at( subEntityId.first ), groupedState );
 
     }
   }
@@ -455,10 +609,10 @@ namespace nslib
     const auto& childrenIds = relParentOf.at( entityGid );
     for ( auto const& childId : childrenIds )
     {
-      if ( SelectionManager::getSelectedState( entities.at( childId )) !=
+      if ( SelectionManager::getSelectedState( entities.at( childId.first )) !=
            SelectedState::SELECTED )
         allChildrenSelected = false;
-      if ( SelectionManager::getSelectedState( entities.at( childId )) ==
+      if ( SelectionManager::getSelectedState( entities.at( childId.first )) ==
            SelectedState::SELECTED )
         noChildrenSelected = false;
     }
@@ -483,10 +637,10 @@ namespace nslib
     const auto& groupedIds = relAGroupOf.at( entityGid );
     for ( auto const& groupedId : groupedIds )
     {
-      if ( SelectionManager::getSelectedState( entities.at( groupedId )) !=
+      if ( SelectionManager::getSelectedState( entities.at( groupedId.first )) !=
            SelectedState::SELECTED )
         allGroupedSelected = false;
-      if ( SelectionManager::getSelectedState( entities.at( groupedId )) ==
+      if ( SelectionManager::getSelectedState( entities.at( groupedId.first )) ==
            SelectedState::SELECTED )
         noGroupedSelected = false;
     }
