@@ -43,6 +43,8 @@ namespace nslib
       virtual ~Domain( void )
       {
         delete _dataLoader;
+        delete this->_entitiesTypes;
+        delete this->_relationshipPropertiesTypes;
       }
 
       bool isSelectableEntity( shift::Entity* entity ) const;

@@ -72,11 +72,11 @@ namespace nslib
           InteractionManager::contextMenuEvent( this, event_ );
       }
 
-      virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      {
-        if ( _interactive )
-          InteractionManager::mousePressEvent( this, event_ );
-      }
+      // virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
+      // {
+      //   if ( _interactive )
+      //     InteractionManager::mousePressEvent( this, event_ );
+      // }
 
 
     protected:

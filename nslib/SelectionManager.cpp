@@ -51,6 +51,19 @@ namespace nslib
 
   }
 
+  std::vector< shift::Entity* > SelectionManager::getActiveSelection( void )
+  {
+    std::vector< shift::Entity* > activeSelection;
+
+    for ( auto selection: _activeSelection )
+    {
+      if( selection.second == SelectedState::SELECTED )
+        activeSelection.push_back( selection.first );
+    }
+
+    return activeSelection;
+  }
+
   void SelectionManager::clearActiveSelection( void )
   {
     _activeSelection.clear( );

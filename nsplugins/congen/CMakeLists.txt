@@ -29,7 +29,7 @@ shift_generate_cxx(
   "Relationship"
   ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_congen_rels.h
+  ${SHIFT_GENERATED_DIR}/shift_cortex_relationshipProperties.h
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )

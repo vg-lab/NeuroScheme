@@ -47,6 +47,8 @@ namespace nslib
     NSLIB_API
     static SelectedState getSelectedState( shift::Entity* entity );
     NSLIB_API
+    static std::vector< shift::Entity* > getActiveSelection( void );
+    NSLIB_API
     static void clearActiveSelection( void );
     NSLIB_API
     static void clearStoredSelections( void );

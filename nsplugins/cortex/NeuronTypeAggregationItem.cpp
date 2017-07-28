@@ -77,12 +77,6 @@ namespace nslib
           event_ );
       }
 
-      void mousePressEvent( QGraphicsSceneMouseEvent* event_ ) final
-      {
-        InteractionManager::mousePressEvent(
-          dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-          event_ );
-      }
     };
 
     class Circle
@@ -119,13 +113,6 @@ namespace nslib
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
       {
         InteractionManager::contextMenuEvent(
-          dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-          event_ );
-      }
-
-      virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      {
-        InteractionManager::mousePressEvent(
           dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
           event_ );
       }

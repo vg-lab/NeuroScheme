@@ -41,7 +41,8 @@ namespace nslib
 
   public:
     GraphicsView( QWidget* parent = 0 );
-    void mousePressEvent( QMouseEvent* /* event */ );
+    void mousePressEvent( QMouseEvent*  event );
+    void mouseReleaseEvent( QMouseEvent*  event );
 
   protected:
     virtual void wheelEvent( QWheelEvent* event_ );

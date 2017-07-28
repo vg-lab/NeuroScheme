@@ -21,7 +21,8 @@
         },
         {
             "name": "ConnectsWith",
-            "namespace": "nslib::cortex::shiftgen",
+            "relationship": "connectsTo",
+            "namespace": "nslib::congen::shiftgen",
             "includes" : [ ],
             "properties": [
                 {
