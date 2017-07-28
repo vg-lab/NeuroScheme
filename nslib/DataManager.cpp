@@ -149,21 +149,6 @@ namespace nslib
           nsol::MiniColumnStats,
           nsol::ColumnStats >( );
       }
-      else
-      {
-        _nsolDataSet.loadBlueConfigHierarchy<
-          nsol::Node,
-          nsol::SectionStats,
-          nsol::DendriteStats,
-          nsol::AxonStats,
-          nsol::SomaStats,
-          nsol::NeuronMorphologyCachedStats,
-          nsol::Neuron,
-          nsol::MiniColumnStats,
-          nsol::ColumnStats >( blueConfig,
-                               targetLabel );
-
-      }
     } catch ( std::exception& ex )
     {
       Log::log( std::string( "Error loading BlueConfig: " ) +
