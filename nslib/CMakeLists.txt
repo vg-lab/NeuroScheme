@@ -1,6 +1,7 @@
 set( NSLIB_SOURCES
   Canvas.cpp
   Config.cpp
+  ConnectionRelationshipEditWidget.cpp
   DataManager.cpp
   DomainManager.cpp
   FilterWidget.cpp
@@ -29,6 +30,7 @@ set( NSLIB_HEADERS
   Canvas.h
   Color.h
   Config.h
+  ConnectionRelationshipEditWidget.h
   DataLoader.h
   DataManager.h
   DomainManager.cpp

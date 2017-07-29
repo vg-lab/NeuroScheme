@@ -26,6 +26,7 @@
 #include <nslib/Config.h>
 #include <nslib/PaneManager.h>
 #include <nslib/SelectionManager.h>
+#include <nslib/InteractionManager.h>
 #include <nslib/Log.h>
 #include <nslib/layouts/CircularLayout.h>
 #include <nslib/layouts/GridLayout.h>
@@ -65,7 +66,6 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
            this, SLOT( toggleShowConnectivity( )));
-
 
 
   QActionGroup* splitTypeGroup = new QActionGroup( this );

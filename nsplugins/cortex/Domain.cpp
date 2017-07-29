@@ -26,6 +26,7 @@
 #include <nslib/DataManager.h>
 #include "RepresentationCreator.h"
 #include <shift_cortex_entities.h>
+#include <shift_cortex_relationshipProperties.h>
 
 namespace nslib
 {
@@ -35,6 +36,8 @@ namespace nslib
     {
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
+      this->_relationshipPropertiesTypes =
+        new nslib::cortex::shiftgen::RelationshipPropertiesTypes;
       auto repCreator = new RepresentationCreator( );
       nslib::RepresentationCreatorManager::addCreator( repCreator );
       auto& _entities = nslib::DataManager::entities( );
