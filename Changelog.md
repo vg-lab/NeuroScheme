@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!35] Added relationship generation using selection and 'drag and drop'.
 * [!34] Added relationship generation using selection and 'drag and drop'.
 * [!33] Fixed bug that crashes loading morphologies with out connectivity.
 * [!32] Bump CMake/common and use it as a submodule.

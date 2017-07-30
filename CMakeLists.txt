@@ -7,7 +7,7 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
-project( NeuroScheme VERSION 0.1.12 )
+project( NeuroScheme VERSION 0.1.13 )
 set( NeuroScheme_VERSION_ABI 10 )
 
 # Disable in source building
