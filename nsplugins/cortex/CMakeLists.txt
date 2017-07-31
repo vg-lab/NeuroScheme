@@ -9,7 +9,7 @@ file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
     "Entity"
     ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
     ${SHIFT_GENERATED_DIR}
-    ${SHIFT_GENERATED_DIR}/shift_cortex_entities.h
+    ${SHIFT_GENERATED_DIR}/shift_cortex_entities
     "${SHIFT_GENERATED_OBJECTS}"
     )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -22,14 +22,14 @@ list( APPEND SHIFT_GENERATED_HEADER_FILES
   ${SHIFT_GENERATED_DIR}/shift_cortex_entities.h )
 
 # Generate relationships
-set( SHIFT_GENERATED_OBJECTS ConnectsWith )
+set( SHIFT_GENERATED_OBJECTS ConnectsWith ParentOf ChildOf )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 shift_generate_cxx(
   "Relationship"
   ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_cortex_relationshipProperties.h
+  ${SHIFT_GENERATED_DIR}/shift_cortex_relationshipProperties
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -40,6 +40,8 @@ foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
 endforeach( )
 list( APPEND SHIFT_GENERATED_HEADER_FILES
   ${SHIFT_GENERATED_DIR}/shift_cortex_relationshipProperties.h )
+list( APPEND SHIFT_GENERATED_IMPL_FILES
+  ${SHIFT_GENERATED_DIR}/shift_cortex_relationshipProperties.cpp )
 
 # Generate representations
 set( SHIFT_GENERATED_OBJECTS
@@ -51,7 +53,7 @@ shift_generate_cxx(
   "Representation"
   ${CMAKE_CURRENT_SOURCE_DIR}/reps.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_cortex_reps.h
+  ${SHIFT_GENERATED_DIR}/shift_cortex_reps
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
