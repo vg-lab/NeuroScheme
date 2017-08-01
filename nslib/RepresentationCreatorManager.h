@@ -64,6 +64,8 @@ namespace nslib
       _repCreators[ repCreatorId ]->clear( );
       _entitiesToReps[ repCreatorId ].clear( );
       _repsToEntities[ repCreatorId ].clear( );
+      _relatedEntitiesReps[ repCreatorId ].clear( );
+      _gidsToEntitiesReps[ repCreatorId ].clear( );
     }
 
     static const shift::TRelatedEntitiesReps& relatedEntities(

@@ -9,15 +9,26 @@
             "flags" : [],
             "properties": [
                 {
-                    "name": "Perc Inhibitory",
-                    "type": "float"
+                    "name": "Nb of neurons",
+                    "type": "uint",
+                    "flags": [ "EDITABLE" ]
+
                 },
                 {
-                    "name": "hola",
-                    "type": "int"
+                    "name": "Neuron model",
+                    "type": "TNeuronModel",
+                    "flags": [ "EDITABLE" ]
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TNeuronModel",
+                    "values": [
+                        "iaf psc alpha"
+                    ]
+                }
+            ]
         },
         {
             "name": "ConnectsWith",
@@ -26,12 +37,101 @@
             "includes" : [ ],
             "properties": [
                 {
-                    "name": "count",
-                    "type": "uint"
+                    "name": "Connectivity Model",
+                    "type": "TConnectivityModel"
+                },
+                {
+                    "name": "Random probability",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Connectivity Model", "value": "Random" } ]
+                },
+                {
+                    "name": "FanOut Outdegree",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Connectivity Model", "value": "FanOut" } ]
+                },
+                {
+                    "name": "FanIn Indegree",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Connectivity Model", "value": "FanIn" } ]
+                },
+                {
+                    "name": "Spatial Gaussian Probability",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Connectivity Model", "value": "Spatial Gaussian" } ]
+                },
+                {
+                    "name": "Spatial Gaussian Sigma",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Connectivity Model", "value": "Spatial Gaussian" } ]
+                },
+                {
+                    "name": "Weight Type",
+                    "type": "TFixedOrDistribution"
+                },
+                {
+                    "name": "Weight",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Weight Type", "value": "Fixed" } ]
+                },
+                {
+                    "name": "Weight Gaussian Mean",
+                    "type": "float",
+                    "constraint" : [ { "propName": "Weight Type", "value": "Gaussian" } ]
+                },
+                {
+                    "name": "Weight Gaussian Sigma",
+                    "type": "float",
+                    "constraint" : [ { "propName": "Weight Type", "value": "Gaussian" } ]
+                },
+                {
+                    "name": "Delay Type",
+                    "type": "TFixedOrDistribution"
+                },
+                {
+                    "name": "Delay",
+                    "type": "float",
+                    "constraint" : [ {"propName": "Delay Type", "value": "Fixed" } ]
+                },
+                {
+                    "name": "Delay Gaussian Mean",
+                    "type": "float",
+                    "constraint" : [ { "propName": "Delay Type", "value": "Gaussian" } ]
+                },
+                {
+                    "name": "Delay Gaussian Sigma",
+                    "type": "float",
+                    "constraint" : [ { "propName": "Delay Type", "value": "Gaussian" } ]
+                },
+                {
+                    "name": "Threshold",
+                    "type": "float"
                 }
+
             ],
             "types":
-            [ ]
+            [
+                {
+                    "class": "enum",
+                    "name": "TConnectivityModel",
+                    "values": [
+                        "All-to-all",
+                        "One-to-one",
+                        "Random",
+                        "FanOut",
+                        "FanIn",
+                        "Spatial Gaussian"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TFixedOrDistribution",
+                    "values": [
+                        "Fixed",
+                        "Gaussian"
+                    ]
+                }
+            ]
         }
 
     ]

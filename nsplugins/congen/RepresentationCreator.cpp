@@ -47,8 +47,8 @@ namespace nslib
                        LOG_LEVEL_VERBOSE );
 
       scoop::SequentialColorMap neuronTypeColorMapper(
-        scoop::ColorPalette::colorBrewerDiverging(
-          scoop::ColorPalette::ColorBrewerDiverging::RdYlGn, 10 ),
+        scoop::ColorPalette::colorBrewerSequential(
+          scoop::ColorPalette::ColorBrewerSequential::PuBu, 6 ),
         0.0f, 100.0f );
 
       for ( const auto entity : entities.vector( ))
@@ -68,7 +68,7 @@ namespace nslib
           neuronPopRep->setProperty(
             "color",
             neuronTypeColorMapper.getColor(
-              neuronPop->getProperty( "Perc Inhibitory" ).value< float >( )));
+              neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
 
           representations.push_back( neuronPopRep );
           // Link entity and rep
@@ -148,7 +148,8 @@ namespace nslib
               relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map(
-                    relMMapIt->second->getProperty( "count" ).value< unsigned int >( ))));
+                    relMMapIt->second->getProperty(
+                      "Weight" ).value< float >( ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
