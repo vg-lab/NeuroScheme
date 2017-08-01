@@ -54,6 +54,7 @@ namespace nslib
     , _checkUniquenessCheck( new QCheckBox )
   {
     QGridLayout* layout = new QGridLayout;
+    layout->setAlignment( Qt::AlignTop );
     layout->setColumnStretch( 1, 1 );
     layout->setColumnMinimumWidth( 1, 150 );
 

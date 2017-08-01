@@ -43,27 +43,28 @@
                 {
                     "name": "Random probability",
                     "type": "float",
-                    "constraint" : [ {"propName": "Connectivity Model", "value": "Random" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model",
+                                        "parentValue": "Random" } ]
                 },
                 {
                     "name": "FanOut Outdegree",
                     "type": "float",
-                    "constraint" : [ {"propName": "Connectivity Model", "value": "FanOut" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanOut" } ]
                 },
                 {
                     "name": "FanIn Indegree",
                     "type": "float",
-                    "constraint" : [ {"propName": "Connectivity Model", "value": "FanIn" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanIn" } ]
                 },
                 {
                     "name": "Spatial Gaussian Probability",
                     "type": "float",
-                    "constraint" : [ {"propName": "Connectivity Model", "value": "Spatial Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
                 },
                 {
                     "name": "Spatial Gaussian Sigma",
                     "type": "float",
-                    "constraint" : [ {"propName": "Connectivity Model", "value": "Spatial Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
                 },
                 {
                     "name": "Weight Type",
@@ -72,17 +73,17 @@
                 {
                     "name": "Weight",
                     "type": "float",
-                    "constraint" : [ {"propName": "Weight Type", "value": "Fixed" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Fixed" } ]
                 },
                 {
                     "name": "Weight Gaussian Mean",
                     "type": "float",
-                    "constraint" : [ { "propName": "Weight Type", "value": "Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Weight Gaussian Sigma",
                     "type": "float",
-                    "constraint" : [ { "propName": "Weight Type", "value": "Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Delay Type",
@@ -91,17 +92,17 @@
                 {
                     "name": "Delay",
                     "type": "float",
-                    "constraint" : [ {"propName": "Delay Type", "value": "Fixed" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Fixed" } ]
                 },
                 {
                     "name": "Delay Gaussian Mean",
                     "type": "float",
-                    "constraint" : [ { "propName": "Delay Type", "value": "Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Delay Gaussian Sigma",
                     "type": "float",
-                    "constraint" : [ { "propName": "Delay Type", "value": "Gaussian" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Threshold",
