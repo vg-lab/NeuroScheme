@@ -37,6 +37,8 @@
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
 
+#include <congen/DataSaver.h>
+
 #include <QGridLayout>
 #include <QPushButton>
 #include <QInputDialog>
@@ -62,12 +64,14 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
+  // Connect save dialog
+  connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
+
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
            this, SLOT( toggleShowConnectivity( )));
-
 
   QActionGroup* splitTypeGroup = new QActionGroup( this );
   _ui->actionSplitHorizontally->setCheckable( true );
@@ -502,3 +506,13 @@ void MainWindow::toggleShowConnectivity( void )
     //   canvas->activeLayoutIndex( ))->refresh( false );
   }
 }
+
+
+void MainWindow::saveScene( void )
+{
+  //Depending on the selected domain, a certain "saver" could be available
+  //At this moment, only NeuroML
+  emit nslib::congen::DataSaver::saveConGenXmlScene( this );
+}
+
+
