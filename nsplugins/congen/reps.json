@@ -10,7 +10,12 @@
                 {
                     "name": "color",
                     "type": "Color"
+                },
+                {
+                    "name": "line perc",
+                    "type": "float"
                 }
+
             ],
             "types": [ ]
         },
@@ -21,9 +26,20 @@
                 {
                     "name": "width",
                     "type": "uint"
+                },
+                {
+                    "name": "head",
+                    "type": "TArrowHead"
                 }
             ],
-            "types": [ ]
+            "types":
+            [
+                {
+                    "class": "enum",
+                    "name": "TArrowHead",
+                    "values": [ "CIRCLE", "TRIANGLE" ]
+                }
+            ]
         }
 
     ]

@@ -62,7 +62,7 @@ namespace nslib
 
       QPolygonF arrowShape;
 
-      float arrowWidth = 3 * nslib::Config::scale( );
+      float arrowWidth = 6 * nslib::Config::scale( );
       float arrowLength = 3 * nslib::Config::scale( );
 
       QLineF auxLine( origin, dest );
@@ -97,6 +97,23 @@ namespace nslib
       _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
       _arrowOriItem->setParentItem( this );
 
+
+      if ( this->_parentRep->getProperty( "head" ).
+           value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
+           shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
+      {
+        auto arrowCircleEnd = new QGraphicsEllipseItem( );
+        arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
+                                 dest.y( ) - size * 0.5f,
+                                 size,
+                                 size );
+
+        arrowCircleEnd->setPen( Qt::NoPen );
+        arrowCircleEnd->setBrush( QBrush( color ));
+        arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        arrowCircleEnd->setParentItem( this );
+      }
+
       arrowShape.clear( );
 
       arrowShape  << auxLine.p1( )
@@ -107,7 +124,6 @@ namespace nslib
                   << arrowInit;
 
       this->setBrush( QBrush( color ));
-      // this->setPen( QPen( color ));
       this->setPen( QPen( QBrush( color ), _arrowThickness ));
       this->setPolygon( arrowShape );
       this->setZValue( -100.0f );

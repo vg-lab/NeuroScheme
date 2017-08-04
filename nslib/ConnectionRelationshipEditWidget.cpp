@@ -24,6 +24,7 @@
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "PaneManager.h"
+#include "RepresentationCreatorManager.h"
 
 #include <QPushButton>
 #include <QGridLayout>
@@ -218,6 +219,21 @@ namespace nslib
 
       caster->fromString( prop, paramString.toStdString( ));
     }
+
+    bool needToClearCache = false;
+    for ( const auto& creatorPair :
+            nslib::RepresentationCreatorManager::creators( ))
+    {
+      needToClearCache = needToClearCache ||
+        creatorPair.second->relationshipUpdatedOrCreated( propObject );
+    }
+
+    // TODO improvemente: check if cache needs to be cleared or if just the
+    // items related to the entity under edition
+    // if ( needToClearCache ) {
+    nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+    // }
+
 
     for ( auto pane : nslib::PaneManager::panes( ))
     {

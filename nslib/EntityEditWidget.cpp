@@ -319,11 +319,19 @@ namespace nslib
         }
       }
 
+      bool needToClearCache = false;
       for ( const auto& creatorPair :
               nslib::RepresentationCreatorManager::creators( ))
       {
-        creatorPair.second->entityUpdatedOrCreated( _entity );
+        needToClearCache = needToClearCache ||
+          creatorPair.second->entityUpdatedOrCreated( _entity );
       }
+
+      // TODO improvemente: check if cache needs to be cleared or if just the
+      // items related to the entity under edition
+      // if ( needToClearCache ) {
+        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
+      // }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
@@ -364,7 +372,6 @@ namespace nslib
           shift::Representation* rep = repPair.first;
           delete rep;
         }
-        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
         for ( auto pane : nslib::PaneManager::panes( ))
         {
           pane->reps( ).clear( );

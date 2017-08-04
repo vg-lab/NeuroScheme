@@ -25,7 +25,8 @@
                     "class": "enum",
                     "name": "TNeuronModel",
                     "values": [
-                        "iaf psc alpha"
+                        "iaf psc alpha",
+                        "undefined"
                     ]
                 }
             ]
