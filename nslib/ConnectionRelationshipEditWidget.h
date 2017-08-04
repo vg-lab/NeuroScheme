@@ -27,7 +27,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLabel>
-
+#include <QLineEdit>
 #include <shift/shift.h>
 
 namespace nslib
@@ -50,6 +50,7 @@ namespace nslib
   private:
     shift::Entity* _originEntity;
     shift::Entity* _destinationEntity;
+    std::unique_ptr< QLineEdit > _entityLabel;
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
     typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;

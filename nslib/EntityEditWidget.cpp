@@ -66,7 +66,7 @@ namespace nslib
       QWidget* widget;
 
       {
-        auto label = new QLabel( "Entity label" );
+        auto label = new QLabel( "Entity name" );
         layout->addWidget( label, element, 0 );
 
         widgetType = TWidgetType::LINE_EDIT;
@@ -331,6 +331,7 @@ namespace nslib
       // items related to the entity under edition
       // if ( needToClearCache ) {
         nslib::RepresentationCreatorManager::clearEntitiesToReps( );
+        nslib::RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )

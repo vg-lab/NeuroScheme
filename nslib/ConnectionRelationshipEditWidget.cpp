@@ -48,6 +48,8 @@ namespace nslib
       ->relationshipPropertiesTypes( );
     shift::Properties* propObject;
 
+    bool propertyObjExists = true;
+
     auto& relConnectsTo =
       *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
     auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
@@ -60,13 +62,18 @@ namespace nslib
         propObject = connectsToMMIt->second;
       }
       else
+      {
         propObject = relationshipPropertiesTypes.getRelationshipProperties(
           "connectsTo" );
+        propertyObjExists = false;
+      }
     }
     else
+    {
       propObject = relationshipPropertiesTypes.getRelationshipProperties(
         "connectsTo" );
-
+      propertyObjExists = false;
+    }
     _propObject = propObject;
 
     assert( propObject );
@@ -78,6 +85,24 @@ namespace nslib
     layout->addWidget( labelRel, 0, 0, 1, 0 );
 
     unsigned int numProp = 1;
+
+    {
+      QWidget* widget;
+      auto label = new QLabel( "Name" );
+      layout->addWidget( label, numProp, 0 );
+
+      _entityLabel.reset( new QLineEdit( ));
+      widget = _entityLabel.get( );
+      QString propName( QString::fromStdString(
+                          ( propertyObjExists ? propObject->label( ) :
+                            originEntity_->label( ) + "-" +
+                            destinationEntity_->label( ))));
+      _entityLabel->setText( propName );
+      _entityLabel->setEnabled( true );
+      layout->addWidget( widget, numProp, 1 );
+      ++numProp;
+    }
+
     for( const auto& propPair: propObject->properties( ))
     {
       const auto prop = propPair.first;
@@ -219,6 +244,7 @@ namespace nslib
 
       caster->fromString( prop, paramString.toStdString( ));
     }
+    propObject->label( ) = _entityLabel->text( ).toStdString( );
 
     bool needToClearCache = false;
     for ( const auto& creatorPair :
