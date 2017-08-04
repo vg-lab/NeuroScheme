@@ -57,12 +57,12 @@ namespace nslib
     void ConnectionArrowItem::createArrow( const QPointF& origin,
                                            const QPointF& dest )
     {
-      _arrowOrigin = origin;
-      _arrowDest = dest;
+      _arrowOrigin  = origin;
+      _arrowDest    = dest;
 
       QPolygonF arrowShape;
 
-      float arrowWidth = 6 * nslib::Config::scale( );
+      float arrowWidth  = 6 * nslib::Config::scale( );
       float arrowLength = 3 * nslib::Config::scale( );
 
       QLineF auxLine( origin, dest );
@@ -82,8 +82,15 @@ namespace nslib
         QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
                  cos( angle + M_PI - M_PI_3 ) * arrowWidth );
 
-      float size = arrowLength;
+      QPointF arrowI1 = _arrowOrigin -
+        QPointF( sin( angle + M_PI ) * arrowWidth,
+                 cos( angle + M_PI ) * arrowWidth );
+      QPointF arrowI2 = _arrowOrigin +
+        QPointF( sin(angle - M_PI ) * arrowWidth,
+                 cos( angle - M_PI ) * arrowWidth );
 
+
+      float size = arrowLength;
 
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
       _arrowOriItem = new QGraphicsEllipseItem( );
@@ -116,12 +123,16 @@ namespace nslib
 
       arrowShape.clear( );
 
-      arrowShape  << auxLine.p1( )
+      arrowShape  << arrowI1
+                  << arrowI2
+                  << auxLine.p1( )
                   << arrowInit
                   << arrowP1
                   << auxLine.p2( )
                   << arrowP2
-                  << arrowInit;
+                  << arrowInit
+                  << auxLine.p1( )
+                  ;
 
       this->setBrush( QBrush( color ));
       this->setPen( QPen( QBrush( color ), _arrowThickness ));

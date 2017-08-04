@@ -25,6 +25,7 @@
 #include <nslibcongen/api.h>
 #include <nslib/DomainManager.h>
 #include "DataLoader.h"
+#include "DataSaver.h"
 
 namespace nslib
 {

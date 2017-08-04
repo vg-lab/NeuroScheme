@@ -70,6 +70,8 @@ set( NSLIBCONGEN_SOURCES
   NeuronPopRep.cpp
   NeuronPopItem.cpp
   RepresentationCreator.cpp
+  XMLConGenExporter.cpp
+  DataSaver.cpp  
   )
 
 set( NSLIBCONGEN_HEADERS
@@ -81,6 +83,8 @@ set( NSLIBCONGEN_HEADERS
   NeuronPopRep.h
   NeuronPopItem.h
   RepresentationCreator.h
+  XMLConGenExporter.h
+  DataSaver.h  
   )
 
 include_directories( ${SHIFT_GENERATED_DIR} )
