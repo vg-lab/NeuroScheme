@@ -30,6 +30,7 @@
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QMenu>
 #include <QPen>
 namespace nslib
@@ -56,6 +57,10 @@ namespace nslib
 
     static void mouseReleaseEvent( QGraphicsItem* item,
                                    QMouseEvent* event );
+
+    static void mouseMoveEvent( QGraphicsView* graphicsView,
+                                QAbstractGraphicsShapeItem* shapeItem,
+                                QMouseEvent* event );
 
     static void createConnectionRelationship(
       shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
@@ -103,6 +108,8 @@ namespace nslib
     static EntityEditWidget* _entityEditWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
+    static std::unique_ptr< QGraphicsLineItem > _tmpConnectionLine;
+    static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
 
   };
 }
