@@ -109,11 +109,11 @@ namespace nslib
 
 
   void InteractionManager::hoverEnterEvent(
-    QAbstractGraphicsShapeItem* item,
-    QGraphicsSceneHoverEvent* /* event */ )
+    QAbstractGraphicsShapeItem* shapeItem,
+    QGraphicsSceneHoverEvent* event )
   {
     // std::cout << "hover" << std::endl;
-    auto selectableItem = dynamic_cast< SelectableItem* >( item );
+    auto selectableItem = dynamic_cast< SelectableItem* >( shapeItem );
     if ( selectableItem )
     {
       selectableItem->hover( true );
@@ -121,7 +121,33 @@ namespace nslib
     }
     else
     {
-      item->setPen( SelectableItem::hoverUnselectedPen( ));
+      shapeItem->setPen( SelectableItem::hoverUnselectedPen( ));
+    }
+
+    assert( event );
+
+    if ( event->modifiers( ).testFlag( Qt::ControlModifier ))
+    {
+      if ( _entityEditWidget != nullptr )
+        delete _entityEditWidget;
+      auto item = dynamic_cast< Item* >( shapeItem );
+      if ( item )
+      {
+        assert( item->parentRep( ));
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        {
+          const auto entities = repsToEntities.at( item->parentRep( ));
+          auto entityGid = ( *entities.begin( ))->entityGid( );
+          _entityEditWidget = new EntityEditWidget(
+            DataManager::entities( ).at( entityGid ),
+            EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+          EntityEditWidget::parentDock( )->show( );
+          _entityEditWidget->show( );
+        }
+      }
     }
   }
 
