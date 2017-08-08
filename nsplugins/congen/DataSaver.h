@@ -26,7 +26,8 @@
 #include <nslib/api.h>
 #include <QWidget>
 
-#include "XMLConGenExporter.h"
+#include "XMLExporter.h"
+#include <nslibcongen/api.h>
 
 namespace nslib
 {
@@ -38,7 +39,7 @@ namespace nslib
       public:
 
       signals:
-        static void saveXmlScene( QWidget * ptr );
+        NSLIBCONGEN_API static void saveXmlScene( QWidget * ptr );
     };
   } /* namespace congen */
 } /* namespace nslib */

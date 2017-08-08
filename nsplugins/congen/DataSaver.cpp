@@ -40,7 +40,7 @@ namespace nslib
                           QObject::tr("NeuroML (*.xml);;All Files (*)"));
       if ( fileName != "" )
       {
-        XMLConGenExporter* exporter_ = new XMLConGenExporter;
+        XMLExporter* exporter_ = new XMLExporter;
         std::vector< unsigned int > entitiesGids;
 
         auto caster = fires::PropertyManager::getPropertyCaster( "Neuron model" );
@@ -75,7 +75,7 @@ namespace nslib
                                   relIt->first)->second->label( );
             params[ "target" ] = DataManager::entities( ).map( ).find(
                                   relPropIt->first)->second->label( );
-            params[ "name" ] = params[ "source" ] + "-" + params[ "target" ];
+            params[ "name" ] = relPropIt->second->label( );
             params[ "synapse_type" ] = "StaticSynapse";
             params[ "Threshold" ] = std::to_string( relPropIt->second->
                                       getProperty( "Threshold" ).value< float >( ));

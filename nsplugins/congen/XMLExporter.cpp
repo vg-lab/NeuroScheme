@@ -20,13 +20,15 @@
  *
  */
 
-#include "XMLConGenExporter.h"
+#include <QFileInfo>
+
+#include "XMLExporter.h"
 
 namespace nslib
 {
   namespace congen
   {
-    XMLConGenExporter::XMLConGenExporter( )
+    XMLExporter::XMLExporter( )
     {
       domDoc.clear( );
 
@@ -51,7 +53,7 @@ namespace nslib
       nodeRoot.setAttribute( "length_units","micrometer" );
     }
 
-    QDomElement	XMLConGenExporter::addElement( QDomDocument& doc,
+    QDomElement	XMLExporter::addElement( QDomDocument& doc,
                                                QDomNode& node,
                                                const QString& tag,
                                                const QString& value)
@@ -69,7 +71,7 @@ namespace nslib
       return lQDomElement;
     }
 
-    void XMLConGenExporter::addPopulation( const QString& xmlns, const QString& name,
+    void XMLExporter::addPopulation( const QString& xmlns, const QString& name,
         const QString& cell_type, const QString& population_size, const QString& x,
         const QString& y, const QString& z, const QString& width, const QString& height,
         const QString& depth )
@@ -104,7 +106,7 @@ namespace nslib
       size.setAttribute( "depth", depth );
     }
 
-    void XMLConGenExporter::addProjection ( const std::unordered_map< std::string, std::string >& params )
+    void XMLExporter::addProjection ( const std::unordered_map< std::string, std::string >& params )
     {
       if ( nodeProjections == nullptr )
       {
@@ -191,16 +193,15 @@ namespace nslib
       } else if ( params.at( "Connectivity Model" ) == "Spatial Gaussian" )
       {
         connectivity_pattern_type = addElement( domDoc, connectivity_pattern_,
-            QString::fromStdString( "SpatialGaussian_StillToDefine" ));
-        connectivity_pattern_type.setAttribute( "SpatialGaussianProbability_StillToDefine",
+            QString::fromStdString( "spatial_gaussian" ));
+        connectivity_pattern_type.setAttribute( "cutoff",
             QString::fromStdString( params.at( "Spatial Gaussian Probability" )).replace( ",","." ));
-        connectivity_pattern_type.setAttribute( "SpatialGaussianSigma_StillToDefine",
+        connectivity_pattern_type.setAttribute( "sigma",
             QString::fromStdString( params.at( "Spatial Gaussian Sigma" )).replace( ",","." ));
       } else throw "Unknown Connectivity Model";
     }
 
-
-    void  XMLConGenExporter::addInput( const QString& name, const QString& frecuency,
+    void  XMLExporter::addInput( const QString& name, const QString& frecuency,
         const QString& population, const QString& site_patterns )
     {
       if ( nodeImpulses == nullptr )
@@ -221,7 +222,7 @@ namespace nslib
       QDomElement site_pattern_type = addElement( domDoc, site_pattern_, site_patterns);
     }
 
-    void XMLConGenExporter::loadConGenXML( const QString& pFilePath )
+    void XMLExporter::loadConGenXML( const QString& pFilePath )
     {
       domDoc.clear( );
 
@@ -237,7 +238,7 @@ namespace nslib
       }
     }
 
-    XMLConGenExporter::~XMLConGenExporter( )
+    XMLExporter::~XMLExporter( )
     {
       if ( nodePopulations != nullptr)   delete nodePopulations;
       if ( nodeProjections != nullptr)   delete nodeProjections;
@@ -245,12 +246,15 @@ namespace nslib
     }
 
 
-    void XMLConGenExporter::exportConGenXML( const std::string& fileName )
+    void XMLExporter::exportConGenXML( const std::string& fileName )
     {
       std::string fileContent = domDoc.toString( ).toStdString( );
 
       std::string fileTXT = fileName;
-      fileTXT += ".xml";
+
+      QFileInfo fi( QString::fromStdString( fileTXT ));
+
+      if ( fi.suffix().toLower() != "xml" ) fileTXT += ".xml";
 
       std::ofstream( fileTXT.c_str( ));
       std::ofstream outputFileTXT;
@@ -260,7 +264,7 @@ namespace nslib
       outputFileTXT.close( );
     }
 
-    void XMLConGenExporter::parseConGenXML( )
+    void XMLExporter::parseConGenXML( )
     {
       throw	"-->>Parse ConGen XML not done yet!";
     }
