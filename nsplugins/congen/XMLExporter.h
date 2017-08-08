@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef __NSLIB__CONGEN_XML_EXPORTER__
-#define __NSLIB__CONGEN_XML_EXPORTER__
+#ifndef __NSLIB_XML_EXPORTER__
+#define __NSLIB_XML_EXPORTER__
 
 #include <QDomDocument>
 #include <QFile>
@@ -34,7 +34,7 @@ namespace nslib
 {
   namespace congen
   {
-    class XMLConGenExporter
+    class XMLExporter
     {
           QDomDocument  domDoc;
 
@@ -44,9 +44,9 @@ namespace nslib
           QDomElement*  nodeImpulses;
 
       public:
-          XMLConGenExporter( );
+          XMLExporter( );
 
-          ~XMLConGenExporter( );
+          ~XMLExporter( );
 
           const QDomDocument & getXMLConGenDomDocument( ) { return domDoc; }
 

@@ -42,7 +42,7 @@ namespace nslib
       , QGraphicsPolygonItem( )
       , nslib::Item( )
       , nslib::InteractiveItem( )
-      , _arrowOriItem( nullptr )
+      , _arrowCircleEnd( nullptr )
 	  {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
@@ -92,6 +92,7 @@ namespace nslib
 
       float size = arrowLength;
 
+      /*
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
       _arrowOriItem = new QGraphicsEllipseItem( );
       _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
@@ -103,36 +104,43 @@ namespace nslib
       _arrowOriItem->setBrush( QBrush( color ));
       _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
       _arrowOriItem->setParentItem( this );
+       */
 
+      arrowShape.clear( );
 
       if ( this->_parentRep->getProperty( "head" ).
            value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
            shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
       {
-        auto arrowCircleEnd = new QGraphicsEllipseItem( );
-        arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
+        _arrowCircleEnd = new QGraphicsEllipseItem( );
+        _arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
                                  dest.y( ) - size * 0.5f,
                                  size,
                                  size );
 
-        arrowCircleEnd->setPen( Qt::NoPen );
-        arrowCircleEnd->setBrush( QBrush( color ));
-        arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
-        arrowCircleEnd->setParentItem( this );
+        _arrowCircleEnd->setPen( Qt::NoPen );
+        _arrowCircleEnd->setBrush( QBrush( color ));
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setParentItem( this );
+
+        arrowShape  << arrowI1
+                    << arrowI2
+                    << auxLine.p1( )
+                    << auxLine.p2( )
+                    << auxLine.p1( );
       }
-
-      arrowShape.clear( );
-
-      arrowShape  << arrowI1
-                  << arrowI2
-                  << auxLine.p1( )
-                  << arrowInit
-                  << arrowP1
-                  << auxLine.p2( )
-                  << arrowP2
-                  << arrowInit
-                  << auxLine.p1( )
-                  ;
+      else
+      {
+        arrowShape  << arrowI1
+                    << arrowI2
+                    << auxLine.p1( )
+                    << arrowInit
+                    << arrowP1
+                    << auxLine.p2( )
+                    << arrowP2
+                    << arrowInit
+                    << auxLine.p1( );
+      }
 
       this->setBrush( QBrush( color ));
       this->setPen( QPen( QBrush( color ), _arrowThickness ));
