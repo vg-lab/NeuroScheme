@@ -116,9 +116,12 @@ namespace nslib
       nslib::DataManager::nsolDataSet( ).close( );
       return true;
 #else
-      ( void ) args;
-      Log::log( "nsol not built in.", LOG_LEVEL_ERROR );
-      return false;
+      if ( args.count( "-bc" ) > 0 || args.count( "-xml" ) > 0 )
+      {
+           Log::log( "nsol not built in.", LOG_LEVEL_ERROR );
+           return false;
+      }
+      return true;
 #endif
     }
 
