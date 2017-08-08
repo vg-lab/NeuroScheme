@@ -68,15 +68,14 @@ namespace nslib
               if ( qAbstractGraphicItem )
                 InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
             }
-
           InteractionManager::highlightConnectivity( this );
-
         }
       }
 
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
       {
-
+        if ( _interactive )
+        {
           auto qGraphicsItemRep =
             dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
           if ( qGraphicsItemRep )
@@ -88,7 +87,7 @@ namespace nslib
                 InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
             }
           InteractionManager::highlightConnectivity( this, false );
-
+        }
       }
 
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
