@@ -36,6 +36,18 @@
 namespace nslib
 {
 
+  class TemporalConnectionLine : public QGraphicsLineItem
+  {
+  public:
+    ~TemporalConnectionLine( void )
+    {
+      // This check could be removed but for the moment serves as a watchdog
+      // that ensures that if the line is deleted by any of the QtGraphicsScene
+      // methods we will get notified
+      // assert( false );
+    }
+  };
+
   class NSLIB_API InteractionManager
   {
   public:
@@ -108,7 +120,7 @@ namespace nslib
     static EntityEditWidget* _entityEditWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
-    static std::unique_ptr< QGraphicsLineItem > _tmpConnectionLine;
+    static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;
     static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
 
   };

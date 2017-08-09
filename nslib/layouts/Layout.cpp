@@ -306,18 +306,24 @@ namespace nslib
   void Layout::_clearScene( void )
   {
     // Remove top items without destroying them
-    int count = 0;
     for ( auto& item : _canvas->scene( ).items( ))
     {
       if ( dynamic_cast< Item* >( item ) && !item->parentItem( ))
       {
-        count++;
         _canvas->scene( ).removeItem( item );
       }
     }
 
+    // // Remove the rest
+    // for ( auto& item : _canvas->scene( ).items( ))
+    // {
+    //   _canvas->scene( ).removeItem( item );
+    // }
+
+
     // Remove the rest
-    _canvas->scene( ).clear( );
+    // NOTE: removed this clear becasue it delete de objects
+    //_canvas->scene( ).clear( );
   }
 
   void Layout::_addRepresentations( const shift::Representations& reps )

@@ -1,4 +1,7 @@
-The following people have contributed to NeuroScheme
+The following people have contributed to NeuroScheme's code
 
-Pablo Toharia
-Sergio E. Galindo
+Pablo Toharia <pablo.toharia@upm.es>
+Sergio E. Galindo <sergio.galindo@urjc.es>
+Juan Jose Garcia-Cantero <juanjose.garcia@urjc.es>
+Juan Pedro Brito-Mendez <juanpedro.brito@upm.es>
+Cristian Rodriguez <cristian.rodriguez@urjc.es>

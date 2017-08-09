@@ -26,6 +26,7 @@
 #include <nslib/reps/SelectableItem.h>
 #include <nslib/version.h>
 #include <nsplugins/cortex/Domain.h>
+#include <nsplugins/congen/Domain.h>
 #include "MainWindow.h"
 
 
@@ -54,9 +55,12 @@ void usageMessage( const std::string& errorMsg = "" )
   std::cout << std::endl;
   std::cout << std::endl;
 
-  std::cout << "Domain options:" << std::endl;
+  std::cout << "Domains and their options:" << std::endl;
   std::cout << "\t - cortex:" << std::endl;
   nslib::cortex::Domain::usageMessage( );
+  std::cout << std::endl;
+  std::cout << "\t - congen:" << std::endl;
+  nslib::congen::Domain::usageMessage( );
 
   std::cout << std::endl;
   exit( -1 );

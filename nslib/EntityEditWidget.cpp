@@ -377,7 +377,7 @@ namespace nslib
         {
           pane->reps( ).clear( );
           // pane->resizeEvent( nullptr );
-          nslib::PaneManager::activePane( )->displayEntities(
+          pane->displayEntities(
             nslib::PaneManager::activePane( )->entities( ),
             false, true );
         }

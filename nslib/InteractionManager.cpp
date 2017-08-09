@@ -44,8 +44,8 @@ namespace nslib
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
   Qt::MouseButtons InteractionManager::_buttons = 0;
-  std::unique_ptr< QGraphicsLineItem > InteractionManager::_tmpConnectionLine =
-    nullptr;
+  std::unique_ptr< TemporalConnectionLine > InteractionManager::_tmpConnectionLine =
+    std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
   QAbstractGraphicsShapeItem* InteractionManager::lastShapeItemHoveredOnMouseMove =
     nullptr;
 
@@ -388,7 +388,10 @@ namespace nslib
                   LOG_LEVEL_ERROR );
     }
 
-  }
+    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+
+  } // context menu
 
 
   void InteractionManager::mousePressEvent( QGraphicsItem* item,
@@ -396,15 +399,20 @@ namespace nslib
   {
     if ( item )
     {
-      _tmpConnectionLine.reset(
-        new QGraphicsLineItem( QLineF( item->scenePos( ), item->scenePos( ))));
-      _tmpConnectionLine->setZValue( -100000 );
-      _tmpConnectionLine->setPen( QPen( QColor( 128, 128, 128),
-                                        1 * nslib::Config::scale( ),
-                                        Qt::DotLine ));
+      // _tmpConnectionLine.reset(
+      //   new QGraphicsLineItem( QLineF( item->scenePos( ), item->scenePos( ))));
 
-      auto scene = item->scene( );
-      scene->addItem( _tmpConnectionLine.get( ));
+      if ( _tmpConnectionLine )
+      {
+        _tmpConnectionLine->setLine( QLineF( item->scenePos( ), item->scenePos( )));
+        _tmpConnectionLine->setZValue( -100000 );
+        _tmpConnectionLine->setPen( QPen( QColor( 128, 128, 128),
+                                          1 * nslib::Config::scale( ),
+                                          Qt::DotLine ));
+
+        auto scene = item->scene( );
+        scene->addItem( _tmpConnectionLine.get( ));
+      }
 
       auto parentItem = item->parentItem( );
       while ( parentItem )
@@ -430,7 +438,7 @@ namespace nslib
                                            QMouseEvent* event )
   {
     // It _item has value means that a link its being drawn
-    if ( _item )
+    if ( _item && _tmpConnectionLine )
     {
       const auto& initPoint = _tmpConnectionLine->line( ).p1( );
       auto newPos = graphicsView->mapToScene( event->pos( ));
@@ -461,7 +469,6 @@ namespace nslib
         item_ = parentItem;
         parentItem = item_->parentItem( );
       }
-
 
       if ( _item == item_ )
       {
@@ -624,9 +631,13 @@ namespace nslib
         }
       }
     }
+
+    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+
     _item = nullptr;
     _buttons = 0;
-    _tmpConnectionLine.reset( );
+
 
   }
 

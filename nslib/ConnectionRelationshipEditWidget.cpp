@@ -260,7 +260,6 @@ namespace nslib
     nslib::RepresentationCreatorManager::clearRelationshipsCache( );
     // }
 
-
     for ( auto pane : nslib::PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
