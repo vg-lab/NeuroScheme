@@ -7,8 +7,8 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
-project( NeuroScheme VERSION 0.1.13 )
-set( NeuroScheme_VERSION_ABI 10 )
+project( NeuroScheme VERSION 0.1.14 )
+set( NeuroScheme_VERSION_ABI 11 )
 
 # Disable in source building
 if( "${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}" )
@@ -56,6 +56,7 @@ common_find_package( Boost REQUIRED COMPONENTS unit_test_framework )
 common_find_package( ShiFT REQUIRED )
 common_find_package( scoop REQUIRED )
 common_find_package( Qt5Widgets SYSTEM REQUIRED )
+common_find_package( Qt5Xml SYSTEM REQUIRED )
 common_find_package( Eigen3 SYSTEM REQUIRED )
 common_find_package( nsol ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package( Lexis ${NEUROSCHEME_OPTS_FIND_ARGS} )

@@ -64,6 +64,15 @@ namespace nslib
     QGraphicsView::mouseReleaseEvent( event_ );
   }
 
+  void GraphicsView::mouseMoveEvent( QMouseEvent* event_ )
+  {
+    QGraphicsView::mouseMoveEvent( event_ );
+
+    auto item = itemAt( event_->pos( ));
+    auto shapeItem = dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+    InteractionManager::mouseMoveEvent( this, shapeItem, event_ );
+  }
+
   void GraphicsView::wheelEvent( QWheelEvent* event_ )
   {
 
@@ -298,7 +307,8 @@ namespace nslib
   void Canvas::displayEntities( shift::Entities& entities_,
                                 bool animate, bool refreshProperties_ )
   {
-    nslib::Log::log( NS_LOG_HEADER + "displayEntities",
+    nslib::Log::log( NS_LOG_HEADER + "displayEntities " +
+                     std::to_string( entities_.size( )),
                            nslib::LOG_LEVEL_VERBOSE );
 
     if ( refreshProperties_ )

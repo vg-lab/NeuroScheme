@@ -44,6 +44,10 @@ namespace nslib
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
   Qt::MouseButtons InteractionManager::_buttons = 0;
+  std::unique_ptr< TemporalConnectionLine > InteractionManager::_tmpConnectionLine =
+    std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
+  QAbstractGraphicsShapeItem* InteractionManager::lastShapeItemHoveredOnMouseMove =
+    nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -109,11 +113,11 @@ namespace nslib
 
 
   void InteractionManager::hoverEnterEvent(
-    QAbstractGraphicsShapeItem* item,
-    QGraphicsSceneHoverEvent* /* event */ )
+    QAbstractGraphicsShapeItem* shapeItem,
+    QGraphicsSceneHoverEvent* event )
   {
     // std::cout << "hover" << std::endl;
-    auto selectableItem = dynamic_cast< SelectableItem* >( item );
+    auto selectableItem = dynamic_cast< SelectableItem* >( shapeItem );
     if ( selectableItem )
     {
       selectableItem->hover( true );
@@ -121,7 +125,31 @@ namespace nslib
     }
     else
     {
-      item->setPen( SelectableItem::hoverUnselectedPen( ));
+      shapeItem->setPen( SelectableItem::hoverUnselectedPen( ));
+    }
+
+    if ( event && event->modifiers( ).testFlag( Qt::ControlModifier ))
+    {
+      if ( _entityEditWidget != nullptr )
+        delete _entityEditWidget;
+      auto item = dynamic_cast< Item* >( shapeItem );
+      if ( item )
+      {
+        assert( item->parentRep( ));
+        const auto& repsToEntities =
+          RepresentationCreatorManager::repsToEntities( );
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        {
+          const auto entities = repsToEntities.at( item->parentRep( ));
+          auto entityGid = ( *entities.begin( ))->entityGid( );
+          _entityEditWidget = new EntityEditWidget(
+            DataManager::entities( ).at( entityGid ),
+            EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+          EntityEditWidget::parentDock( )->show( );
+          _entityEditWidget->show( );
+        }
+      }
     }
   }
 
@@ -130,6 +158,9 @@ namespace nslib
     QAbstractGraphicsShapeItem* item,
     QGraphicsSceneHoverEvent* /* event */ )
   {
+    if ( !item )
+      return;
+
     auto selectableItem = dynamic_cast< SelectableItem* >( item );
     if ( selectableItem )
     {
@@ -357,7 +388,10 @@ namespace nslib
                   LOG_LEVEL_ERROR );
     }
 
-  }
+    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+
+  } // context menu
 
 
   void InteractionManager::mousePressEvent( QGraphicsItem* item,
@@ -365,6 +399,21 @@ namespace nslib
   {
     if ( item )
     {
+      // _tmpConnectionLine.reset(
+      //   new QGraphicsLineItem( QLineF( item->scenePos( ), item->scenePos( ))));
+
+      if ( _tmpConnectionLine )
+      {
+        _tmpConnectionLine->setLine( QLineF( item->scenePos( ), item->scenePos( )));
+        _tmpConnectionLine->setZValue( -100000 );
+        _tmpConnectionLine->setPen( QPen( QColor( 128, 128, 128),
+                                          1 * nslib::Config::scale( ),
+                                          Qt::DotLine ));
+
+        auto scene = item->scene( );
+        scene->addItem( _tmpConnectionLine.get( ));
+      }
+
       auto parentItem = item->parentItem( );
       while ( parentItem )
       {
@@ -384,9 +433,31 @@ namespace nslib
     }
   }
 
+  void InteractionManager::mouseMoveEvent( QGraphicsView* graphicsView,
+                                           QAbstractGraphicsShapeItem* shapeItem,
+                                           QMouseEvent* event )
+  {
+    // It _item has value means that a link its being drawn
+    if ( _item && _tmpConnectionLine )
+    {
+      const auto& initPoint = _tmpConnectionLine->line( ).p1( );
+      auto newPos = graphicsView->mapToScene( event->pos( ));
+      _tmpConnectionLine->setLine( QLineF( initPoint, newPos ));
+
+      if ( shapeItem && dynamic_cast< Item* >( shapeItem ))
+      {
+        InteractionManager::hoverLeaveEvent( lastShapeItemHoveredOnMouseMove,
+                                             nullptr );
+        InteractionManager::hoverEnterEvent( shapeItem, nullptr );
+        lastShapeItemHoveredOnMouseMove = shapeItem;
+      }
+    }
+  }
+
   void InteractionManager::mouseReleaseEvent( QGraphicsItem* item_,
                                               QMouseEvent* /*event*/ )
   {
+
     if( item_ && _item )
     {
       auto parentItem = item_->parentItem( );
@@ -398,7 +469,6 @@ namespace nslib
         item_ = parentItem;
         parentItem = item_->parentItem( );
       }
-
 
       if ( _item == item_ )
       {
@@ -541,25 +611,34 @@ namespace nslib
           auto originItem = dynamic_cast< Item* >( _item );
           auto destinationItem = dynamic_cast< Item* >( item_ );
 
-          const auto& repsToEntities =
-            RepresentationCreatorManager::repsToEntities( );
-          if (( repsToEntities.find( originItem->parentRep( )) !=
-                repsToEntities.end( )) &&
-              ( repsToEntities.find( destinationItem->parentRep( )) !=
-                repsToEntities.end( )))
+          if ( destinationItem )
           {
-            const auto originEntity =
-              *( repsToEntities.at( originItem->parentRep( )).begin( ));
-            const auto destinationEntity =
-              *( repsToEntities.at( destinationItem->parentRep( )).begin( ));
+            const auto& repsToEntities =
+              RepresentationCreatorManager::repsToEntities( );
+            if (( repsToEntities.find( originItem->parentRep( )) !=
+                  repsToEntities.end( )) &&
+                ( repsToEntities.find( destinationItem->parentRep( )) !=
+                  repsToEntities.end( )))
+            {
+              const auto originEntity =
+                *( repsToEntities.at( originItem->parentRep( )).begin( ));
+              const auto destinationEntity =
+                *( repsToEntities.at( destinationItem->parentRep( )).begin( ));
 
-            createConnectionRelationship( originEntity, destinationEntity );
+              createConnectionRelationship( originEntity, destinationEntity );
+            }
           }
         }
       }
     }
+
+    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+
     _item = nullptr;
     _buttons = 0;
+
+
   }
 
   void InteractionManager::createConnectionRelationship(
@@ -657,6 +736,9 @@ namespace nslib
     const shift::RelationshipOneToN& relAGroupOf,
     unsigned int entityGid )
   {
+    if ( relSuperEntityOf.count( entityGid ) < 1 )
+      return;
+
     for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
     {
       bool allGroupedSelected, noGroupedSelected;

@@ -1,9 +1,13 @@
 # NeuroScheme
 
 ## git master
-* [!35] Added relationship generation using selection and 'drag and drop'.
-* [!34] Added relationship generation using selection and 'drag and drop'.
-* [!33] Fixed bug that crashes loading morphologies with out connectivity.
+* [!10] Added first implementation for congen domain
+* [!38] Added contraints for subproperties in congen
+* [!37] Added basic NeuroML exportation for congen
+* [!39] Added a line following the mouse movement while defining a new projection.
+* [!35] Fixed bug clearing reps cache
+* [!34] Added drag&drop for relationship creation.
+* [!33] Fixed bug that crashed loading morphologies with out connectivity.
 * [!32] Bump CMake/common and use it as a submodule.
 * [!31] Added subentities creation.
 * [!30] In cortex added update of maximums when new neuron is added or edited.

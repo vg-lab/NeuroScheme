@@ -1,0 +1,46 @@
+{
+    "name": "congen",
+    "namespace": "nslib::congen::shiftgen",
+    "reps": [
+        {
+            "name": "NeuronPopRep",
+            "includes" : [ "<nslib/Color.h>" ],
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "color",
+                    "type": "Color"
+                },
+                {
+                    "name": "line perc",
+                    "type": "float"
+                }
+
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "ConnectionArrowRep",
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "width",
+                    "type": "uint"
+                },
+                {
+                    "name": "head",
+                    "type": "TArrowHead"
+                }
+            ],
+            "types":
+            [
+                {
+                    "class": "enum",
+                    "name": "TArrowHead",
+                    "values": [ "CIRCLE", "TRIANGLE" ]
+                }
+            ]
+        }
+
+    ]
+}

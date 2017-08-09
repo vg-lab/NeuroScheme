@@ -35,6 +35,7 @@
 #include <nslib/layouts/ScatterPlotLayout.h>
 #include <nslib/EntityEditWidget.h>
 #include <cortex/Domain.h>
+#include <congen/Domain.h>
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -61,12 +62,14 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
+  // Connect save dialog
+  connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
+
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
            this, SLOT( toggleShowConnectivity( )));
-
 
   QActionGroup* splitTypeGroup = new QActionGroup( this );
   _ui->actionSplitHorizontally->setCheckable( true );
@@ -101,22 +104,16 @@ MainWindow::MainWindow( QWidget* parent_ )
       nslib::DomainManager::setActiveDomain( domain );
       if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
         exit( -1 );
-      // domain->
+    }
+    else if ( nslib::Config::inputArgs( )[ domainArg ][0] == "congen" )
+    {
+      nslib::Domain* domain = new nslib::congen::Domain;
+      nslib::DomainManager::setActiveDomain( domain );
+      if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+        exit( -1 );
 
-      // if ( nslib::Config::cliDataSource ==
-      //      nslib::Config::CLI_BLUECONFIG )
-      // {
-      //   nslib::Log::log( NS_LOG_HEADER + "Loading blue config",
-      //                          nslib::LOG_LEVEL_VERBOSE );
-      //   nslib::DataManager::loadBlueConfig(
-      //     nslib::Config::cliInputFile,
-      //     nslib::Config::targetLabel,
-      //     nslib::Config::loadMorphologies,
-      //     nslib::Config::csvNeuronStatsFileName );
-      // }
     }
   }
-
   nslib::PaneManager::splitter( widget );
 
   // First pane
@@ -507,3 +504,13 @@ void MainWindow::toggleShowConnectivity( void )
     //   canvas->activeLayoutIndex( ))->refresh( false );
   }
 }
+
+
+void MainWindow::saveScene( void )
+{
+  //Depending on the selected domain, a certain "saver" could be available
+  //At this moment, only NeuroML
+  emit nslib::congen::DataSaver::saveXmlScene( this );
+}
+
+

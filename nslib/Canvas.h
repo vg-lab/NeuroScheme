@@ -41,8 +41,9 @@ namespace nslib
 
   public:
     GraphicsView( QWidget* parent = 0 );
-    void mousePressEvent( QMouseEvent*  event );
-    void mouseReleaseEvent( QMouseEvent*  event );
+    void mousePressEvent( QMouseEvent* event ) override;
+    void mouseReleaseEvent( QMouseEvent* event ) override;
+    void mouseMoveEvent( QMouseEvent* event ) override;
 
   protected:
     virtual void wheelEvent( QWheelEvent* event_ );
@@ -51,12 +52,9 @@ namespace nslib
 
   class GraphicsScene : public QGraphicsScene
   {
+  public:
+    virtual ~GraphicsScene( void ) { }
     void contextMenuEvent( QGraphicsSceneContextMenuEvent* event );
-
-    // void mousePressEvent( QMouseEvent* /* event */ )
-    // {
-    //   PaneManager::activePane( dynamic_cast< Canvas* >( this->parentWidget( )));
-    // }
 
   }; // class GraphicsScene
 

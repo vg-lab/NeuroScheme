@@ -31,10 +31,10 @@
 
 
 
-#define NEUROSCHEME_THROW( msg )                                               \
-  {                                                                            \
-    nslib::Log::log( std::string( msg ), nslib::LOG_LEVEL_ERROR ); \
-    throw std::runtime_error( msg );                                           \
+#define NEUROSCHEME_THROW( msg )                                        \
+  {                                                                     \
+    nslib::Log::log( std::string( msg ), nslib::LOG_LEVEL_ERROR );      \
+    throw std::runtime_error( msg );                                    \
   }
 
 #define NEUROSCHEME_CHECK_THROW( cond, errorMsg )   \

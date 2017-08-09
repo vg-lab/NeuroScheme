@@ -68,9 +68,8 @@ set( NSLIB_LINK_LIBRARIES
   ShiFT
   scoop
   Qt5::Widgets
+  Qt5::Xml
   )
-
-
 
 if ( TARGET ZeroEQ AND TARGET Lexis AND TARGET Servus )
   list( APPEND NSLIB_LINK_LIBRARIES Lexis ZeroEQ Servus )

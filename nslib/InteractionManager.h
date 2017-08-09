@@ -30,11 +30,23 @@
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QMenu>
 #include <QPen>
-#include <iostream> // Borrar
 namespace nslib
 {
+
+  class TemporalConnectionLine : public QGraphicsLineItem
+  {
+  public:
+    ~TemporalConnectionLine( void )
+    {
+      // This check could be removed but for the moment serves as a watchdog
+      // that ensures that if the line is deleted by any of the QtGraphicsScene
+      // methods we will get notified
+      // assert( false );
+    }
+  };
 
   class NSLIB_API InteractionManager
   {
@@ -58,18 +70,12 @@ namespace nslib
     static void mouseReleaseEvent( QGraphicsItem* item,
                                    QMouseEvent* event );
 
+    static void mouseMoveEvent( QGraphicsView* graphicsView,
+                                QAbstractGraphicsShapeItem* shapeItem,
+                                QMouseEvent* event );
+
     static void createConnectionRelationship(
       shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
-
-    // static const QPen& getSelectedPen( ) { return _selectedPen; }
-    // static const QPen& getPartiallySelectedPen( )
-    // {
-    //   return _partiallySelectedPen;
-    // }
-    // static const QPen& getUnselectedPen( )
-    // {
-    //   return _unselectedPen;
-    // }
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
@@ -79,13 +85,6 @@ namespace nslib
       bool& noChildrenSelected );
 
   protected:
-
-
-  // void InteractionManager::_PropagateSelectedToChilds(
-  //   shift::Entities& entities,
-  //   shift::RelationshipOneToN& relParentOf,
-  //   unsigned int entityGid,
-  //   SelectedState state
 
     static void _propagateSelectedStateToChilds(
       const shift::Entities& entities,
@@ -121,6 +120,8 @@ namespace nslib
     static EntityEditWidget* _entityEditWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
+    static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;
+    static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
 
   };
 }

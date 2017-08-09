@@ -1,0 +1,140 @@
+{
+    "name": "congen",
+    "namespace": "nslib::congen::shiftgen",
+    "reps": [
+        {
+            "name": "NeuronPop",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [],
+            "flags" : [],
+            "properties": [
+                {
+                    "name": "Nb of neurons",
+                    "type": "uint",
+                    "flags": [ "EDITABLE" ]
+
+                },
+                {
+                    "name": "Neuron model",
+                    "type": "TNeuronModel",
+                    "flags": [ "EDITABLE" ]
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TNeuronModel",
+                    "values": [
+                        "iaf psc alpha",
+                        "undefined"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ConnectsWith",
+            "relationship": "connectsTo",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Connectivity Model",
+                    "type": "TConnectivityModel"
+                },
+                {
+                    "name": "Random probability",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model",
+                                        "parentValue": "Random" } ]
+                },
+                {
+                    "name": "FanOut Outdegree",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanOut" } ]
+                },
+                {
+                    "name": "FanIn Indegree",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanIn" } ]
+                },
+                {
+                    "name": "Spatial Gaussian Probability",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
+                },
+                {
+                    "name": "Spatial Gaussian Sigma",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
+                },
+                {
+                    "name": "Weight Type",
+                    "type": "TFixedOrDistribution"
+                },
+                {
+                    "name": "Weight",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Fixed" } ]
+                },
+                {
+                    "name": "Weight Gaussian Mean",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
+                },
+                {
+                    "name": "Weight Gaussian Sigma",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
+                },
+                {
+                    "name": "Delay Type",
+                    "type": "TFixedOrDistribution"
+                },
+                {
+                    "name": "Delay",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Fixed" } ]
+                },
+                {
+                    "name": "Delay Gaussian Mean",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
+                },
+                {
+                    "name": "Delay Gaussian Sigma",
+                    "type": "float",
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
+                },
+                {
+                    "name": "Threshold",
+                    "type": "float"
+                }
+
+            ],
+            "types":
+            [
+                {
+                    "class": "enum",
+                    "name": "TConnectivityModel",
+                    "values": [
+                        "All-to-all",
+                        "One-to-one",
+                        "Random",
+                        "FanOut",
+                        "FanIn",
+                        "Spatial Gaussian"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TFixedOrDistribution",
+                    "values": [
+                        "Fixed",
+                        "Gaussian"
+                    ]
+                }
+            ]
+        }
+
+    ]
+}

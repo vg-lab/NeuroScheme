@@ -13,6 +13,7 @@ set( NEUROSCHEME_HEADERS
 set( NEUROSCHEME_LINK_LIBRARIES
   nslib
   nslibcortex
+  nslibcongen
   )
 
 include_directories(
