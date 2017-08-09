@@ -78,8 +78,12 @@ namespace nslib
         this->setZValue( 100 );
         this->setBrush( QBrush( hoverColor ));
         this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
-        _arrowOriItem->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
-        _arrowOriItem->setBrush( QBrush( hoverColor ));
+
+        if ( _arrowCircleEnd != nullptr )
+        {
+          _arrowCircleEnd->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+          _arrowCircleEnd->setBrush( QBrush( hoverColor ));
+        }
       }
 
       virtual void highlight( scoop::Color color_ )
@@ -87,8 +91,11 @@ namespace nslib
         this->setZValue( 100 );
         this->setBrush( QBrush( color_ ));
         this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
-        _arrowOriItem->setPen( QPen( QBrush( color_ ), _arrowThickness ));
-        _arrowOriItem->setBrush( QBrush( color_ ));
+        if ( _arrowCircleEnd != nullptr )
+        {
+          _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+          _arrowCircleEnd->setBrush( QBrush( color_ ));
+        }
       }
 
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
@@ -103,15 +110,20 @@ namespace nslib
         this->setZValue( -100 );
         this->setBrush( QBrush( color ));
         this->setPen( QPen( QBrush( color ), _arrowThickness ));
-        _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-        _arrowOriItem->setBrush( QBrush( color ));
+        if ( _arrowCircleEnd != nullptr )
+        {
+          _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+          _arrowCircleEnd->setBrush( QBrush( color ));
+        }
       }
 
       static QColor color;
       static QColor hoverColor;
 
     protected:
-      QGraphicsEllipseItem* _arrowOriItem;
+      //QGraphicsEllipseItem* _arrowOriItem;
+
+      QGraphicsEllipseItem* _arrowCircleEnd;
 
       float _arrowThickness;
       QLineF _line;
