@@ -61,11 +61,19 @@ namespace nslib
 
     static void clearEntitiesToReps( unsigned int repCreatorId = 0 )
     {
-      _repCreators[ repCreatorId ]->clear( );
+      //_repCreators[ repCreatorId ]->clear( );
+      for ( auto& repPair : _repsToEntities[ repCreatorId ] )
+          delete repPair.first;
       _entitiesToReps[ repCreatorId ].clear( );
       _repsToEntities[ repCreatorId ].clear( );
-      _relatedEntitiesReps[ repCreatorId ].clear( );
       _gidsToEntitiesReps[ repCreatorId ].clear( );
+    }
+
+    static void clearRelationshipsCache( unsigned int repCreatorId = 0 )
+    {
+      for ( auto& relPair : _relatedEntitiesReps[ repCreatorId ] )
+          delete std::get< 0 >( relPair.second );
+      _relatedEntitiesReps[ repCreatorId ].clear( );
     }
 
     static const shift::TRelatedEntitiesReps& relatedEntities(

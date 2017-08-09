@@ -19,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__REPRESENTATION_CREATOR__
-#define __NSLIB__REPRESENTATION_CREATOR__
+#ifndef __NSPLUGINS_CONGEN__REPRESENTATION_CREATOR__
+#define __NSPLUGINS_CONGEN__REPRESENTATION_CREATOR__
 #include <shift/shift.h>
 #include <nslib/mappers/VariableMapper.h>
 #include <scoop/scoop.h>
@@ -36,6 +36,9 @@ namespace nslib
     class RepresentationCreator : public shift::RepresentationCreator
     {
     public:
+
+      RepresentationCreator( void );
+
       virtual ~RepresentationCreator( void ) {};
 
       void create(
@@ -56,10 +59,14 @@ namespace nslib
 
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
 
+      bool entityUpdatedOrCreated( shift::Entity* entity ) final;
+      bool relationshipUpdatedOrCreated(
+        shift::RelationshipProperties* relProperties ) final;
 
     protected:
 
-      unsigned int _maxConnectionsPerEntity;
+      unsigned int _maxNeuronsPerPopulation;
+      float _maxAbsoluteWeight;
 };
 
   } // namespace congen

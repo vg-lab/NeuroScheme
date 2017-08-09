@@ -82,7 +82,7 @@ namespace nslib
         _neuronTypeAggsMap.clear( );
       }
 
-      void entityUpdatedOrCreated( shift::Entity* entity ) override;
+      bool entityUpdatedOrCreated( shift::Entity* entity ) override;
 
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))

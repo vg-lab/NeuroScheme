@@ -64,6 +64,15 @@ namespace nslib
     QGraphicsView::mouseReleaseEvent( event_ );
   }
 
+  void GraphicsView::mouseMoveEvent( QMouseEvent* event_ )
+  {
+    QGraphicsView::mouseMoveEvent( event_ );
+
+    auto item = itemAt( event_->pos( ));
+    auto shapeItem = dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+    InteractionManager::mouseMoveEvent( this, shapeItem, event_ );
+  }
+
   void GraphicsView::wheelEvent( QWheelEvent* event_ )
   {
 

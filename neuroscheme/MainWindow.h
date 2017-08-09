@@ -78,6 +78,8 @@ public slots:
   void duplicateActivePane( void );
   void home( void );
   void toggleShowConnectivity( void );
+  void saveScene( void );
+
 protected:
 
   QString _tableColumnToString( TTableColumns column );

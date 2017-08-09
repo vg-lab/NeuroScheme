@@ -54,6 +54,7 @@ namespace nslib
     , _checkUniquenessCheck( new QCheckBox )
   {
     QGridLayout* layout = new QGridLayout;
+    layout->setAlignment( Qt::AlignTop );
     layout->setColumnStretch( 1, 1 );
     layout->setColumnMinimumWidth( 1, 150 );
 
@@ -65,7 +66,7 @@ namespace nslib
       QWidget* widget;
 
       {
-        auto label = new QLabel( "Entity label" );
+        auto label = new QLabel( "Entity name" );
         layout->addWidget( label, element, 0 );
 
         widgetType = TWidgetType::LINE_EDIT;
@@ -318,11 +319,20 @@ namespace nslib
         }
       }
 
+      bool needToClearCache = false;
       for ( const auto& creatorPair :
               nslib::RepresentationCreatorManager::creators( ))
       {
-        creatorPair.second->entityUpdatedOrCreated( _entity );
+        needToClearCache = needToClearCache ||
+          creatorPair.second->entityUpdatedOrCreated( _entity );
       }
+
+      // TODO improvemente: check if cache needs to be cleared or if just the
+      // items related to the entity under edition
+      // if ( needToClearCache ) {
+        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
+        nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+      // }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
@@ -363,7 +373,6 @@ namespace nslib
           shift::Representation* rep = repPair.first;
           delete rep;
         }
-        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
         for ( auto pane : nslib::PaneManager::panes( ))
         {
           pane->reps( ).clear( );

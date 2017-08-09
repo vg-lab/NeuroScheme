@@ -25,13 +25,21 @@
 #include <nslib/DataManager.h>
 #include "RepresentationCreator.h"
 #include <shift_NeuronPop.h>
+#include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
+#include <algorithm>
 
 namespace nslib
 {
   namespace congen
   {
+
+    RepresentationCreator::RepresentationCreator( void )
+      : _maxNeuronsPerPopulation( 1 )
+      , _maxAbsoluteWeight( 0.0f )
+    {
+    }
 
     void RepresentationCreator::create(
       const shift::Entities& entities,
@@ -46,16 +54,27 @@ namespace nslib
       nslib::Log::log( "congen::Representationcreator::create",
                        LOG_LEVEL_VERBOSE );
 
-      scoop::SequentialColorMap neuronTypeColorMapper(
-        scoop::ColorPalette::colorBrewerSequential(
-          scoop::ColorPalette::ColorBrewerSequential::PuBu, 6 ),
-        0.0f, 100.0f );
+      scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
+        neuronModelColorMap;
+      neuronModelColorMap.setColor(
+        shiftgen::NeuronPop::TNeuronModel::iaf_psc_alpha,
+        scoop::Color( "#5c8daa" ));
+      neuronModelColorMap.setColor(
+        shiftgen::NeuronPop::TNeuronModel::undefined,
+        scoop::Color( "#e7ba83" ));
+
+      MapperFloatToFloat
+        neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
+
+      // scoop::SequentialColorMap neuronTypeColorMapper(
+      //   scoop::ColorPalette::colorBrewerSequential(
+      //     scoop::ColorPalette::ColorBrewerSequential::PuBu, 6 ),
+      //   0.0f, _maxNeuronsPerPopulation );
 
       for ( const auto entity : entities.vector( ))
       {
         if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
         {
-          // std::cout << "Entity with already a rep" << std::endl;
           for ( const auto rep : entitiesToReps[ entity ] )
             representations.push_back( rep );
           continue;
@@ -67,9 +86,18 @@ namespace nslib
 
           neuronPopRep->setProperty(
             "color",
-            neuronTypeColorMapper.getColor(
+            neuronModelColorMap.getColor(
+              neuronPop->getProperty( "Neuron model" ).
+              value< shiftgen::NeuronPop::TNeuronModel >( )));
+          neuronPopRep->setProperty(
+            "line perc",
+            neuronsToPercentage.map(
               neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
 
+          // neuronPopRep->setProperty(
+          //   "color",
+          //   neuronTypeColorMapper.getColor(
+          //     neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
           representations.push_back( neuronPopRep );
           // Link entity and rep
           if ( linkEntitiesToReps )
@@ -84,7 +112,7 @@ namespace nslib
     }
 
 
-        void RepresentationCreator::generateRelations(
+    void RepresentationCreator::generateRelations(
       const shift::Entities& entities,
       const shift::TGidToEntitiesReps& gidsToEntitiesReps,
       shift::TRelatedEntitiesReps& relatedEntitiesReps,
@@ -96,8 +124,8 @@ namespace nslib
           DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
       MapperFloatToFloat nbConnectionsToWidth(
-        0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
-        1.0f, 3.0f );
+        0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
+        1.0f, 5.0f );
 
       for( auto& entity : entities.vector( ))
       {
@@ -139,17 +167,40 @@ namespace nslib
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
 
-            std::unordered_multimap< shift::Entity::EntityGid,
-                                     shift::RelationshipProperties* > relMMap =
+            const std::unordered_multimap< shift::Entity::EntityGid,
+                                     shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
             auto relMMapIt = relMMap.find( other->entityGid( ));
             if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
             {
-              relationRep->setProperty(
+              // If fixed weight over zero or if gaussian and mean over zero
+              // then circle
+              if (( relMMapIt->second->getProperty( "Weight Type" ).
+                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                    shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
+                    relMMapIt->second->getProperty( "Weight" ).value< float >( )
+                    < 0.0f ) ||
+                  ( relMMapIt->second->getProperty( "Weight Type" ).
+                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                    shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
+                    relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
+                    value< float >( )
+                    < 0.0f ))
+              {
+                relationRep->setProperty(
+                  "head", shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
+              }
+              else
+              {
+                relationRep->setProperty(
+                  "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
+              }
+
+                relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map(
+                  nbConnectionsToWidth.map( fabsf(
                     relMMapIt->second->getProperty(
-                      "Weight" ).value< float >( ))));
+                      "Weight" ).value< float >( )))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
@@ -170,6 +221,54 @@ namespace nslib
 
     } // generateRelations
 
+
+    bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    {
+      bool needToClear = false;
+
+      if ( dynamic_cast< shiftgen::NeuronPop* >( entity ))
+      {
+        auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
+        auto newNeuronsPerPopulation =
+          entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
+
+        _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
+                                            _maxNeuronsPerPopulation );
+
+        needToClear = ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation );
+
+      }
+
+      if ( needToClear )
+        this->clear( );
+
+      return needToClear;
+    }
+
+
+    bool RepresentationCreator::relationshipUpdatedOrCreated(
+      shift::RelationshipProperties* relProperties )
+    {
+      bool needToClear = false;
+
+      if ( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
+      {
+        auto oldMaxAbsoluteWeight = _maxAbsoluteWeight;
+        auto newAbsoluteWeight = fabsf(
+          ( relProperties->getProperty( "Weight Type" ).
+            value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+            shiftgen::ConnectsWith::TFixedOrDistribution::Fixed  ?
+            relProperties->getProperty( "Weight" ).value< float >( ) :
+            relProperties->getProperty( "Weight Gaussian Mean" ).value< float >( )));
+
+        _maxAbsoluteWeight= std::max( newAbsoluteWeight,
+                                      _maxAbsoluteWeight );
+
+        needToClear = ( _maxAbsoluteWeight != oldMaxAbsoluteWeight );
+      }
+
+      return needToClear;
+    }
 
   } // namespace congen
 } // namespace nslib

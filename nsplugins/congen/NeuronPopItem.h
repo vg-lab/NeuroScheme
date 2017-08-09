@@ -57,13 +57,37 @@ namespace nslib
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
       {
         if ( _interactive )
-          InteractionManager::hoverEnterEvent( this, event_ );
+        {
+          auto qGraphicsItemRep =
+            dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+          if ( qGraphicsItemRep )
+            for ( auto& item : qGraphicsItemRep->items( ))
+            {
+              auto qAbstractGraphicItem =
+                dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+              if ( qAbstractGraphicItem )
+                InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
+            }
+          InteractionManager::highlightConnectivity( this );
+        }
       }
 
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
       {
         if ( _interactive )
-          InteractionManager::hoverLeaveEvent( this, event_ );
+        {
+          auto qGraphicsItemRep =
+            dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+          if ( qGraphicsItemRep )
+            for ( auto& item : qGraphicsItemRep->items( ))
+            {
+              auto qAbstractGraphicItem =
+                dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+              if ( qAbstractGraphicItem )
+                InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
+            }
+          InteractionManager::highlightConnectivity( this, false );
+        }
       }
 
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )

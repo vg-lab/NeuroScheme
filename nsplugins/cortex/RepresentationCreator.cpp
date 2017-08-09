@@ -581,7 +581,7 @@ namespace nslib
     }
 
 
-    void RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
     {
       if ( dynamic_cast< Neuron* >( entity ))
       {
@@ -607,6 +607,9 @@ namespace nslib
         // _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
         // _maxConnectionsPerEntity = maxConnectionsPerEntity_;
       }
+
+      //TODO this should return true if cache needs to be cleared
+      return true;
     }
 
 
