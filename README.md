@@ -36,13 +36,13 @@ command can be used:
 ## Building
 
 NeuroScheme has been succesfully built and used on Ubuntu 16.04/17.04, Mac OSX
-Yosemite and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
+Yosemite/Sierra and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
 enough to build it just with the required dependencies.
 
 ```bash
-git clone https://gitlab.gmrv.es/nsviz/NeuroScheme.git
-mkdir neuroscheme/build && cd neuroscheme/build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+git clone --recursive https://gitlab.gmrv.es/nsviz/NeuroScheme.git
+mkdir NeuroScheme/build && cd NeuroSceme/build
+cmake .. -DCLONE_SUBPROJECTS=ON -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
