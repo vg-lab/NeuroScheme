@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!39] OSX Sierra building fixes.
 * [!10] Added first implementation for congen domain
 * [!38] Added contraints for subproperties in congen
 * [!37] Added basic NeuroML exportation for congen

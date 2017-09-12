@@ -46,7 +46,7 @@ namespace nslib
     void mouseMoveEvent( QMouseEvent* event ) override;
 
   protected:
-    virtual void wheelEvent( QWheelEvent* event_ );
+    virtual void wheelEvent( QWheelEvent* event_ ) override;
 
   }; // class GraphicsView
 

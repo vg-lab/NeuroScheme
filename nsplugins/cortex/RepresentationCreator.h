@@ -48,14 +48,14 @@ namespace nslib
         shift::TRepsToEntities& repsToEntities,
         shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
-        bool linkRepsToObjs = false );
+        bool linkRepsToObjs = false ) override;
 
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        const std::string& relationName );
+        const std::string& relationName ) override;
 
       void setMaximums( float maxNeuronSomaVolume_,
                         float maxNeuronSomaArea_,
