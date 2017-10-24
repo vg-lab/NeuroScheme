@@ -65,8 +65,8 @@ Win7-Subproject-vs14:
   - set BUILD_GENERATOR=Visual Studio 14 Win64
   - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON
   - set GENERATOR_EXTRA_OPTIONS=
-  - '"c:\Program Files (x86)\Git\bin\bash.exe" --login  .gitlab-ci.sh'
-  - set PATH=%PATH%;"c:\Program Files (x86)\Git\bin"
+  - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
+  - set PATH=%PATH%;"c:\Program Files\Git\bin"
   tags:
   - win7
   except:
