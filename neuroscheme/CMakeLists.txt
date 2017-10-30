@@ -34,4 +34,12 @@ if (MSVC)
   endif()
 endif( )
 
+if ( APPLE )
+  set( NEUROSCHEME_ICON icons/ns.icns )
+endif()
+
+if ( UNIX AND NOT APPLE )
+  set( NEUROSCHEME_ICON icons/ns_icon.png )
+endif( )
+
 common_application( NeuroScheme GUI ${COMMON_APP_ARGS})
