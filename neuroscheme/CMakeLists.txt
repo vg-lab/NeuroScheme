@@ -35,7 +35,7 @@ if (MSVC)
 endif( )
 
 if ( APPLE )
-  set( NEUROSCHEME_ICON icons/ns.icns )
+  set( NEUROSCHEME_ICON ns.icns )
 endif()
 
 if ( UNIX AND NOT APPLE )
