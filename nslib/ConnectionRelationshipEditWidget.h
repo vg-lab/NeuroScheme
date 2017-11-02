@@ -38,9 +38,9 @@ namespace nslib
     Q_OBJECT
 
   public:
-    ConnectionRelationshipEditWidget( shift::Entity*  originEntity_,
+    ConnectionRelationshipEditWidget(shift::Entity*  originEntity_,
                                       shift::Entity* destinationEntity_,
-                                      QWidget* parent = 0);
+                                      QWidget* parent_ = 0);
 
   public slots:
     void validateDialog( );

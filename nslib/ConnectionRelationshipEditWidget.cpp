@@ -39,8 +39,8 @@ namespace nslib
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
     shift::Entity* originEntity_,
     shift::Entity* destinationEntity_,
-    QWidget* parent )
-    : QWidget( parent )
+    QWidget* parent_ )
+    : QWidget( parent_ )
     , _originEntity( originEntity_ )
     , _destinationEntity( destinationEntity_ )
   {
@@ -78,18 +78,18 @@ namespace nslib
 
     assert( propObject );
 
-    QGridLayout* layout = new QGridLayout;
-    layout->setAlignment( Qt::AlignTop );
+    QGridLayout* myLayout = new QGridLayout;
+    myLayout->setAlignment( Qt::AlignTop );
 
     auto labelRel = new QLabel( QString( "Relationship Parameters" ));
-    layout->addWidget( labelRel, 0, 0, 1, 0 );
+    myLayout->addWidget( labelRel, 0, 0, 1, 0 );
 
     unsigned int numProp = 1;
 
     {
       QWidget* widget;
       auto label = new QLabel( "Name" );
-      layout->addWidget( label, numProp, 0 );
+      myLayout->addWidget( label, numProp, 0 );
 
       _entityLabel.reset( new QLineEdit( ));
       widget = _entityLabel.get( );
@@ -99,7 +99,7 @@ namespace nslib
                             destinationEntity_->label( ))));
       _entityLabel->setText( propName );
       _entityLabel->setEnabled( true );
-      layout->addWidget( widget, numProp, 1 );
+      myLayout->addWidget( widget, numProp, 1 );
       ++numProp;
     }
 
@@ -111,7 +111,7 @@ namespace nslib
       {
         auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
         auto label = new QLabel( QString::fromStdString( propName ));
-        layout->addWidget( label, numProp, 0 );
+        myLayout->addWidget( label, numProp, 0 );
 
         const auto& categories = caster->categories( );
 
@@ -149,7 +149,7 @@ namespace nslib
           lineEditwidget->setEnabled( true );
         }
 
-        layout->addWidget( widget, numProp, 1 );
+        myLayout->addWidget( widget, numProp, 1 );
 
         if ( !propObject->evalConstraint( shift::Properties::SUBPROPERTY,
                                           propName ))
@@ -164,15 +164,15 @@ namespace nslib
     }
 
     QPushButton* cancelButton = new QPushButton( QString( "Cancel" ));
-    layout->addWidget( cancelButton, numProp, 0 );
+    myLayout->addWidget( cancelButton, numProp, 0 );
     QPushButton* validationButton = new QPushButton( QString( "Create" ));
-    layout->addWidget( validationButton, numProp, 1 );
+    myLayout->addWidget( validationButton, numProp, 1 );
 
     connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( validationButton, SIGNAL( clicked( )),
              this, SLOT( validateDialog( )));
 
-    setLayout( layout );
+    setLayout( myLayout );
     setWindowTitle( tr( "Create connection relationship" ));
   }
 
