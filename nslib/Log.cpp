@@ -10,8 +10,8 @@ namespace nslib
 {
 
   TLogLevel Log::_logLevel =
-#ifdef _DEBUG
-    LOG_LEVEL_VERBOSE;
+#ifdef DEBUG
+    LOG_LEVEL_WARNING;
 #else
     LOG_LEVEL_ERROR;
 #endif
