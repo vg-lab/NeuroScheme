@@ -41,7 +41,7 @@ enough to build it just with the required dependencies.
 
 ```bash
 git clone --recursive https://gitlab.gmrv.es/nsviz/NeuroScheme.git
-mkdir NeuroScheme/build && cd NeuroSceme/build
+mkdir NeuroScheme/build && cd NeuroScheme/build
 cmake .. -DCLONE_SUBPROJECTS=ON -DCMAKE_BUILD_TYPE=Release
 make
 ```
