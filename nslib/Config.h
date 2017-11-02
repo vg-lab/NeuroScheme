@@ -34,6 +34,7 @@ namespace nslib
     : public std::unordered_map< std::string, std::vector< std::string >>
   {
   public:
+
     bool has( const std::string& arg )
     {
       return this->count( arg ) == 1;
@@ -43,8 +44,7 @@ namespace nslib
     {
       for ( const auto& arg : args )
       {
-        auto found = ( this->count( arg ) == 1 );
-        if ( found )
+        if (( this->count( arg ) == 1 ))
           return true;
       }
       return false;
@@ -57,8 +57,7 @@ namespace nslib
       numArgsFound = 0;
       for ( const auto& arg : args )
       {
-        auto found = ( this->count( arg ) == 1 );
-        if ( found )
+        if ( this->count( arg ) == 1 )
         {
           ++numArgsFound;
           argFound = arg;

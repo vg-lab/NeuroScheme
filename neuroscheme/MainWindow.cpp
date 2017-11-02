@@ -95,23 +95,30 @@ MainWindow::MainWindow( QWidget* parent_ )
 
   // Active domain
   auto domainArg = nslib::Config::isArgumentDefined( { "--domain", "-d"} );
-  if ( !domainArg.empty( ) &&
-       nslib::Config::inputArgs( )[ domainArg ].size( ) == 1 )
+  if ( domainArg.empty( ))
   {
-    if ( nslib::Config::inputArgs( )[ domainArg ][0] == "cortex" )
-    {
-      nslib::Domain* domain = new nslib::cortex::Domain;
-      nslib::DomainManager::setActiveDomain( domain );
-      if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
-        exit( -1 );
-    }
-    else if ( nslib::Config::inputArgs( )[ domainArg ][0] == "congen" )
-    {
-      nslib::Domain* domain = new nslib::congen::Domain;
-      nslib::DomainManager::setActiveDomain( domain );
-      if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
-        exit( -1 );
+    nslib::Log::log( NS_LOG_HEADER + "Domain not defined",
+                     nslib::LOG_LEVEL_WARNING );
 
+  }
+  else
+  {
+    if ( nslib::Config::inputArgs( )[ domainArg ].size( ) == 1 )
+    {
+      if ( nslib::Config::inputArgs( )[ domainArg ][0] == "cortex" )
+      {
+        nslib::Domain* domain = new nslib::cortex::Domain;
+        nslib::DomainManager::setActiveDomain( domain );
+        if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+          exit( -1 );
+      }
+      else if ( nslib::Config::inputArgs( )[ domainArg ][0] == "congen" )
+      {
+        nslib::Domain* domain = new nslib::congen::Domain;
+        nslib::DomainManager::setActiveDomain( domain );
+        if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+          exit( -1 );
+      }
     }
   }
   nslib::PaneManager::splitter( widget );
