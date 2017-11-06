@@ -45,18 +45,18 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = false;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent )
-    : QWidget( parent )
+    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
+    : QWidget( parent_ )
     , _entity( nullptr )
     , _action( action )
     , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
     , _checkUniquenessCheck( new QCheckBox )
   {
-    QGridLayout* layout = new QGridLayout;
-    layout->setAlignment( Qt::AlignTop );
-    layout->setColumnStretch( 1, 1 );
-    layout->setColumnMinimumWidth( 1, 150 );
+    QGridLayout* gridLayout = new QGridLayout;
+    gridLayout->setAlignment( Qt::AlignTop );
+    gridLayout->setColumnStretch( 1, 1 );
+    gridLayout->setColumnMinimumWidth( 1, 150 );
 
     unsigned int element = 0;
 
@@ -67,7 +67,7 @@ namespace nslib
 
       {
         auto label = new QLabel( "Entity name" );
-        layout->addWidget( label, element, 0 );
+        gridLayout->addWidget( label, element, 0 );
 
         widgetType = TWidgetType::LINE_EDIT;
         _entityLabel.reset( new QLineEdit( ));
@@ -75,7 +75,7 @@ namespace nslib
         QString propName( QString::fromStdString( entity->label( )));
         _entityLabel->setText( propName );
         _entityLabel->setEnabled( true );
-        layout->addWidget( widget, element, 1 );
+        gridLayout->addWidget( widget, element, 1 );
         ++element;
       }
 
@@ -89,7 +89,7 @@ namespace nslib
           auto label = new QLabel(
             QString::fromStdString( propName ));
 
-          layout->addWidget( label, element, 0 );
+          gridLayout->addWidget( label, element, 0 );
 
           const auto& categories = caster->categories( );
 
@@ -124,7 +124,7 @@ namespace nslib
                                        caster->toString( propPair.second )));
             lineEditwidget->setEnabled( isEditable );
           }
-          layout->addWidget( widget, element, 1 );
+          gridLayout->addWidget( widget, element, 1 );
           ++element;
 
           _entityParamCont.push_back(
@@ -139,56 +139,56 @@ namespace nslib
         sep3->setFrameShape( QFrame::HLine );
         sep4->setFrameShape( QFrame::HLine );
 
-        layout->addWidget( sep3,element,0 );
-        layout->addWidget( sep4,element,1 );
+        gridLayout->addWidget( sep3,element,0 );
+        gridLayout->addWidget( sep4,element,1 );
         ++element;
 
         widgetType = TWidgetType::LINE_EDIT;
         auto label = new QLabel(
           QString::fromStdString( "Number of entities" ));
-        layout->addWidget( label, element, 0 );
+        gridLayout->addWidget( label, element, 0 );
 
         _numNewEntities.reset( new QLineEdit );
         widget = _numNewEntities.get( );
         _numNewEntities->setText( "1" );
 
         _numNewEntities->setEnabled( true );
-        layout->addWidget( widget, element, 1 );
+        gridLayout->addWidget( widget, element, 1 );
       }
       ++element;
     }
 
     QPushButton* cancelButton = new QPushButton( tr( "Close" ));
-    layout->addWidget( cancelButton, element, 0 );
+    gridLayout->addWidget( cancelButton, element, 0 );
 
     QPushButton* validationButton = new QPushButton(
       ( _isNew ? tr( "New" ) : tr( "Save" )));
-    layout->addWidget( validationButton, element, 1 );
+    gridLayout->addWidget( validationButton, element, 1 );
 
     ++element;
     auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
-    layout->addWidget( autoCloseLabel, element, 0 );
+    gridLayout->addWidget( autoCloseLabel, element, 0 );
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
     connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
              this, SLOT( toggleAutoClose( )));
-    layout->addWidget( _autoCloseCheck.get( ), element, 1 );
+    gridLayout->addWidget( _autoCloseCheck.get( ), element, 1 );
 
     ++element;
     auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
-    layout->addWidget( checkUniquenessLabel, element, 0 );
+    gridLayout->addWidget( checkUniquenessLabel, element, 0 );
 
     //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
     _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
     connect( _checkUniquenessCheck.get( ), SIGNAL( clicked( )),
              this, SLOT( toggleCheckUniqueness( )));
-    layout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
+    gridLayout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
 
     connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( validationButton, SIGNAL( clicked( )),
              this, SLOT( validateDialog( )));
 
-    setLayout( layout );
+    setLayout( gridLayout );
     setWindowTitle( tr( "Entity inspector" ));
 
     _entity = entity;

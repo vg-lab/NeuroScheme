@@ -51,7 +51,7 @@ namespace nslib
     innerFill.closeSubpath( );
     ( void ) innerFill.united( innerArc );
 
-    // Substract inner from outer
+    // Subtract inner from outer
     QPainterPath ringFill = outerFill.subtracted( innerFill );
     this->setPath( ringFill );
 

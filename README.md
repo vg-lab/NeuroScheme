@@ -20,7 +20,7 @@ project is a refactor of https://gitlab.gmrv.es/nsviz/neuroscheme.git
     * ZeroEQ & Lexis: enables syncing selections, syncing camera position and
       sending binary cell set operations (2)
     * (TODO) gmrvlex: enables sending focus messages
-    * (TODO) Deflect: eanbles streaming the main window of the app
+    * (TODO) Deflect: enables streaming the main window of the app
 
 (1) Automatically download and build
 (2) Automatically download and build uncommenting .gitsubprojects entry
@@ -35,20 +35,20 @@ command can be used:
 
 ## Building
 
-NeuroScheme has been succesfully built and used on Ubuntu 16.04/17.04, Mac OSX
+NeuroScheme has been successfully built and used on Ubuntu 16.04/17.04, Mac OSX
 Yosemite/Sierra and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
 enough to build it just with the required dependencies.
 
 ```bash
 git clone --recursive https://gitlab.gmrv.es/nsviz/NeuroScheme.git
-mkdir NeuroScheme/build && cd NeuroSceme/build
+mkdir NeuroScheme/build && cd NeuroScheme/build
 cmake .. -DCLONE_SUBPROJECTS=ON -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
 ## Running
 
-All the features should be accesible using the GUI but some of the are also
+All the features should be accessible using the GUI but some of the are also
 available through CLI. Running the following can provide a list of the CLI
 arguments NeuroScheme accepts:
 

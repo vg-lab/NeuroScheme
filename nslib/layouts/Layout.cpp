@@ -322,7 +322,7 @@ namespace nslib
 
 
     // Remove the rest
-    // NOTE: removed this clear becasue it delete de objects
+    // NOTE: removed this clear because it delete de objects
     //_canvas->scene( ).clear( );
   }
 

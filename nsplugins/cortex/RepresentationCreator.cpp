@@ -297,7 +297,7 @@ namespace nslib
 
           if ( _neuronTypeAggsMap.count( neuronTypeAggregationKey ) == 0 )
           {
-            // std::cout << "+++ Doesnt exist" << std::endl;
+            // std::cout << "+++ Doesn't exist" << std::endl;
             _neuronTypeAggsMap[ neuronTypeAggregationKey ] =
               new NeuronTypeAggregationRep( );
           }

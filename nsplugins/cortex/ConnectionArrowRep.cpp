@@ -164,9 +164,9 @@ namespace nslib
 
     void ConnectionArrowRep::hoverEnterEvent( QGraphicsSceneHoverEvent*  )
     {
-      for ( auto item : _items )
+      for ( auto item_ : _items )
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
         if ( arrowItem )
           arrowItem->hoverEnter( );
       }
@@ -174,9 +174,9 @@ namespace nslib
 
     void ConnectionArrowRep::hoverLeaveEvent( QGraphicsSceneHoverEvent*  )
     {
-      for ( auto item : _items )
+      for ( auto item_ : _items )
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
         if ( arrowItem )
           arrowItem->hoverLeave( );
       }
@@ -184,9 +184,9 @@ namespace nslib
 
     void ConnectionArrowRep::highlight( const scoop::Color& color )
     {
-      for ( auto item : _items )
+      for ( auto item_ : _items )
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item.second );
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
         if ( arrowItem )
           arrowItem->highlight( color );
       }
