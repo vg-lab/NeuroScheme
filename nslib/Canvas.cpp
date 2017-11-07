@@ -224,8 +224,10 @@ namespace nslib
     this->view( ).setSceneRect( rectf );
     this->view( ).setTransform( transf );
 
-    this->layouts( ).getLayout(
-      this->activeLayoutIndex( ))->refresh( false );
+    auto activeLayoutIndex =
+      this->layouts( ).getLayout( this->activeLayoutIndex( ));
+    if ( activeLayoutIndex )
+      activeLayoutIndex->refresh( false );
   }
 
   void Canvas::showEvent( QShowEvent* /* event_ */ )

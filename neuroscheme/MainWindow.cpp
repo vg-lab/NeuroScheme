@@ -50,6 +50,7 @@ MainWindow::MainWindow( QWidget* parent_ )
   , _ui( new Ui::MainWindow )
 {
   _ui->setupUi( this );
+
   // This is a WAR to show the menu in some
   // systems that does not appear
   //_ui->menubar->setNativeMenuBar( false );
@@ -93,39 +94,12 @@ MainWindow::MainWindow( QWidget* parent_ )
                          QSizePolicy::Expanding );
   this->setCentralWidget( widget );
 
-  // Active domain
-  auto domainArg = nslib::Config::isArgumentDefined( { "--domain", "-d"} );
-  if ( domainArg.empty( ))
-  {
-    nslib::Log::log( NS_LOG_HEADER + "Domain not defined",
-                     nslib::LOG_LEVEL_WARNING );
 
-  }
-  else
-  {
-    if ( nslib::Config::inputArgs( )[ domainArg ].size( ) == 1 )
-    {
-      if ( nslib::Config::inputArgs( )[ domainArg ][0] == "cortex" )
-      {
-        nslib::Domain* domain = new nslib::cortex::Domain;
-        nslib::DomainManager::setActiveDomain( domain );
-        if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
-          exit( -1 );
-      }
-      else if ( nslib::Config::inputArgs( )[ domainArg ][0] == "congen" )
-      {
-        nslib::Domain* domain = new nslib::congen::Domain;
-        nslib::DomainManager::setActiveDomain( domain );
-        if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
-          exit( -1 );
-      }
-    }
-  }
   nslib::PaneManager::splitter( widget );
 
   // First pane
   nslib::Log::log( NS_LOG_HEADER + "Creating first pane",
-                         nslib::LOG_LEVEL_VERBOSE );
+                   nslib::LOG_LEVEL_VERBOSE );
   auto canvas = nslib::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->setSizePolicy( QSizePolicy::Expanding,
@@ -247,6 +221,8 @@ MainWindow::MainWindow( QWidget* parent_ )
              SLOT( deleteStoredSelection( )));
 
     _storedSelections.dock->setWidget( dockWidget );
+    _storedSelections.dock->close( );
+
   } // END selection dock
 
   {
@@ -265,9 +241,55 @@ MainWindow::MainWindow( QWidget* parent_ )
                          Qt::Vertical );
     _entityEditDock->close( );
   }
-  
-  resizeEvent( 0 );
+
 }
+
+void MainWindow::selectDomain( void )
+{
+  // Active domain
+  auto domainArg = nslib::Config::isArgumentDefined( { "--domain", "-d"} );
+
+  QStringList availableDomains( { "cortex", "congen" } );
+  QString domainSelected = availableDomains.first( );
+
+  // If not domain via CLI, then ask via GUI dialog
+  if ( domainArg.empty( ))
+  {
+    domainSelected =
+      QInputDialog::getItem( this, "Select domain", "Domain name:",
+                             availableDomains,  0, false );
+  }
+  else
+    domainSelected =
+      QString::fromStdString( nslib::Config::inputArgs( )[ domainArg ][0] );
+
+  if ( domainSelected == "cortex" )
+  {
+    nslib::Domain* domain = new nslib::cortex::Domain;
+    nslib::DomainManager::setActiveDomain( domain );
+    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+      exit( -1 );
+  }
+  else if ( domainSelected == "congen" )
+  {
+    nslib::Domain* domain = new nslib::congen::Domain;
+    nslib::DomainManager::setActiveDomain( domain );
+    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+      exit( -1 );
+  }
+  else
+  {
+    QString msg( "domain \"" + domainSelected + "\" unknown. "
+                 "Valid values are: " );
+    msg += availableDomains.join(", ");
+    nslib::Log::log( NS_LOG_HEADER + msg.toStdString( ), nslib::LOG_LEVEL_ERROR );
+    exit( -1 );
+  }
+
+  this->setWindowTitle( this->windowTitle( ) + " (" + domainSelected + ")" );
+
+  resizeEvent( 0 );
+} // MainWindow::selectDomain
 
 MainWindow::~MainWindow( void )
 {

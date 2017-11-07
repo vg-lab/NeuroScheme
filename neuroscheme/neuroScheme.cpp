@@ -225,6 +225,8 @@ int main( int argc, char** argv )
   MainWindow mainWindow( 0 );
   mainWindow.setWindowTitle( "NeuroScheme" );
   mainWindow.show( );
+  mainWindow.selectDomain( );
+
   if ( initWindowSize )
     mainWindow.resize( initWindowWidth, initWindowHeight );
   // else
