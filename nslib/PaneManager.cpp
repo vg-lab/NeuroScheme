@@ -156,7 +156,7 @@ namespace nslib
     if ( !orig )
     {
       nslib::Log::log( NS_LOG_HEADER + "Creating canvas",
-                             nslib::LOG_LEVEL_VERBOSE );
+                       nslib::LOG_LEVEL_VERBOSE );
       canvas = new Canvas( _splitter ); //->parentWidget( ));
       _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
@@ -164,7 +164,7 @@ namespace nslib
     else
     {
       nslib::Log::log( NS_LOG_HEADER + "Cloning canvas",
-                             nslib::LOG_LEVEL_VERBOSE );
+                       nslib::LOG_LEVEL_VERBOSE );
       canvas = orig->clone( );
       auto parentSplitter =
         dynamic_cast< QSplitter* >( orig->parentWidget( ));
