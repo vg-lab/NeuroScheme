@@ -109,10 +109,6 @@ MainWindow::MainWindow( QWidget* parent_ )
   canvas->addLayout( new nslib::ScatterPlotLayout( ));
   canvas->addLayout( new nslib::CircularLayout( ));
 
-  canvas->displayEntities(
-    nslib::DataManager::rootEntities( ), false, true );
-  nslib::PaneManager::panes( ).insert( canvas );
-
   // Layouts dock
   {
     _layoutsDock = new QDockWidget( );
@@ -287,6 +283,11 @@ void MainWindow::selectDomain( void )
   }
 
   this->setWindowTitle( this->windowTitle( ) + " (" + domainSelected + ")" );
+
+  auto canvas = nslib::PaneManager::activePane( );
+  canvas->displayEntities(
+    nslib::DataManager::rootEntities( ), false, true );
+  nslib::PaneManager::panes( ).insert( canvas );
 
   resizeEvent( 0 );
 } // MainWindow::selectDomain
