@@ -1,6 +1,7 @@
 # NeuroScheme
 
 ## git master
+* [!45] Rewrite about dialog to make it verbose about built components version.
 * [!39] OSX Sierra building fixes.
 * [!10] Added first implementation for congen domain
 * [!38] Added contraints for subproperties in congen

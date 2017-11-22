@@ -36,6 +36,20 @@
 #include <nslib/EntityEditWidget.h>
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
+#include <scoop/version.h>
+#ifdef NEUROSCHEME_USE_GMRVLEX
+#include <gmrvlex/version.h>
+#endif
+#ifdef NEUROSCHEME_USE_DEFLECT
+#include <deflect/version.h>
+#endif
+#ifdef NEUROSCHEME_USE_NSOL
+#include <nsol/version.h>
+#endif
+#ifdef NEUROSCHEME_USE_ZEROEQ
+#include <zeroeq/version.h>
+#endif
+
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -503,23 +517,58 @@ void MainWindow::home( void )
 
 void MainWindow::aboutDialog( void )
 {
-  QMessageBox::about(
-    this, tr("About neuroscheme"),
-    tr("<p><BIG><b>NeuroScheme</b></BIG><br><br>") +
-    tr( "version " ) +
-    tr( nslib::Version::getString( ).c_str( )) +
-    tr( " (" ) +
-    tr( std::to_string( nslib::Version::getRevision( )).c_str( )) +
-    tr( ")" ) +
-    tr ("<br><br>GMRV - Universidad Rey Juan Carlos<br><br>"
-        "<a href=www.gmrv.es>www.gmrv.es</a><br>"
-        "<a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
-        "<br>(c) 2015. Universidad Rey Juan Carlos<br><br>"
-        "<img src=':/icons/logoGMRV.png' > &nbsp; &nbsp;"
-        "<img src=':/icons/logoURJC.png' >"
-        "</p>"
-        ""));
+  QString msj = 
+    QString( "<h2>NeuroScheme</h2>" ) +
+    tr( "A tool for multi-scale visual exploration of neuroscientific data, based on schematic representations." ) + 
+    "<br>" + 
+    tr( "Version " ) + nslib::Version::getString( ).c_str( ) +
+    tr( " rev (%1)<br>").arg(nslib::Version::getRevision( )) +
+    "<a href='https://gmrv.es/neuroscheme/'>https://gmrv.es/neuroscheme</a>" + 
+    "<h4>" + tr( "Build info:" ) + "</h4>" +
+    "<ul><li>NSlib " + NSLIB_REV_STRING +    
+    "</li><li>Scoop " + SCOOP_REV_STRING +     
+    "</li><li>ShiFT " + SHIFT_REV_STRING + 
+    "</li><li>FiReS " + FIRES_REV_STRING +
+    
+#ifdef NEUROSCHEME_USE_ZEROEQ
+    "</li><li>ZeroEQ " + ZEROEQ_REV_STRING +
+#else
+    "</li><li>ZeroEQ " + tr ("support not built.") +
+#endif
+
+#ifdef NEUROSCHEME_USE_NSOL
+    "</li><li>Nsol " + NSOL_REV_STRING +
+#else
+    "</li><li>Nsol " + tr ("support not built.") +
+#endif
+
+#ifdef NEUROSCHEME_USE_GMRVLEX
+    "</li><li>GmrvLex " + GMRVLEX_REV_STRING +
+#else
+    "</li><li>GmrvLex " + tr ("support not built.") +
+#endif
+
+#ifdef NEUROSCHEME_USE_DEFLECT
+    "</li><li>Deflect " + DEFLECT_REV_STRING +
+#else
+    "</li><li>Deflect " + tr ("support not built.") +
+#endif
+
+    "</li></ul>" +
+    "<h4>" + tr( "Developed by:" ) + "</h4>" +
+    "GMRV / URJC / UPM"
+    "<br><a href='https://gmrv.es/gmrvvis'>https://gmrv.es/gmrvvis</a>"
+    //"<br><a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
+    "<br>(C) 2016-2017<br><br>"
+    "<a href='https://gmrv.es/gmrvvis'><img src=':/icons/logoGMRV.png'/></a>"
+    "&nbsp;&nbsp;&nbsp;&nbsp;"
+    "<a href='https://www.urjc.es'><img src=':/icons/logoURJC.png' /></a>"
+    "&nbsp;&nbsp;&nbsp;&nbsp;"
+    "<a href='https://www.upm.es'><img src=':/icons/logoUPM.png' /></a>";
+    
+  QMessageBox::about(this, tr( "About NeuroScheme" ), msj );
 }
+
 
 void MainWindow::toggleShowConnectivity( void )
 {
