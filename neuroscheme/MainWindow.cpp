@@ -36,6 +36,7 @@
 #include <nslib/EntityEditWidget.h>
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
+#include <scoop/scoop.h>
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -503,23 +504,74 @@ void MainWindow::home( void )
 
 void MainWindow::aboutDialog( void )
 {
-  QMessageBox::about(
-    this, tr("About neuroscheme"),
-    tr("<p><BIG><b>NeuroScheme</b></BIG><br><br>") +
-    tr( "version " ) +
-    tr( nslib::Version::getString( ).c_str( )) +
-    tr( " (" ) +
-    tr( std::to_string( nslib::Version::getRevision( )).c_str( )) +
-    tr( ")" ) +
-    tr ("<br><br>GMRV - Universidad Rey Juan Carlos<br><br>"
-        "<a href=www.gmrv.es>www.gmrv.es</a><br>"
-        "<a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
-        "<br>(c) 2015. Universidad Rey Juan Carlos<br><br>"
-        "<img src=':/icons/logoGMRV.png' > &nbsp; &nbsp;"
-        "<img src=':/icons/logoURJC.png' >"
-        "</p>"
-        ""));
+  QString msj = 
+    QString( "<h2>NeuroScheme</h2>" ) +
+    tr( "A navigator for neuroscientific data." ) + 
+    "<br>" + 
+    tr( "Version " ) + nslib::Version::getString( ).c_str( ) +
+    tr( " (%1)<br>").arg(nslib::Version::getRevision( )) +
+    "<a href='https://gmrv.es/neuroscheme/'>https://gmrv.es/neuroscheme</a>" + 
+    "<h4>" + tr( "Build info:" ) + "</h4>" +
+    "<ul><li>NSlib " +
+    nslib::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(nslib::Version::getRevision( )) +
+    
+    "</li><li>FiReS " +
+    fires::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(fires::Version::getRevision( )) +
+    "</li><li>Scoop " +
+    scoop::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(scoop::Version::getRevision( )) +
+    
+    "</li><li>ShiFT " +
+    shift::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(shift::Version::getRevision( )) +
+
+    "</li><li>ZeroEQ " +
+#ifdef NEUROSCHEME_USE_ZEROEQ
+    zeroeq::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(zeroeq::Version::getRevision( )) +
+#else
+    tr ("support not built.") +
+#endif
+
+    "</li><li>Nsol " +
+#ifdef NEUROSCHEME_USE_NSOL
+    nsol::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(nsol::Version::getRevision( )) +
+#else
+    tr ("support not built.") +
+#endif
+
+    "</li><li>GmrvLex " +
+#ifdef NEUROSCHEME_USE_GMRVLEX
+    gmrvlex::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(gmrvlex::Version::getRevision( )) +
+#else
+    tr ("support not built.") +
+#endif
+
+    "</li><li>Deflect " +
+#ifdef NEUROSCHEME_USE_DEFLECT
+    deflect::Version::getString( ).c_str( ) +
+    QString( " (%1)").arg(deflect::Version::getRevision( )) +
+#else
+    tr ("support not built.") +
+#endif    
+
+    "</li></ul>" +
+    "<h4>" + tr( "Developed by:" ) + "</h4>" +
+    "GMRV - Universidad Rey Juan Carlos"
+    "<br><a href='https://gmrv.es/gmrvvis'>https://gmrv.es/gmrvvis</a>"
+    //"<br><a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
+    "<br>(C) 2015-2017<br><br>"
+    "<a href='https://gmrv.es/gmrvvis'><img src=':/icons/logoGMRV.png'/></a>"
+    "&nbsp;&nbsp;&nbsp;&nbsp;"
+    "<a href='https://www.urjc.es'><img src=':/icons/logoURJC.png' /></a>";
+    
+  QMessageBox::about(this, tr( "About NeuroScheme" ), msj );
 }
+
 
 void MainWindow::toggleShowConnectivity( void )
 {
