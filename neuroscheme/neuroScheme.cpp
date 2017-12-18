@@ -30,11 +30,6 @@
 #include "MainWindow.h"
 
 
-bool atLeastTwo( bool a, bool b, bool c )
-{
-  return a ^ b ? c : a;
-}
-
 void usageMessage( const std::string& errorMsg = "" )
 {
   if ( !errorMsg.empty( ))
@@ -197,8 +192,8 @@ int main( int argc, char** argv )
   bool fullscreen = false;
   bool initWindowSize = false;
   bool initWindowMaximized = false;
-  int initWindowWidth;
-  int initWindowHeight;
+  int initWindowWidth = 0;
+  int initWindowHeight = 0;
 
   std::string foundArg;
 
