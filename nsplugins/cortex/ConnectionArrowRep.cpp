@@ -77,12 +77,12 @@ namespace nslib
         auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
 
         if ( originItem == nullptr )
-          Log::log( "No successfully dynamic cast on originItem",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "No successfully dynamic cast on originItem",
+                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
         if ( destItem == nullptr )
-          Log::log( "No successfully dynamic cast on destItem",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "No successfully dynamic cast on destItem",
+                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
         auto originArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
         auto& lineAnim = originArrowItem->lineAnim( );

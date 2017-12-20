@@ -23,7 +23,7 @@
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "InteractionManager.h"
-#include "Log.h"
+#include "Loggers.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
@@ -212,7 +212,8 @@ namespace nslib
 
   void Canvas::resizeEvent( QResizeEvent* )
   {
-    Log::log( NS_LOG_HEADER, LOG_LEVEL_VERBOSE );
+    Loggers::get( )->log( "Canvas resize event",
+                         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     const QSize viewerSize = this->view( ).size( );
     const QRectF rectf = QRectF( - viewerSize.width( ) / 2,
                                  - viewerSize.height( ) / 2,
@@ -259,14 +260,13 @@ namespace nslib
   {
     if ( index == -1 )
     {
-      Log::log( NS_LOG_HEADER +
-                " trying to change to a layout with -1 index",
-                LOG_LEVEL_WARNING );
+      Loggers::get( )->log( "Trying to change to a layout with -1 index",
+                            LOG_LEVEL_WARNING );
 
       return;
     }
-    Log::log( NS_LOG_HEADER + "layout changed to " + std::to_string( index ),
-              LOG_LEVEL_VERBOSE );
+    Loggers::get( )->log( "Layout changed to " + std::to_string( index ),
+                         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     if ( _layouts.getLayout( index ))
     {
       _activeLayoutIndex = index;
@@ -296,22 +296,21 @@ namespace nslib
 
       }
       else
-        Log::log( NS_LOG_HEADER + " null pane layout",
-                  LOG_LEVEL_WARNING );
+        Loggers::get( )->log( "Null pane layout",
+                             LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
     }
     else
-      Log::log( NS_LOG_HEADER +
-                " null layout with index" + std::to_string( index ),
-                LOG_LEVEL_WARNING );
+      Loggers::get( )->log( "Null layout with index" + std::to_string( index ),
+                           LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
 
   }
 
   void Canvas::displayEntities( shift::Entities& entities_,
                                 bool animate, bool refreshProperties_ )
   {
-    nslib::Log::log( NS_LOG_HEADER + "displayEntities " +
-                     std::to_string( entities_.size( )),
-                           nslib::LOG_LEVEL_VERBOSE );
+    nslib::Loggers::get( )->log(
+      "displayEntities " + std::to_string( entities_.size( )),
+      nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
     if ( refreshProperties_ )
     {
@@ -332,7 +331,7 @@ namespace nslib
 
   void Canvas::addLayout( Layout* layout_ )
   {
-    Log::log( NS_LOG_HEADER, LOG_LEVEL_VERBOSE );
+    Loggers::get( )->log( "Add layout", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
     _layouts.addLayout( layout_ );
     layout_->canvas( this );

@@ -20,6 +20,7 @@
  *
  */
 #include "DataLoader.h"
+#include <nslib/Loggers.h>
 #include <nslib/DataManager.h>
 #include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>
@@ -35,7 +36,8 @@ namespace nslib
 
     bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& /* args */ )
     {
-      nslib::Log::log( "Loading data for congen", LOG_LEVEL_VERBOSE );
+      // ::nslib::Logger::get( )->log(
+      //   "Loading data for congen", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
       // auto& _entities = nslib::DataManager::entities( );
       // auto& _rootEntities = nslib::DataManager::rootEntities( );

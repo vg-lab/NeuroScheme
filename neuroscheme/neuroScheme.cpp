@@ -20,7 +20,7 @@
  *
  */
 #include <QApplication>
-#include <nslib/Log.h>
+#include <nslib/Loggers.h>
 #include <nslib/Config.h>
 #include <nslib/ZeroEQManager.h>
 #include <nslib/reps/SelectableItem.h>
@@ -51,7 +51,9 @@ void usageMessage( const std::string& errorMsg = "" )
             << std::endl
             << "\t[ --help ]"
             << std::endl
-            << "\t[ [ --scale | -sc ] scaleFactor = 1.0f ]";
+            << "\t[ [ --scale | -sc ] scaleFactor = 1.0f ]"
+            << "\t[ [ --log-file | -l ] log_file_name ]"
+            << "\t[ [ --not-colored-log | -ncl ]";
   std::cout << std::endl;
   std::cout << std::endl;
 
@@ -185,8 +187,37 @@ void parseArguments( int argc, char** argv,
 
 int main( int argc, char** argv )
 {
+
+  std::string foundArg;
   auto& args = nslib::Config::inputArgs( );
   parseArguments( argc, argv, args );
+
+  std::ostream* logStream = &std::cerr;
+  std::ofstream logFileStream;
+  foundArg = checkArg( { "--log-file", "-l" }, 1 );
+  if ( !foundArg.empty( ))
+  {
+    logFileStream.open( args[ foundArg ][ 0 ],
+                        std::ofstream::out | std::ofstream::app );
+    logStream = &logFileStream;
+  }
+
+  bool coloredOutput = true;
+  foundArg = checkArg( { "--not-colored-log", "-ncl" }, 0 );
+  if ( !foundArg.empty( ))
+    coloredOutput = false;
+
+  nslib::Loggers::add(
+    new nslib::Logger( "nslib", *logStream,
+#ifdef DEBUG
+                    nslib::LOG_LEVEL_WARNING
+#else
+                    nslib::LOG_LEVEL_ERROR
+#endif
+                    ,
+                    coloredOutput ));
+  nslib::Loggers::get( )->setCurrentThreadName( "main thread" );
+
 
   if ( args.count( "--help" ) == 1 )
     usageMessage( );
@@ -199,8 +230,6 @@ int main( int argc, char** argv )
   bool initWindowMaximized = false;
   int initWindowWidth;
   int initWindowHeight;
-
-  std::string foundArg;
 
   foundArg = checkArg( { "--window-size", "-ws" }, 2 );
   if ( !foundArg.empty( ))
@@ -217,6 +246,7 @@ int main( int argc, char** argv )
   foundArg = checkArg( { "--scale", "-sc" }, 1 );
   if ( !foundArg.empty( ))
     nslib::Config::scale( std::stof( args[ foundArg ][ 0 ] ));
+
 
 
   QApplication app( argc, argv );
@@ -242,8 +272,8 @@ int main( int argc, char** argv )
       nslib::ZeroEQManager::init( args["-zeroeq"][0] );
     else
     {
-      nslib::Log::log( "Error -zeroeq value empty.",
-                       nslib::LOG_LEVEL_ERROR );
+      nslib::Loggers::get( )->log( "Error -zeroeq value empty.",
+                                  nslib::LOG_LEVEL_ERROR );
       usageMessage( );
     }
   }

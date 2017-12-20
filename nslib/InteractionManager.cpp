@@ -24,7 +24,7 @@
 #include "DomainManager.h"
 #include "InteractionManager.h"
 #include "layouts/LayoutManager.h"
-#include "Log.h"
+#include "Loggers.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
@@ -378,14 +378,14 @@ namespace nslib
         }
         else
         {
-          Log::log( NS_LOG_HEADER + "item without entity",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "item without entity",
+                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
           return;
         }
       }
       else
-        Log::log( NS_LOG_HEADER + "clicked element is not item",
-                  LOG_LEVEL_ERROR );
+        Loggers::get( )->log( "Clicked element is not item",
+                              LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
     }
 
     if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
@@ -591,8 +591,8 @@ namespace nslib
             }
             else
             {
-              Log::log( NS_LOG_HEADER + "item without entity",
-                        LOG_LEVEL_ERROR );
+              Loggers::get( )->log( "item without entity",
+                                    LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
               return;
             }
           }

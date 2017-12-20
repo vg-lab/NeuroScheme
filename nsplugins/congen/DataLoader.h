@@ -24,7 +24,7 @@
 
 #include <nslib/Config.h>
 #include <nslib/DataLoader.h>
-#include <nslib/Log.h>
+#include <nslib/Loggers.h>
 #include <unordered_map>
 #include <string>
 

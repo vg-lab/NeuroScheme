@@ -23,6 +23,7 @@
 #include <nslib/mappers/VariableMapper.h>
 #include <nslib/error.h>
 #include <nslib/DataManager.h>
+#include <nslib/Loggers.h>
 #include "RepresentationCreator.h"
 #include <shift_NeuronPop.h>
 #include <shift_ConnectsWith.h>
@@ -51,8 +52,8 @@ namespace nslib
       bool linkRepsToEntities
       )
     {
-      nslib::Log::log( "congen::Representationcreator::create",
-                       LOG_LEVEL_VERBOSE );
+      nslib::Loggers::get( )->log( "create",
+                                   LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         neuronModelColorMap;

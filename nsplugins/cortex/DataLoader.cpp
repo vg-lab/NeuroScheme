@@ -21,6 +21,7 @@
  */
 #include "DataLoader.h"
 #include <nslib/DataManager.h>
+#include <nslib/Loggers.h>
 #include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>
 #include "Neuron.h"
@@ -39,12 +40,13 @@ namespace nslib
 #ifdef NEUROSCHEME_USE_NSOL
       // std::cout << "Loading data" << std::endl;
       if ( args.empty( ))
-        Log::log( "No arguments provided", LOG_LEVEL_ERROR );
+        Loggers::get( )->log( "No arguments provided",
+                              LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
       if ( args.count( "-bc" ) > 0 && args.count( "-xml" ) > 0 )
       {
-        Log::log( "-bc and -xml arguments are exclusive",
-                  LOG_LEVEL_ERROR );
+        Loggers::get( )->log( "-bc and -xml arguments are exclusive",
+                              LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -52,32 +54,38 @@ namespace nslib
       {
         if ( args.at( "-bc" ).size( ) != 1 )
         {
-          Log::log( "-bc provided with more or less that one filename",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "-bc expect one filename, but " +
+                                std::to_string(args.at( "-bc" ).size( )) +
+                                " were found.",
+                                LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
         if ( args.count( "-target" ) != 1 )
         {
-          Log::log( "-bc provided but no -target found", LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "-bc provided but no -target found",
+                                LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
         if ( args.at( "-target" ).size( ) != 1 )
         {
-          Log::log( "-target provided with more or less that one target name",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "-target expect one target name but " +
+                                std::to_string(args.at( "-target" ).size( )) +
+                                " were found.",
+                                LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
         if ( args.count( "-cns" ) == 1 )
         {
           if ( args.at( "-cns" ).size( ) != 1 )
           {
-            Log::log( "-cns provided with more or less that one csv files",
-                      LOG_LEVEL_ERROR );
+            Loggers::get( )->log( "-cns expect one csv file, but " +
+                                  std::to_string(args.at( "-cns" ).size( )) +
+                                  " were found." );
             return false;
           }
         }
-        nslib::Log::log( NS_LOG_HEADER + "Loading blue config",
-                               nslib::LOG_LEVEL_VERBOSE );
+        Loggers::get( )->log( "Loading blue config",
+                              nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
         nslib::DataManager::loadBlueConfig(
           args.at( "-bc" )[0],
           args.at( "-target" )[0],
@@ -97,13 +105,16 @@ namespace nslib
       {
         if ( args.at( "-xml" ).size( ) != 1 )
         {
-          Log::log( "-xml provided with more or less that one filename",
-                    LOG_LEVEL_ERROR );
+          Loggers::get( )->log( "-xml expect one filename, but " +
+                                std::to_string( args.at( "-xml" ).size( )) +
+                                " were found.",
+                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
           return false;
         }
 
-        nslib::Log::log( NS_LOG_HEADER + "Loading nsol xml",
-                               nslib::LOG_LEVEL_VERBOSE );
+        Loggers::get( )->log(
+          "Loading nsol xml",
+          nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
         nslib::DataManager::loadNsolXmlScene( args.at( "-xml" )[0] );
 
@@ -118,8 +129,9 @@ namespace nslib
 #else
       if ( args.count( "-bc" ) > 0 || args.count( "-xml" ) > 0 )
       {
-           Log::log( "nsol not built in.", LOG_LEVEL_ERROR );
-           return false;
+        nslib::Loggers::get( )->log( "nsol not built in.", LOG_LEVEL_ERROR,
+                                     NEUROSCHEME_FILE_LINE );
+        return false;
       }
       return true;
 #endif
@@ -326,8 +338,9 @@ namespace nslib
 
       if ( !csvNeuronStatsFileName.empty( ))
       {
-        Log::log( NS_LOG_HEADER + "Loading neuron morphology stats from " +
-                  csvNeuronStatsFileName, LOG_LEVEL_VERBOSE );
+        Loggers::get( )->log( "Loading neuron morphology stats from " +
+                              csvNeuronStatsFileName, LOG_LEVEL_VERBOSE,
+                              NEUROSCHEME_FILE_LINE );
         std::ifstream csvNeuronStatsFile( csvNeuronStatsFileName );
         if ( !csvNeuronStatsFile.is_open( ))
         {
@@ -357,10 +370,12 @@ namespace nslib
 
             if ( fields != 26 )
             {
-              nslib::Log::log( std::string( "Skipping lineString " ) +
-                                     std::to_string( lineCount ) +
-                                     std::string( ". Not enough fields found" ),
-                                     nslib::LOG_LEVEL_WARNING );
+              Loggers::get( )->log(
+                std::string( "Skipping lineString " ) +
+                std::to_string( lineCount ) +
+                std::string( ". Expected 26 fields, but found " ) +
+                std::to_string( fields ) + ".",
+                nslib::LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE);
               continue;
             }
 
