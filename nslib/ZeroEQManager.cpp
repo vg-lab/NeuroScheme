@@ -21,6 +21,7 @@
  */
 #ifdef NEUROSCHEME_USE_ZEROEQ
 
+#include "Loggers.h"
 #include <zeroeq/zeroeq.h>
 #include <lexis/lexis.h>
 #include <QObject>
@@ -30,7 +31,6 @@
 #include <gmrvlex/gmrvlex.h>
 #endif
 
-#include "Log.h"
 #include "ZeroEQManager.h"
 #include "SelectionManager.h"
 
@@ -102,11 +102,11 @@ namespace nslib
   {
     if ( _publisher && _publishSelection )
     {
-      nslib::Log::log(
+      nslib::Loggers::get( )->log(
         std::string( "NeuroScheme: publishing selection with " +
                      std::to_string( gids.size( )) +
                      std::string( " neurons" )),
-        nslib::LOG_LEVEL_VERBOSE );
+        nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
       _publisher->publish( lexis::data::SelectedIDs( gids ) );
     }
     // std::cout << "Publish GIDS: ";

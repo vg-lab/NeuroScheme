@@ -23,7 +23,7 @@
 #define __NSLIB_ERROR__
 
 
-#include "Log.h"
+#include "Loggers.h"
 #include <stdexcept>
 #include <exception>
 #include <iostream>
@@ -31,10 +31,11 @@
 
 
 
-#define NEUROSCHEME_THROW( msg )                                        \
-  {                                                                     \
-    nslib::Log::log( std::string( msg ), nslib::LOG_LEVEL_ERROR );      \
-    throw std::runtime_error( msg );                                    \
+#define NEUROSCHEME_THROW( msg )                                             \
+  {                                                                          \
+    nslib::Loggers::get( )->log( std::string( msg ), nslib::LOG_LEVEL_ERROR, \
+                                 NEUROSCHEME_FILE_LINE );                    \
+    throw std::runtime_error( msg );                                         \
   }
 
 #define NEUROSCHEME_CHECK_THROW( cond, errorMsg )   \

@@ -1,32 +1,10 @@
-set( NSLIB_SOURCES
-  Canvas.cpp
-  Config.cpp
-  ConnectionRelationshipEditWidget.cpp
-  DataManager.cpp
-  DomainManager.cpp
-  FilterWidget.cpp
-  InteractionManager.cpp
-  Log.cpp
-  PaneManager.cpp
-  RepresentationCreatorManager.cpp
-  ScatterPlotWidget.cpp
-  SelectionManager.cpp
-  SortWidget.cpp
-  ZeroEQManager.cpp
-  layouts/CircularLayout.cpp
-  layouts/GridLayout.cpp
-  layouts/Layout.cpp
-  layouts/CameraBasedLayout.cpp
-  layouts/ScatterPlotLayout.cpp
-  mappers/VariableMapper.cpp
-  reps/CollapseButtonItem.cpp
-  reps/RingItem.cpp
-  reps/SelectableItem.cpp
-  qxt/qxtspanslider.cpp
-  EntityEditWidget.cpp
-  )
+set( SILO_NAMESPACE nslib )
+set( SILO_NAME NEUROSCHEME )
+configure_file( ${CMAKE_SOURCE_DIR}/deps/silo/silo.in.hpp
+  ${CMAKE_BINARY_DIR}/include/nslib/Logger.hpp )
 
 set( NSLIB_HEADERS
+  ${CMAKE_BINARY_DIR}/include/nslib/Logger.hpp
   Canvas.h
   Color.h
   Config.h
@@ -37,7 +15,7 @@ set( NSLIB_HEADERS
   error.h
   FilterWidget.h
   InteractionManager.h
-  Log.h
+  Loggers.h
   PaneManager.h
   RepresentationCreatorManager.h
   ScatterPlotWidget.h
@@ -62,6 +40,34 @@ set( NSLIB_HEADERS
   reps/RingItem.h
   reps/SelectableItem.h
   EntityEditWidget.h
+  )
+
+set( NSLIB_SOURCES
+  Canvas.cpp
+  Config.cpp
+  ConnectionRelationshipEditWidget.cpp
+  DataManager.cpp
+  DomainManager.cpp
+  FilterWidget.cpp
+  InteractionManager.cpp
+  Loggers.cpp
+  PaneManager.cpp
+  RepresentationCreatorManager.cpp
+  ScatterPlotWidget.cpp
+  SelectionManager.cpp
+  SortWidget.cpp
+  ZeroEQManager.cpp
+  layouts/CircularLayout.cpp
+  layouts/GridLayout.cpp
+  layouts/Layout.cpp
+  layouts/CameraBasedLayout.cpp
+  layouts/ScatterPlotLayout.cpp
+  mappers/VariableMapper.cpp
+  reps/CollapseButtonItem.cpp
+  reps/RingItem.cpp
+  reps/SelectableItem.cpp
+  qxt/qxtspanslider.cpp
+  EntityEditWidget.cpp
   )
 
 set( NSLIB_LINK_LIBRARIES

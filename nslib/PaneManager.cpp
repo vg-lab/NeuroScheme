@@ -21,7 +21,7 @@
  */
 #include "DataManager.h"
 #include "PaneManager.h"
-#include "Log.h"
+#include "Loggers.h"
 #include <assert.h>
 #include <QLabel>
 #include <QPushButton>
@@ -155,16 +155,16 @@ namespace nslib
     Canvas* canvas;
     if ( !orig )
     {
-      nslib::Log::log( NS_LOG_HEADER + "Creating canvas",
-                       nslib::LOG_LEVEL_VERBOSE );
+      nslib::Loggers::get( )->log(
+        "Creating canvas", nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
       canvas = new Canvas( _splitter ); //->parentWidget( ));
       _splitter->addWidget( canvas ); //, _nextRow, _nextColumn );
       canvas->connectLayoutSelector( );
     }
     else
     {
-      nslib::Log::log( NS_LOG_HEADER + "Cloning canvas",
-                       nslib::LOG_LEVEL_VERBOSE );
+      nslib::Loggers::get( )->log(
+        "Cloning canvas", nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
       canvas = orig->clone( );
       auto parentSplitter =
         dynamic_cast< QSplitter* >( orig->parentWidget( ));

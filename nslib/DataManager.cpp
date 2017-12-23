@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 GMRV/URJC/UPM.
+ *
+ * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *
+ * This file is part of NeuroScheme
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
+#include "Loggers.h"
 #include "DataManager.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
@@ -151,8 +173,9 @@ namespace nslib
       }
     } catch ( std::exception& ex )
     {
-      Log::log( std::string( "Error loading BlueConfig: " ) +
-                std::string( ex.what( )), LOG_LEVEL_ERROR );
+      Loggers::get( )->log(
+        std::string( "Error loading BlueConfig: " ) +
+        std::string( ex.what( )), LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
       errorMessage->showMessage( "Error loading BlueConfig" );
       return;
     }
@@ -182,8 +205,9 @@ namespace nslib
         nsol::ColumnStats >( xmlSceneFile );
     } catch ( std::exception& ex )
     {
-      Log::log( std::string( "Error loading scene: " ) +
-                std::string( ex.what( )), LOG_LEVEL_ERROR );
+      Loggers::get( )->log( std::string( "Error loading scene: " ) +
+                           std::string( ex.what( )), LOG_LEVEL_ERROR,
+                           NEUROSCHEME_FILE_LINE );
       errorMessage->showMessage( QString("Error loading scene") +
                                  QString(ex.what( )));
       return;
@@ -191,8 +215,8 @@ namespace nslib
 
     #else
     (void) xmlSceneFile;
-    Log::log( "nsol not built or built without QtCore",
-              LOG_LEVEL_ERROR );
+    Loggers::get( )->log( "nsol not built or built without QtCore",
+                         LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
     #endif
   }

@@ -19,51 +19,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__INTERACTIVE_ITEM__
-#define __NSLIB__INTERACTIVE_ITEM__
+#ifndef __NSLIB_LOGGERS__
+#define __NSLIB_LOGGERS__
 
-#include "../Loggers.h"
-#include <QGraphicsItem>
+#include <nslib/api.h>
+#include <nslib/Logger.hpp>
+#include <assert.h>
 
 namespace nslib
 {
-  class InteractiveItem
+  class Loggers
   {
   public:
 
-    enum
+    static Logger* get( unsigned int idx = 0 )
     {
-      HIERARCHY_ENABLED = 0x01,
-    };
-
-    InteractiveItem( unsigned int flags_ = 0 )
-      : _interactive( true )
-      , _interactiveItemFlags( flags_ )
-    {
-    }
-    virtual ~InteractiveItem( void ) { }
-
-    bool setInteractive( bool interactive_ )
-    {
-      return _interactive = interactive_ ;
+      return _loggers.at( idx );
     }
 
-    bool interactive( void ) const
+    static void add( Logger* logger, unsigned int idx = 0 )
     {
-      return _interactive;
-    }
-
-    unsigned int interactiveItemFlags( void )
-    {
-      return _interactiveItemFlags;
+      _loggers[ idx ] = logger;
     }
 
   protected:
-    bool _interactive;
-    unsigned int _interactiveItemFlags;
-
+    NSLIB_API static std::unordered_map< unsigned int, Logger* > _loggers;
   };
-
-} // namespace nslib
-
-#endif // __NSLIB_COLLAPSABLE_ITEM__
+}
+#endif

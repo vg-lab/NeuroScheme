@@ -1,7 +1,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #   NeuroScheme
-#   2016 (c) GMRV / URJC / UPM
+#   2015-2017 (c) GMRV / URJC / UPM
 #   gmrv@gmrv.es
 #   www.gmrv.es
 #
@@ -21,6 +21,10 @@ list( APPEND CMAKE_MODULE_PATH
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
   message(FATAL_ERROR "CMake/common missing, run: git submodule update --init")
+endif()
+
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/deps/silo/silo.in.hpp)
+  message(FATAL_ERROR "deps/silo/silo.in.hpp missing, run: git submodule update --init")
 endif()
 
 # Default build type is Debug

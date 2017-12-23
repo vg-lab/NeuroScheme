@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "../Loggers.h"
 #include "CameraBasedLayout.h"
 #include "../reps/Item.h"
 #include "../error.h"
@@ -86,9 +87,8 @@ namespace nslib
 
           const auto entities = repsToEntities.at( representation );
           if ( entities.size( ) < 1 )
-            Log::log( NS_LOG_HEADER +
-                      "No entities associated to representation",
-                      LOG_LEVEL_ERROR );
+            Loggers::get( )->log( "No entities associated to representation",
+                                 LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
           auto center =
             DomainManager::getActiveDomain( )->entity3DPosition(
               *entities.begin( ));

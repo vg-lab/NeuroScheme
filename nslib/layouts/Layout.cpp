@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#include "../Loggers.h"
 #include "../error.h"
 #include "../Config.h"
 #include "../DataManager.h"
@@ -104,9 +105,9 @@ namespace nslib
                         shift::Representations& representations,
                         bool animate )
   {
-    nslib::Log::log( NS_LOG_HEADER + "display " +
-                     std::to_string( entities.size( )),
-                     nslib::LOG_LEVEL_VERBOSE );
+    nslib::Loggers::get( )->log(
+      "display " + std::to_string( entities.size( )),
+      nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
 
     representations.clear( );
@@ -227,8 +228,9 @@ namespace nslib
 
    void Layout::refreshWidgetsProperties(
     const TProperties& properties )
-  {
-    Log::log( NS_LOG_HEADER + _name, LOG_LEVEL_VERBOSE );
+   {
+     Loggers::get( )->log( "Refreshing property " + _name, LOG_LEVEL_VERBOSE,
+                          NEUROSCHEME_FILE_LINE );
 
     if ( _sortWidget &&
          _sortWidget->propertiesSelector( ))
@@ -275,7 +277,6 @@ namespace nslib
       _scatterPlotWidget->blockSignals( false );
 
     }
-    Log::log( NS_LOG_HEADER + _name + " Done", LOG_LEVEL_VERBOSE );
 
   }
 
@@ -359,9 +360,9 @@ namespace nslib
         {
           const auto entities = repsToEntities.at( representation );
           if ( entities.size( ) < 1 )
-            Log::log( NS_LOG_HEADER +
-                      "No entities associated to representation",
-                      LOG_LEVEL_ERROR );
+            Loggers::get( )->log(
+              "No entities associated to representation",
+              LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
           auto selectableItem = dynamic_cast< SelectableItem* >( item );
           if ( selectableItem )

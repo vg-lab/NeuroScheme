@@ -24,10 +24,10 @@
 #include <nslib/DataManager.h>
 #include <nslib/DomainManager.h>
 #include <nslib/Config.h>
+#include <nslib/Loggers.h>
 #include <nslib/PaneManager.h>
 #include <nslib/SelectionManager.h>
 #include <nslib/InteractionManager.h>
-#include <nslib/Log.h>
 #include <nslib/layouts/CircularLayout.h>
 #include <nslib/layouts/GridLayout.h>
 #include <nslib/layouts/CameraBasedLayout.h>
@@ -112,8 +112,8 @@ MainWindow::MainWindow( QWidget* parent_ )
   nslib::PaneManager::splitter( widget );
 
   // First pane
-  nslib::Log::log( NS_LOG_HEADER + "Creating first pane",
-                   nslib::LOG_LEVEL_VERBOSE );
+  nslib::Loggers::get( )->log( "Creating first pane",
+                               nslib::LOG_LEVEL_VERBOSE );
   auto canvas = nslib::PaneManager::newPane( );
   canvas->activeLayoutIndex( 0 );
   canvas->setSizePolicy( QSizePolicy::Expanding,
@@ -292,7 +292,7 @@ void MainWindow::selectDomain( void )
     QString msg( "domain \"" + domainSelected + "\" unknown. "
                  "Valid values are: " );
     msg += availableDomains.join(", ");
-    nslib::Log::log( NS_LOG_HEADER + msg.toStdString( ), nslib::LOG_LEVEL_ERROR );
+    nslib::Loggers::get( )->log( msg.toStdString( ), nslib::LOG_LEVEL_ERROR );
     exit( -1 );
   }
 
@@ -354,9 +354,8 @@ void MainWindow::storeSelection( void )
   // In case selection is empty return
   if ( nslib::SelectionManager::activeSelectionSize( ) == 0 )
   {
-    nslib::Log::log( NS_LOG_HEADER +
-                           "Tried to store an empty selection ",
-                           nslib::LOG_LEVEL_VERBOSE );
+    nslib::Loggers::get( )->log( "Tried to store an empty selection ",
+                                 nslib::LOG_LEVEL_VERBOSE );
     return;
   }
 
@@ -391,9 +390,9 @@ void MainWindow::storeSelection( void )
     auto it = _storedSelections.tableWidgets.find( label.toStdString( ));
     if ( it == _storedSelections.tableWidgets.end( ))
     {
-      nslib::Log::log( NS_LOG_HEADER +
-                             "Stored selection row not found ",
-                             nslib::LOG_LEVEL_ERROR );
+      nslib::Loggers::get( )->log(
+        "Stored selection row not found ",
+        nslib::LOG_LEVEL_ERROR );
       return;
     }
 
@@ -471,9 +470,9 @@ void MainWindow::deleteStoredSelection( void )
     if ( !nslib::SelectionManager::deleteStoredSelection(
            label.toStdString( )))
     {
-      nslib::Log::log( NS_LOG_HEADER +
-                             "Tried to delete a non existing saved selection ",
-                             nslib::LOG_LEVEL_WARNING );
+      nslib::Loggers::get( )->log(
+        "Tried to delete a non existing saved selection ",
+        nslib::LOG_LEVEL_WARNING );
 
     }
 // #ifdef NEUROSCHEME_USE_ZEROEQ

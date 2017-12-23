@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "../Log.h"
+#include "../Loggers.h"
 #include "ScatterPlotLayout.h"
 #include "../mappers/VariableMapper.h"
 #include "../reps/QGraphicsItemRepresentation.h"
@@ -45,8 +45,8 @@ namespace nslib
   {
     if ( reps.size( ) == 0 )
     {
-      Log::log( NS_LOG_HEADER + " empty set of reps to arrange.",
-                LOG_LEVEL_WARNING );
+      Loggers::get( )->log( " empty set of reps to arrange.",
+                           LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
       return;
     }
     unsigned int margin = 150;
@@ -95,7 +95,7 @@ namespace nslib
           representation );
       if ( !graphicsItemRep )
       {
-        Log::log( "Item null", LOG_LEVEL_WARNING );
+        Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );
       }
       else
       {
