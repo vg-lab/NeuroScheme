@@ -37,7 +37,7 @@ namespace nslib
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
-        new nslib::cortex::shiftgen::RelationshipPropertiesTypes;
+        new nslib::cortex::shiftgen::RelationshipPropertiesTypes( );
       auto repCreator = new RepresentationCreator( );
       nslib::RepresentationCreatorManager::addCreator( repCreator );
       auto& _entities = nslib::DataManager::entities( );

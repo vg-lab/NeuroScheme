@@ -26,7 +26,7 @@
 #include <nslib/RepresentationCreatorManager.h>
 #include <shift_NeuronPop.h>
 #include <shift_congen_entities.h>
-#include <shift_cortex_relationshipProperties.h>
+#include <shift_congen_relationshipProperties.h>
 
 namespace nslib
 {
@@ -40,7 +40,7 @@ namespace nslib
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
-        new nslib::congen::shiftgen::RelationshipPropertiesTypes;
+        new nslib::congen::shiftgen::RelationshipPropertiesTypes( );
       auto repCreator = new RepresentationCreator( );
       nslib::RepresentationCreatorManager::addCreator( repCreator );
       auto& _entities = nslib::DataManager::entities( );
