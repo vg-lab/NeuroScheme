@@ -23,6 +23,24 @@
 #include <nslib/reps/RingItem.h>
 #include <QPen>
 
+#define POSX0 1.0f                    // Precomputed values for cos(0)
+#define POSY0 0.0f                    // Precomputed values for sin(0)
+
+#define POSX1 0.5000007660251953f     // Precomputed values for cos(60)
+#define POSY1 0.8660249615191342f     // Precomputed values for sin(60)
+
+#define POSX2 -0.49999846794843594f   // Precomputed values for cos(120)
+#define POSY2 0.8660262883130146f     // Precomputed values for sin(120)
+
+#define POSX3 -0.9999999999964793f    // Precomputed values for cos(180)
+#define POSY3 0.00000265358979335273f // Precomputed values for sin(180)
+
+#define POSX4 -0.5000030640984338f    // Precomputed values for cos(240)
+#define POSY4 -0.8660236347191557f    // Precomputed values for sin(240)
+
+#define POSX5 0.49999616986815576f    // Precomputed values for cos(300)
+#define POSY5 -0.8660276151007971f    // Precomputed values for sin(300)
+
 namespace nslib
 {
   namespace congen
@@ -56,7 +74,7 @@ namespace nslib
       QPainterPath path_;
       QPolygon poly;
 
-      int size_2 = roundf( size * 0.5f );
+      /*int size_2 = roundf( size * 0.5f );
       int sizeTopBottomX = roundf( size_2 * 0.5f );
       int sizeTopBottomY = roundf( size_2 * 0.7f );
       int sizeMiddle = roundf( size_2 * 0.9f );
@@ -68,7 +86,41 @@ namespace nslib
       QPoint pMR (  sizeMiddle,  0           );
       QPoint pML ( -sizeMiddle,  0           );
 
-      poly << pTL << pTR << pMR << pBR << pBL << pML;
+      poly << pTL << pTR << pMR << pBR << pBL << pML;*/
+
+      float size_2 = roundf( size * 0.5f );
+
+
+      poly << QPoint(
+        ( size_2 * POSX0 ),
+        ( size_2 * POSY0 )
+      );
+
+      poly << QPoint(
+        ( size_2 * POSX1 ),
+        ( size_2 * POSY1 )
+      );
+
+      poly << QPoint(
+        ( size_2 * POSX2 ),
+        ( size_2 * POSY2 )
+      );
+
+      poly << QPoint(
+        ( size_2 * POSX3 ),
+        ( size_2 * POSY3 )
+      );
+
+      poly << QPoint(
+        ( size_2 * POSX4 ),
+        ( size_2 * POSY4 )
+      );
+
+      poly << QPoint(
+        ( size_2 * POSX5 ),
+        ( size_2 * POSY5 )
+      );
+
       // QPoint pUL (-int(size)/2, -int(size)/24);
       // QPoint pUM (           0, -int(size)/6);
       // QPoint pUR ( int(size)/2, -int(size)/24);
@@ -107,9 +159,9 @@ namespace nslib
       // auto lineWidth = lineContainerWidth; //roundf(  circleItemSize * .85f );
       // auto lineHeight = lineContainerHeight; //roundf( circleItemSize * .09f );
       auto line = new QGraphicsRectItem(
-        pBL.x( ),
-        pBL.y( ) - size_2 * 0.03,
-        roundf( ( pBR.x( ) - pBL.x( )) *
+        POSX4,
+        POSY4 - size_2 * 0.03,
+        roundf( ( POSX5 - POSX4) *
                 neuronRep.getProperty( "line perc" ).value< float >( )),
         size_2 * 0.06 );
 
