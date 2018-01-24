@@ -27,6 +27,7 @@
 #include "RepresentationCreator.h"
 #include <shift_NeuronPop.h>
 #include <random>
+#include <nslib/DomainManager.h>
 
 namespace nslib
 {
@@ -39,35 +40,75 @@ namespace nslib
       // ::nslib::Logger::get( )->log(
       //   "Loading data for congen", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-      // auto& _entities = nslib::DataManager::entities( );
-      // auto& _rootEntities = nslib::DataManager::rootEntities( );
+      auto& _entities = nslib::DataManager::entities( );
+      auto& _rootEntities = nslib::DataManager::rootEntities( );
       // fires::PropertyManager::clear( );
-      // _entities.clear( );
-      // _rootEntities.clear( );
+      _entities.clear( );
+      _rootEntities.clear( );
 
-      // _entities.relationships( )[ "isParentOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isChildOf" ] =
-      //   new shift::RelationshipOneToOne;
+//      _entities.relationships( )[ "isParentOf" ] =
+//        new shift::RelationshipOneToN;
+//      _entities.relationships( )[ "isChildOf" ] =
+//        new shift::RelationshipOneToOne;
+//
+//      _entities.relationships( )[ "isAGroupOf" ] =
+//        new shift::RelationshipOneToN;
+//      _entities.relationships( )[ "isPartOf" ] =
+//        new shift::RelationshipOneToN;
+//
+//      _entities.relationships( )[ "isSuperEntityOf" ] =
+//        new shift::RelationshipOneToN;
+//      _entities.relationships( )[ "isSubEntityOf" ] =
+//        new shift::RelationshipOneToOne;
 
-      // _entities.relationships( )[ "isAGroupOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isPartOf" ] =
-      //   new shift::RelationshipOneToN;
+//      auto& relParentOf =
+//        *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+//      auto& relChildOf =
+//        *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
 
-      // _entities.relationships( )[ "isSuperEntityOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isSubEntityOf" ] =
-      //   new shift::RelationshipOneToOne;
+      auto& relConnectsTo =
+          *( _entities.relationships( )[ "connectsTo" ]->asOneToN( ));
+      auto& relConnectedBy =
+          *( _entities.relationships( )[ "connectedBy" ]->asOneToN( ));
 
-      // auto& relParentOf =
-      //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-      // auto& relChildOf =
-      //   *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+      shift::Entity* neuronPop = new NeuronPop( 1 );
+      _rootEntities.add( neuronPop );
+      _entities.add( neuronPop );
 
-      // shift::Entity* neuronPop = new NeuronPop( 50 );
-      // _rootEntities.add( neuronPop );
-      // _entities.add( neuronPop );
+      shift::Entity* neuronPop2 = new NeuronPop( 1 );
+      _rootEntities.add( neuronPop2 );
+      _entities.add( neuronPop2 );
+
+      auto relationshipPropertiesTypes = nslib::DomainManager::getActiveDomain( )
+          ->relationshipPropertiesTypes( );
+
+      shift::RelationshipProperties* propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" )->create( );
+
+
+
+      shift::Entity* neuronPop3 = new NeuronPop( 1 );
+      _rootEntities.add( neuronPop3 );
+      _entities.add( neuronPop3 );
+
+
+
+      relConnectsTo[ neuronPop3->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop3->entityGid( ), nullptr ));
+
+      relConnectsTo[ neuronPop->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop->entityGid( ), nullptr ));
+
+
+      /**auto connection*/
+      relConnectsTo[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), nullptr ));//*/
 
       // std::default_random_engine generator;
       // std::uniform_int_distribution< int > distribution( 0,100 );
