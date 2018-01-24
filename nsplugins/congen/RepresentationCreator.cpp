@@ -29,6 +29,7 @@
 #include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
+#include "autoConnectionArrowRep.h"
 #include <algorithm>
 
 namespace nslib
@@ -141,15 +142,16 @@ namespace nslib
 
         for( auto& other : entities.vector( ))
         {
-          if( other->entityGid( ) == entity->entityGid( ))
-            continue;
+          /* Removed to not skip auto-connections
+           if( other->entityGid( ) == entity->entityGid( ))
+            continue;//*/
 
-          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
-          if( otherRep == gidsToEntitiesReps.end( ))
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ) );
+          if( otherRep == gidsToEntitiesReps.end( ) )
             continue;
 
           auto numberOfConnections =
-              entityRelations->second.count( other->entityGid( ));
+              entityRelations->second.count( other->entityGid( ) );
 
           if( numberOfConnections == 0 )
             continue;
@@ -158,61 +160,78 @@ namespace nslib
           // the same elements are imported. Then, create a loop to iterate
           // over the given results and create a new one if not found.
           auto combinedKey = std::make_pair( entity->entityGid( ),
-                                             other->entityGid( ));
+                                             other->entityGid( ) );
           auto alreadyConnected =
               relatedEntitiesReps.find( combinedKey );
 
-          if( alreadyConnected == relatedEntitiesReps.end( ))
+          if( alreadyConnected == relatedEntitiesReps.end( ) )
           {
-            ConnectionArrowRep* relationRep =
-              new ConnectionArrowRep( srcEntityRep->second.second,
-                                      otherRep->second.second );
-
-            const std::unordered_multimap< shift::Entity::EntityGid,
-                                     shift::RelationshipProperties* >& relMMap =
-              ( *relatedElements )[ entity->entityGid( ) ];
-            auto relMMapIt = relMMap.find( other->entityGid( ));
-            if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
+            ConnectionArrowRep* relationRep;
+            if( srcEntityRep->second.second == otherRep->second.second )
+            {
+              //IAGODEBUG
+              std::cout << "AUTO - Conection:" << srcEntityRep->second.second
+                        << " - "
+                        << otherRep->second.second << std::endl;
+              relationRep =
+                  new autoConnectionArrowRep( otherRep->second.second );
+            }
+            else
+            {
+              //IAGODEBUG
+              std::cout << "Conection:" << srcEntityRep->second.second << " - "
+                        << otherRep->second.second << std::endl;
+              relationRep =
+                  new ConnectionArrowRep( srcEntityRep->second.second,
+                                          otherRep->second.second );
+            }
+            const std::unordered_multimap<shift::Entity::EntityGid,
+                shift::RelationshipProperties*>& relMMap =
+                ( *relatedElements )[ entity->entityGid( ) ];
+            auto relMMapIt = relMMap.find( other->entityGid( ) );
+            if( relMMapIt !=
+                ( *relatedElements )[ entity->entityGid( ) ].end( ) )
             {
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle
-              if (( relMMapIt->second->getProperty( "Weight Type" ).
-                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+              if( ( relMMapIt->second->getProperty( "Weight Type" ).
+                  value<shiftgen::ConnectsWith::TFixedOrDistribution>( ) ==
                     shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
-                    relMMapIt->second->getProperty( "Weight" ).value< float >( )
+                    relMMapIt->second->getProperty( "Weight" ).value<float>( )
                     < 0.0f ) ||
                   ( relMMapIt->second->getProperty( "Weight Type" ).
-                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                      value<shiftgen::ConnectsWith::TFixedOrDistribution>( ) ==
                     shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
                     relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
-                    value< float >( )
-                    < 0.0f ))
+                        value<float>( )
+                    < 0.0f ) )
               {
                 relationRep->setProperty(
-                  "head", shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
+                    "head",
+                    shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
               }
               else
               {
                 relationRep->setProperty(
-                  "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
+                    "head",
+                    shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
               }
 
-                relationRep->setProperty(
-                "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map( fabsf(
-                    relMMapIt->second->getProperty(
-                      "Weight" ).value< float >( )))));
+              relationRep->setProperty(
+                  "width", ( unsigned int ) roundf(
+                      nbConnectionsToWidth.map( fabsf(
+                          relMMapIt->second->getProperty(
+                              "Weight" ).value<float>( ) ) ) ) );
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
-              std::make_pair( combinedKey,
-                              std::make_tuple( relationRep,
-                                               entity,
-                                               other,
-                                               srcEntityRep->second.second,
-                                               otherRep->second.second )));
+                std::make_pair( combinedKey,
+                                std::make_tuple( relationRep,
+                                                 entity,
+                                                 other,
+                                                 srcEntityRep->second.second,
+                                                 otherRep->second.second ) ) );
           }
-
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
 
         }

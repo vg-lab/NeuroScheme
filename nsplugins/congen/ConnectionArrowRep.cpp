@@ -36,6 +36,8 @@ namespace nslib
       , _originRep( originRep_ )
       , _destRep( destRep_ )
     {
+      //IAGODEBUG
+      std::cout << "creada conexion" << std::endl;
     }
 
     ConnectionArrowRep::ConnectionArrowRep( const ConnectionArrowRep& other )

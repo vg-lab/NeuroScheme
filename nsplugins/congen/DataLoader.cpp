@@ -92,23 +92,30 @@ namespace nslib
       _entities.add( neuronPop3 );
 
 
-
+      //3-2
       relConnectsTo[ neuronPop3->entityGid( )].insert(
           std::make_pair( neuronPop2->entityGid( ), propObject ));
       relConnectedBy[ neuronPop2->entityGid( )].insert(
           std::make_pair( neuronPop3->entityGid( ), nullptr ));
 
+      //1-2
       relConnectsTo[ neuronPop->entityGid( )].insert(
-          std::make_pair( neuronPop2->entityGid( ), propObject ));
-      relConnectedBy[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop3->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop3->entityGid( )].insert(
           std::make_pair( neuronPop->entityGid( ), nullptr ));
+
+      //2-1
+      relConnectsTo[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), nullptr ));
 
 
       /**auto connection*/
-      relConnectsTo[ neuronPop2->entityGid( )].insert(
-          std::make_pair( neuronPop2->entityGid( ), propObject ));
-      relConnectedBy[ neuronPop2->entityGid( )].insert(
-          std::make_pair( neuronPop2->entityGid( ), nullptr ));//*/
+      relConnectsTo[ neuronPop->entityGid( )].insert(
+          std::make_pair( neuronPop->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop->entityGid( )].insert(
+          std::make_pair( neuronPop->entityGid( ), nullptr ));//*/
 
       // std::default_random_engine generator;
       // std::uniform_int_distribution< int > distribution( 0,100 );
