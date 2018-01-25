@@ -29,7 +29,8 @@
 #include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
-#include "autoConnectionArrowRep.h"
+#include "AutoConnectionArrowRep.h"
+#include "LineConnectionArrowRep.h"
 #include <algorithm>
 
 namespace nslib
@@ -174,7 +175,7 @@ namespace nslib
                         << " - "
                         << otherRep->second.second << std::endl;
               relationRep =
-                  new autoConnectionArrowRep( otherRep->second.second );
+                  new AutoConnectionArrowRep( srcEntityRep->second.second );
             }
             else
             {
@@ -182,7 +183,7 @@ namespace nslib
               std::cout << "Conection:" << srcEntityRep->second.second << " - "
                         << otherRep->second.second << std::endl;
               relationRep =
-                  new ConnectionArrowRep( srcEntityRep->second.second,
+                  new LineConnectionArrowRep( srcEntityRep->second.second,
                                           otherRep->second.second );
             }
             const std::unordered_multimap<shift::Entity::EntityGid,

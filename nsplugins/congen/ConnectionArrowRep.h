@@ -38,21 +38,19 @@ namespace nslib
     {
     public:
 
-      ConnectionArrowRep( shift::Representation* originRep_,
-                          shift::Representation* destRep_ );
-      ConnectionArrowRep( const ConnectionArrowRep& );
-      virtual ~ConnectionArrowRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                           bool create = true );
 
-      void preRender( shift::OpConfig* opConfig = nullptr );
+      virtual ~ConnectionArrowRep( void ) {}
+      virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                           bool create = true ) = 0;
+
+      virtual void preRender( shift::OpConfig* opConfig = nullptr ) = 0;
 
       void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
       void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
       virtual void highlight(
         const scoop::Color& color = scoop::Color( 255, 0, 0 ));
-      virtual void unHighlight( void ) final { hoverLeaveEvent( nullptr ); }
+      virtual void unHighlight( void ) final;
 
     protected:
       shift::Representation* _originRep;

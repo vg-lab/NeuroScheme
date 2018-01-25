@@ -36,7 +36,7 @@ namespace nslib
     QColor ConnectionArrowItem::color = QColor( 100,100,100, 255 );
     QColor ConnectionArrowItem::hoverColor = QColor( 255,100,100, 255 );
 
-	  ConnectionArrowItem::ConnectionArrowItem(
+	  /*ConnectionArrowItem::ConnectionArrowItem(
       const ConnectionArrowRep& connectionArrowRep )
       : QObject( )
       , QGraphicsPolygonItem( )
@@ -52,101 +52,62 @@ namespace nslib
 
       _arrowThickness = nslib::Config::scale( ) *
         connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
+    }*/
+
+
+
+    QPropertyAnimation& ConnectionArrowItem::lineAnim( void ) { return _lineAnim; }
+
+    void ConnectionArrowItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+      if ( rep )
+        rep->hoverEnterEvent( event_ );
     }
 
-    void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest )
+    void ConnectionArrowItem::hoverEnter( void )
     {
-      _arrowOrigin  = origin;
-      _arrowDest    = dest;
+      this->setZValue( 100 );
+      this->setBrush( QBrush( hoverColor ));
+      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
 
-      QPolygonF arrowShape;
-
-      float arrowWidth  = 6 * nslib::Config::scale( );
-      float arrowLength = 3 * nslib::Config::scale( );
-
-      QLineF auxLine( origin, dest );
-
-      auto lengthInv = 1.0f / auxLine.length( );
-
-      double angle = ::acos( auxLine.dx( ) * lengthInv );
-      if ( auxLine.dy( ) >= 0 )
-    	  angle = ( M_PI * 2.0 ) - angle;
-
-      QPointF arrowInit = auxLine.pointAt(
-        1.0f - (arrowLength * lengthInv ));
-      QPointF arrowP1 = arrowInit -
-        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI_3 ) * arrowWidth );
-      QPointF arrowP2 = arrowInit -
-        QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI - M_PI_3 ) * arrowWidth );
-
-      QPointF arrowI1 = _arrowOrigin -
-        QPointF( sin( angle + M_PI ) * arrowWidth,
-                 cos( angle + M_PI ) * arrowWidth );
-      QPointF arrowI2 = _arrowOrigin +
-        QPointF( sin(angle - M_PI ) * arrowWidth,
-                 cos( angle - M_PI ) * arrowWidth );
-
-
-      float size = arrowLength;
-
-      /*
-      if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
-      _arrowOriItem = new QGraphicsEllipseItem( );
-      _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
-                              origin.y( ) - size * 0.5f,
-                              size,
-                              size );
-
-      _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( color ));
-      _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-      _arrowOriItem->setParentItem( this );
-       */
-
-      arrowShape.clear( );
-
-      if ( this->_parentRep->getProperty( "head" ).
-           value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
-           shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
+      if ( _arrowCircleEnd != nullptr )
       {
-        _arrowCircleEnd = new QGraphicsEllipseItem( );
-        _arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
-                                 dest.y( ) - size * 0.5f,
-                                 size,
-                                 size );
-
-        _arrowCircleEnd->setPen( Qt::NoPen );
-        _arrowCircleEnd->setBrush( QBrush( color ));
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
-        _arrowCircleEnd->setParentItem( this );
-
-        arrowShape  << arrowI1
-                    << arrowI2
-                    << auxLine.p1( )
-                    << auxLine.p2( )
-                    << auxLine.p1( );
+        _arrowCircleEnd->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( hoverColor ));
       }
-      else
+    }
+
+    void ConnectionArrowItem::highlight( scoop::Color color_ )
+    {
+      this->setZValue( 100 );
+      this->setBrush( QBrush( color_ ));
+      this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+      if ( _arrowCircleEnd != nullptr )
       {
-        arrowShape  << arrowI1
-                    << arrowI2
-                    << auxLine.p1( )
-                    << arrowInit
-                    << arrowP1
-                    << auxLine.p2( )
-                    << arrowP2
-                    << arrowInit
-                    << auxLine.p1( );
+        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color_ ));
       }
+    }
 
+    void ConnectionArrowItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+      if ( rep )
+        rep->hoverLeaveEvent( event_ );
+    }
+
+    void ConnectionArrowItem::hoverLeave( void )
+    {
+      this->setZValue( -100 );
       this->setBrush( QBrush( color ));
       this->setPen( QPen( QBrush( color ), _arrowThickness ));
-      this->setPolygon( arrowShape );
-      this->setZValue( -100.0f );
-
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color ));
+      }
     }
-  }
-}
+
+  } // namespace congen
+} // namespace nslib
