@@ -65,8 +65,6 @@ set( NSLIBCONGEN_SOURCES
   ConnectionArrowRep.cpp
   AutoConnectionArrowItem.cpp
   AutoConnectionArrowRep.cpp
-  LineConnectionArrowItem.cpp
-  LineConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
   NeuronPopRep.cpp
@@ -82,8 +80,6 @@ set( NSLIBCONGEN_HEADERS
   ConnectionArrowRep.h
   AutoConnectionArrowItem.h
   AutoConnectionArrowRep.h
-  LineConnectionArrowItem.h
-  LineConnectionArrowRep.h
   DataLoader.h
   Domain.h
   NeuronPopRep.h

@@ -30,7 +30,6 @@
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
 #include "AutoConnectionArrowRep.h"
-#include "LineConnectionArrowRep.h"
 #include <algorithm>
 
 namespace nslib
@@ -143,10 +142,6 @@ namespace nslib
 
         for( auto& other : entities.vector( ))
         {
-          /* Removed to not skip auto-connections
-           if( other->entityGid( ) == entity->entityGid( ))
-            continue;//*/
-
           auto otherRep = gidsToEntitiesReps.find( other->entityGid( ) );
           if( otherRep == gidsToEntitiesReps.end( ) )
             continue;
@@ -170,20 +165,18 @@ namespace nslib
             ConnectionArrowRep* relationRep;
             if( srcEntityRep->second.second == otherRep->second.second )
             {
-              //IAGODEBUG
-              std::cout << "AUTO - Conection:" << srcEntityRep->second.second
+              //SLDEBUG
+              std::cout << "AUTO - Connection:" << srcEntityRep->second.second
                         << " - "
                         << otherRep->second.second << std::endl;
+              //END
               relationRep =
                   new AutoConnectionArrowRep( srcEntityRep->second.second );
             }
             else
             {
-              //IAGODEBUG
-              std::cout << "Conection:" << srcEntityRep->second.second << " - "
-                        << otherRep->second.second << std::endl;
               relationRep =
-                  new LineConnectionArrowRep( srcEntityRep->second.second,
+                  new ConnectionArrowRep( srcEntityRep->second.second,
                                           otherRep->second.second );
             }
             const std::unordered_multimap<shift::Entity::EntityGid,
