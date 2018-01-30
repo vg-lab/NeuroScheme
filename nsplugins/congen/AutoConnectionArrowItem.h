@@ -30,7 +30,7 @@ namespace nslib
 {
   namespace congen
   {
-    class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem, QPainter
+    class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem
     {
       public:
       AutoConnectionArrowItem( const AutoConnectionArrowRep& connectionArrowRep );

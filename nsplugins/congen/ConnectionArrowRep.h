@@ -52,7 +52,7 @@ namespace nslib
 
       virtual void highlight(
           const scoop::Color& color = scoop::Color( 255, 0, 0 ));
-      virtual void unHighlight( void ) final { hoverLeaveEvent( nullptr ); }
+      virtual void unHighlight( void ) final;
 
       protected:
       shift::Representation* _originRep;

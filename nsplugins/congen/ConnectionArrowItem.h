@@ -42,7 +42,7 @@ namespace nslib
 
     class ConnectionArrowItem
         : public QObject
-            , public QGraphicsPolygonItem
+            , public QGraphicsPathItem
             , public nslib::Item
             , public nslib::InteractiveItem
     {
@@ -53,70 +53,25 @@ namespace nslib
 
       ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep );
 
-      virtual ~ConnectionArrowItem( void ) {}
+      virtual ~ConnectionArrowItem( void );
 
-      const QLineF& line( void ) const { return _line; }
+      const QLineF& line( void );
 
-      void setLine( const QLineF& line_ )
-      {
-        _line = line_;
-        createArrow( _line.p1( ), _line.p2( ));
-      }
+      void setLine( const QLineF& line_ );
 
       virtual void createArrow( const QPointF& origin, const QPointF& dest );
 
-      QPropertyAnimation& lineAnim( void ) { return _lineAnim; }
+      QPropertyAnimation& lineAnim( void );
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
-        if ( rep )
-          rep->hoverEnterEvent( event_ );
-      }
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 
-      virtual void hoverEnter( void )
-      {
-        this->setZValue( 100 );
-        this->setBrush( QBrush( hoverColor ));
-        this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+      virtual void hoverEnter( void );
 
-        if ( _arrowCircleEnd != nullptr )
-        {
-          _arrowCircleEnd->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
-          _arrowCircleEnd->setBrush( QBrush( hoverColor ));
-        }
-      }
+      virtual void highlight( scoop::Color color_ );
 
-      virtual void highlight( scoop::Color color_ )
-      {
-        this->setZValue( 100 );
-        this->setBrush( QBrush( color_ ));
-        this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
-        if ( _arrowCircleEnd != nullptr )
-        {
-          _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
-          _arrowCircleEnd->setBrush( QBrush( color_ ));
-        }
-      }
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
 
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
-        if ( rep )
-          rep->hoverLeaveEvent( event_ );
-      }
-
-      virtual void hoverLeave( void )
-      {
-        this->setZValue( -100 );
-        this->setBrush( QBrush( color ));
-        this->setPen( QPen( QBrush( color ), _arrowThickness ));
-        if ( _arrowCircleEnd != nullptr )
-        {
-          _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
-          _arrowCircleEnd->setBrush( QBrush( color ));
-        }
-      }
+      virtual void hoverLeave( void );
 
       static QColor color;
       static QColor hoverColor;

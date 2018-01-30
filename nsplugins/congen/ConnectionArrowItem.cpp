@@ -37,7 +37,7 @@ namespace nslib
     ConnectionArrowItem::ConnectionArrowItem(
         const ConnectionArrowRep& connectionArrowRep )
         : QObject( )
-        , QGraphicsPolygonItem( )
+        , QGraphicsPathItem( )
         , nslib::Item( )
         , nslib::InteractiveItem( )
         , _arrowCircleEnd( nullptr )
@@ -52,8 +52,24 @@ namespace nslib
                         connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
     }
 
+    ConnectionArrowItem::~ConnectionArrowItem( void )
+    {
+
+    }
+
+    const QLineF& ConnectionArrowItem::line( void )
+    {
+      return _line;
+    }
+
+    void ConnectionArrowItem::setLine( const QLineF& line_ )
+    {
+      _line = line_;
+      createArrow( _line.p1( ), _line.p2( ));
+    }
+
     void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest )
+      const QPointF& dest )
     {
       _arrowOrigin  = origin;
       _arrowDest    = QPointF(0.0f, 0.0f);
@@ -140,10 +156,73 @@ namespace nslib
                     << auxLine.p1( );
       }
 
+      auto myPath = new QPainterPath();//TODO memory leak
+      myPath->moveTo(_arrowDest);
+      myPath->addPolygon(arrowShape);
+
       this->setBrush( QBrush( color ));
       this->setPen( QPen( QBrush( color ), _arrowThickness ));
-      this->setPolygon( arrowShape );
+      this->setPath( *myPath );
       this->setZValue( -100.0f );
     }
-  }
-}
+
+    QPropertyAnimation& ConnectionArrowItem::lineAnim( void )
+    {
+      return _lineAnim;
+    }
+
+    void ConnectionArrowItem::hoverEnterEvent(
+      QGraphicsSceneHoverEvent* event_ )
+    {
+      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+      if ( rep )
+        rep->hoverEnterEvent( event_ );
+    }
+
+    void ConnectionArrowItem::hoverEnter( void )
+    {
+      this->setZValue( 100 );
+      this->setBrush( QBrush( hoverColor ));
+      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( hoverColor ));
+      }
+    }
+
+    void ConnectionArrowItem::highlight( scoop::Color color_ )
+    {
+      this->setZValue( 100 );
+      this->setBrush( QBrush( color_ ));
+      this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color_ ));
+      }
+    }
+
+    void ConnectionArrowItem::hoverLeaveEvent(
+      QGraphicsSceneHoverEvent* event_ )
+    {
+      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+      if ( rep )
+        rep->hoverLeaveEvent( event_ );
+    }
+
+    void ConnectionArrowItem::hoverLeave( void )
+    {
+      this->setZValue( -100 );
+      this->setBrush( QBrush( color ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color ));
+      }
+    }
+
+  } // namespace congen
+} // namespace nslib

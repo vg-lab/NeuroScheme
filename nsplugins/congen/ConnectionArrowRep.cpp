@@ -192,5 +192,7 @@ namespace nslib
       }
     }
 
+    void ConnectionArrowRep::unHighlight( void ) { hoverLeaveEvent( nullptr ); }
+
   } // namespace congen
 } // namespace nslib

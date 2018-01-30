@@ -148,17 +148,14 @@ namespace nslib
 
       */
 
-      QPainterPath myPath;
-      myPath.moveTo(_arrowDest);
-      myPath.arcTo(0, 0, 30, 30, 40, 200);
-      QPainter* p = new QPainter();
+      auto myPath = new QPainterPath();//TODO memory leak
+      myPath->moveTo(100.0f,100.0f);
+      myPath->arcTo(75.0f,75.0f,125.0f,125.0f,20.0f,200.0f);
+      //myPath->addEllipse(0.0f,0.0f,50.0f,50.0f);
 
-      p->begin(0);
-
-      p->setBrush( QBrush( color ));
-      p->setPen( QPen( QBrush( color ), _arrowThickness ));
-      p->drawPath(myPath);
-      //this->setPolygon( arrowShape );
+      this->setBrush( QBrush( color ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
+      this->setPath(*myPath);
       this->setZValue( -100.0f );
 
     }
