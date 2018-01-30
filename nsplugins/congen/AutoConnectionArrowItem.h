@@ -30,12 +30,12 @@ namespace nslib
 {
   namespace congen
   {
-    class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem
+    class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem, QPainter
     {
       public:
       AutoConnectionArrowItem( const AutoConnectionArrowRep& connectionArrowRep );
 
-      void createArrow( const QPointF& origin, const QPointF& dest ) override;
+      virtual void createArrow( const QPointF& origin, const QPointF& dest ) override;
     };
   } // namespace congen
 } // namespace nslib

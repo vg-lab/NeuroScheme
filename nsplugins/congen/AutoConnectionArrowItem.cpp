@@ -55,8 +55,13 @@ namespace nslib
       _arrowOrigin  = origin;
       _arrowDest    = dest;
 
-      _arrowDest = QPointF(55555.0f, 55555.0f);
+      //SLDEBUG
+      float dist = 1.5;
+      //END
 
+      _arrowDest = QPointF(_arrowOrigin.x()*(1+dist), _arrowOrigin.y()*(1+dist));
+
+      /*
       QPolygonF arrowShape;
 
       float arrowWidth  = 6 * nslib::Config::scale( );
@@ -70,8 +75,10 @@ namespace nslib
       if ( auxLine.dy( ) >= 0 )
         angle = ( M_PI * 2.0 ) - angle;
 
+
       QPointF arrowInit = auxLine.pointAt(
           1.0f - (arrowLength * lengthInv ));
+
       QPointF arrowP1 = arrowInit -
                         QPointF( sin( angle + M_PI_3 ) * arrowWidth,
                                  cos( angle + M_PI_3 ) * arrowWidth );
@@ -89,7 +96,7 @@ namespace nslib
 
       float size = arrowLength;
 
-      /*
+
       if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
       _arrowOriItem = new QGraphicsEllipseItem( );
       _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
@@ -103,8 +110,8 @@ namespace nslib
       _arrowOriItem->setParentItem( this );
        */
 
-      arrowShape.clear( );
-
+      //arrowShape.clear( );
+/*
       if ( this->_parentRep->getProperty( "head" ).
           value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
            shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
@@ -139,9 +146,19 @@ namespace nslib
                     << auxLine.p1( );
       }
 
-      this->setBrush( QBrush( color ));
-      this->setPen( QPen( QBrush( color ), _arrowThickness ));
-      this->setPolygon( arrowShape );
+      */
+
+      QPainterPath myPath;
+      myPath.moveTo(_arrowDest);
+      myPath.arcTo(0, 0, 30, 30, 40, 200);
+      QPainter* p = new QPainter();
+
+      p->begin(0);
+
+      p->setBrush( QBrush( color ));
+      p->setPen( QPen( QBrush( color ), _arrowThickness ));
+      p->drawPath(myPath);
+      //this->setPolygon( arrowShape );
       this->setZValue( -100.0f );
 
     }

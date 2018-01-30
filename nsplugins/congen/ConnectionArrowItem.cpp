@@ -56,7 +56,7 @@ namespace nslib
                                            const QPointF& dest )
     {
       _arrowOrigin  = origin;
-      _arrowDest    = dest;
+      _arrowDest    = QPointF(0.0f, 0.0f);
 
       QPolygonF arrowShape;
 
