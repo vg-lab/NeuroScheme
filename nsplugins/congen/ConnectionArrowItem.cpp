@@ -156,7 +156,7 @@ namespace nslib
                     << auxLine.p1( );
       }
 
-      auto myPath = new QPainterPath();//TODO memory leak
+      auto myPath = new QPainterPath();//SLDEBUG TODO memory leak
       myPath->moveTo(_arrowDest);
       myPath->addPolygon(arrowShape);
 

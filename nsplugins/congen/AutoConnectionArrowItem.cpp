@@ -148,7 +148,7 @@ namespace nslib
 
       */
 
-      auto myPath = new QPainterPath();//TODO memory leak
+      auto myPath = new QPainterPath();//SLDEBUG TODO memory leak
       myPath->moveTo(100.0f,100.0f);
       myPath->arcTo(75.0f,75.0f,125.0f,125.0f,20.0f,200.0f);
       //myPath->addEllipse(0.0f,0.0f,50.0f,50.0f);
