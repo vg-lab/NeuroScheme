@@ -138,6 +138,7 @@ namespace nslib
           dynamic_cast< ConnectionArrowItem* >( arrowItem )->
               createArrow( QPointF(destOri.x( ), destOri.y( ) ),
                            QPointF(destDest.x( ), destDest.y( ) ));
+		//TODO: continue
 
         }
       }

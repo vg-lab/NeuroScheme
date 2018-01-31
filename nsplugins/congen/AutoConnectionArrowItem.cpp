@@ -39,6 +39,7 @@ namespace nslib
 {
   namespace congen
   {
+
     AutoConnectionArrowItem::AutoConnectionArrowItem(
         const AutoConnectionArrowRep& connectionArrowRep )
         : ConnectionArrowItem( connectionArrowRep )
@@ -52,112 +53,69 @@ namespace nslib
       std::cout << "AutoConnectionArrowItem createArrow" << std::endl;
       //END
 
-      _arrowOrigin  = origin;
-      _arrowDest    = dest;
+      _arrowOrigin = origin;
+      _arrowDest = dest;
 
       //SLDEBUG
-      float dist = 1.5;
+      float dist = 2.0f;//statify
+      float radius = 40.0f;//statify
+      //float radiusGlifo = 40.0f;//statify
       //END
 
-      _arrowDest = QPointF(_arrowOrigin.x()*(1+dist), _arrowOrigin.y()*(1+dist));
+      auto painterPath = QPainterPath( );
+      painterPath.moveTo( _arrowOrigin.x()*dist + radius, _arrowOrigin.y()*dist );
+      painterPath.arcTo( _arrowOrigin.x()*dist - radius, _arrowOrigin.y()*dist - radius, radius*2.0f, radius*2.0f, 20.0f, 200.0f );
 
-      /*
-      QPolygonF arrowShape;
-
-      float arrowWidth  = 6 * nslib::Config::scale( );
-      float arrowLength = 3 * nslib::Config::scale( );
-
-      QLineF auxLine( _arrowOrigin, _arrowDest );
-
-      auto lengthInv = 1.0f / auxLine.length( );
-
-      double angle = ::acos( auxLine.dx( ) * lengthInv );
-      if ( auxLine.dy( ) >= 0 )
-        angle = ( M_PI * 2.0 ) - angle;
-
-
-      QPointF arrowInit = auxLine.pointAt(
-          1.0f - (arrowLength * lengthInv ));
-
-      QPointF arrowP1 = arrowInit -
-                        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                                 cos( angle + M_PI_3 ) * arrowWidth );
-      QPointF arrowP2 = arrowInit -
-                        QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
-                                 cos( angle + M_PI - M_PI_3 ) * arrowWidth );
-
-      QPointF arrowI1 = _arrowOrigin -
-                        QPointF( sin( angle + M_PI ) * arrowWidth,
-                                 cos( angle + M_PI ) * arrowWidth );
-      QPointF arrowI2 = _arrowOrigin +
-                        QPointF( sin(angle - M_PI ) * arrowWidth,
-                                 cos( angle - M_PI ) * arrowWidth );
-
-
-      float size = arrowLength;
-
-
-      if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
-      _arrowOriItem = new QGraphicsEllipseItem( );
-      _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
-                              origin.y( ) - size * 0.5f,
-                              size,
-                              size );
-
-      _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( color ));
-      _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-      _arrowOriItem->setParentItem( this );
-       */
-
-      //arrowShape.clear( );
-/*
-      if ( this->_parentRep->getProperty( "head" ).
-          value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
-           shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
-      {
-        _arrowCircleEnd = new QGraphicsEllipseItem( );
-        _arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
-                                  dest.y( ) - size * 0.5f,
-                                  size,
-                                  size );
-
-        _arrowCircleEnd->setPen( Qt::NoPen );
-        _arrowCircleEnd->setBrush( QBrush( color ));
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
-        _arrowCircleEnd->setParentItem( this );
-
-        arrowShape  << arrowI1
-                    << arrowI2
-                    << auxLine.p1( )
-                    << auxLine.p2( )
-                    << auxLine.p1( );
-      }
-      else
-      {
-        arrowShape  << arrowI1
-                    << arrowI2
-                    << auxLine.p1( )
-                    << arrowInit
-                    << arrowP1
-                    << auxLine.p2( )
-                    << arrowP2
-                    << arrowInit
-                    << auxLine.p1( );
-      }
-
-      */
-
-      auto myPath = new QPainterPath();//SLDEBUG TODO memory leak
-      myPath->moveTo(100.0f,100.0f);
-      myPath->arcTo(75.0f,75.0f,125.0f,125.0f,20.0f,200.0f);
-      //myPath->addEllipse(0.0f,0.0f,50.0f,50.0f);
-
-      this->setBrush( QBrush( color ));
-      this->setPen( QPen( QBrush( color ), _arrowThickness ));
-      this->setPath(*myPath);
+      this->setBrush( QBrush(QColor(0,0,0,0)) );
+      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setPath( painterPath );
       this->setZValue( -100.0f );
 
+    }
+
+    void AutoConnectionArrowItem::hoverEnter( void )
+    {
+      this->setZValue( 100 );
+      this->setBrush( QBrush( Qt::NoBrush ));
+      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( hoverColor ));
+      }
+    }
+
+    void AutoConnectionArrowItem::highlight( scoop::Color color_ )
+    {
+      this->setZValue( 100 );
+      this->setBrush( QBrush( Qt::NoBrush  ));
+      this->setPen( QPen( QBrush( QColor(50, 206, 22)/*Green*/ ), _arrowThickness ));
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QColor(50, 206, 22)/*Green*/ );
+      }
+    }
+
+    void AutoConnectionArrowItem::hoverLeaveEvent(
+        QGraphicsSceneHoverEvent* event_ )
+    {
+      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+      if ( rep )
+        rep->hoverLeaveEvent( event_ );
+    }
+
+    void AutoConnectionArrowItem::hoverLeave( void )
+    {
+      this->setZValue( -100 );
+      this->setBrush( QBrush( Qt::NoBrush  ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
+      if ( _arrowCircleEnd != nullptr )
+      {
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( Qt::NoBrush  ));
+      }
     }
 
   } // namespace congen

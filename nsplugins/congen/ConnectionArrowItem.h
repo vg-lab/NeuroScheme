@@ -76,6 +76,7 @@ namespace nslib
       static QColor color;
       static QColor hoverColor;
 
+
       protected:
       //QGraphicsEllipseItem* _arrowOriItem;
 

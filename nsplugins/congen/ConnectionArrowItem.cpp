@@ -34,6 +34,7 @@ namespace nslib
     QColor ConnectionArrowItem::color = QColor( 100,100,100, 255 );
     QColor ConnectionArrowItem::hoverColor = QColor( 255,100,100, 255 );
 
+
     ConnectionArrowItem::ConnectionArrowItem(
         const ConnectionArrowRep& connectionArrowRep )
         : QObject( )
@@ -72,7 +73,7 @@ namespace nslib
       const QPointF& dest )
     {
       _arrowOrigin  = origin;
-      _arrowDest    = QPointF(0.0f, 0.0f);
+      _arrowDest    = dest;
 
       QPolygonF arrowShape;
 
@@ -115,7 +116,7 @@ namespace nslib
                               size );
 
       _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( color ));
+      _arrowOriItem->setBrush( QBrush( brushColor ));
       _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
       _arrowOriItem->setParentItem( this );
        */
@@ -133,7 +134,7 @@ namespace nslib
                                   size );
 
         _arrowCircleEnd->setPen( Qt::NoPen );
-        _arrowCircleEnd->setBrush( QBrush( color ));
+        _arrowCircleEnd->setBrush( QBrush( color ) );
         _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
         _arrowCircleEnd->setParentItem( this );
 
@@ -156,13 +157,13 @@ namespace nslib
                     << auxLine.p1( );
       }
 
-      auto myPath = new QPainterPath();//SLDEBUG TODO memory leak
-      myPath->moveTo(_arrowDest);
-      myPath->addPolygon(arrowShape);
+      auto painterPath = QPainterPath( );
+      painterPath.moveTo( _arrowDest );
+      painterPath.addPolygon( arrowShape );
 
-      this->setBrush( QBrush( color ));
-      this->setPen( QPen( QBrush( color ), _arrowThickness ));
-      this->setPath( *myPath );
+      this->setBrush( QBrush( color ) );
+      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setPath( painterPath );
       this->setZValue( -100.0f );
     }
 

@@ -36,6 +36,15 @@ namespace nslib
       AutoConnectionArrowItem( const AutoConnectionArrowRep& connectionArrowRep );
 
       virtual void createArrow( const QPointF& origin, const QPointF& dest ) override;
+
+      virtual void hoverEnter( void )  override;
+
+      virtual void highlight( scoop::Color color_ )  override;
+
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )  override;
+
+      virtual void hoverLeave( void ) override;
+
     };
   } // namespace congen
 } // namespace nslib
