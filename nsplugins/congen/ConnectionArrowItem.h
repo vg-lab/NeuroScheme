@@ -59,7 +59,7 @@ namespace nslib
 
       void setLine( const QLineF& line_ );
 
-      virtual void createArrow( const QPointF& origin, const QPointF& dest );
+      void createArrow( const QPointF& origin, const QPointF& dest );
 
       QPropertyAnimation& lineAnim( void );
 

@@ -44,27 +44,20 @@ namespace nslib
         const AutoConnectionArrowRep& connectionArrowRep )
         : ConnectionArrowItem( connectionArrowRep )
     {
+      _arrowThickness = 2;
     }
 
-    void AutoConnectionArrowItem::createArrow( const QPointF& origin,
-                                               const QPointF& dest )
+    void AutoConnectionArrowItem::createAutoArrow( const QPointF& arcCenter, float arcDegrees,
+                          float arcRadius, float startAngle)
     {
-      //SLDEBUG
-      std::cout << "AutoConnectionArrowItem createArrow" << std::endl;
-      //END
-
-      _arrowOrigin = origin;
-      _arrowDest = dest;
-
-      //SLDEBUG
-      float dist = 2.0f;//statify
-      float radius = 40.0f;//statify
-      //float radiusGlifo = 40.0f;//statify
-      //END
+      _arrowOrigin = arcCenter;
 
       auto painterPath = QPainterPath( );
-      painterPath.moveTo( _arrowOrigin.x()*dist + radius, _arrowOrigin.y()*dist );
-      painterPath.arcTo( _arrowOrigin.x()*dist - radius, _arrowOrigin.y()*dist - radius, radius*2.0f, radius*2.0f, 20.0f, 200.0f );
+      painterPath.moveTo( arcCenter.x() + arcRadius*cos(startAngle),
+                          arcCenter.y() - arcRadius*sin(startAngle) );
+      painterPath.arcTo( arcCenter.x() - arcRadius,
+                         arcCenter.y() - arcRadius,
+                         arcRadius*2.0f, arcRadius*2.0f, startAngle*180/M_PI, arcDegrees*180/M_PI );
 
       this->setBrush( QBrush(QColor(0,0,0,0)) );
       this->setPen( QPen( QBrush( color ), _arrowThickness ) );

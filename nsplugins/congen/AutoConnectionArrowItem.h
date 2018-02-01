@@ -35,7 +35,7 @@ namespace nslib
       public:
       AutoConnectionArrowItem( const AutoConnectionArrowRep& connectionArrowRep );
 
-      virtual void createArrow( const QPointF& origin, const QPointF& dest ) override;
+      void createAutoArrow( const QPointF& arcCenter, float arcDegrees,  float arcRadius, float startAngle);
 
       virtual void hoverEnter( void )  override;
 
