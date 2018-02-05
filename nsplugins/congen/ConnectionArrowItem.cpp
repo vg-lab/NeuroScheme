@@ -135,7 +135,7 @@ namespace nslib
 
         _arrowCircleEnd->setPen( Qt::NoPen );
         _arrowCircleEnd->setBrush( QBrush( color ) );
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ) );
         _arrowCircleEnd->setParentItem( this );
 
         arrowShape  << arrowI1

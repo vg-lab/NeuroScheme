@@ -52,13 +52,13 @@ namespace nslib
       float glyphRadius = originItem->boundingRect().width( ) * 0.5f * originItem->scale( );
       float arcRadius = (glyphRadius * 0.3f);
 
-      float relativeAngle = atan(originItem->y()/originItem->x());
-      float dist = glyphRadius + arcRadius*0.7;
+      float relativeAngle = atanf(originItem->y()/originItem->x());
+      float dist = glyphRadius + arcRadius*0.7f;
 
       QPointF arcCenter = QPointF(originItem->x()+dist*cos(relativeAngle),
                                   originItem->y()+dist*sin(relativeAngle));
 
-      float startAngle = acos((arcRadius*arcRadius + dist*dist
+      float startAngle = acosf((arcRadius*arcRadius + dist*dist
                                 - glyphRadius*glyphRadius)
                                /(2*arcRadius*dist));
       float arcDegrees = 2*(M_PI - startAngle);

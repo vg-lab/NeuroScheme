@@ -47,19 +47,45 @@ namespace nslib
       _arrowThickness = 2;
     }
 
-    void AutoConnectionArrowItem::createAutoArrow( const QPointF& arcCenter, float arcDegrees,
-                          float arcRadius, float startAngle)
+    void AutoConnectionArrowItem::createAutoArrow( const QPointF& arcCenter
+        , float arcDegrees, float arcRadius, float startAngle)
     {
-      _arrowOrigin = arcCenter;
+      _arrowOrigin = QPointF( arcCenter.x( ) + arcRadius * cosf( startAngle ),
+                              arcCenter.y( ) - arcRadius * sinf( startAngle ) );
+      _arrowDest = QPointF(
+          arcCenter.x( ) + arcRadius * cosf( startAngle + arcDegrees ),
+          arcCenter.y( ) - arcRadius * sinf( startAngle + arcDegrees ) );
+
+      float arrowWidth  = 0.23f * nslib::Config::scale( )*arcRadius;
+
+      QPointF arrowP1 = _arrowDest -
+                        QPointF( cos( -startAngle - M_PI_3/2.0f ) * arrowWidth,
+                                 sin( -startAngle - M_PI_3/2.0f ) * arrowWidth );
+      QPointF arrowP2 = _arrowDest -
+                        QPointF( cos( M_PI_3/2.0f - startAngle) * arrowWidth,
+                                 sin( M_PI_3/2.0f - startAngle ) * arrowWidth );
+
+      QPolygonF arrowShape;
+      arrowShape << arrowP1 << _arrowDest << arrowP2;
+
+
+      QPointF arrowI1 = _arrowOrigin - QPointF( sinf( startAngle + 2*M_PI_3) * arrowWidth,
+                                                cosf( startAngle + 2*M_PI_3) * arrowWidth );
+      QPointF arrowI2 = _arrowOrigin + QPointF( sinf( startAngle + 2*M_PI_3) * arrowWidth,
+                                                cosf( startAngle + 2*M_PI_3) * arrowWidth );
 
       auto painterPath = QPainterPath( );
-      painterPath.moveTo( arcCenter.x() + arcRadius*cos(startAngle),
-                          arcCenter.y() - arcRadius*sin(startAngle) );
-      painterPath.arcTo( arcCenter.x() - arcRadius,
-                         arcCenter.y() - arcRadius,
-                         arcRadius*2.0f, arcRadius*2.0f, startAngle*180/M_PI, arcDegrees*180/M_PI );
+      painterPath.moveTo( arrowI1 );
+      painterPath.lineTo( arrowI2 );
+      painterPath.moveTo( _arrowOrigin );
 
-      this->setBrush( QBrush(QColor(0,0,0,0)) );
+      painterPath.arcTo( arcCenter.x( ) - arcRadius,
+        arcCenter.y( ) - arcRadius, arcRadius * 2.0f, arcRadius * 2.0f,
+        startAngle * 180 / M_PI, arcDegrees * 180 / M_PI );
+
+      painterPath.addPolygon(arrowShape);
+
+      this->setBrush( QBrush( QColor( 0, 0, 0, 0 ) ) );
       this->setPen( QPen( QBrush( color ), _arrowThickness ) );
       this->setPath( painterPath );
       this->setZValue( -100.0f );
