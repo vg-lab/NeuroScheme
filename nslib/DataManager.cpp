@@ -135,7 +135,7 @@ namespace nslib
       //this->closeData( );
       _nsolDataSet.loadBlueConfigHierarchy<
         nsol::Node,
-        nsol::SectionStats,
+        nsol::NeuronMorphologySectionStats,
         nsol::DendriteStats,
         nsol::AxonStats,
         nsol::SomaStats,
@@ -149,7 +149,7 @@ namespace nslib
       {
         _nsolDataSet.loadAllMorphologies<
           nsol::Node,
-          nsol::SectionStats,
+          nsol::NeuronMorphologySectionStats,
           nsol::DendriteStats,
           nsol::AxonStats,
           nsol::SomaStats,
@@ -162,7 +162,7 @@ namespace nslib
       {
         _nsolDataSet.loadBlueConfigConnectivity<
           nsol::Node,
-          nsol::SectionStats,
+          nsol::NeuronMorphologySectionStats,
           nsol::DendriteStats,
           nsol::AxonStats,
           nsol::SomaStats,
@@ -195,7 +195,7 @@ namespace nslib
       // this->CloseData( );
       _nsolDataSet.loadXmlScene<
         nsol::NodeCached,
-        nsol::SectionCachedStats,
+        nsol::NeuronMorphologySectionCachedStats,
         nsol::DendriteCachedStats,
         nsol::AxonCachedStats,
         nsol::SomaStats,

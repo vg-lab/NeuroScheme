@@ -65,19 +65,20 @@ namespace nslib
   {
   public:
 
-    static void init( const std::string& /*session*/ )
+    static void connect( const std::string& /*session*/ )
+    NEUROSCHEME_USE_ZEROEQ_IMPL;
+    static void disconnect( void )
     NEUROSCHEME_USE_ZEROEQ_IMPL;
     ~ZeroEQManager( void ) NEUROSCHEME_USE_ZEROEQ_IMPL;
     static void receiveEvents( void ) NEUROSCHEME_USE_ZEROEQ_IMPL;
     static void publishSelection(
-      const std::vector< unsigned int >& ) NEUROSCHEME_USE_ZEROEQ_IMPL;
+      const std::vector< unsigned int >& ) NEUROSCHEME_USE_GMRVLEX_IMPL;
+    static void publishFocusOnSelection(
+      const std::vector< unsigned int >& ) NEUROSCHEME_USE_GMRVLEX_IMPL;
 
 #ifdef NEUROSCHEME_USE_ZEROEQ
-    static zeroeq::Subscriber* subscriber( void ) NEUROSCHEME_USE_ZEROEQ_IMPL;
+    static zeroeq::Subscriber* subscriber( void );
 #endif
-
-    //static void receiveEvents( void );
-
   protected:
 
 #ifdef NEUROSCHEME_USE_LEXIS
@@ -88,7 +89,7 @@ namespace nslib
 #endif
 
     static bool _publishSelection;
-
+    static bool _publishFocusOnSelection;
 #ifdef NEUROSCHEME_USE_ZEROEQ
     static zeroeq::Subscriber *_subscriber;
     static zeroeq::Publisher *_publisher;

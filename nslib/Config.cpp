@@ -30,8 +30,16 @@ namespace nslib
   }
 
   NeuroSchemeInputArguments Config::_inputArgs = NeuroSchemeInputArguments( );
-  bool Config::_showConnectivity = false;
-  float Config::_scale = 1.f;
+
+#define NSLIB_CONFIG_INIT( TYPE, NAME, VALUE )  \
+  TYPE Config::_##NAME = VALUE
+
+  NSLIB_CONFIG_INIT( bool, showConnectivity, false );
+  NSLIB_CONFIG_INIT( bool, autoPublishSelection, true );
+  NSLIB_CONFIG_INIT( bool, autoPublishFocusOnSelection, false );
+  NSLIB_CONFIG_INIT( bool, autoPublishFocusOnDisplayed, false );
+  NSLIB_CONFIG_INIT( float, scale, 1.0f );
+  NSLIB_CONFIG_INIT( std::string, zeroEQSession, "" );
 
   std::string Config::isArgumentDefined(
       const std::vector< std::string >& argNames )
@@ -42,26 +50,6 @@ namespace nslib
         return arg;
     }
     return std::string( );
-  }
-
-  bool Config::showConnectivity( void )
-  {
-    return _showConnectivity;
-  }
-
-  void Config::showConnectivity( bool showConnectivity_ )
-  {
-    _showConnectivity = showConnectivity_;
-  }
-
-  float Config::scale( void )
-  {
-    return _scale;
-  }
-
-  void Config::scale( float scale_ )
-  {
-    _scale = scale_;
   }
 
 }

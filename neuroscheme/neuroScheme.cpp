@@ -242,12 +242,26 @@ int main( int argc, char** argv )
   if ( !foundArg.empty( ))
     nslib::Config::scale( std::stof( args[ foundArg ][ 0 ] ));
 
-
+  bool zeroEQ = false;
+  if ( args.count( "-zeroeq" ) == 1 )
+  {
+    if ( args["-zeroeq"].size( ) == 1 )
+    {
+      zeroEQ = true;
+      nslib::Config::zeroEQSession( args["-zeroeq"][0] );
+    }
+    else
+    {
+      nslib::Loggers::get( )->log( "Error -zeroeq value empty.",
+                                   nslib::LOG_LEVEL_ERROR );
+      usageMessage( );
+    }
+  }
 
   QApplication app( argc, argv );
   //QGuiApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
-  MainWindow mainWindow( 0 );
+  MainWindow mainWindow( 0,  zeroEQ );
   mainWindow.setWindowTitle( "NeuroScheme" );
   mainWindow.show( );
   mainWindow.selectDomain( );
@@ -261,19 +275,11 @@ int main( int argc, char** argv )
   if ( fullscreen )
     mainWindow.showFullScreen( );
 
-  if ( args.count( "-zeroeq" ) == 1 )
-  {
-    if ( args["-zeroeq"].size( ) == 1 )
-      nslib::ZeroEQManager::init( args["-zeroeq"][0] );
-    else
-    {
-      nslib::Loggers::get( )->log( "Error -zeroeq value empty.",
-                                  nslib::LOG_LEVEL_ERROR );
-      usageMessage( );
-    }
-  }
-
   nslib::SelectableItem::init( );
+
+  // The connect has to be placed after the main window creation
+  if ( zeroEQ )
+    nslib::ZeroEQManager::connect( args["-zeroeq"][0] );
 
   return app.exec( );
 

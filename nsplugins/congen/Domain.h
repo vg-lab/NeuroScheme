@@ -26,12 +26,47 @@
 #include <nslib/DomainManager.h>
 #include "DataLoader.h"
 #include "DataSaver.h"
+#include <QObject>
 
 namespace nslib
 {
 
   namespace congen
   {
+
+    class DomainGUI : QObject
+    {
+      Q_OBJECT;
+
+    public:
+      DomainGUI( QMenuBar* menubar )
+      {
+        for ( auto action : menubar->actions( ))
+        {
+          if ( action->menu( ))
+          {
+            auto menu = dynamic_cast< QMenu* >( action->parent( ));
+            if ( action->text( ) == "File" && menu )
+            {
+              _actionLoadNeuroML.reset( new QAction( "Load NeuroML", menu ));
+              menu->addAction( _actionLoadNeuroML.get( ));
+
+              connect( _actionLoadNeuroML.get( ), SIGNAL( triggered( )),
+                       this, SLOT( loadNeuroML( )));
+
+            }
+          }
+        }
+    }
+    public slots:
+      void loadNeuroML( void )
+      {
+        std::cout << "TODO" << std::endl;
+      };
+    protected:
+      std::unique_ptr< QAction > _actionLoadNeuroML;
+
+    };
 
     class NSLIBCONGEN_API Domain
       : public ::nslib::Domain
@@ -52,7 +87,16 @@ namespace nslib
       unsigned int selectableEntityId( shift::Entity* entity ) const;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const;
       static void usageMessage( void );
+      void createGUI( QMenuBar* menubar ) final
+      {
+        _domainGUI.reset( new DomainGUI( menubar ));
+      }
+
+
+    protected:
+      std::unique_ptr< DomainGUI > _domainGUI;
     };
+
   }
 }
 
