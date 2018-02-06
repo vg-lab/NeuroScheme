@@ -22,9 +22,7 @@
  */
 #include "AutoConnectionArrowRep.h"
 #include "ConnectionArrowItem.h"
-#include "../../ShiFT/shift/Representation.h"
 #include "AutoConnectionArrowItem.h"
-#include <iostream>
 
 
 namespace nslib
@@ -33,44 +31,59 @@ namespace nslib
   {
 
     AutoConnectionArrowRep::AutoConnectionArrowRep(
-          shift::Representation *Rep_)
-        : ConnectionArrowRep(Rep_, Rep_) {
+        shift::Representation* Rep_ )
+        : ConnectionArrowRep( Rep_, Rep_ )
+    {
     }
 
-    void AutoConnectionArrowRep::preRender( shift::OpConfig* opConfig_ ){
+    void AutoConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )
+    {
       OpConfig* opConfig = dynamic_cast< OpConfig* >( opConfig_ );
-      if ( !opConfig )
+      if( !opConfig )
+      {
         return;
-
+      }
       GraphicsScene* scene = opConfig->scene( );
 
-      auto  arrowItem   = this->item( scene );
+      auto arrowItem = this->item( scene );
 
       auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
-              _originRep )->item( scene );
+        _originRep )->item( scene );
 
-      float glyphRadius = originItem->boundingRect().width( ) * 0.5f * originItem->scale( );
-      float arcRadius = (glyphRadius * 0.3f);
+      QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
 
-      float relativeAngle = atanf(originItem->y()/originItem->x());
-      float dist = glyphRadius + arcRadius*0.7f;
+      float glyphRadius = float( originItem->boundingRect( ).width( ) )
+        * 0.5f * float( originItem->scale( ) );
 
-      QPointF arcCenter = QPointF(originItem->x()+dist*cos(relativeAngle),
-                                  originItem->y()+dist*sin(relativeAngle));
+      float arcRadius = ( glyphRadius * arcLengthFactor );
 
-      float startAngle = acosf((arcRadius*arcRadius + dist*dist
-                                - glyphRadius*glyphRadius)
-                               /(2*arcRadius*dist));
-      float arcDegrees = 2*(M_PI - startAngle);
+      float relativeAngle = atanf( float( originItem->y( )/originItem->x( ) ) );
+      if( originItem->x( ) < 0 )
+      {
+        relativeAngle += M_PI;
+      }
+
+      float dist = glyphRadius + arcRadius * centersDistFactor;
+
+      QPointF arcCenter = QPointF(
+        originItem->x( ) + dist * cosf( relativeAngle ),
+        originItem->y( ) + dist * sinf( relativeAngle ) );
+
+      float startAngle = acosf( ( arcRadius * arcRadius + dist * dist
+        - glyphRadius * glyphRadius ) / ( 2.0f * arcRadius * dist ) );
+
+      float arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
 
       dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
-          createAutoArrow( arcCenter, arcDegrees, arcRadius, startAngle + M_PI - relativeAngle );
+        createAutoArrow( arcCenter, arcDegrees, arcRadius,
+        startAngle + float( M_PI ) - relativeAngle, glyphCenter );
     }
 
-    QGraphicsItem* AutoConnectionArrowRep::item( QGraphicsScene* scene, bool create )
+    QGraphicsItem*
+    AutoConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-      if ( create && ( _items.find( scene ) == _items.end( )) &&
-           !_items[ scene ] )
+      if( create && ( _items.find( scene ) == _items.end( ) ) &&
+          !_items[ scene ] )
       {
         _items[ scene ] = new AutoConnectionArrowItem( *this );
       }

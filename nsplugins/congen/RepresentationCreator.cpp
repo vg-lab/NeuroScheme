@@ -165,11 +165,6 @@ namespace nslib
             ConnectionArrowRep* relationRep;
             if( srcEntityRep->second.second == otherRep->second.second )
             {
-              //SLDEBUG
-              std::cout << "AUTO - Connection:" << srcEntityRep->second.second
-                        << " - "
-                        << otherRep->second.second << std::endl;
-              //END
               relationRep =
                   new AutoConnectionArrowRep( srcEntityRep->second.second );
             }

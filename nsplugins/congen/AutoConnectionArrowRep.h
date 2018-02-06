@@ -38,6 +38,11 @@ namespace nslib
       AutoConnectionArrowRep( const AutoConnectionArrowRep& );
       AutoConnectionArrowRep( shift::Representation *Rep_ );
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
+
+      protected:
+      const float centersDistFactor = 0.7f;
+      const float arcLengthFactor = 0.3f;
+
     };
   } // namespace congen
 } // namespace nslib

@@ -124,6 +124,18 @@ namespace nslib
       relConnectedBy[ neuronPop4->entityGid( )].insert(
           std::make_pair( neuronPop4->entityGid( ), nullptr ));//*/
 
+      /**auto connection 2*/
+      relConnectsTo[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop2->entityGid( )].insert(
+          std::make_pair( neuronPop2->entityGid( ), nullptr ));//*/
+
+      /**auto connection 5*/
+      relConnectsTo[ neuronPop5->entityGid( )].insert(
+          std::make_pair( neuronPop5->entityGid( ), propObject ));
+      relConnectedBy[ neuronPop5->entityGid( )].insert(
+          std::make_pair( neuronPop5->entityGid( ), nullptr ));//*/
+
       // std::default_random_engine generator;
       // std::uniform_int_distribution< int > distribution( 0,100 );
       // // int dice_roll = distribution( generator );

@@ -33,15 +33,17 @@ namespace nslib
     class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem
     {
       public:
-      AutoConnectionArrowItem( const AutoConnectionArrowRep& connectionArrowRep );
+      AutoConnectionArrowItem(
+          const AutoConnectionArrowRep& connectionArrowRep );
 
-      void createAutoArrow( const QPointF& arcCenter, float arcDegrees,  float arcRadius, float startAngle);
+      void createAutoArrow( const QPointF& arcCenter, float arcDegrees,
+         float arcRadius, float startAngle, QPointF glyphCenter );
 
-      virtual void hoverEnter( void )  override;
+      virtual void hoverEnter( void ) override;
 
-      virtual void highlight( scoop::Color color_ )  override;
+      virtual void highlight( scoop::Color color_ ) override;
 
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )  override;
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
       virtual void hoverLeave( void ) override;
 
