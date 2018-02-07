@@ -40,8 +40,8 @@ namespace nslib
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
 
       protected:
-      const float centersDistFactor = 0.7f;
-      const float arcLengthFactor = 0.3f;
+      const float _centersDistFactor = 0.5f; // determines distance between arc and glyph centres relative to arc size; -1 to 1
+      const float _arcSizeFactor = 0.3f; // determines arc size; positive float
 
     };
   } // namespace congen

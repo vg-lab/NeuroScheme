@@ -55,7 +55,7 @@ namespace nslib
       float glyphRadius = float( originItem->boundingRect( ).width( ) )
         * 0.5f * float( originItem->scale( ) );
 
-      float arcRadius = ( glyphRadius * arcLengthFactor );
+      float arcRadius = ( glyphRadius * _arcSizeFactor );
 
       float relativeAngle = atanf( float( originItem->y( )/originItem->x( ) ) );
       if( originItem->x( ) < 0 )
@@ -63,16 +63,24 @@ namespace nslib
         relativeAngle += M_PI;
       }
 
-      float dist = glyphRadius + arcRadius * centersDistFactor;
+      float dist = glyphRadius + arcRadius * (_centersDistFactor);
 
       QPointF arcCenter = QPointF(
         originItem->x( ) + dist * cosf( relativeAngle ),
         originItem->y( ) + dist * sinf( relativeAngle ) );
 
-      float startAngle = acosf( ( arcRadius * arcRadius + dist * dist
-        - glyphRadius * glyphRadius ) / ( 2.0f * arcRadius * dist ) );
+      float startAngle;
+      if (_centersDistFactor < 1 ) {
+        startAngle = acosf((arcRadius * arcRadius + dist * dist
+                                  - glyphRadius * glyphRadius) /
+                                 (2.0f * arcRadius * dist));
+      }
+      else
+      {
+        startAngle = 0;
+      }
 
-      float arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
+      float arcDegrees = 2.0f * ( float ( M_PI ) - startAngle );
 
       dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
         createAutoArrow( arcCenter, arcDegrees, arcRadius,

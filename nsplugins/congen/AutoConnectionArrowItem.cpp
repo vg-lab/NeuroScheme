@@ -72,23 +72,25 @@ namespace nslib
       QPolygonF arrowShape;
       arrowShape << arrowHead1 << _arrowDest << arrowHead2;
 
-      QPointF relativeDir = _arrowOrigin - glyphCenter;
+      auto painterPath = QPainterPath();
 
-      Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ) );
-      vector.normalize( );
-      vector *= arrowWidth;
+      if ( arcDegrees < 2.0f * float(M_PI)) {
+        QPointF relativeDir = _arrowOrigin - glyphCenter;
 
-      QPointF arrowBack = QPointF( -vector.y( ), vector.x( ) );
+        Eigen::Vector2d vector(relativeDir.x(), relativeDir.y());
+        vector.normalize();
+        vector *= arrowWidth;
 
-      QPointF arrowI1 = _arrowOrigin + arrowBack;
-      QPointF arrowI2 = _arrowOrigin - arrowBack;
+        QPointF arrowBack = QPointF(-vector.y(), vector.x());
 
+        QPointF arrowI1 = _arrowOrigin + arrowBack;
+        QPointF arrowI2 = _arrowOrigin - arrowBack;
 
-      auto painterPath = QPainterPath( );
-      painterPath.moveTo( arrowI1 );
-      painterPath.lineTo( arrowI2 );
-      painterPath.moveTo( _arrowOrigin );
+        painterPath.moveTo(arrowI1);
+        painterPath.lineTo(arrowI2);
+      }
 
+      painterPath.moveTo(_arrowOrigin);
 
       painterPath.arcTo( arcCenter.x( ) - arcRadius,
         arcCenter.y( ) - arcRadius, arcRadius * 2.0f, arcRadius * 2.0f,
