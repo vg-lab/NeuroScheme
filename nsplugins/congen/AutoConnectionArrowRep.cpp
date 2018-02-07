@@ -30,6 +30,14 @@ namespace nslib
   namespace congen
   {
 
+    const float AutoConnectionArrowRep::_centersDistFactor = 0.5f;
+    const float AutoConnectionArrowRep::_arcSizeFactor = 0.3f;
+    float  AutoConnectionArrowRep::glyphRadius = 0.0f;
+    float  AutoConnectionArrowRep::arcRadius = 0.0f;
+    float  AutoConnectionArrowRep::dist = 0.0f;
+    float  AutoConnectionArrowRep::startAngle = 0.0f;
+    float  AutoConnectionArrowRep::arcDegrees = 0.0f;
+
     AutoConnectionArrowRep::AutoConnectionArrowRep(
         shift::Representation* Rep_ )
         : ConnectionArrowRep( Rep_, Rep_ )
@@ -50,12 +58,10 @@ namespace nslib
       auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
         _originRep )->item( scene );
 
+
+      AutoConnectionArrowRep::calcPreRender(opConfig, originItem );
+
       QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
-
-      float glyphRadius = float( originItem->boundingRect( ).width( ) )
-        * 0.5f * float( originItem->scale( ) );
-
-      float arcRadius = ( glyphRadius * _arcSizeFactor );
 
       float relativeAngle = atanf( float( originItem->y( )/originItem->x( ) ) );
       if( originItem->x( ) < 0 )
@@ -63,24 +69,10 @@ namespace nslib
         relativeAngle += M_PI;
       }
 
-      float dist = glyphRadius + arcRadius * (_centersDistFactor);
-
       QPointF arcCenter = QPointF(
-        originItem->x( ) + dist * cosf( relativeAngle ),
-        originItem->y( ) + dist * sinf( relativeAngle ) );
+          originItem->x( ) + dist * cosf( relativeAngle ),
+          originItem->y( ) + dist * sinf( relativeAngle ) );
 
-      float startAngle;
-      if (_centersDistFactor < 1 ) {
-        startAngle = acosf((arcRadius * arcRadius + dist * dist
-                                  - glyphRadius * glyphRadius) /
-                                 (2.0f * arcRadius * dist));
-      }
-      else
-      {
-        startAngle = 0;
-      }
-
-      float arcDegrees = 2.0f * ( float ( M_PI ) - startAngle );
 
       dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
         createAutoArrow( arcCenter, arcDegrees, arcRadius,
@@ -96,6 +88,36 @@ namespace nslib
         _items[ scene ] = new AutoConnectionArrowItem( *this );
       }
       return _items.at( scene );
+    }
+
+    void AutoConnectionArrowRep::calcPreRender( shift::OpConfig* opConfig_, /**/QGraphicsItem* originItem/**shift::Representation* _originRep**/ )
+    {
+      OpConfig* opConfig = dynamic_cast< OpConfig* >( opConfig_ );
+      if( !opConfig )
+      {
+        return;
+      }
+      /**GraphicsScene* scene = opConfig->scene( );
+
+      auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
+          _originRep )->item( scene );**/
+
+      glyphRadius = float( originItem->boundingRect( ).width( ) )
+                          * 0.5f * float( originItem->scale( ) );
+
+      arcRadius = ( glyphRadius * _arcSizeFactor );
+
+
+      dist = glyphRadius + arcRadius * ( _centersDistFactor );
+
+      startAngle = 0;
+      if( _centersDistFactor < 1 )
+      {
+        startAngle = acosf( ( arcRadius * arcRadius + dist * dist
+          - glyphRadius * glyphRadius ) / ( 2.0f * arcRadius * dist ) );
+      }
+
+      arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
     }
 
   } // namespace congen

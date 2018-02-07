@@ -106,11 +106,11 @@ namespace nslib
           std::make_pair( neuronPop->entityGid( ), nullptr ));
 
 
-      /**auto connection 1*/
+      /**auto connection 1*
       relConnectsTo[ neuronPop->entityGid( )].insert(
-          std::make_pair( neuronPop->entityGid( ), propObject ));
+          std::make_pair( neuronPop->entityGid( ), propObject ) );
       relConnectedBy[ neuronPop->entityGid( )].insert(
-          std::make_pair( neuronPop->entityGid( ), nullptr ));//*/
+          std::make_pair( neuronPop->entityGid( ), nullptr ) );//*/
 
       /**auto connection 3*/
       relConnectsTo[ neuronPop3->entityGid( )].insert(

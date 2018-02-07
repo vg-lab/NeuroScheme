@@ -35,13 +35,25 @@ namespace nslib
       public :
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );
-      AutoConnectionArrowRep( const AutoConnectionArrowRep& );
       AutoConnectionArrowRep( shift::Representation *Rep_ );
+      static void calcPreRender( shift::OpConfig* opConfig_, /**/QGraphicsItem* originItem/**shift::Representation* _originRep**/ );
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
 
+      /*
+       * Determines distance between arc and
+       * glyph centres relative to arc size; -1 to 1
+       */
+      static const float _centersDistFactor;
+      // Determines arc size; positive float
+      static const float _arcSizeFactor;
+
       protected:
-      const float _centersDistFactor = 0.5f; // determines distance between arc and glyph centres relative to arc size; -1 to 1
-      const float _arcSizeFactor = 0.3f; // determines arc size; positive float
+
+      static float glyphRadius;
+      static float arcRadius;
+      static float dist;
+      static float startAngle;
+      static float arcDegrees;
 
     };
   } // namespace congen
