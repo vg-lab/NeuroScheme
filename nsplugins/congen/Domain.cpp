@@ -37,7 +37,6 @@ namespace nslib
     Domain::Domain( void )
     {
       this->_dataLoader = new DataLoader;
-      this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
         new nslib::congen::shiftgen::RelationshipPropertiesTypes( );

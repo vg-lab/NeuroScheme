@@ -34,7 +34,8 @@ namespace nslib
   {
     using NeuronPop = shiftgen::NeuronPop;
 
-    bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& /* args */ )
+    bool DataLoader::cliLoadData(
+      const ::nslib::NeuroSchemeInputArguments& /* args */ )
     {
       // ::nslib::Logger::get( )->log(
       //   "Loading data for congen", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );

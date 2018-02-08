@@ -116,8 +116,8 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 #endif
   ////////////////////////////////////////////////////////////////
 
-  // Connect save dialog
-  connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
+  // // Connect save dialog
+  // connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
 
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
@@ -318,14 +318,14 @@ void MainWindow::selectDomain( void )
   {
     domain = new nslib::cortex::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
       exit( -1 );
   }
   else if ( domainSelected == "congen" )
   {
     domain = new nslib::congen::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
       exit( -1 );
   }
   else
@@ -345,7 +345,7 @@ void MainWindow::selectDomain( void )
   nslib::PaneManager::panes( ).insert( canvas );
 
   if ( domain )
-    domain->createGUI( _ui->menubar );
+    domain->createGUI( this, _ui->menubar );
 
   resizeEvent( 0 );
 } // MainWindow::selectDomain
@@ -628,12 +628,12 @@ void MainWindow::toggleShowConnectivity( void )
 }
 
 
-void MainWindow::saveScene( void )
-{
-  //Depending on the selected domain, a certain "saver" could be available
-  //At this moment, only NeuroML
-  emit nslib::congen::DataSaver::saveXmlScene( this );
-}
+// void MainWindow::saveScene( void )
+// {
+//   //Depending on the selected domain, a certain "saver" could be available
+//   //At this moment, only NeuroML
+//   emit nslib::congen::DataSaver::saveXmlScene( this );
+// }
 
 void MainWindow::actionPublishSelectionToggle( void )
 {

@@ -35,7 +35,8 @@ namespace nslib
 
     using ConnectsWith = shiftgen::ConnectsWith;
 
-    bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& args )
+    bool DataLoader::cliLoadData(
+      const ::nslib::NeuroSchemeInputArguments& args )
     {
 #ifdef NEUROSCHEME_USE_NSOL
       // std::cout << "Loading data" << std::endl;
@@ -251,6 +252,9 @@ namespace nslib
       bool withMorphologies,
       const std::string& csvNeuronStatsFileName )
     {
+      Loggers::get( )->log( "Creating entities",
+                            nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+
       auto& _entities = nslib::DataManager::entities( );
       auto& _rootEntities = nslib::DataManager::rootEntities( );
       //fires::PropertyManager::clear( );

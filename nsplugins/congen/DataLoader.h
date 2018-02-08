@@ -43,7 +43,7 @@ namespace nslib
 
       virtual ~DataLoader( void ) {}
 
-      virtual bool loadData(
+      bool cliLoadData(
         const ::nslib::NeuroSchemeInputArguments& arguments ) final;
 
     };

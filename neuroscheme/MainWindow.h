@@ -79,7 +79,7 @@ public slots:
   void duplicateActivePane( void );
   void home( void );
   void toggleShowConnectivity( void );
-  void saveScene( void );
+  // void saveScene( void );
   void actionPublishSelectionToggle( void );
   void actionPublishFocusOnSelectionToggle( void );
   void actionPublishFocusOnDisplayedToggle( void );

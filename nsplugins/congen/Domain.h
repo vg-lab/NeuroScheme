@@ -27,6 +27,7 @@
 #include "DataLoader.h"
 #include "DataSaver.h"
 #include <QObject>
+#include <QMainWindow>
 
 namespace nslib
 {
@@ -39,7 +40,8 @@ namespace nslib
       Q_OBJECT;
 
     public:
-      DomainGUI( QMenuBar* menubar )
+      DomainGUI( QMainWindow* mw_, QMenuBar* menubar )
+        : _mw( mw_ )
       {
         for ( auto action : menubar->actions( ))
         {
@@ -50,9 +52,18 @@ namespace nslib
             {
               _actionLoadNeuroML.reset( new QAction( "Load NeuroML", menu ));
               menu->addAction( _actionLoadNeuroML.get( ));
-
               connect( _actionLoadNeuroML.get( ), SIGNAL( triggered( )),
                        this, SLOT( loadNeuroML( )));
+
+              _actionSaveNeuroML.reset( new QAction( "Save NeuroML", menu ));
+              menu->addAction( _actionSaveNeuroML.get( ));
+              connect( _actionSaveNeuroML.get( ), SIGNAL( triggered( )),
+                       this, SLOT( saveNeuroML( )));
+
+              QIcon iconSave;
+              iconSave.addFile( QStringLiteral( ":/icons/save.svg" ),
+                                QSize( ), QIcon::Normal, QIcon::Off );
+              _actionSaveNeuroML->setIcon( iconSave );
 
             }
           }
@@ -63,8 +74,16 @@ namespace nslib
       {
         std::cout << "TODO" << std::endl;
       };
+
+      void saveNeuroML( void )
+      {
+        nslib::congen::DataSaver::saveXmlScene( _mw );
+      };
+
     protected:
+      QMainWindow* _mw;
       std::unique_ptr< QAction > _actionLoadNeuroML;
+      std::unique_ptr< QAction > _actionSaveNeuroML;
 
     };
 
@@ -87,9 +106,9 @@ namespace nslib
       unsigned int selectableEntityId( shift::Entity* entity ) const;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const;
       static void usageMessage( void );
-      void createGUI( QMenuBar* menubar ) final
+      void createGUI( QMainWindow* mw, QMenuBar* menubar ) final
       {
-        _domainGUI.reset( new DomainGUI( menubar ));
+        _domainGUI.reset( new DomainGUI( mw, menubar ));
       }
 
 

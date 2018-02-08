@@ -34,12 +34,10 @@ namespace nslib
   namespace congen
   {
     class DataSaver
-        : public QWidget
     {
       public:
 
-      signals:
-        NSLIBCONGEN_API static void saveXmlScene( QWidget * ptr );
+        NSLIBCONGEN_API static void saveXmlScene( QWidget* parent );
     };
   } /* namespace congen */
 } /* namespace nslib */

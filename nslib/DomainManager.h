@@ -26,6 +26,7 @@
 #include <shift/shift.h>
 #include <Eigen/Dense>
 #include <QMenuBar>
+#include <QMainWindow>
 #include "DataLoader.h"
 
 namespace nslib
@@ -53,7 +54,7 @@ namespace nslib
       relationshipPropertiesTypes( void ) const
     { return *_relationshipPropertiesTypes; }
 
-    virtual void createGUI( QMenuBar* /* menubar */ ) {};
+    virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ ) {};
 
   protected:
     DataLoader* _dataLoader;

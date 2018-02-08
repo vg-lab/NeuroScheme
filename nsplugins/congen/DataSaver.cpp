@@ -59,7 +59,7 @@ namespace nslib
                                        "0", "0", "0",
                                        "0", "0", "0" );
            }
-        }  
+        }
         const auto& relConnectsTo = *( DataManager::entities( ).
                                  relationships( )[ "connectsTo" ]->asOneToN( ));
         std::unordered_map< std::string, std::string > params;
