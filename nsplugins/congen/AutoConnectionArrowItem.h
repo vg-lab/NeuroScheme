@@ -34,10 +34,10 @@ namespace nslib
     {
       public:
       AutoConnectionArrowItem(
-          const AutoConnectionArrowRep& connectionArrowRep );
+        const AutoConnectionArrowRep& connectionArrowRep );
 
       void createAutoArrow( const QPointF& arcCenter, float arcDegrees,
-         float arcRadius, float startAngle, QPointF glyphCenter );
+        float arcRadius, float startAngle, QPointF glyphCenter );
 
       virtual void hoverEnter( void ) override;
 

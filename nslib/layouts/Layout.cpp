@@ -29,7 +29,7 @@
 #include "../RepresentationCreatorManager.h"
 #include "../reps/CollapseButtonItem.h"
 #include "../SelectionManager.h"
-//#include <nsplugins/congen/AutoConnectionArrowRep.h>
+//SLDEBUG #include <nsplugins/congen/AutoConnectionArrowRep.h>
 
 namespace nslib
 {
@@ -225,9 +225,7 @@ namespace nslib
 
     OpConfig opConfig( &_canvas->scene( ), animate );
 
-    //SL DEBUG
-    //LLAMADA STATICO
-    //congen::AutoConnectionArrowRep::calcPreRender( &opConfig, representations.front());
+    //SLDEBUG: setOutdated
 
 
     for ( auto& relationshipRep : relationshipReps )

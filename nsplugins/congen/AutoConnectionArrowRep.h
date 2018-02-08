@@ -25,7 +25,6 @@
 
 #include "ConnectionArrowRep.h"
 
-
 namespace nslib
 {
   namespace congen
@@ -34,26 +33,28 @@ namespace nslib
     {
       public :
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                           bool create = true );
-      AutoConnectionArrowRep( shift::Representation *Rep_ );
-      static void calcPreRender( shift::OpConfig* opConfig_, /**/QGraphicsItem* originItem/**shift::Representation* _originRep**/ );
+        bool create = true );
+      AutoConnectionArrowRep( shift::Representation* Rep_ );
+      static void recalcArcData( QGraphicsItem* originItem );
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
 
-      /*
-       * Determines distance between arc and
-       * glyph centres relative to arc size; -1 to 1
-       */
+      protected:
+      // determines distance between arc and glyph centres; -1 to 1
       static const float _centersDistFactor;
-      // Determines arc size; positive float
+
+      // determines arc size; positive float
       static const float _arcSizeFactor;
 
-      protected:
-
+      //the following determine various values needed to paint auto-connections
       static float glyphRadius;
       static float arcRadius;
       static float dist;
       static float startAngle;
       static float arcDegrees;
+
+      // determines whether the values above are up to date
+      static float glyphBoundingRect;
+      static float glyphScale;
 
     };
   } // namespace congen
