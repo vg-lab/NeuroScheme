@@ -40,6 +40,15 @@ namespace nslib
 {
   namespace congen
   {
+    float  AutoConnectionArrowItem::arcRadius;
+    float  AutoConnectionArrowItem::dist;
+    float  AutoConnectionArrowItem::startAngle;
+    float  AutoConnectionArrowItem::arcDegrees;
+    float  AutoConnectionArrowItem::glyphRadius;
+    float  AutoConnectionArrowItem::glyphBoundingRect = 0.0f;
+    float  AutoConnectionArrowItem::glyphScale = 0.0f;
+    const float AutoConnectionArrowItem::_centersDistFactor = 0.5f;
+    const float AutoConnectionArrowItem::_arcSizeFactor = 0.3f;
 
     AutoConnectionArrowItem::AutoConnectionArrowItem(
         const AutoConnectionArrowRep& connectionArrowRep )
@@ -48,23 +57,71 @@ namespace nslib
       _arrowThickness = 1.3f;
     }
 
-    void AutoConnectionArrowItem::createAutoArrow( const QPointF& arcCenter,
-      float arcDegrees, float arcRadius, float startAngle, QPointF glyphCenter )
+    const QLineF& AutoConnectionArrowItem::line( void )
     {
-      _arrowOrigin = QPointF( arcCenter.x( ) + arcRadius * cosf( startAngle ),
-        arcCenter.y( ) - arcRadius * sinf( startAngle ) );
+      return _line;
+    }
+
+    void AutoConnectionArrowItem::setLine( const QLineF& line_ )
+    {
+      _line = line_;
+      createAutoArrow( float(_line.p1( ).x( ) ),float (_line.p1( ).y( ) ), _line
+        .p2( ) );
+    }
+    void AutoConnectionArrowItem::createAutoArrow(float glyphScale_, float
+      glyphBoundingRect_, QPointF    glyphCenter )    {
+
+
+
+      if( glyphBoundingRect_ != glyphBoundingRect ||
+        glyphScale_ != glyphScale )
+      {
+        glyphScale = glyphScale_;
+        glyphBoundingRect = glyphBoundingRect_;
+        AutoConnectionArrowItem::recalcArcData( );
+      }
+
+      float relativeAngle;
+
+      if( false )
+      {
+        relativeAngle = M_PI * 1.75f;
+      }
+      else
+      {
+        relativeAngle = atanf(
+          float( glyphCenter.y( ) / glyphCenter.x( ) ) );
+        if( glyphCenter.x( ) < 0 )
+        {
+          relativeAngle += M_PI;
+        }
+      }
+
+
+      QPointF arcCenter = QPointF(
+        glyphCenter.x( ) + dist * cosf( relativeAngle ),
+        glyphCenter.y( ) + dist * sinf( relativeAngle ) );
+
+      relativeAngle = startAngle  + float( M_PI ) - relativeAngle;
+
+
+
+
+
+      _arrowOrigin = QPointF( arcCenter.x( ) + arcRadius * cosf( relativeAngle ),
+        arcCenter.y( ) - arcRadius * sinf( relativeAngle ) );
       _arrowDest = QPointF(
-        arcCenter.x( ) + arcRadius * cosf( startAngle + arcDegrees ),
-        arcCenter.y( ) - arcRadius * sinf( startAngle + arcDegrees ) );
+        arcCenter.x( ) + arcRadius * cosf( relativeAngle + arcDegrees ),
+        arcCenter.y( ) - arcRadius * sinf( relativeAngle + arcDegrees ) );
 
       float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
 
-      float arrowAngle = float( M_PI ) * 0.825f + arcDegrees + startAngle;
+      float arrowAngle = float( M_PI ) * 0.825f + arcDegrees + relativeAngle;
 
       QPointF arrowHead1 = _arrowDest - QPointF(
         sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
-      arrowAngle = float( M_PI ) *1.115f + arcDegrees + startAngle;
+      arrowAngle = float( M_PI ) *1.115f + arcDegrees + relativeAngle;
 
       QPointF arrowHead2 = _arrowDest - QPointF(
           sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
@@ -94,7 +151,7 @@ namespace nslib
 
       painterPath.arcTo( arcCenter.x( ) - arcRadius,
         arcCenter.y( ) - arcRadius, arcRadius * 2.0f, arcRadius * 2.0f,
-        startAngle * 180 / M_PI, arcDegrees * 180 / M_PI );
+        relativeAngle * 180 / M_PI, arcDegrees * 180 / M_PI );
 
       painterPath.addPolygon( arrowShape );
 
@@ -153,6 +210,31 @@ namespace nslib
         _arrowCircleEnd->setBrush( QBrush( Qt::NoBrush ) );
       }
     }
+
+    void AutoConnectionArrowItem::recalcArcData( )
+    {
+
+      glyphRadius = glyphBoundingRect * 0.5f *
+        glyphScale;
+
+      arcRadius = ( glyphRadius * _arcSizeFactor );
+
+      dist = glyphRadius + arcRadius * ( _centersDistFactor );
+
+      if( _centersDistFactor < 1 )
+      {
+        startAngle = acosf(
+          ( arcRadius * arcRadius + dist * dist - glyphRadius * glyphRadius ) /
+            ( 2.0f * arcRadius * dist ) );
+      }
+      else
+      {
+        startAngle = 0.0f;
+      }
+      arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
+    }
+
+
 
   } // namespace congen
 } // namespace nslib

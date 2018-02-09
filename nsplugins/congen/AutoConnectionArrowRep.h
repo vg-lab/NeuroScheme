@@ -35,7 +35,6 @@ namespace nslib
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
         bool create = true );
       AutoConnectionArrowRep( shift::Representation* Rep_ );
-      static void recalcArcData( QGraphicsItem* originItem );
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
 
       protected:

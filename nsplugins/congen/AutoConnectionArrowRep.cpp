@@ -56,43 +56,76 @@ namespace nslib
 
       auto arrowItem = this->item( scene );
 
-      auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
-        _originRep )->item( scene );
-
-      if( originItem->boundingRect( ).x( ) != glyphBoundingRect ||
-        originItem->scale( ) != glyphScale )
+      if( opConfig->isAnimating( ) )
       {
-        AutoConnectionArrowRep::recalcArcData( originItem );
-        glyphScale = float( originItem->scale( ) );
-        glyphBoundingRect = float( originItem->boundingRect( ).x( ) );
-      }
+        auto originRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
+        auto destRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _destRep );
 
-      QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
+        auto originItem = dynamic_cast< Item* >( originRep->item( scene ));
+        auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
 
-      float relativeAngle;
+        if( originItem == nullptr )
+        {
+          Loggers::get( )->log( "No successfully dynamic cast on originItem",
+            LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+        }
 
-      if( true )
-      {
-        relativeAngle = M_PI * 1.75f;
+        if( destItem == nullptr )
+        {
+          Loggers::get( )->log( "No successfully dynamic cast on destItem",
+            LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+        }
+
+        auto originArrowItem =
+          dynamic_cast< AutoConnectionArrowItem* >( arrowItem );
+        auto& lineAnim = originArrowItem->lineAnim( );
+        lineAnim.setPropertyName( "line" );
+        lineAnim.setTargetObject( originArrowItem );
+        lineAnim.setDuration( ANIM_DURATION );
+
+
+        auto originItemB = dynamic_cast< QGraphicsItemRepresentation* >(
+          _originRep )->item( scene );
+
+        float glyphScale = originItemB->scale( );
+        float glyphBoundingRect = originItemB->boundingRect( ).width( );
+
+
+
+        auto originPosAnimStart =
+          originItem->posAnim( ).startValue( ).toPointF( );
+        auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
+
+
+
+        lineAnim.setStartValue(
+          QLineF( QPointF( glyphBoundingRect, glyphScale ),
+            QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
+
+        lineAnim.setEndValue(
+          QLineF( QPointF( glyphBoundingRect, glyphScale ),
+            QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
+
+        lineAnim.start( );
+
       }
       else
       {
-        relativeAngle = atanf(
-          float( originItem->y( ) / originItem->x( ) ) );
-        if( originItem->x( ) < 0 )
-        {
-          relativeAngle += M_PI;
-        }
+
+        auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
+          _originRep )->item( scene );
+
+        float glyphScale = originItem->scale( );
+        float glyphBoundingRect = originItem->boundingRect( ).width( );
+
+        QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
+
+        dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
+          createAutoArrow( glyphScale, glyphBoundingRect,
+          glyphCenter );
       }
-
-      QPointF arcCenter = QPointF(
-        originItem->x( ) + dist * cosf( relativeAngle ),
-        originItem->y( ) + dist * sinf( relativeAngle ) );
-
-      dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
-        createAutoArrow( arcCenter, arcDegrees, arcRadius,
-        startAngle + float( M_PI ) - relativeAngle,
-        glyphCenter );
     }
 
     QGraphicsItem*
@@ -106,28 +139,5 @@ namespace nslib
       return _items.at( scene );
     }
 
-    void AutoConnectionArrowRep::recalcArcData( QGraphicsItem* originItem )
-    {
-
-      glyphRadius = float( originItem->boundingRect( ).width( ) ) * 0.5f *
-        float( originItem->scale( ) );
-
-      arcRadius = ( glyphRadius * _arcSizeFactor );
-
-      dist = glyphRadius + arcRadius * ( _centersDistFactor );
-
-      if( _centersDistFactor < 1 )
-      {
-        startAngle = acosf(
-          ( arcRadius * arcRadius + dist * dist - glyphRadius * glyphRadius ) /
-            ( 2.0f * arcRadius * dist ) );
-      }
-      else
-      {
-        startAngle = 0.0f;
-      }
-      arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
-
-    }
   } // namespace congen
 } // namespace nslib
