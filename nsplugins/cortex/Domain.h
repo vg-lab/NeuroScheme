@@ -39,12 +39,13 @@ namespace nslib
 
     public slots:
       void loadBlueConfig( void );
+      void loadXmlScene( void );
 
     protected:
       QMainWindow* _mw;
       QString _lastOpenedFileName;
       std::unique_ptr< QAction > _actionLoadBlueConfig;
-
+      std::unique_ptr< QAction > _actionLoadXmlScene;
     };
 
     class NSLIBCORTEX_API Domain

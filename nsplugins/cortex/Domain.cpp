@@ -54,11 +54,17 @@ namespace nslib
             connect( _actionLoadBlueConfig.get( ), SIGNAL( triggered( )),
                      this, SLOT( loadBlueConfig( )));
 
-            // QIcon iconSave;
-            // iconSave.addFile( QStringLiteral( ":/icons/save.svg" ),
-            //                   QSize( ), QIcon::Normal, QIcon::Off );
-            // _actionSaveNeuroML->setIcon( iconSave );
+            _actionLoadXmlScene.reset( new QAction( "Load XML Scene", menu ));
+            menu->addAction( _actionLoadXmlScene.get( ));
+            connect( _actionLoadXmlScene.get( ), SIGNAL( triggered( )),
+                     this, SLOT( loadXmlScene( )));
 
+            #ifndef NSOL_USE_BRION
+            _actionLoadBlueConfig->setEnabled( false );
+            #endif
+            #ifndef NEUROSCHEME_USE_NSOL
+            _actionLoadXmlScene->setEnabled( false );
+            #endif
           }
         }
       }
@@ -130,6 +136,7 @@ namespace nslib
 
     void DomainGUI::loadBlueConfig( void )
     {
+#ifdef NSOL_USE_BRION
       QString path;
       QString filter(
         tr( "BlueConfig ( BlueConfig CircuitConfig);; All files (*)" ));
@@ -182,7 +189,6 @@ namespace nslib
 
             _lastOpenedFileName = QFileInfo( path ).path( );
             std::string fileName = path.toStdString( );
-//          _viewer->LoadBlueConfig( fileName, targetLabel, false, false );
 
             Loggers::get( )->log( "Loading blue config",
                                   nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
@@ -201,10 +207,42 @@ namespace nslib
 
           }
         }
-
-
       }
+#endif
+    }
 
+    void DomainGUI::loadXmlScene( void )
+    {
+#ifdef NEUROSCHEME_USE_NSOL
+      QString path;
+      QString filter( tr("Xml Scene ( *.xml );; All files (*)" ));
+      auto fd = new QFileDialog( _mw, QString( "Open Xml Scene" ),
+                                 _lastOpenedFileName, filter );
+
+      fd->setOption( QFileDialog::DontUseNativeDialog, true );
+      fd->setFileMode( QFileDialog/*::FileMode*/::AnyFile );
+      if ( fd->exec( ))
+        path = fd->selectedFiles( )[0];
+
+      if ( path != QString(""))
+      {
+        _lastOpenedFileName = QFileInfo( path ).path( );
+        auto fileName = path.toStdString( );
+
+        Loggers::get( )->log( "Loading blue config",
+                              nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+        nslib::DataManager::loadNsolXmlScene( fileName );
+
+        DataLoader::createEntitiesFromNsolColumns(
+          nslib::DataManager::nsolDataSet( ).columns( ),
+          nslib::DataManager::nsolDataSet( ).circuit( ));
+
+        auto canvas = nslib::PaneManager::activePane( );
+        canvas->displayEntities(
+          nslib::DataManager::rootEntities( ), false, true );
+        nslib::PaneManager::panes( ).insert( canvas );
+      }
+#endif
     }
 
     Domain::Domain( void )
