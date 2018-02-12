@@ -20,18 +20,94 @@
  *
  */
 
+#include "DataLoader.h"
 #include "Domain.h"
 #include "RepresentationCreator.h"
 #include <nslib/DataManager.h>
+#include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>
 #include <shift_NeuronPop.h>
 #include <shift_congen_entities.h>
 #include <shift_congen_relationshipProperties.h>
+#include <QFileDialog>
 
 namespace nslib
 {
   namespace congen
   {
+    DomainGUI::DomainGUI( QMainWindow* mw_, QMenuBar* menubar )
+      : _mw( mw_ )
+    {
+      for ( auto action : menubar->actions( ))
+      {
+        if ( action->menu( ))
+        {
+          auto menu = dynamic_cast< QMenu* >( action->parent( ));
+          if ( action->text( ) == "&File" && menu )
+          {
+            _actionLoadNeuroML.reset( new QAction( "&Load NeuroML", menu ));
+            menu->insertAction( menu->actions( ).last( ), _actionLoadNeuroML.get( ));
+            connect( _actionLoadNeuroML.get( ), SIGNAL( triggered( )),
+                     this, SLOT( loadNeuroML( )));
+
+            _actionSaveNeuroML.reset( new QAction( "&Save NeuroML", menu ));
+            menu->insertAction( menu->actions( ).last( ), _actionSaveNeuroML.get( ));
+            connect( _actionSaveNeuroML.get( ), SIGNAL( triggered( )),
+                     this, SLOT( saveNeuroML( )));
+
+            QIcon iconSave;
+            iconSave.addFile( QStringLiteral( ":/icons/save.svg" ),
+                              QSize( ), QIcon::Normal, QIcon::Off );
+            _actionSaveNeuroML->setIcon( iconSave );
+
+            QIcon iconLoad;
+            iconLoad.addFile( QStringLiteral( ":/icons/open.svg" ),
+                              QSize( ), QIcon::Normal, QIcon::Off );
+            _actionLoadNeuroML->setIcon( iconLoad );
+
+          }
+        }
+      }
+    }
+
+    void DomainGUI::loadNeuroML( void )
+    {
+      QString path;
+      QString filter( tr("Xml Scene ( *.xml );; All files (*)" ));
+      auto fd = new QFileDialog( _mw, QString( "Open Xml Scene" ),
+                                 _lastOpenedFileName, filter );
+
+      fd->setOption( QFileDialog::DontUseNativeDialog, true );
+      fd->setFileMode( QFileDialog/*::FileMode*/::AnyFile );
+      if ( fd->exec( ))
+        path = fd->selectedFiles( )[0];
+
+      if ( path != QString(""))
+      {
+        _lastOpenedFileName = QFileInfo( path ).path( );
+        auto fileName = path.toStdString( );
+
+        Loggers::get( )->log( "Loading blue config",
+                              nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+
+        nslib::congen::DataLoader::loadNeuroML( fileName );
+
+        // DataLoader::createEntitiesFromNsolColumns(
+        //   nslib::DataManager::nsolDataSet( ).columns( ),
+        //   nslib::DataManager::nsolDataSet( ).circuit( ));
+
+        auto canvas = nslib::PaneManager::activePane( );
+        canvas->displayEntities(
+          nslib::DataManager::rootEntities( ), false, true );
+        nslib::PaneManager::panes( ).insert( canvas );
+      }
+    };
+
+    void DomainGUI::saveNeuroML( void )
+    {
+      nslib::congen::DataSaver::saveXmlScene( _mw );
+    };
+
     using NeuronPop = shiftgen::NeuronPop;
 
     Domain::Domain( void )

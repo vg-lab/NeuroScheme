@@ -29,7 +29,7 @@
    </property>
    <widget class="QMenu" name="menuPanes">
     <property name="title">
-     <string>Panes</string>
+     <string>&amp;Panes</string>
     </property>
     <addaction name="actionDuplicatePane"/>
     <addaction name="actionKillPane"/>
@@ -39,20 +39,20 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionHome"/>
     <addaction name="actionShowConnectivity"/>
    </widget>
    <widget class="QMenu" name="menuEvents">
     <property name="title">
-     <string>Events</string>
+     <string>&amp;Events</string>
     </property>
     <addaction name="actionAutoPublishSelection"/>
     <addaction name="actionPublishSelection"/>
@@ -63,7 +63,7 @@
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -137,17 +137,17 @@
   </action>
   <action name="actionSplitHorizontally">
    <property name="text">
-    <string>Split horizontally</string>
+    <string>Split &amp;horizontally</string>
    </property>
   </action>
   <action name="actionSplitVertically">
    <property name="text">
-    <string>Split vertically</string>
+    <string>Split &amp;vertically</string>
    </property>
   </action>
   <action name="actionKillPane">
    <property name="text">
-    <string>Kill pane</string>
+    <string>&amp;Kill pane</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+K</string>
@@ -155,7 +155,7 @@
   </action>
   <action name="actionDuplicatePane">
    <property name="text">
-    <string>Duplicate Pane</string>
+    <string>&amp;Duplicate Pane</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -167,7 +167,7 @@
      <normaloff>:/icons/home.svg</normaloff>:/icons/home.svg</iconset>
    </property>
    <property name="text">
-    <string>Home</string>
+    <string>&amp;Home</string>
    </property>
    <property name="toolTip">
     <string>Home</string>
@@ -194,7 +194,7 @@
      <normaloff>:/icons/connection.svg</normaloff>:/icons/connection.svg</iconset>
    </property>
    <property name="text">
-    <string>Show connectivity</string>
+    <string>Show &amp;connectivity</string>
    </property>
    <property name="toolTip">
     <string>Show connectivity</string>
@@ -224,7 +224,7 @@
     <string>Send auto focus event on display</string>
    </property>
    <property name="toolTip">
-    <string>Sent focus event automatically on desplayed elements</string>
+    <string>Send focus event automatically on displayed elements</string>
    </property>
   </action>
   <action name="actionFocusOnDisplayed">
@@ -307,7 +307,7 @@
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>

@@ -40,48 +40,15 @@ namespace nslib
       Q_OBJECT;
 
     public:
-      DomainGUI( QMainWindow* mw_, QMenuBar* menubar )
-        : _mw( mw_ )
-      {
-        for ( auto action : menubar->actions( ))
-        {
-          if ( action->menu( ))
-          {
-            auto menu = dynamic_cast< QMenu* >( action->parent( ));
-            if ( action->text( ) == "File" && menu )
-            {
-              _actionLoadNeuroML.reset( new QAction( "Load NeuroML", menu ));
-              menu->addAction( _actionLoadNeuroML.get( ));
-              connect( _actionLoadNeuroML.get( ), SIGNAL( triggered( )),
-                       this, SLOT( loadNeuroML( )));
+      DomainGUI( QMainWindow* mw_, QMenuBar* menubar );
 
-              _actionSaveNeuroML.reset( new QAction( "Save NeuroML", menu ));
-              menu->addAction( _actionSaveNeuroML.get( ));
-              connect( _actionSaveNeuroML.get( ), SIGNAL( triggered( )),
-                       this, SLOT( saveNeuroML( )));
-
-              QIcon iconSave;
-              iconSave.addFile( QStringLiteral( ":/icons/save.svg" ),
-                                QSize( ), QIcon::Normal, QIcon::Off );
-              _actionSaveNeuroML->setIcon( iconSave );
-
-            }
-          }
-        }
-    }
     public slots:
-      void loadNeuroML( void )
-      {
-        std::cout << "TODO" << std::endl;
-      };
-
-      void saveNeuroML( void )
-      {
-        nslib::congen::DataSaver::saveXmlScene( _mw );
-      };
+      void loadNeuroML( void );
+      void saveNeuroML( void );
 
     protected:
       QMainWindow* _mw;
+      QString _lastOpenedFileName;
       std::unique_ptr< QAction > _actionLoadNeuroML;
       std::unique_ptr< QAction > _actionSaveNeuroML;
 

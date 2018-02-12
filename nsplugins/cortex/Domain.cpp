@@ -47,17 +47,23 @@ namespace nslib
         if ( action->menu( ))
         {
           auto menu = dynamic_cast< QMenu* >( action->parent( ));
-          if ( action->text( ) == "File" && menu )
+          if ( action->text( ) == "&File" && menu )
           {
-            _actionLoadBlueConfig.reset( new QAction( "Load BlueConfig", menu ));
-            menu->addAction( _actionLoadBlueConfig.get( ));
+            _actionLoadBlueConfig.reset( new QAction( "Load &BlueConfig", menu ));
+            menu->insertAction( menu->actions( ).last( ), _actionLoadBlueConfig.get( ));
             connect( _actionLoadBlueConfig.get( ), SIGNAL( triggered( )),
                      this, SLOT( loadBlueConfig( )));
 
-            _actionLoadXmlScene.reset( new QAction( "Load XML Scene", menu ));
-            menu->addAction( _actionLoadXmlScene.get( ));
+            _actionLoadXmlScene.reset( new QAction( "Load &XML Scene", menu ));
+            menu->insertAction( menu->actions( ).last( ), _actionLoadXmlScene.get( ));
             connect( _actionLoadXmlScene.get( ), SIGNAL( triggered( )),
                      this, SLOT( loadXmlScene( )));
+
+            QIcon iconSave;
+            iconSave.addFile( QStringLiteral( ":/icons/open.svg" ),
+                              QSize( ), QIcon::Normal, QIcon::Off );
+            _actionLoadBlueConfig->setIcon( iconSave );
+            _actionLoadXmlScene->setIcon( iconSave );
 
             #ifndef NSOL_USE_BRION
             _actionLoadBlueConfig->setEnabled( false );
@@ -113,15 +119,14 @@ namespace nslib
         _layout->addWidget( _okButton.get( ), row, 1);
         connect( _okButton.get( ), SIGNAL( clicked( )), this, SLOT( close( )));
         setLayout( _layout.get( ));
-
       }
 
       bool loadMorphology( void ) { return _checkLoadMorpho->isChecked( ); }
       bool loadConnectivity( void ) { return _checkLoadConnectivity->isChecked( ); }
       bool loadCSVStats( void ) { return _checkLoadCSVStats->isChecked( ); }
 
-    public slots:
-      void close( void ) { this->close( ); }
+    // public slots:
+    //   void ok( void ) { this->close( ); }
 
     protected:
       std::unique_ptr< QLabel > _labelLoadMorpho;

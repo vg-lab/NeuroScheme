@@ -188,7 +188,7 @@ namespace nslib
 
   void DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
   {
-    #ifdef NSOL_USE_QT5CORE
+#ifdef NSOL_USE_QT5CORE
     auto errorMessage = new QErrorMessage;
     try
     {
@@ -213,13 +213,14 @@ namespace nslib
       return;
     }
 
-    #else
+#else
     (void) xmlSceneFile;
     Loggers::get( )->log( "nsol not built or built without QtCore",
                          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
-    #endif
+#endif
   }
+
 
 
 } // namespace nslib

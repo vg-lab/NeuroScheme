@@ -182,7 +182,10 @@ void parseArguments( int argc, char** argv,
 
 int main( int argc, char** argv )
 {
-
+#ifndef _WINDOWS
+  //WAR for Brion swc reader
+  setenv( "LANG", "C", 1 );
+#endif
   std::string foundArg;
   auto& args = nslib::Config::inputArgs( );
   parseArguments( argc, argv, args );
