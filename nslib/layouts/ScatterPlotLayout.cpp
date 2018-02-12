@@ -32,6 +32,7 @@ namespace nslib
   ScatterPlotLayout::ScatterPlotLayout( void )
     : Layout( "ScatterPlot", Layout::SCATTERPLOT_ENABLED )
   {
+    _layoutType = SCATTERPLOT_LAYOUT;
   }
 
 

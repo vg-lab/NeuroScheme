@@ -20,19 +20,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+#define _USE_MATH_DEFINES
+
 #include "AutoConnectionArrowItem.h"
 #include "ConnectionArrowItem.h"
+#include "ConnectionArrowRep.h"
 #include <nslib/Color.h>
 #include <nslib/InteractionManager.h>
 #include <nslib/reps/InteractiveItem.h>
 #include <nslib/reps/Item.h>
 #include <nslib/reps/SelectableItem.h>
-#include "ConnectionArrowRep.h"
-
 #include <QGraphicsPolygonItem>
 #include <QPropertyAnimation>
-
-#include <ctime>
+#include <cmath>
 #include <nslib/Config.h>
 #include <Eigen/Dense>
 
@@ -40,19 +40,25 @@ namespace nslib
 {
   namespace congen
   {
+    const float AutoConnectionArrowItem::M_PI_x2 = M_PI_Float + M_PI_Float;
+    const float AutoConnectionArrowItem::Rad_To_Deg = 180.0f/M_PI_Float;
+    const float AutoConnectionArrowItem::M_PI_0825 = 0.825f*M_PI_Float;
+    const float AutoConnectionArrowItem::M_PI_1115= 1.115f*M_PI_Float;
+    const float AutoConnectionArrowItem::M_PI_175= 1.75f*M_PI_Float;
+
+
+    float AutoConnectionArrowItem::_centersDistFactor = 0.5f;
+    float AutoConnectionArrowItem::_arcSizeFactor = 0.35f;
+
+    float  AutoConnectionArrowItem::glyphRadius = 0.0f;
     float  AutoConnectionArrowItem::arcRadius;
     float  AutoConnectionArrowItem::dist;
     float  AutoConnectionArrowItem::startAngle;
     float  AutoConnectionArrowItem::arcDegrees;
-    float  AutoConnectionArrowItem::glyphRadius;
-    float  AutoConnectionArrowItem::glyphBoundingRect = 0.0f;
-    float  AutoConnectionArrowItem::glyphScale = 0.0f;
-    const float AutoConnectionArrowItem::_centersDistFactor = 0.5f;
-    const float AutoConnectionArrowItem::_arcSizeFactor = 0.3f;
 
     AutoConnectionArrowItem::AutoConnectionArrowItem(
-        const AutoConnectionArrowRep& connectionArrowRep )
-        : ConnectionArrowItem( connectionArrowRep )
+      const AutoConnectionArrowRep& connectionArrowRep )
+      : ConnectionArrowItem( connectionArrowRep )
     {
       _arrowThickness = 1.3f;
     }
@@ -65,27 +71,25 @@ namespace nslib
     void AutoConnectionArrowItem::setLine( const QLineF& line_ )
     {
       _line = line_;
-      createAutoArrow( float(_line.p1( ).x( ) ),float (_line.p1( ).y( ) ), _line
-        .p2( ) );
+      createAutoArrow( float( _line.p1( ).x( ) ), float( _line.p1( ).y( ) ),
+        _line.p2( ) );
     }
-    void AutoConnectionArrowItem::createAutoArrow(float glyphScale_, float
-      glyphBoundingRect_, QPointF    glyphCenter )    {
 
+    void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
+      float isGrid_, QPointF glyphCenter )
+    {
 
-
-      if( glyphBoundingRect_ != glyphBoundingRect ||
-        glyphScale_ != glyphScale )
+      if( glyphRadius_ != glyphRadius )
       {
-        glyphScale = glyphScale_;
-        glyphBoundingRect = glyphBoundingRect_;
+        glyphRadius = glyphRadius_;
         AutoConnectionArrowItem::recalcArcData( );
       }
 
       float relativeAngle;
 
-      if( false )
+      if( isGrid_ == 1.0f )
       {
-        relativeAngle = M_PI * 1.75f;
+        relativeAngle = M_PI_175;
       }
       else
       {
@@ -93,22 +97,18 @@ namespace nslib
           float( glyphCenter.y( ) / glyphCenter.x( ) ) );
         if( glyphCenter.x( ) < 0 )
         {
-          relativeAngle += M_PI;
+          relativeAngle += M_PI_Float;
         }
       }
-
 
       QPointF arcCenter = QPointF(
         glyphCenter.x( ) + dist * cosf( relativeAngle ),
         glyphCenter.y( ) + dist * sinf( relativeAngle ) );
 
-      relativeAngle = startAngle  + float( M_PI ) - relativeAngle;
+      relativeAngle = startAngle + M_PI_Float - relativeAngle;
 
-
-
-
-
-      _arrowOrigin = QPointF( arcCenter.x( ) + arcRadius * cosf( relativeAngle ),
+      _arrowOrigin = QPointF(
+        arcCenter.x( ) + arcRadius * cosf( relativeAngle ),
         arcCenter.y( ) - arcRadius * sinf( relativeAngle ) );
       _arrowDest = QPointF(
         arcCenter.x( ) + arcRadius * cosf( relativeAngle + arcDegrees ),
@@ -116,27 +116,28 @@ namespace nslib
 
       float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
 
-      float arrowAngle = float( M_PI ) * 0.825f + arcDegrees + relativeAngle;
+      float arrowAngle = M_PI_0825 + arcDegrees + relativeAngle;
 
       QPointF arrowHead1 = _arrowDest - QPointF(
         sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
-      arrowAngle = float( M_PI ) *1.115f + arcDegrees + relativeAngle;
+      arrowAngle = M_PI_1115 + arcDegrees + relativeAngle;
 
       QPointF arrowHead2 = _arrowDest - QPointF(
-          sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
+        sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
       QPolygonF arrowShape;
       arrowShape << arrowHead1 << _arrowDest << arrowHead2;
 
       auto painterPath = QPainterPath( );
 
-      if ( arcDegrees < 2.0f * float(M_PI)) {
+      if( arcDegrees < M_PI_x2 )
+      {
         QPointF relativeDir = _arrowOrigin - glyphCenter;
 
         Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ) );
         vector.normalize( );
-        vector *= arrowWidth;
+        vector = vector * arrowWidth;
 
         QPointF arrowBack = QPointF( -vector.y( ), vector.x( ) );
 
@@ -151,7 +152,7 @@ namespace nslib
 
       painterPath.arcTo( arcCenter.x( ) - arcRadius,
         arcCenter.y( ) - arcRadius, arcRadius * 2.0f, arcRadius * 2.0f,
-        relativeAngle * 180 / M_PI, arcDegrees * 180 / M_PI );
+        relativeAngle * Rad_To_Deg, arcDegrees * Rad_To_Deg);
 
       painterPath.addPolygon( arrowShape );
 
@@ -171,7 +172,7 @@ namespace nslib
       if( _arrowCircleEnd != nullptr )
       {
         _arrowCircleEnd->setPen(
-            QPen( QBrush( hoverColor ), _arrowThickness ) );
+          QPen( QBrush( hoverColor ), _arrowThickness ) );
         _arrowCircleEnd->setBrush( QBrush( hoverColor ) );
       }
     }
@@ -181,7 +182,7 @@ namespace nslib
       this->setZValue( 100 );
       this->setBrush( QBrush( Qt::NoBrush ) );
       this->setPen(
-          QPen( QBrush( QColor( 50, 206, 22 )/*Green*/ ), _arrowThickness ) );
+        QPen( QBrush( QColor( 50, 206, 22 )/*Green*/ ), _arrowThickness ) );
       if( _arrowCircleEnd != nullptr )
       {
         _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ) );
@@ -190,7 +191,7 @@ namespace nslib
     }
 
     void AutoConnectionArrowItem::hoverLeaveEvent(
-        QGraphicsSceneHoverEvent* event_ )
+      QGraphicsSceneHoverEvent* event_ )
     {
       auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
       if( rep )
@@ -214,9 +215,6 @@ namespace nslib
     void AutoConnectionArrowItem::recalcArcData( )
     {
 
-      glyphRadius = glyphBoundingRect * 0.5f *
-        glyphScale;
-
       arcRadius = ( glyphRadius * _arcSizeFactor );
 
       dist = glyphRadius + arcRadius * ( _centersDistFactor );
@@ -231,10 +229,22 @@ namespace nslib
       {
         startAngle = 0.0f;
       }
-      arcDegrees = 2.0f * ( float( M_PI ) - startAngle );
+      arcDegrees = M_PI_x2- startAngle -startAngle;
     }
 
+    void
+    AutoConnectionArrowItem::setCentersDistFactor( float centersDistFactor_ )
+    {
+      _centersDistFactor = centersDistFactor_;
+      glyphRadius = 0.0f;
+    }
 
+    void AutoConnectionArrowItem::setArcSizeFactor( float arcSizeFactor_ )
+    {
+      _arcSizeFactor = arcSizeFactor_;
+      glyphRadius = 0.0f;
+
+    }
 
   } // namespace congen
 } // namespace nslib

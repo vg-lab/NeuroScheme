@@ -29,16 +29,6 @@ namespace nslib
   namespace congen
   {
 
-    const float AutoConnectionArrowRep::_centersDistFactor = 0.5f;
-    const float AutoConnectionArrowRep::_arcSizeFactor = 0.3f;
-    float  AutoConnectionArrowRep::glyphRadius;
-    float  AutoConnectionArrowRep::arcRadius;
-    float  AutoConnectionArrowRep::dist;
-    float  AutoConnectionArrowRep::startAngle;
-    float  AutoConnectionArrowRep::arcDegrees;
-    float  AutoConnectionArrowRep::glyphBoundingRect = 0.0f;
-    float  AutoConnectionArrowRep::glyphScale = 0.0f;
-
     AutoConnectionArrowRep::AutoConnectionArrowRep(
       shift::Representation* Rep_ )
       : ConnectionArrowRep( Rep_, Rep_ )
@@ -47,7 +37,7 @@ namespace nslib
 
     void AutoConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )
     {
-      OpConfig* opConfig = dynamic_cast< OpConfig* >( opConfig_ );
+      auto opConfig = dynamic_cast< OpConfig* >( opConfig_ );
       if( !opConfig )
       {
         return;
@@ -63,8 +53,8 @@ namespace nslib
         auto destRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _destRep );
 
-        auto originItem = dynamic_cast< Item* >( originRep->item( scene ));
-        auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
+        auto originItem = dynamic_cast< Item* >( originRep->item( scene ) );
+        auto destItem = dynamic_cast< Item* >( destRep->item( scene ) );
 
         if( originItem == nullptr )
         {
@@ -85,28 +75,33 @@ namespace nslib
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
 
-
         auto originItemB = dynamic_cast< QGraphicsItemRepresentation* >(
           _originRep )->item( scene );
 
-        float glyphScale = originItemB->scale( );
-        float glyphBoundingRect = originItemB->boundingRect( ).width( );
+        float glyphScaleStart =
+          originItem->scaleAnim( ).startValue( ).toFloat( );
 
+        float glyphScaleEnd = originItem->scaleAnim( ).endValue( ).toFloat( );
 
+        float glyphBoundingRect =
+          0.5f * float( originItemB->boundingRect( ).width( ) );
 
         auto originPosAnimStart =
           originItem->posAnim( ).startValue( ).toPointF( );
         auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
 
-
+        float glyphRadius = glyphScaleStart * glyphBoundingRect;
+        float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
         lineAnim.setStartValue(
-          QLineF( QPointF( glyphBoundingRect, glyphScale ),
-            QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
+          QLineF( QPointF( glyphRadius, isGrid ),
+          QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
+
+        glyphRadius = glyphScaleEnd * glyphBoundingRect;
 
         lineAnim.setEndValue(
-          QLineF( QPointF( glyphBoundingRect, glyphScale ),
-            QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
+          QLineF( QPointF( glyphRadius, isGrid ),
+          QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
 
         lineAnim.start( );
 
@@ -117,14 +112,14 @@ namespace nslib
         auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
           _originRep )->item( scene );
 
-        float glyphScale = originItem->scale( );
-        float glyphBoundingRect = originItem->boundingRect( ).width( );
+        float glyphRadius = 0.5f * float( originItem->scale( ) )
+          * float( originItem->boundingRect( ).width( ) );
+        float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
         QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
 
         dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
-          createAutoArrow( glyphScale, glyphBoundingRect,
-          glyphCenter );
+          createAutoArrow( glyphRadius, isGrid, glyphCenter );
       }
     }
 

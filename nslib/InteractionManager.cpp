@@ -333,12 +333,9 @@ namespace nslib
             }
             else if ( autoEntity && autoEntity == selectedAction )
             {
-              if ( _entityEditWidget != nullptr )
-                delete _entityEditWidget;
-
               createConnectionRelationship(
-                  DataManager::entities( ).at( entityGid ),
-                  DataManager::entities( ).at( entityGid ) );
+                DataManager::entities( ).at( entityGid ),
+                DataManager::entities( ).at( entityGid ) );
 
             }
             else

@@ -36,25 +36,6 @@ namespace nslib
         bool create = true );
       AutoConnectionArrowRep( shift::Representation* Rep_ );
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
-
-      protected:
-      // determines distance between arc and glyph centres; -1 to 1
-      static const float _centersDistFactor;
-
-      // determines arc size; positive float
-      static const float _arcSizeFactor;
-
-      //the following determine various values needed to paint auto-connections
-      static float glyphRadius;
-      static float arcRadius;
-      static float dist;
-      static float startAngle;
-      static float arcDegrees;
-
-      // determines whether the values above are up to date
-      static float glyphBoundingRect;
-      static float glyphScale;
-
     };
   } // namespace congen
 } // namespace nslib

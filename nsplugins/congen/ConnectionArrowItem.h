@@ -55,9 +55,9 @@ namespace nslib
 
       virtual ~ConnectionArrowItem( void );
 
-      const QLineF& line( void );
+      virtual const QLineF& line( void );
 
-      void setLine( const QLineF& line_ );
+      virtual void setLine( const QLineF& line_ );
 
       void createArrow( const QPointF& origin, const QPointF& dest );
 
@@ -80,7 +80,9 @@ namespace nslib
       protected:
       //QGraphicsEllipseItem* _arrowOriItem;
 
-      const float M_PI_3 = float( M_PI ) * 0.33f;
+      const static float M_PI_3;
+      const static float M_PI_Float;
+
       QGraphicsEllipseItem* _arrowCircleEnd;
 
       float _arrowThickness;

@@ -30,19 +30,21 @@ namespace nslib
 {
   namespace congen
   {
-    class AutoConnectionArrowItem : public nslib::congen::ConnectionArrowItem
+    class AutoConnectionArrowItem
+      : public nslib::congen::ConnectionArrowItem
     {
       Q_OBJECT
       Q_PROPERTY( QLineF line READ line WRITE setLine )
 
       public:
-      AutoConnectionArrowItem(const AutoConnectionArrowRep& connectionArrowRep );
+      AutoConnectionArrowItem(
+        const AutoConnectionArrowRep& connectionArrowRep );
 
-      const QLineF& line( void );
-      void setLine( const QLineF& line_ );
+      virtual const QLineF& line( void ) override;
+      virtual void setLine( const QLineF& line_ ) override;
 
-      void createAutoArrow(float glyphScale_, float
-      glyphBoundingRect_, QPointF    glyphCenter ) ;
+      void createAutoArrow( float glyphScale_,
+        float glyphBoundingRect_, QPointF glyphCenter );
 
       static void recalcArcData( );
       virtual void hoverEnter( void ) override;
@@ -52,25 +54,31 @@ namespace nslib
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
       virtual void hoverLeave( void ) override;
+      void setArcSizeFactor( float arcSizeFactor_ );
+      void setCentersDistFactor( float centersDistFactor_ );
 
-
+      protected:
 
       //the following determine various values needed to paint auto-connections
-      static float glyphRadius;
       static float arcRadius;
       static float dist;
       static float startAngle;
       static float arcDegrees;
 
       // determines whether the values above are up to date
-      static float glyphBoundingRect;
-      static float glyphScale;
+      static float glyphRadius;
 
       // determines distance between arc and glyph centres; -1 to 1
-      static const float _centersDistFactor;
+      static float _centersDistFactor;
 
       // determines arc size; positive float
-      static const float _arcSizeFactor;
+      static float _arcSizeFactor;
+
+      static const float M_PI_x2;
+      static const float Rad_To_Deg;
+      static const float M_PI_0825;
+      static const float M_PI_1115;
+      static const float M_PI_175;
 
     };
   } // namespace congen

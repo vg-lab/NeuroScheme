@@ -47,16 +47,20 @@ namespace nslib
   class OpConfig : public shift::OpConfig
   {
   public:
-    OpConfig( GraphicsScene* scene_ = nullptr, bool animating_=false )
-      : _scene( scene_ ), _animating(animating_)
+    OpConfig( GraphicsScene* scene_ = nullptr, bool animating_=false,
+      bool grid_ = false )
+      : _scene( scene_ ), _animating(animating_), _grid(grid_)
     {}
     virtual ~OpConfig( void ) {};
     GraphicsScene* scene( void ) { return _scene; };
     bool isAnimating(){ return _animating; };
+    bool isGrid(){ return _grid; };
 
-  protected:
+
+    protected:
     GraphicsScene*  _scene;
     bool            _animating;
+    bool            _grid;
   };
 
   class Canvas;
@@ -84,6 +88,15 @@ namespace nslib
       FILTER_ENABLED = 0x02,
       CAMERA_ENABLED = 0x04,
       SCATTERPLOT_ENABLED = 0x08
+    };
+
+    enum
+    {
+      UNDEFINED_LAYOUT = 0,
+      CAMERA_BASED_LAYOUT = 1,
+      CIRCULAR_LAYOUT = 2,
+      GRID_LAYAOUT = 3,
+      SCATTERPLOT_LAYOUT = 4
     };
 
 
@@ -138,6 +151,7 @@ namespace nslib
     SortWidget* _sortWidget;
     FilterWidget* _filterWidget;
     ScatterPlotWidget* _scatterPlotWidget;
+    unsigned int _layoutType;
   };
 
 }
