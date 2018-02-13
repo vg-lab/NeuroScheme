@@ -22,10 +22,10 @@
  */
 #define _USE_MATH_DEFINES
 
-#include <cmath>
-
 #include "ConnectionArrowItem.h"
+
 #include <nslib/Config.h>
+#include <cmath>
 
 namespace nslib
 {

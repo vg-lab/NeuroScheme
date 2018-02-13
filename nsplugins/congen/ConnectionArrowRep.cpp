@@ -20,6 +20,7 @@
  *
  */
 #include "ConnectionArrowItem.h"
+
 #include <nslib/Color.h>
 
 #include <QVector2D>

@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- * Authors: Fernando Lucas Pérez
- * 			    Iago Calvo Lista
+ * Authors: Iago Calvo Lista
+ *          Fernando Lucas Pérez
+ *
  *
  * This file is part of NeuroScheme
  *
@@ -37,24 +38,88 @@ namespace nslib
       Q_PROPERTY( QLineF line READ line WRITE setLine )
 
       public:
+      /**
+       *
+       * Creates a new AutoConnectionArrowItem from a AutoConnectionArrowRep
+       * @param autoConnectionArrowRep AutoConnectionArrowRep to which the new
+       * AutoConnectionArrowItem correspond
+       */
       AutoConnectionArrowItem(
-        const AutoConnectionArrowRep& connectionArrowRep );
+        const AutoConnectionArrowRep& autoConnectionArrowRep );
 
+      /**
+       *
+       * Override getter for the line used for transition animations
+       *
+       * @return line animated in transition animations
+       */
       virtual const QLineF& line( void ) override;
+
+      /**
+       *
+       * Override setter for the line used during transitions; calls the
+       * auxiliar function createAutoArrow
+       *
+       * @param line_ new line to be drawn
+       */
       virtual void setLine( const QLineF& line_ ) override;
 
-      void createAutoArrow( float glyphScale_,
-        float glyphBoundingRect_, QPointF glyphCenter );
+      /**
+       *
+       * Creates the path corresponding to the autoconnection arrow
+       *
+       * @param glyphRadius_ value of the radius of the NeuronPop representation
+       * @param isGrid_ if equal to 1.0f uses the angle for grid layouts
+       * @param glyphCenter Qpoint of the center of the NeuronPop representation
+       */
+      void createAutoArrow(
+        float glyphRadius_, float isGrid_, QPointF glyphCenter);
 
+      /**
+       *
+       * Recalcs static common data common for all the representations
+       *
+       */
       static void recalcArcData( );
+
+      /**
+       *
+       * Set the color to red when the mouse is over it
+       *
+       */
       virtual void hoverEnter( void ) override;
 
-      virtual void highlight( scoop::Color color_ ) override;
-
+      /**
+       *
+       * Restore the normal color when the mouses leaves the neuron
+       *
+       * @param event_
+       */
+      virtual void hoverLeave( void ) override;
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
-      virtual void hoverLeave( void ) override;
+      /**
+      *
+      * Set the color to green when the mouse is over the its NeuronPop
+      *
+      */
+      virtual void highlight( scoop::Color color_ ) override;
+
+
+      /**
+       * Sets the _arcSizeFactor who the determines the arc size
+       *
+       * @param arcSizeFactor_ positive float value of the new _arcSizeFactor
+       */
       void setArcSizeFactor( float arcSizeFactor_ );
+
+      /**
+       * sets the _acentersDistFactor who the determines the adetermines
+       * distance between arc and glyph centres
+       *
+       * @param centersDistFactor_ float between -1.0f and 1.0f of the new
+       * _centersDistFactor
+       */
       void setCentersDistFactor( float centersDistFactor_ );
 
       protected:
@@ -68,12 +133,13 @@ namespace nslib
       // determines whether the values above are up to date
       static float glyphRadius;
 
-      // determines distance between arc and glyph centres; -1 to 1
+      // determines distance between arc and glyph centres; -1.0f to 1.0f
       static float _centersDistFactor;
 
       // determines arc size; positive float
       static float _arcSizeFactor;
 
+      //static const pi values used in different render calculations
       static const float M_PI_x2;
       static const float Rad_To_Deg;
       static const float M_PI_0825;

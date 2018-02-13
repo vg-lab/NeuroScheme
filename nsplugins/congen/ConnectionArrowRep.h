@@ -45,7 +45,7 @@ namespace nslib
 
       virtual ~ConnectionArrowRep( void ) { }
 
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+      virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
         bool create = true );
 
       virtual void preRender( shift::OpConfig* opConfig = nullptr );

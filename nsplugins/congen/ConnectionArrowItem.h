@@ -23,12 +23,13 @@
 #ifndef __NSLIB__CONGEN__CONNECTION_ARROW_ITEM__
 #define __NSLIB__CONGEN__CONNECTION_ARROW_ITEM__
 
+#include "ConnectionArrowRep.h"
+
 #include <nslib/Color.h>
 #include <nslib/InteractionManager.h>
 #include <nslib/reps/InteractiveItem.h>
 #include <nslib/reps/Item.h>
 #include <nslib/reps/SelectableItem.h>
-#include "ConnectionArrowRep.h"
 
 #include <QGraphicsPolygonItem>
 #include <QPropertyAnimation>

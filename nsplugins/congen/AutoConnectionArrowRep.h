@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- * Authors: Fernando Lucas Pérez
- * 			    Iago Calvo Lista
+ * Authors: Iago Calvo Lista
+ *          Fernando Lucas Pérez
  *
  * This file is part of NeuroScheme
  *
@@ -32,9 +32,34 @@ namespace nslib
     class AutoConnectionArrowRep : public nslib::congen::ConnectionArrowRep
     {
       public :
+      /**
+       *
+       * Returns the corresponding item on the scene
+       *
+       * @param scene scene from where obtain the item
+       * @param create if true creates the item if necessary
+       * @return corresponding AutoConnectionArrowItem
+       */
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-        bool create = true );
+        bool create = true ) override;
+
+      /**
+       *
+       * Creates a new AutoConnectionArrowRep from a NeuronPopRep representation
+       *
+       * @param Rep_ NeuronPopRep Representation corresponding to the new
+       * AutoConnectionArrowItem
+       */
       AutoConnectionArrowRep( shift::Representation* Rep_ );
+
+      /**
+       *
+       * Creates and configures the corresponding AutoConnectionArrowItem and
+       * configures the transition animations
+       *
+       * @param opConfig Storage configuration data that allows detect
+       * animations when necessary and a layout type
+       */
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
     };
   } // namespace congen

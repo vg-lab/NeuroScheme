@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- * Authors: Fernando Lucas Pérez
- * 			    Iago Calvo Lista
+ * Authors: Iago Calvo Lista
+ *          Fernando Lucas Pérez
  *
  * This file is part of NeuroScheme
  *
@@ -46,46 +46,42 @@ namespace nslib
 
       auto arrowItem = this->item( scene );
 
+      //Checks if an transition animation its necessary
       if( opConfig->isAnimating( ) )
       {
+        //Casting to obtain the originItem
         auto originRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
-        auto destRep =
-          dynamic_cast< QGraphicsItemRepresentation* >( _destRep );
 
         auto originItem = dynamic_cast< Item* >( originRep->item( scene ) );
-        auto destItem = dynamic_cast< Item* >( destRep->item( scene ) );
 
         if( originItem == nullptr )
         {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         }
-
-        if( destItem == nullptr )
-        {
-          Loggers::get( )->log( "No successfully dynamic cast on destItem",
-            LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-        }
+        auto originItemB = dynamic_cast< QGraphicsItemRepresentation* >(
+          _originRep )->item( scene );
 
         auto originArrowItem =
           dynamic_cast< AutoConnectionArrowItem* >( arrowItem );
+
+        //Creates the line (autoConnection Arrow) to animate
         auto& lineAnim = originArrowItem->lineAnim( );
         lineAnim.setPropertyName( "line" );
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
 
-        auto originItemB = dynamic_cast< QGraphicsItemRepresentation* >(
-          _originRep )->item( scene );
-
+        //Change of glyph Scale during the animation
         float glyphScaleStart =
           originItem->scaleAnim( ).startValue( ).toFloat( );
-
         float glyphScaleEnd = originItem->scaleAnim( ).endValue( ).toFloat( );
 
+        //Radius of the glyph to animate
         float glyphBoundingRect =
           0.5f * float( originItemB->boundingRect( ).width( ) );
 
+        //Change of glyph center position during the animation
         auto originPosAnimStart =
           originItem->posAnim( ).startValue( ).toPointF( );
         auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
@@ -93,31 +89,37 @@ namespace nslib
         float glyphRadius = glyphScaleStart * glyphBoundingRect;
         float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
+        //start values of the animation
         lineAnim.setStartValue(
           QLineF( QPointF( glyphRadius, isGrid ),
           QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
 
+        //End values of the animation
         glyphRadius = glyphScaleEnd * glyphBoundingRect;
-
         lineAnim.setEndValue(
           QLineF( QPointF( glyphRadius, isGrid ),
           QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
 
+        //Starts the animation
         lineAnim.start( );
 
       }
       else
       {
 
+        //Cast the origin Item
         auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
           _originRep )->item( scene );
 
+        //Calc of the glyph Radius
         float glyphRadius = 0.5f * float( originItem->scale( ) )
           * float( originItem->boundingRect( ).width( ) );
         float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
+        //Calc of the   Center of the Glyph
         QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
 
+        //Draws the new autoConnection Arrow
         dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
           createAutoArrow( glyphRadius, isGrid, glyphCenter );
       }

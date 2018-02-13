@@ -37,34 +37,59 @@ namespace nslib
 
     bool DataLoader::loadData( const ::nslib::NeuroSchemeInputArguments& /* args */ )
     {
+
       // ::nslib::Logger::get( )->log(
       //   "Loading data for congen", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
+      // auto& _entities = nslib::DataManager::entities( );
+      // auto& _rootEntities = nslib::DataManager::rootEntities( );
+      // fires::PropertyManager::clear( );
+      // _entities.clear( );
+      // _rootEntities.clear( );
+
+      // _entities.relationships( )[ "isParentOf" ] =
+      //   new shift::RelationshipOneToN;
+      // _entities.relationships( )[ "isChildOf" ] =
+      //   new shift::RelationshipOneToOne;
+
+      // _entities.relationships( )[ "isAGroupOf" ] =
+      //   new shift::RelationshipOneToN;
+      // _entities.relationships( )[ "isPartOf" ] =
+      //   new shift::RelationshipOneToN;
+
+      // _entities.relationships( )[ "isSuperEntityOf" ] =
+      //   new shift::RelationshipOneToN;
+      // _entities.relationships( )[ "isSubEntityOf" ] =
+      //   new shift::RelationshipOneToOne;
+
+      // auto& relParentOf =
+      //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+      // auto& relChildOf =
+      //   *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+
+      // shift::Entity* neuronPop = new NeuronPop( 50 );
+      // _rootEntities.add( neuronPop );
+      // _entities.add( neuronPop );
+
+      // std::default_random_engine generator;
+      // std::uniform_int_distribution< int > distribution( 0,100 );
+      // // int dice_roll = distribution( generator );
+      // for ( unsigned int i = 0; i < 10; ++i )
+      // {
+      //   shift::Entity* neuronPop2 = new NeuronPop( distribution( generator ));
+      //   shift::Relationship::Establish( relParentOf, relChildOf,
+      //                                   neuronPop, neuronPop2 );
+      //   _entities.add( neuronPop2 );
+      // }
+
+      // auto repCretor = new RepresentationCreator( );
+      // nslib::RepresentationCreatorManager::addCreator( repCretor );
+
+
       auto& _entities = nslib::DataManager::entities( );
       auto& _rootEntities = nslib::DataManager::rootEntities( );
-      // fires::PropertyManager::clear( );
       _entities.clear( );
       _rootEntities.clear( );
-
-//      _entities.relationships( )[ "isParentOf" ] =
-//        new shift::RelationshipOneToN;
-//      _entities.relationships( )[ "isChildOf" ] =
-//        new shift::RelationshipOneToOne;
-//
-//      _entities.relationships( )[ "isAGroupOf" ] =
-//        new shift::RelationshipOneToN;
-//      _entities.relationships( )[ "isPartOf" ] =
-//        new shift::RelationshipOneToN;
-//
-//      _entities.relationships( )[ "isSuperEntityOf" ] =
-//        new shift::RelationshipOneToN;
-//      _entities.relationships( )[ "isSubEntityOf" ] =
-//        new shift::RelationshipOneToOne;
-
-//      auto& relParentOf =
-//        *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-//      auto& relChildOf =
-//        *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
 
       auto& relConnectsTo =
           *( _entities.relationships( )[ "connectsTo" ]->asOneToN( ));
@@ -87,7 +112,6 @@ namespace nslib
           "connectsTo" )->create( );
 
 
-
       shift::Entity* neuronPop3 = new NeuronPop( 1 );
       _rootEntities.add( neuronPop3 );
       _entities.add( neuronPop3 );
@@ -106,38 +130,38 @@ namespace nslib
           std::make_pair( neuronPop->entityGid( ), nullptr ));
 
 
-      /**auto connection 1*/
+      //auto connection 1
       relConnectsTo[ neuronPop->entityGid( )].insert(
           std::make_pair( neuronPop->entityGid( ), propObject ) );
       relConnectedBy[ neuronPop->entityGid( )].insert(
-          std::make_pair( neuronPop->entityGid( ), nullptr ) );//*/
+          std::make_pair( neuronPop->entityGid( ), nullptr ) );
 
-      /**auto connection 3*/
+      //auto connection 3
       relConnectsTo[ neuronPop3->entityGid( )].insert(
           std::make_pair( neuronPop3->entityGid( ), propObject ));
       relConnectedBy[ neuronPop3->entityGid( )].insert(
-          std::make_pair( neuronPop3->entityGid( ), nullptr ));//*/
+          std::make_pair( neuronPop3->entityGid( ), nullptr ));
 
-      /**auto connection 4*/
+      //auto connection 4
       relConnectsTo[ neuronPop4->entityGid( )].insert(
           std::make_pair( neuronPop4->entityGid( ), propObject ));
       relConnectedBy[ neuronPop4->entityGid( )].insert(
-          std::make_pair( neuronPop4->entityGid( ), nullptr ));//*/
+          std::make_pair( neuronPop4->entityGid( ), nullptr ));
 
-      /**auto connection 2*/
+      //auto connection 2
       relConnectsTo[ neuronPop2->entityGid( )].insert(
           std::make_pair( neuronPop2->entityGid( ), propObject ));
       relConnectedBy[ neuronPop2->entityGid( )].insert(
-          std::make_pair( neuronPop2->entityGid( ), nullptr ));//*/
+          std::make_pair( neuronPop2->entityGid( ), nullptr ));
 
-      /**auto connection 5*/
+      //auto connection 5
       relConnectsTo[ neuronPop5->entityGid( )].insert(
           std::make_pair( neuronPop5->entityGid( ), propObject ));
       relConnectedBy[ neuronPop5->entityGid( )].insert(
-          std::make_pair( neuronPop5->entityGid( ), nullptr ));//*/
+          std::make_pair( neuronPop5->entityGid( ), nullptr ));
 
-      /**auto connection Neurons*/
-    for(int i=0; i<17;i++){
+      //auto connection Neurons
+    for(int i=0; i<5;i++){
       shift::Entity* neuronPopTemp = new NeuronPop( 1 );
       _rootEntities.add( neuronPopTemp );
       _entities.add( neuronPopTemp );
@@ -146,22 +170,7 @@ namespace nslib
         std::make_pair( neuronPopTemp->entityGid( ), propObject ));
       relConnectedBy[ neuronPopTemp->entityGid( )].insert(
         std::make_pair( neuronPopTemp->entityGid( ), nullptr ));
-    }//*/
-
-
-      // std::default_random_engine generator;
-      // std::uniform_int_distribution< int > distribution( 0,100 );
-      // // int dice_roll = distribution( generator );
-      // for ( unsigned int i = 0; i < 10; ++i )
-      // {
-      //   shift::Entity* neuronPop2 = new NeuronPop( distribution( generator ));
-      //   shift::Relationship::Establish( relParentOf, relChildOf,
-      //                                   neuronPop, neuronPop2 );
-      //   _entities.add( neuronPop2 );
-      // }
-
-      // auto repCretor = new RepresentationCreator( );
-      // nslib::RepresentationCreatorManager::addCreator( repCretor );
+    }
 
       return true;
     }
