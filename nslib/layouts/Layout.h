@@ -48,19 +48,19 @@ namespace nslib
   {
   public:
     OpConfig( GraphicsScene* scene_ = nullptr, bool animating_=false,
-      bool grid_ = false )
-      : _scene( scene_ ), _animating(animating_), _grid(grid_)
+      int layoutType_ = 0 )
+      : _scene( scene_ ), _animating(animating_), _layoutType(layoutType_)
     {}
     virtual ~OpConfig( void ) {};
     GraphicsScene* scene( void ) { return _scene; };
     bool isAnimating(){ return _animating; };
-    bool isGrid(){ return _grid; };
+    bool isGrid(){ return _layoutType == 3; };
 
 
     protected:
     GraphicsScene*  _scene;
     bool            _animating;
-    bool            _grid;
+    int            _layoutType;
   };
 
   class Canvas;
@@ -95,7 +95,7 @@ namespace nslib
       UNDEFINED_LAYOUT = 0,
       CAMERA_BASED_LAYOUT = 1,
       CIRCULAR_LAYOUT = 2,
-      GRID_LAYAOUT = 3,
+      GRID_LAYOUT = 3,
       SCATTERPLOT_LAYOUT = 4
     };
 

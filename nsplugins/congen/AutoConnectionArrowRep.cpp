@@ -46,10 +46,9 @@ namespace nslib
 
       auto arrowItem = this->item( scene );
 
-      //Checks if an transition animation its necessary
+      //Checks whether the current scene is being animated
       if( opConfig->isAnimating( ) )
       {
-        //Casting to obtain the originItem
         auto originRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
 
@@ -66,13 +65,13 @@ namespace nslib
         auto originArrowItem =
           dynamic_cast< AutoConnectionArrowItem* >( arrowItem );
 
-        //Creates the line (autoConnection Arrow) to animate
+        //Creates the line to be animated
         auto& lineAnim = originArrowItem->lineAnim( );
         lineAnim.setPropertyName( "line" );
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
 
-        //Change of glyph Scale during the animation
+        //Change of the NeuronPop glyph's Scale during the animation
         float glyphScaleStart =
           originItem->scaleAnim( ).startValue( ).toFloat( );
         float glyphScaleEnd = originItem->scaleAnim( ).endValue( ).toFloat( );
@@ -89,15 +88,13 @@ namespace nslib
         float glyphRadius = glyphScaleStart * glyphBoundingRect;
         float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
-        //start values of the animation
-        lineAnim.setStartValue(
-          QLineF( QPointF( glyphRadius, isGrid ),
+        //Start values of the animation
+        lineAnim.setStartValue( QLineF( QPointF( glyphRadius, isGrid ),
           QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
 
         //End values of the animation
         glyphRadius = glyphScaleEnd * glyphBoundingRect;
-        lineAnim.setEndValue(
-          QLineF( QPointF( glyphRadius, isGrid ),
+        lineAnim.setEndValue( QLineF( QPointF( glyphRadius, isGrid ),
           QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
 
         //Starts the animation
@@ -106,22 +103,19 @@ namespace nslib
       }
       else
       {
-
-        //Cast the origin Item
         auto originItem = dynamic_cast< QGraphicsItemRepresentation* >(
           _originRep )->item( scene );
 
-        //Calc of the glyph Radius
+        //Calculates glyph Radius
         float glyphRadius = 0.5f * float( originItem->scale( ) )
           * float( originItem->boundingRect( ).width( ) );
-        float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
 
-        //Calc of the   Center of the Glyph
+        //Calculates center of the Glyph
         QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
 
-        //Draws the new autoConnection Arrow
+        //Draws the new arrow
         dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
-          createAutoArrow( glyphRadius, isGrid, glyphCenter );
+          createAutoArrow( glyphRadius, opConfig->isGrid( ), glyphCenter );
       }
     }
 

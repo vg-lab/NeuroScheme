@@ -37,18 +37,22 @@
 #include <ctime>
 
 namespace nslib
-          {
+{
   namespace congen
   {
 
     class ConnectionArrowItem
-        : public QObject
-            , public QGraphicsPathItem
-            , public nslib::Item
-            , public nslib::InteractiveItem
+      : public QObject,
+        public QGraphicsPathItem,
+        public nslib::Item,
+        public nslib::InteractiveItem
     {
       Q_OBJECT
-      Q_PROPERTY( QLineF line READ line WRITE setLine )
+      Q_PROPERTY( QLineF line
+        READ
+        line
+        WRITE
+        setLine )
 
       public:
 
@@ -76,7 +80,6 @@ namespace nslib
 
       static QColor color;
       static QColor hoverColor;
-
 
       protected:
       //QGraphicsEllipseItem* _arrowOriItem;

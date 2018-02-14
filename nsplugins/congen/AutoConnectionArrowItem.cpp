@@ -4,7 +4,6 @@
  * Authors: Iago Calvo Lista
  *          Fernando Lucas Pérez
  *
- *
  * This file is part of NeuroScheme
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -72,57 +71,56 @@ namespace nslib
     void AutoConnectionArrowItem::setLine( const QLineF& line_ )
     {
       _line = line_;
-      createAutoArrow( float( _line.p1( ).x( ) ), float( _line.p1( ).y( ) ),
+      createAutoArrow( float( _line.p1( ).x( ) ), _line.p1( ).y( ) == 1.0f ,
         _line.p2( ) );
     }
 
     void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
-      float isGrid_, QPointF glyphCenter )
+      bool isGrid_, QPointF glyphCenter_ )
     {
-      // if glyphRadius had changed recalcs the representation arc data
+      //Recalculates static data when relevant changes have been made
       if( glyphRadius_ != glyphRadius )
       {
         glyphRadius = glyphRadius_;
         AutoConnectionArrowItem::recalcArcData( );
       }
 
-      //Angle of the glyphDirection
       float relativeAngle;
-      if( isGrid_ == 1.0f )
+      if( isGrid_ )
       {
-        //Fix the angle to the right upper square in a grid layout
+        //Fixes arrow position to the upper right corner when layout is grid
         relativeAngle = M_PI_175;
       }
       else
       {
-        //In the rest of layouts the angles uses the line with the origin
+        //Fixes arrow position to the point furthest from the canvas centre
         relativeAngle = atanf(
-          float( glyphCenter.y( ) / glyphCenter.x( ) ) );
-        if( glyphCenter.x( ) < 0 )
+          float( glyphCenter_.y( ) / glyphCenter_.x( ) ) );
+        if( glyphCenter_.x( ) < 0 )
         {
           relativeAngle += M_PI_Float;
         }
       }
 
-      //Center of the arc
+      //Arrow arc center
       QPointF arcCenter = QPointF(
-        glyphCenter.x( ) + dist * cosf( relativeAngle ),
-        glyphCenter.y( ) + dist * sinf( relativeAngle ) );
+        glyphCenter_.x( ) + dist * cosf( relativeAngle ),
+        glyphCenter_.y( ) + dist * sinf( relativeAngle ) );
 
-      //Recalcs the relativeAngle in fuction of the startAngle
+      //Angle where the arrow arc will start
       relativeAngle = startAngle + M_PI_Float - relativeAngle;
 
-      //Start of the arrow
+      //Arrow start
       _arrowOrigin = QPointF(
         arcCenter.x( ) + arcRadius * cosf( relativeAngle ),
         arcCenter.y( ) - arcRadius * sinf( relativeAngle ) );
 
-      //End of the arrow
+      //Arrow end
       _arrowDest = QPointF(
         arcCenter.x( ) + arcRadius * cosf( relativeAngle + arcDegrees ),
         arcCenter.y( ) - arcRadius * sinf( relativeAngle + arcDegrees ) );
 
-      //Data for the arrow representation
+      //Data necessary to draw the arrow
       float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
       float arrowAngle = M_PI_0825 + arcDegrees + relativeAngle;
 
@@ -134,7 +132,7 @@ namespace nslib
       QPointF arrowHead2 = _arrowDest - QPointF(
         sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
-      //Creates the head of the arrow as a polygon
+      //Creates arrowhead
       QPolygonF arrowShape;
       arrowShape << arrowHead1 << _arrowDest << arrowHead2;
 
@@ -144,7 +142,7 @@ namespace nslib
       //Draws the back of the arrow
       if( arcDegrees < M_PI_x2 )
       {
-        QPointF relativeDir = _arrowOrigin - glyphCenter;
+        QPointF relativeDir = _arrowOrigin - glyphCenter_;
 
         Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ) );
         vector.normalize( );
@@ -161,10 +159,10 @@ namespace nslib
 
       painterPath.moveTo( _arrowOrigin );
 
-      //Draws the arc with the calculated data
+      //Draws the complete arrow with the calculated data
       painterPath.arcTo( arcCenter.x( ) - arcRadius,
         arcCenter.y( ) - arcRadius, arcRadius * 2.0f, arcRadius * 2.0f,
-        relativeAngle * Rad_To_Deg, arcDegrees * Rad_To_Deg);
+        relativeAngle * Rad_To_Deg, arcDegrees * Rad_To_Deg );
 
       painterPath.addPolygon( arrowShape );
 
@@ -177,15 +175,15 @@ namespace nslib
 
     void AutoConnectionArrowItem::recalcArcData( )
     {
-      //Radius of the arc
+      //Arrow arc radius
       arcRadius = ( glyphRadius * _arcSizeFactor );
 
-      //Separation between the arc Center and the GlyphCenter
+      //Distance between arrow and glyph centres
       dist = glyphRadius + arcRadius * ( _centersDistFactor );
 
       if( _centersDistFactor < 1 )
       {
-        //Angle were the arcs start
+        //Angle were arcs start
         startAngle = acosf(
           ( arcRadius * arcRadius + dist * dist - glyphRadius * glyphRadius ) /
             ( 2.0f * arcRadius * dist ) );
@@ -194,8 +192,8 @@ namespace nslib
       {
         startAngle = 0.0f;
       }
-      //Degrees that the arc covers
-      arcDegrees = M_PI_x2- startAngle -startAngle;
+      //Degrees covered by the arc
+      arcDegrees = M_PI_x2 - startAngle - startAngle;
     }
 
     void AutoConnectionArrowItem::hoverEnter( void )

@@ -40,85 +40,89 @@ namespace nslib
       public:
       /**
        *
-       * Creates a new AutoConnectionArrowItem from a AutoConnectionArrowRep
-       * @param autoConnectionArrowRep AutoConnectionArrowRep to which the new
-       * AutoConnectionArrowItem correspond
+       * Creates a new AutoConnectionArrowItem from an AutoConnectionArrowRep
+       *
+       * @param autoConnectionArrowRep AutoConnectionArrowRep that contains the
+       * necessary info for the new AutoConnectionArrowItem
        */
       AutoConnectionArrowItem(
         const AutoConnectionArrowRep& autoConnectionArrowRep );
 
       /**
        *
-       * Override getter for the line used for transition animations
+       * Override getter for the QLineF used to animate transitions
        *
-       * @return line animated in transition animations
+       * @return line QLineF with the necessary info to be interpolated in
+       * animations
        */
       virtual const QLineF& line( void ) override;
 
       /**
        *
-       * Override setter for the line used during transitions; calls the
-       * auxiliar function createAutoArrow
+       * Override setter for the QLineF used for animations;
+       * invokes createAutoArrow
        *
-       * @param line_ new line to be drawn
+       * @param line_ new line to be stored
        */
       virtual void setLine( const QLineF& line_ ) override;
 
       /**
        *
-       * Creates the path corresponding to the autoconnection arrow
+       * Creates the graphic elements of the arrow
        *
        * @param glyphRadius_ value of the radius of the NeuronPop representation
-       * @param isGrid_ if equal to 1.0f uses the angle for grid layouts
-       * @param glyphCenter Qpoint of the center of the NeuronPop representation
+       * @param isGrid_ true if the current layout is a grid
+       * @param glyphCenter_ QPointF pointing to the center of the NeuronPop
+       * representation
        */
       void createAutoArrow(
-        float glyphRadius_, float isGrid_, QPointF glyphCenter);
+        float glyphRadius_, bool isGrid_, QPointF glyphCenter_ );
 
       /**
        *
-       * Recalcs static common data common for all the representations
+       * Recalcs static data common to all current autoconnection arrows
        *
        */
       static void recalcArcData( );
 
       /**
        *
-       * Set the color to red when the mouse is over it
+       * Sets item color to red on mouseover
        *
        */
       virtual void hoverEnter( void ) override;
 
       /**
        *
-       * Restore the normal color when the mouses leaves the neuron
+       * Restores original color after mouseover
        *
-       * @param event_
        */
       virtual void hoverLeave( void ) override;
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
       /**
       *
-      * Set the color to green when the mouse is over the its NeuronPop
+      * Sets the color to green when pointer is over its associated NeuronPop
       *
       */
       virtual void highlight( scoop::Color color_ ) override;
 
-
       /**
-       * Sets the _arcSizeFactor who the determines the arc size
+       * Sets _arcSizeFactor, which determines the size of the autoconnection
+       * arc
        *
-       * @param arcSizeFactor_ positive float value of the new _arcSizeFactor
+       * @param arcSizeFactor_ positive float that calculates a size for the arc
+       * based on the size of the NeuronPop glyph it's associated with
        */
       void setArcSizeFactor( float arcSizeFactor_ );
 
       /**
-       * sets the _acentersDistFactor who the determines the adetermines
-       * distance between arc and glyph centres
+       * Sets the _centersDistFactor, which determines the distance between
+       * arrow and glyph centres
        *
-       * @param centersDistFactor_ float between -1.0f and 1.0f of the new
-       * _centersDistFactor
+       * @param centersDistFactor_ float to which _centersDistFactor will be set
+       * to. -1.0f hides the arrow inside the glyph, while 1.0f makes its arc
+       * tangent to the glyph
        */
       void setCentersDistFactor( float centersDistFactor_ );
 
@@ -133,7 +137,7 @@ namespace nslib
       // determines whether the values above are up to date
       static float glyphRadius;
 
-      // determines distance between arc and glyph centres; -1.0f to 1.0f
+      // determines distance between arc and glyph centres
       static float _centersDistFactor;
 
       // determines arc size; positive float

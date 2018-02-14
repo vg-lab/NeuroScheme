@@ -223,7 +223,7 @@ namespace nslib
       _arrangeItems( representations, animate );
     }
 
-    OpConfig opConfig( &_canvas->scene( ), animate, _layoutType == GRID_LAYAOUT );
+    OpConfig opConfig( &_canvas->scene( ), animate, _layoutType );
 
     for ( auto& relationshipRep : relationshipReps )
       relationshipRep->preRender( &opConfig );

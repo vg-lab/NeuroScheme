@@ -31,7 +31,7 @@ namespace nslib
 {
   namespace congen
   {
-    const float ConnectionArrowItem::M_PI_Float = float(M_PI);
+    const float ConnectionArrowItem::M_PI_Float = float( M_PI );
     const float ConnectionArrowItem::M_PI_3 = M_PI_Float * 0.33f;
     QColor ConnectionArrowItem::color = QColor( 100, 100, 100, 255 );
     QColor ConnectionArrowItem::hoverColor = QColor( 255, 100, 100, 255 );
@@ -47,7 +47,7 @@ namespace nslib
       this->setAcceptHoverEvents( true );
 
       _arrowThickness = nslib::Config::scale( ) *
-        connectionArrowRep.getProperty( "width" ).value<unsigned int>( );
+        connectionArrowRep.getProperty( "width" ).value< unsigned int >( );
     }
 
     ConnectionArrowItem::~ConnectionArrowItem( void )
@@ -121,7 +121,7 @@ namespace nslib
       arrowShape.clear( );
 
       if( this->_parentRep->getProperty( "head" ).
-        value<shiftgen::ConnectionArrowRep::TArrowHead>( ) ==
+        value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
         shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
       {
         _arrowCircleEnd = new QGraphicsEllipseItem( );

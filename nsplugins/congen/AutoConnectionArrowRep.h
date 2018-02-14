@@ -34,10 +34,10 @@ namespace nslib
       public :
       /**
        *
-       * Returns the corresponding item on the scene
+       * Returns the corresponding item from the scene
        *
-       * @param scene scene from where obtain the item
-       * @param create if true creates the item if necessary
+       * @param scene QGraphicsScene from which the item is obtained
+       * @param create creates a new item if true; else, returns existing item
        * @return corresponding AutoConnectionArrowItem
        */
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
@@ -45,20 +45,20 @@ namespace nslib
 
       /**
        *
-       * Creates a new AutoConnectionArrowRep from a NeuronPopRep representation
+       * Creates a new AutoConnectionArrowRep from a NeuronPopRep
        *
-       * @param Rep_ NeuronPopRep Representation corresponding to the new
-       * AutoConnectionArrowItem
+       * @param Rep_ NeuronPopRep to which an AutoConnectionArrowRep
+       * will be attached
        */
       AutoConnectionArrowRep( shift::Representation* Rep_ );
 
       /**
        *
        * Creates and configures the corresponding AutoConnectionArrowItem and
-       * configures the transition animations
+       * configures transition animations
        *
-       * @param opConfig Storage configuration data that allows detect
-       * animations when necessary and a layout type
+       * @param opConfig OpConfig object that contains information about the
+       * current layout type and whether the scene is being animated
        */
       void preRender( shift::OpConfig* opConfig = nullptr ) override;
     };

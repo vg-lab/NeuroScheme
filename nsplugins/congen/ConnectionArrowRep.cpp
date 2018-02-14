@@ -32,23 +32,22 @@ namespace nslib
 
     ConnectionArrowRep::ConnectionArrowRep( shift::Representation* originRep_,
       shift::Representation* destRep_ )
-        : shiftgen::ConnectionArrowRep( ), _originRep( originRep_ ),
-          _destRep( destRep_ )
+      : shiftgen::ConnectionArrowRep( ), _originRep( originRep_ ),
+        _destRep( destRep_ )
     {
     }
 
     ConnectionArrowRep::ConnectionArrowRep( const ConnectionArrowRep& other )
-        : shiftgen::ConnectionArrowRep( other ), _originRep( other._originRep ),
-          _destRep( other._destRep )
+      : shiftgen::ConnectionArrowRep( other ), _originRep( other._originRep ),
+        _destRep( other._destRep )
     {
     }
-
 
     QGraphicsItem*
     ConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
       if( create && ( _items.find( scene ) == _items.end( ) ) &&
-          !_items[ scene ] )
+        !_items[ scene ] )
       {
         _items[ scene ] = new ConnectionArrowItem( *this );
       }
@@ -70,9 +69,9 @@ namespace nslib
       if( opConfig->isAnimating( ) )
       {
         auto originRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
+          dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
         auto destRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( _destRep );
+          dynamic_cast< QGraphicsItemRepresentation* >( _destRep );
 
         auto originItem = dynamic_cast< Item* >( originRep->item( scene ));
         auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
@@ -80,13 +79,13 @@ namespace nslib
         if( originItem == nullptr )
         {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
-                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+            LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         }
 
         if( destItem == nullptr )
         {
           Loggers::get( )->log( "No successfully dynamic cast on destItem",
-                                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+            LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         }
 
         auto originArrowItem =
@@ -95,7 +94,6 @@ namespace nslib
         lineAnim.setPropertyName( "line" );
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
-
 
         auto originPosAnimStart =
           originItem->posAnim( ).startValue( ).toPointF( );
@@ -115,31 +113,29 @@ namespace nslib
         auto normAnimEnd =
           QVector2D( destPosAnimEnd - originPosAnimEnd ).normalized( );
 
-
         auto destIniOri =
           QVector2D( originPosAnimStart ) + originWidth_2 *
-          originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
+            originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
         auto destIniDest =
           QVector2D( destPosAnimStart ) - destWidth_2 *
-          originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
+            originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
         auto destEndOri =
           QVector2D( originPosAnimEnd ) + originWidth_2 *
-          originScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
+            originScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
         auto destEndDest =
           QVector2D( destPosAnimEnd ) - destWidth_2 *
-          destScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
-
+            destScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
         lineAnim.setStartValue(
           QLineF( QPointF( destIniOri.x( ), destIniOri.y( ) ),
-          QPointF( destIniDest.x( ), destIniDest.y( ) ) ) );
+            QPointF( destIniDest.x( ), destIniDest.y( ) ) ) );
 
         lineAnim.setEndValue(
           QLineF( QPointF( destEndOri.x( ), destEndOri.y( ) ),
-          QPointF( destEndDest.x( ), destEndDest.y( ) ) ) );
+            QPointF( destEndDest.x( ), destEndDest.y( ) ) ) );
 
         lineAnim.start( );
 
@@ -147,22 +143,22 @@ namespace nslib
       else
       {
         auto originItem = dynamic_cast< QGraphicsItem* > (
-            dynamic_cast< QGraphicsItemRepresentation* >(
-                _originRep )->item( scene ) );
+          dynamic_cast< QGraphicsItemRepresentation* >(
+            _originRep )->item( scene ) );
 
         auto destItem = dynamic_cast< QGraphicsItem* > (
           dynamic_cast< QGraphicsItemRepresentation* >(
-          _destRep )->item( scene ) );
+            _destRep )->item( scene ) );
 
         auto destOri = QVector2D( originItem->pos( ) ) +
           ( ( originItem->boundingRect( ).width( ) * 0.5f *
-          originItem->scale( ) ) * QVector2D( destItem->pos( ) -
-          originItem->pos( ) ).normalized( ) );
+            originItem->scale( ) ) * QVector2D( destItem->pos( ) -
+            originItem->pos( ) ).normalized( ) );
 
         auto destDest = QVector2D( destItem->pos( ) ) -
           ( ( destItem->boundingRect( ).width( ) * 0.5f *
-          originItem->scale( ) ) * QVector2D( destItem->pos( ) -
-          originItem->pos( ) ).normalized( ) );
+            originItem->scale( ) ) * QVector2D( destItem->pos( ) -
+            originItem->pos( ) ).normalized( ) );
 
         dynamic_cast< ConnectionArrowItem* >( arrowItem )->
           createArrow( QPointF( destOri.x( ), destOri.y( ) ),
@@ -170,7 +166,6 @@ namespace nslib
 
       }
     }
-
 
     void ConnectionArrowRep::hoverEnterEvent( QGraphicsSceneHoverEvent* )
     {
