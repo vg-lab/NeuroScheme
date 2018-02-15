@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- * Authors: Iago Calvo Lista
- *          Fernando Lucas Pérez
+ * Authors: Iago Calvo Lista <i.calvol@alumnos.urjc.es>
+ *          Fernando Lucas Pérez <f.lucas@alumnos.urjc.es>
  *
  *
  * This file is part of NeuroScheme
@@ -144,7 +144,6 @@ namespace nslib
       static float _arcSizeFactor;
 
       //static const pi values used in different render calculations
-      static const float M_PI_x2;
       static const float Rad_To_Deg;
       static const float M_PI_0825;
       static const float M_PI_1115;

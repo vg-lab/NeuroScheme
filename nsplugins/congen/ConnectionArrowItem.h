@@ -84,8 +84,12 @@ namespace nslib
       protected:
       //QGraphicsEllipseItem* _arrowOriItem;
 
-      const static float M_PI_3;
       const static float M_PI_Float;
+      const static float M_PI_3;
+      const static float M_PI_Inverse;
+      static const float M_PI_x2;
+      static const float M_PI_067;
+
 
       QGraphicsEllipseItem* _arrowCircleEnd;
 

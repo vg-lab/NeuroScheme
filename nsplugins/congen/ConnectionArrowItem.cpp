@@ -32,7 +32,10 @@ namespace nslib
   namespace congen
   {
     const float ConnectionArrowItem::M_PI_Float = float( M_PI );
+    const float ConnectionArrowItem::M_PI_Inverse = 1.0f/M_PI_Float;
+    const float ConnectionArrowItem::M_PI_x2 = M_PI_Float + M_PI_Float;
     const float ConnectionArrowItem::M_PI_3 = M_PI_Float * 0.33f;
+    const float ConnectionArrowItem::M_PI_067 = M_PI_Float - M_PI_3;
     QColor ConnectionArrowItem::color = QColor( 100, 100, 100, 255 );
     QColor ConnectionArrowItem::hoverColor = QColor( 255, 100, 100, 255 );
 
@@ -83,7 +86,7 @@ namespace nslib
       double angle = ::acos( auxLine.dx( ) * lengthInv );
       if( auxLine.dy( ) >= 0 )
       {
-        angle = ( M_PI * 2.0 ) - angle;
+        angle = M_PI_x2 - angle;
       }
 
       QPointF arrowInit = auxLine.pointAt(
@@ -92,15 +95,15 @@ namespace nslib
         QPointF( sin( angle + M_PI_3 ) * arrowWidth,
           cos( angle + M_PI_3 ) * arrowWidth );
       QPointF arrowP2 = arrowInit -
-        QPointF( sin( angle + M_PI - M_PI_3 ) * arrowWidth,
-          cos( angle + M_PI - M_PI_3 ) * arrowWidth );
+        QPointF( sin( angle + M_PI_067 ) * arrowWidth,
+          cos( angle + M_PI_067 ) * arrowWidth );
 
       QPointF arrowI1 = _arrowOrigin -
-        QPointF( sin( angle + M_PI ) * arrowWidth,
-          cos( angle + M_PI ) * arrowWidth );
+        QPointF( sin( angle + M_PI_Float ) * arrowWidth,
+          cos( angle + M_PI_Float ) * arrowWidth );
       QPointF arrowI2 = _arrowOrigin +
-        QPointF( sin( angle - M_PI ) * arrowWidth,
-          cos( angle - M_PI ) * arrowWidth );
+        QPointF( sin( angle - M_PI_Float ) * arrowWidth,
+          cos( angle - M_PI_Float ) * arrowWidth );
 
       float size = arrowLength;
 

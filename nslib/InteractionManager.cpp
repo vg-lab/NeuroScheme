@@ -265,7 +265,8 @@ namespace nslib
           {
             editEntity = _contextMenu->addAction( QString( "Edit" ) );
             dupEntity = _contextMenu->addAction( QString( "Duplicate" ) );
-            autoEntity = _contextMenu->addAction( QString( "Auto Connection" ) );
+            autoEntity = _contextMenu->addAction( QString( "Add Auto Connection"
+            ) );
 
           }
           if ( editEntity || dupEntity || autoEntity )

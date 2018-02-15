@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
- * Authors: Iago Calvo Lista
- *          Fernando Lucas Pérez
+ * Authors: Iago Calvo Lista <i.calvol@alumnos.urjc.es>
+ *          Fernando Lucas Pérez <f.lucas@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -41,8 +41,7 @@ namespace nslib
 {
   namespace congen
   {
-    const float AutoConnectionArrowItem::M_PI_x2 = M_PI_Float + M_PI_Float;
-    const float AutoConnectionArrowItem::Rad_To_Deg = 180.0f / M_PI_Float;
+    const float AutoConnectionArrowItem::Rad_To_Deg = 180.0f*M_PI_Inverse;
     const float AutoConnectionArrowItem::M_PI_0825 = 0.825f * M_PI_Float;
     const float AutoConnectionArrowItem::M_PI_1115 = 1.115f * M_PI_Float;
     const float AutoConnectionArrowItem::M_PI_175 = 1.75f * M_PI_Float;
