@@ -1,18 +1,27 @@
 <RCC>
   <qresource>
-    <file>icons/connectivity.png</file>
+    <file>icons/open.svg</file>
+    <file>icons/autopublishselection.svg</file>
+    <file>icons/save.svg</file>
+    <file>icons/publishselection.svg</file>
+    <file>icons/zeroeq.svg</file>
+    <file>icons/connection.svg</file>
+    <file>icons/focusonselection.svg</file>
+    <file>icons/focusondisplay.svg</file>
+    <file>icons/autofocusonselection.svg</file>
+    <file>icons/autofocusondisplay.svg</file>
     <file>icons/ns_icon.png</file>
-    <file>icons/savedselections.png</file>
     <file>icons/fullscreen.png</file>
+    <file>icons/savedselections.svg</file>
     <file>icons/autofocusondisplayed.png</file>
     <file>icons/focusondisplayed.png</file>
-    <file>icons/settings.png</file>
     <file>icons/open_xml.png</file>
+    <file>icons/settings.svg</file>
     <file>icons/focusonselection.png</file>
     <file>icons/autofocus.png</file>
     <file>icons/deflect.png</file>
-    <file>icons/home.png</file>
     <file>icons/switch_camera.png</file>
+    <file>icons/home.svg</file>
     <file>icons/network.png</file>
     <file>icons/close.png</file>
     <file>icons/open_bc.png</file>

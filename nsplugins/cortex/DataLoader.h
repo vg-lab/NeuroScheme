@@ -43,11 +43,11 @@ namespace nslib
 
       virtual ~DataLoader( void ) {}
 
-      virtual bool loadData(
+      bool cliLoadData(
         const ::nslib::NeuroSchemeInputArguments& arguments ) final;
 
 #ifdef NEUROSCHEME_USE_NSOL
-      void createEntitiesFromNsolColumns(
+      static void createEntitiesFromNsolColumns(
         const nsol::Columns& columns,
         const nsol::Circuit& circuit,
         bool withMorphologies = true,

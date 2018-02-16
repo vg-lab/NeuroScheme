@@ -5,7 +5,7 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>0</y>    
+    <y>0</y>
     <width>800</width>
     <height>600</height>
    </rect>
@@ -24,12 +24,12 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>39</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPanes">
     <property name="title">
-     <string>Panes</string>
+     <string>&amp;Panes</string>
     </property>
     <addaction name="actionDuplicatePane"/>
     <addaction name="actionKillPane"/>
@@ -39,25 +39,39 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
+    <addaction name="actionHome"/>
     <addaction name="actionShowConnectivity"/>
    </widget>
-   <widget class="QMenu" name="menuScene">
+   <widget class="QMenu" name="menuEvents">
     <property name="title">
-     <string>Scene</string>
+     <string>&amp;Events</string>
     </property>
-    <addaction name="actionSave"/>
+    <addaction name="actionAutoPublishSelection"/>
+    <addaction name="actionPublishSelection"/>
+    <addaction name="actionAutoFocusOnDisplayed"/>
+    <addaction name="actionFocusOnDisplayed"/>
+    <addaction name="actionFocusOnSelection"/>
+    <addaction name="actionAutoFocusOnSelection"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuPanes"/>
    <addaction name="menuView"/>
-   <addaction name="menuScene"/>
+   <addaction name="menuEvents"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -72,10 +86,18 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionHome"/>
+   <addaction name="actionShowConnectivity"/>
    <addaction name="separator"/>
    <addaction name="actionLayouts"/>
    <addaction name="actionStoredSelections"/>
-   <addaction name="actionShowConnectivity"/>
+   <addaction name="separator"/>
+   <addaction name="actionToggleZeroEQ"/>
+   <addaction name="actionPublishSelection"/>
+   <addaction name="actionAutoPublishSelection"/>
+   <addaction name="actionFocusOnSelection"/>
+   <addaction name="actionAutoFocusOnSelection"/>
+   <addaction name="actionFocusOnDisplayed"/>
+   <addaction name="actionAutoFocusOnDisplayed"/>
   </widget>
   <action name="actionLayouts">
    <property name="checkable">
@@ -83,7 +105,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
+     <normaloff>:/icons/settings.svg</normaloff>:/icons/settings.svg</iconset>
    </property>
    <property name="text">
     <string>Search and Filter</string>
@@ -101,7 +123,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/savedselections.png</normaloff>:/icons/savedselections.png</iconset>
+     <normaloff>:/icons/savedselections.svg</normaloff>:/icons/savedselections.svg</iconset>
    </property>
    <property name="text">
     <string>Saved Selections</string>
@@ -115,17 +137,17 @@
   </action>
   <action name="actionSplitHorizontally">
    <property name="text">
-    <string>Split horizontally</string>
+    <string>Split &amp;horizontally</string>
    </property>
   </action>
   <action name="actionSplitVertically">
    <property name="text">
-    <string>Split vertically</string>
+    <string>Split &amp;vertically</string>
    </property>
   </action>
   <action name="actionKillPane">
    <property name="text">
-    <string>Kill pane</string>
+    <string>&amp;Kill pane</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+K</string>
@@ -133,7 +155,7 @@
   </action>
   <action name="actionDuplicatePane">
    <property name="text">
-    <string>Duplicate Pane</string>
+    <string>&amp;Duplicate Pane</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -142,10 +164,10 @@
   <action name="actionHome">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
+     <normaloff>:/icons/home.svg</normaloff>:/icons/home.svg</iconset>
    </property>
    <property name="text">
-    <string>Home</string>
+    <string>&amp;Home</string>
    </property>
    <property name="toolTip">
     <string>Home</string>
@@ -155,6 +177,10 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/ns_icon.png</normaloff>:/icons/ns_icon.png</iconset>
+   </property>
    <property name="text">
     <string>About...</string>
    </property>
@@ -165,10 +191,10 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/connectivity.png</normaloff>:/icons/connectivity.png</iconset>
+     <normaloff>:/icons/connection.svg</normaloff>:/icons/connection.svg</iconset>
    </property>
    <property name="text">
-    <string>Show connectivity</string>
+    <string>Show &amp;connectivity</string>
    </property>
    <property name="toolTip">
     <string>Show connectivity</string>
@@ -178,8 +204,113 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/save.svg</normaloff>:/icons/save.svg</iconset>
+   </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save to NeuroML</string>
+   </property>
+  </action>
+  <action name="actionAutoFocusOnDisplayed">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/autofocusondisplay.svg</normaloff>:/icons/autofocusondisplay.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Send auto focus event on display</string>
+   </property>
+   <property name="toolTip">
+    <string>Send focus event automatically on displayed elements</string>
+   </property>
+  </action>
+  <action name="actionFocusOnDisplayed">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/focusondisplay.svg</normaloff>:/icons/focusondisplay.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Focus event on displayed</string>
+   </property>
+   <property name="toolTip">
+    <string>Send focus event based on the elements displayed</string>
+   </property>
+  </action>
+  <action name="actionFocusOnSelection">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/focusonselection.svg</normaloff>:/icons/focusonselection.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Send focus on selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Send focus event based on selected elements</string>
+   </property>
+  </action>
+  <action name="actionAutoFocusOnSelection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/autofocusonselection.svg</normaloff>:/icons/autofocusonselection.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Auto focus on selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Send automatically focus events based on selected elements</string>
+   </property>
+  </action>
+  <action name="actionAutoPublishSelection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/autopublishselection.svg</normaloff>:/icons/autopublishselection.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Auto publish selection</string>
+   </property>
+  </action>
+  <action name="actionPublishSelection">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/publishselection.svg</normaloff>:/icons/publishselection.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Publish selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
+  </action>
+  <action name="actionToggleZeroEQ">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/zeroeq.svg</normaloff>:/icons/zeroeq.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle ZeroEQ</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect or disconnect ZeroEQ</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

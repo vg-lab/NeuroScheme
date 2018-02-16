@@ -21,19 +21,7 @@
  */
 #include "MainWindow.h"
 #include <nslib/version.h>
-#include <nslib/DataManager.h>
-#include <nslib/DomainManager.h>
-#include <nslib/Config.h>
-#include <nslib/Loggers.h>
-#include <nslib/PaneManager.h>
-#include <nslib/SelectionManager.h>
-#include <nslib/InteractionManager.h>
-#include <nslib/layouts/CircularLayout.h>
-#include <nslib/layouts/GridLayout.h>
-#include <nslib/layouts/CameraBasedLayout.h>
-#include <nslib/layouts/LayoutManager.h>
-#include <nslib/layouts/ScatterPlotLayout.h>
-#include <nslib/EntityEditWidget.h>
+#include <nslib/nslib.h>
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
 #include <scoop/version.h>
@@ -59,10 +47,12 @@
 #include <QLabel>
 
 
-MainWindow::MainWindow( QWidget* parent_ )
+MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
   , _ui( new Ui::MainWindow )
 {
+  ( void ) zeroEQ;
+
   _ui->setupUi( this );
 
   // This is a WAR to show the menu in some
@@ -77,8 +67,57 @@ MainWindow::MainWindow( QWidget* parent_ )
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
 
-  // Connect save dialog
-  connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
+  connect( _ui->actionQuit, SIGNAL( triggered( )),
+           this, SLOT( quit( )));
+
+  // ZeroEQ related actions ///////////////////////////////////////
+#ifdef NEUROSCHEME_USE_ZEROEQ
+  _ui->actionToggleZeroEQ->setEnabled( true );
+  _ui->actionToggleZeroEQ->setChecked( zeroEQ );
+  connect( _ui->actionToggleZeroEQ, SIGNAL( triggered( )),
+           this, SLOT( toggleZeroEQ( )));
+
+  _ui->actionAutoPublishSelection->setEnabled( true );
+  _ui->actionAutoPublishSelection->setChecked( true );
+  nslib::Config::autoPublishSelection( true );
+  connect( _ui->actionAutoPublishSelection, SIGNAL( triggered( )),
+           this, SLOT( actionPublishSelectionToggle( )));
+
+  connect( _ui->actionPublishSelection, SIGNAL( triggered( )),
+           this, SLOT( actionPublishSelection( )));
+#else
+  _ui->actionPublishSelection->setEnabled( false );
+  _ui->actionAutoPublishSelection->setEnabled( false );
+#endif
+
+#ifdef NEUROSCHEME_USE_GMRVLEX
+  _ui->actionAutoFocusOnSelection->setEnabled( true );
+  _ui->actionAutoFocusOnSelection->setChecked( false );
+  nslib::Config::autoPublishFocusOnSelection( false );
+  connect( _ui->actionAutoFocusOnSelection, SIGNAL( triggered( )),
+           this, SLOT( actionPublishFocusOnSelectionToggle( )));
+
+  _ui->actionAutoFocusOnDisplayed->setEnabled( true );
+  _ui->actionAutoFocusOnDisplayed->setChecked( false );
+  nslib::Config::autoPublishFocusOnDisplayed( false );
+  connect( _ui->actionAutoFocusOnDisplayed, SIGNAL( triggered( )),
+           this, SLOT( actionPublishFocusOnDisplayedToggle( )));
+
+  connect( _ui->actionFocusOnSelection, SIGNAL( triggered( )),
+           this, SLOT( actionPublishFocusOnSelection( )));
+  connect( _ui->actionFocusOnDisplayed, SIGNAL( triggered( )),
+           this, SLOT( actionPublishFocusOnDisplayed( )));
+
+#else
+  _ui->actionFocusOnDisplayed->setEnabled( false );
+  _ui->actionAutoFocusOnDisplayed->setEnabled( false );
+  _ui->actionFocusOnSelection->setEnabled( false );
+  _ui->actionAutoFocusOnSelection->setEnabled( false );
+#endif
+  ////////////////////////////////////////////////////////////////
+
+  // // Connect save dialog
+  // connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
 
   // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
@@ -273,18 +312,20 @@ void MainWindow::selectDomain( void )
     domainSelected =
       QString::fromStdString( nslib::Config::inputArgs( )[ domainArg ][0] );
 
+  nslib::Domain* domain = nullptr;
+
   if ( domainSelected == "cortex" )
   {
-    nslib::Domain* domain = new nslib::cortex::Domain;
+    domain = new nslib::cortex::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
       exit( -1 );
   }
   else if ( domainSelected == "congen" )
   {
-    nslib::Domain* domain = new nslib::congen::Domain;
+    domain = new nslib::congen::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->loadData( nslib::Config::inputArgs( )))
+    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
       exit( -1 );
   }
   else
@@ -302,6 +343,9 @@ void MainWindow::selectDomain( void )
   canvas->displayEntities(
     nslib::DataManager::rootEntities( ), false, true );
   nslib::PaneManager::panes( ).insert( canvas );
+
+  if ( domain )
+    domain->createGUI( this, _ui->menubar );
 
   resizeEvent( 0 );
 } // MainWindow::selectDomain
@@ -584,11 +628,72 @@ void MainWindow::toggleShowConnectivity( void )
 }
 
 
-void MainWindow::saveScene( void )
+// void MainWindow::saveScene( void )
+// {
+//   //Depending on the selected domain, a certain "saver" could be available
+//   //At this moment, only NeuroML
+//   emit nslib::congen::DataSaver::saveXmlScene( this );
+// }
+
+void MainWindow::actionPublishSelectionToggle( void )
 {
-  //Depending on the selected domain, a certain "saver" could be available
-  //At this moment, only NeuroML
-  emit nslib::congen::DataSaver::saveXmlScene( this );
+  nslib::Config::autoPublishSelection(
+    _ui->actionAutoPublishSelection->isChecked( ));
 }
 
+void MainWindow::actionPublishFocusOnSelectionToggle( void )
+{
+  nslib::Config::autoPublishFocusOnSelection(
+    _ui->actionAutoFocusOnSelection->isChecked( ));
+}
 
+void MainWindow::actionPublishFocusOnDisplayedToggle( void )
+{
+  nslib::Config::autoPublishFocusOnDisplayed(
+    _ui->actionAutoFocusOnDisplayed->isChecked( ));
+}
+
+void MainWindow::actionPublishSelection( void )
+{
+  std::vector< unsigned int > ids;
+  nslib::SelectionManager::selectableEntitiesIds( ids );
+  nslib::ZeroEQManager::publishSelection( ids );
+}
+
+void MainWindow::actionPublishFocusOnSelection( void )
+{
+  std::vector< unsigned int > ids;
+  nslib::SelectionManager::selectableEntitiesIds( ids );
+  nslib::ZeroEQManager::publishFocusOnSelection( ids );
+}
+
+void MainWindow::actionPublishFocusOnDisplayed( void )
+{
+  std::cerr << "TODO" << std::endl;
+}
+
+void MainWindow::toggleZeroEQ( void )
+{
+  if ( _ui->actionToggleZeroEQ->isChecked( ))
+  {
+    bool ok;
+    QString text = QInputDialog::getText(
+      this, tr("Please select ZeroEQ session"),
+      tr("ZeroEQ session:"), QLineEdit::Normal,
+      QString::fromStdString( nslib::Config::zeroEQSession( )), &ok );
+    if ( ok && !text.isEmpty( ))
+    {
+      nslib::Config::zeroEQSession( text.toStdString( ));
+      nslib::ZeroEQManager::connect( nslib::Config::zeroEQSession( ));
+    }
+    else
+      _ui->actionToggleZeroEQ->setChecked( false );
+  }
+  else
+    nslib::ZeroEQManager::disconnect( );
+}
+
+void MainWindow::quit( void )
+{
+  QCoreApplication::quit( );
+}

@@ -36,7 +36,6 @@
 
 namespace nslib
 {
-  bool ZeroEQManager::_publishSelection = true;
   zeroeq::Subscriber* ZeroEQManager::_subscriber = nullptr;
   zeroeq::Publisher* ZeroEQManager::_publisher = nullptr;
   SubscriberTimer* ZeroEQManager::_timer = nullptr;
@@ -54,10 +53,7 @@ namespace nslib
     this->start( 50 );
   }
 
-  void ZeroEQManager::init( const std::string& session )
-    // : _publishSelection( true )
-    // , _subscriber( session.empty() ? zeroeq::DEFAULT_SESSION : session )
-    // , _publisher( session.empty() ? zeroeq::DEFAULT_SESSION : session )
+  void ZeroEQManager::connect( const std::string& session )
   {
     _subscriber = new zeroeq::Subscriber(
       session.empty() ? zeroeq::DEFAULT_SESSION : session );
@@ -97,25 +93,42 @@ namespace nslib
     _timer->start( 50 );
   }
 
+  void ZeroEQManager::disconnect( void )
+  {
+    delete _timer;
+    _timer = nullptr;
+    delete _subscriber;
+    _subscriber = nullptr;
+    delete _publisher;
+    _publisher = nullptr;
+  }
+
   void ZeroEQManager::publishSelection(
     const std::vector< unsigned int >& gids )
   {
-    if ( _publisher && _publishSelection )
+  if ( _publisher )
     {
       nslib::Loggers::get( )->log(
         std::string( "NeuroScheme: publishing selection with " +
                      std::to_string( gids.size( )) +
                      std::string( " neurons" )),
         nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-      _publisher->publish( lexis::data::SelectedIDs( gids ) );
+      _publisher->publish( lexis::data::SelectedIDs( gids ));
     }
-    // std::cout << "Publish GIDS: ";
-    // for ( auto gid : gids )
-    // {
-    //   std::cout << gid << " ";
-    // }
-    // std::cout << std::endl;
+  }
 
+  void ZeroEQManager::publishFocusOnSelection(
+    const std::vector< unsigned int >& gids )
+  {
+    if ( _publisher )
+    {
+      nslib::Loggers::get( )->log(
+        std::string( "NeuroScheme: publishing focus on selection with " +
+                     std::to_string( gids.size( )) +
+                     std::string( " neurons" )),
+        nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+      _publisher->publish( zeroeq::gmrv::FocusedIDs( gids ));
+    }
   }
 
   void ZeroEQManager::_selectionUpdateCallback (
@@ -137,10 +150,12 @@ namespace nslib
     PaneManager::setViewMatrix( event->getMatrix( ));
   }
 
+#ifdef NEUROSCHEME_USE_ZEROEQ
   zeroeq::Subscriber* ZeroEQManager::subscriber( void )
   {
     return _subscriber;
   }
+#endif
 
 //   void ZeroEQManager::_receiveEvents( void )
 //   {

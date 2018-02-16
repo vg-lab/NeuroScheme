@@ -600,7 +600,11 @@ namespace nslib
           // Publish selection
           std::vector< unsigned int > ids;
           SelectionManager::selectableEntitiesIds( ids );
-          ZeroEQManager::publishSelection( ids );
+
+          if ( Config::autoPublishSelection( ))
+            ZeroEQManager::publishSelection( ids );
+          if ( Config::autoPublishFocusOnSelection( ))
+            ZeroEQManager::publishFocusOnSelection( ids );
         } // selection event
       }
       else

@@ -34,7 +34,7 @@ namespace nslib
 
     virtual ~DataLoader( void ) {}
 
-    virtual bool loadData(
+    virtual bool cliLoadData(
       const NeuroSchemeInputArguments& arguments ) = 0;
 
 
