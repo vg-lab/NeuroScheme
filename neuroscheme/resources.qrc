@@ -35,5 +35,8 @@
     <file>icons/cellsetop.png</file>
     <file>icons/filter.png</file>
     <file>icons/sort.png</file>
+    <file>icons/horizontalSplit.svg</file>
+    <file>icons/verticalSplit.svg</file>
+    <file>icons/documentClose.svg</file>
   </qresource>
 </RCC>

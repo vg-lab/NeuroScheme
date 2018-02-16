@@ -74,7 +74,6 @@ public slots:
   void deleteStoredSelection( void );
   void restoreSelection( void );
   void updateLayoutsDock( void );
-  void paneDivisionChanged( void );
   void killActivePane( void );
   void duplicateActivePane( void );
   void home( void );
