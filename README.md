@@ -48,10 +48,60 @@ make
 
 ## Running
 
-All the features should be accessible using the GUI but some of the are also
-available through CLI. Running the following can provide a list of the CLI
-arguments NeuroScheme accepts:
+At the moment NeuroScheme running options have to be defined via command line
+interface. To take a look to the arguments NeuroScheme accepts you can run the
+following:
 
 ```bash
-./NeuroScheme --help
+./bin/NeuroScheme --help
 ```
+
+NeuroScheme accepts different domains (in example, cortex and congen domains)
+which can be selected when GUI is started or via the "-d" parameter. Each domain
+can have each own specific parameters, which can be displayed with --help
+argument.
+
+### Loading and exporting data
+
+#### Cortex domain
+
+Loading data in cortex domain can be done from both nsol's XML scene and
+BlueBrain's BlueConfig files. If you have built NeuroScheme with nsol support
+(explained in the [Dependencies](#dependencies) section) you can
+try to visualize a very simple scene by running:
+
+```bash
+./bin/NeuroScheme -d cortex -xml nsol/testData/scene.xml
+```
+
+Cortex domain does not support exporting data.
+
+#### Congen domain
+
+Congen domain at the moment only allows creating data but does not support
+loading data yet (soon we hope!).
+
+### Interacting with data
+
+Once a dataset has been loaded you can navigate through the hierarchy or
+visualize the grouped items right-clicking in the representation and selecting
+the proper option (if available in the specific dataset). The new visualization
+can be shown in the same panel or in a new one (horizontal or vertical pane
+splitting can be selected under "Panes" menu).
+
+Clicking in the toolbar "gear" icon a side panel is shown containing the options
+regarding layouts, filtering and sorting capabilities.
+
+Clicking in the toolbar "drawer" icon a side panel is shown containing the
+options regarding stored selections.
+
+### Creating data
+
+The creating feature is still in early development stage. If you want to try it
+out you can start with a clear canvas or load a dataset as specified before. To
+create entities you can click on the background of the canvas, select the type
+of entity and define its properties in the side panel. To edit or duplicate an
+entity right click on its representation and select the apropriated option. You
+can also define connection relationships between entities using drag and
+drop. To visualize connections you have to enable the option in the toolbar or
+under the menu "Scene".
