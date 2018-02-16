@@ -38,7 +38,7 @@ namespace nslib
     void AutoConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )
     {
       auto opConfig = dynamic_cast< OpConfig* >( opConfig_ );
-      if( !opConfig )
+      if ( !opConfig )
       {
         return;
       }
@@ -47,14 +47,14 @@ namespace nslib
       auto arrowItem = this->item( scene );
 
       //Checks whether the current scene is being animated
-      if( opConfig->isAnimating( ) )
+      if ( opConfig->isAnimating( ) )
       {
         auto originRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
 
         auto originItem = dynamic_cast< Item* >( originRep->item( scene ) );
 
-        if( originItem == nullptr )
+        if ( originItem == nullptr )
         {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
@@ -122,7 +122,7 @@ namespace nslib
     QGraphicsItem*
     AutoConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-      if( create && ( _items.find( scene ) == _items.end( ) ) &&
+      if ( create && ( _items.find( scene ) == _items.end( ) ) &&
         !_items[ scene ] )
       {
         _items[ scene ] = new AutoConnectionArrowItem( *this );

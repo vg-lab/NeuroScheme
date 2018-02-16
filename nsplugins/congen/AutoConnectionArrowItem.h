@@ -34,10 +34,10 @@ namespace nslib
     class AutoConnectionArrowItem
       : public nslib::congen::ConnectionArrowItem
     {
-      Q_OBJECT
-      Q_PROPERTY( QLineF line READ line WRITE setLine )
+    Q_OBJECT
+    Q_PROPERTY( QLineF line READ line WRITE setLine )
 
-      public:
+    public:
       /**
        *
        * Creates a new AutoConnectionArrowItem from an AutoConnectionArrowRep
@@ -126,7 +126,7 @@ namespace nslib
        */
       void setCentersDistFactor( float centersDistFactor_ );
 
-      protected:
+    protected:
 
       //the following determine various values needed to paint auto-connections
       static float arcRadius;

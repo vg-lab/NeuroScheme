@@ -129,7 +129,7 @@ namespace nslib
       relConnectedBy[ neuronPop3->entityGid( )].insert(
           std::make_pair( neuronPop->entityGid( ), nullptr ));
 
-
+/*
       //auto connection 1
       relConnectsTo[ neuronPop->entityGid( )].insert(
           std::make_pair( neuronPop->entityGid( ), propObject ) );
@@ -170,7 +170,7 @@ namespace nslib
         std::make_pair( neuronPopTemp->entityGid( ), propObject ));
       relConnectedBy[ neuronPopTemp->entityGid( )].insert(
         std::make_pair( neuronPopTemp->entityGid( ), nullptr ));
-    }
+    }*/
 
       return true;
     }

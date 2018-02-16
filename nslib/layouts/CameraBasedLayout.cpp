@@ -36,7 +36,6 @@ namespace nslib
   CameraBasedLayout::CameraBasedLayout( void )
     : Layout( "3D", Layout::CAMERA_ENABLED )
   {
-    _layoutType = CAMERA_BASED_LAYOUT;
     // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
     // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
   }

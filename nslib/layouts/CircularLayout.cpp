@@ -42,7 +42,6 @@ namespace nslib
                                   bool animate,
                                   const shift::Representations& postFilterReps )
   {
-    _layoutType = CIRCULAR_LAYOUT;
     std::unordered_set< QGraphicsItem* > filteredOutItems;
     auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
     bool doFiltering =

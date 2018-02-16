@@ -42,8 +42,12 @@ namespace nslib
   namespace congen
   {
     const float AutoConnectionArrowItem::Rad_To_Deg = 180.0f*M_PI_Inverse;
+
+    //Values used to draw the arrowhead, made const to avoid recalculating
     const float AutoConnectionArrowItem::M_PI_0825 = 0.825f * M_PI_Float;
     const float AutoConnectionArrowItem::M_PI_1115 = 1.115f * M_PI_Float;
+
+    //Default angle for drawing the autoconnections when the layout is a grid
     const float AutoConnectionArrowItem::M_PI_175 = 1.75f * M_PI_Float;
 
     float AutoConnectionArrowItem::_centersDistFactor = 0.5f;
@@ -59,7 +63,8 @@ namespace nslib
       const AutoConnectionArrowRep& autoConnectionArrowRep )
       : ConnectionArrowItem( autoConnectionArrowRep )
     {
-      _arrowThickness = 1.3f;
+      _arrowThickness = 1.3f *
+        autoConnectionArrowRep.getProperty( "width" ).value< unsigned int >( );
     }
 
     const QLineF& AutoConnectionArrowItem::line( void )

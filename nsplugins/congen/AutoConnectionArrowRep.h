@@ -31,7 +31,7 @@ namespace nslib
   {
     class AutoConnectionArrowRep : public nslib::congen::ConnectionArrowRep
     {
-      public :
+    public :
       /**
        *
        * Returns the corresponding item from the scene
