@@ -24,18 +24,16 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>39</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPanes">
     <property name="title">
      <string>&amp;Panes</string>
     </property>
-    <addaction name="actionDuplicatePane"/>
-    <addaction name="actionKillPane"/>
-    <addaction name="separator"/>
     <addaction name="actionSplitVertically"/>
     <addaction name="actionSplitHorizontally"/>
+    <addaction name="actionKillPane"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -136,29 +134,33 @@
    </property>
   </action>
   <action name="actionSplitHorizontally">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/horizontalSplit.svg</normaloff>:/icons/horizontalSplit.svg</iconset>
+   </property>
    <property name="text">
     <string>Split &amp;horizontally</string>
    </property>
   </action>
   <action name="actionSplitVertically">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/verticalSplit.svg</normaloff>:/icons/verticalSplit.svg</iconset>
+   </property>
    <property name="text">
     <string>Split &amp;vertically</string>
    </property>
   </action>
   <action name="actionKillPane">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/documentClose.svg</normaloff>:/icons/documentClose.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Kill pane</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+K</string>
-   </property>
-  </action>
-  <action name="actionDuplicatePane">
-   <property name="text">
-    <string>&amp;Duplicate Pane</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actionHome">

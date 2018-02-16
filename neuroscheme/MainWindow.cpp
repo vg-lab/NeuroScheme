@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *          Jose M. Espadero <josemiguel.espadero@urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -125,17 +126,12 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
            this, SLOT( toggleShowConnectivity( )));
 
-  QActionGroup* splitTypeGroup = new QActionGroup( this );
-  _ui->actionSplitHorizontally->setCheckable( true );
-  _ui->actionSplitHorizontally->setActionGroup( splitTypeGroup );
-  _ui->actionSplitVertically->setCheckable( true );
-  _ui->actionSplitVertically->setActionGroup( splitTypeGroup );
-  _ui->actionSplitVertically->setChecked( true );
-  connect( splitTypeGroup, SIGNAL( triggered( QAction* )),
-           this, SLOT( paneDivisionChanged(  )));
-
-  connect( _ui->actionDuplicatePane, SIGNAL( triggered( )),
+  connect( _ui->actionSplitHorizontally, SIGNAL( triggered( )),
            this, SLOT( duplicateActivePane( )));
+
+  connect( _ui->actionSplitVertically, SIGNAL( triggered( )),
+           this, SLOT( duplicateActivePane( )));
+
   connect( _ui->actionKillPane, SIGNAL( triggered( )),
            this, SLOT( killActivePane( )));
 
@@ -531,16 +527,6 @@ void MainWindow::sortStoredSelectionsTable( int column )
   _storedSelections.table->sortByColumn( column );
 }
 
-
-void MainWindow::paneDivisionChanged( void )
-{
-  nslib::PaneManager::paneDivision(
-    _ui->actionSplitVertically->isChecked( ) ?
-    nslib::PaneManager::VERTICAL :
-    nslib::PaneManager::HORIZONTAL );
-}
-
-
 void MainWindow::killActivePane( void )
 {
   nslib::PaneManager::killActivePane( );
@@ -548,8 +534,14 @@ void MainWindow::killActivePane( void )
 
 void MainWindow::duplicateActivePane( void )
 {
-  nslib::PaneManager::newPaneFromActivePane( );
+  //Choose if split will be horizontal or vertical
+  if (QObject::sender() == _ui->actionSplitHorizontally )
+    nslib::PaneManager::paneDivision(nslib::PaneManager::HORIZONTAL);
+  else
+    nslib::PaneManager::paneDivision(nslib::PaneManager::VERTICAL);
 
+  //Do the split
+  nslib::PaneManager::newPaneFromActivePane( );
 }
 
 void MainWindow::home( void )
