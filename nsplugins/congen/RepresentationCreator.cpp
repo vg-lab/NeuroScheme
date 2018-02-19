@@ -59,10 +59,10 @@ namespace nslib
         neuronModelColorMap;
       neuronModelColorMap.setColor(
         shiftgen::NeuronPop::TNeuronModel::iaf_psc_alpha,
-        scoop::Color( "#5c8daa" ) );
+        scoop::Color( "#5c8daa" ));
       neuronModelColorMap.setColor(
         shiftgen::NeuronPop::TNeuronModel::undefined,
-        scoop::Color( "#e7ba83" ) );
+        scoop::Color( "#e7ba83" ));
 
       MapperFloatToFloat
         neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
@@ -72,15 +72,15 @@ namespace nslib
       //     scoop::ColorPalette::ColorBrewerSequential::PuBu, 6 ),
       //   0.0f, _maxNeuronsPerPopulation );
 
-      for( const auto entity : entities.vector( ) )
+      for( const auto entity : entities.vector( ))
       {
-        if( entitiesToReps.find( entity ) != entitiesToReps.end( ) )
+        if( entitiesToReps.find( entity ) != entitiesToReps.end( ))
         {
           for( const auto rep : entitiesToReps[ entity ] )
             representations.push_back( rep );
           continue;
         }
-        if( dynamic_cast< shiftgen::NeuronPop* >( entity ) )
+        if( dynamic_cast< shiftgen::NeuronPop* >( entity ))
         {
           auto neuronPop = dynamic_cast< shiftgen::NeuronPop* >( entity );
           auto neuronPopRep = new NeuronPopRep( );
@@ -89,11 +89,11 @@ namespace nslib
             "color",
             neuronModelColorMap.getColor(
               neuronPop->getProperty( "Neuron model" ).
-                value< shiftgen::NeuronPop::TNeuronModel >( ) ) );
+                value< shiftgen::NeuronPop::TNeuronModel >( )));
           neuronPopRep->setProperty(
             "line perc",
             neuronsToPercentage.map(
-              neuronPop->getProperty( "Nb of neurons" ).value< uint >( ) ) );
+              neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
 
           // neuronPopRep->setProperty(
           //   "color",
@@ -111,7 +111,7 @@ namespace nslib
           }
 
           gidsToEntitiesReps
-            .insert( TripleKey( entity->entityGid( ), entity, neuronPopRep ) );
+            .insert( TripleKey( entity->entityGid( ), entity, neuronPopRep ));
 
         }
       }
@@ -132,31 +132,31 @@ namespace nslib
         0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
         1.0f, 5.0f );
 
-      for( auto& entity : entities.vector( ) )
+      for( auto& entity : entities.vector( ))
       {
-        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ) );
-        if( srcEntityRep == gidsToEntitiesReps.end( ) )
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
         {
           continue;
         }
 
-        auto entityRelations = relatedElements->find( entity->entityGid( ) );
+        auto entityRelations = relatedElements->find( entity->entityGid( ));
 
-        if( entityRelations == relatedElements->end( ) )
+        if( entityRelations == relatedElements->end( ))
         {
           continue;
         }
 
-        for( auto& other : entities.vector( ) )
+        for( auto& other : entities.vector( ))
         {
-          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ) );
-          if( otherRep == gidsToEntitiesReps.end( ) )
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
           {
             continue;
           }
 
           auto numberOfConnections =
-            entityRelations->second.count( other->entityGid( ) );
+            entityRelations->second.count( other->entityGid( ));
 
           if( numberOfConnections == 0 )
           {
@@ -167,11 +167,11 @@ namespace nslib
           // the same elements are imported. Then, create a loop to iterate
           // over the given results and create a new one if not found.
           auto combinedKey = std::make_pair( entity->entityGid( ),
-            other->entityGid( ) );
+            other->entityGid( ));
           auto alreadyConnected =
             relatedEntitiesReps.find( combinedKey );
 
-          if( alreadyConnected == relatedEntitiesReps.end( ) )
+          if( alreadyConnected == relatedEntitiesReps.end( ))
           {
             ConnectionArrowRep* relationRep;
             if( srcEntityRep->second.second == otherRep->second.second )
@@ -188,9 +188,9 @@ namespace nslib
             const std::unordered_multimap< shift::Entity::EntityGid,
               shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
-            auto relMMapIt = relMMap.find( other->entityGid( ) );
+            auto relMMapIt = relMMap.find( other->entityGid( ));
             if( relMMapIt !=
-              ( *relatedElements )[ entity->entityGid( ) ].end( ) )
+              ( *relatedElements )[ entity->entityGid( ) ].end( ))
             {
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle
@@ -204,7 +204,7 @@ namespace nslib
                   shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
                   relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
                     value< float >( )
-                    < 0.0f ) )
+                    < 0.0f ))
               {
                 relationRep->setProperty(
                   "head",
@@ -221,7 +221,7 @@ namespace nslib
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map( fabsf(
                     relMMapIt->second->getProperty(
-                      "Weight" ).value< float >( ) ) ) ) );
+                      "Weight" ).value< float >( )))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
@@ -230,10 +230,10 @@ namespace nslib
                   entity,
                   other,
                   srcEntityRep->second.second,
-                  otherRep->second.second ) ) );
+                  otherRep->second.second )));
           }
           relatedEntities
-            .push_back( std::get< 0 >( alreadyConnected->second ) );
+            .push_back( std::get< 0 >( alreadyConnected->second ));
 
         }
 
@@ -246,7 +246,7 @@ namespace nslib
     {
       bool needToClear = false;
 
-      if( dynamic_cast< shiftgen::NeuronPop* >( entity ) )
+      if( dynamic_cast< shiftgen::NeuronPop* >( entity ))
       {
         auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
         auto newNeuronsPerPopulation =
@@ -273,7 +273,7 @@ namespace nslib
     {
       bool needToClear = false;
 
-      if( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ) )
+      if( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
       {
         auto oldMaxAbsoluteWeight = _maxAbsoluteWeight;
         auto newAbsoluteWeight = fabsf(
@@ -282,7 +282,7 @@ namespace nslib
               shiftgen::ConnectsWith::TFixedOrDistribution::Fixed ?
             relProperties->getProperty( "Weight" ).value< float >( ) :
             relProperties->getProperty( "Weight Gaussian Mean" )
-              .value< float >( ) ) );
+              .value< float >( )));
 
         _maxAbsoluteWeight = std::max( newAbsoluteWeight,
           _maxAbsoluteWeight );

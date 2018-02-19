@@ -199,12 +199,12 @@ namespace nslib
         {
           QAction* action = nullptr;
 
-          if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ) )
+          if ( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
             continue;
 
           action = _contextMenu->addAction(
             QString( "Add "  ) +
-            QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type ) ) );
+            QString::fromStdString(std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
 
           actionToIdx[action]=entityIdx;
           ++entityIdx;
@@ -235,13 +235,13 @@ namespace nslib
         assert( item->parentRep( ));
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
-        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ) )
+        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
-          const auto entities = repsToEntities.at( item->parentRep( ) );
+          const auto entities = repsToEntities.at( item->parentRep( ));
           auto entityGid = ( *entities.begin( ))->entityGid( );
 
           auto& relParentOf = *( DataManager::entities( ).
-                            relationships( )[ "isParentOf" ]->asOneToN( ) );
+                            relationships( )[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
@@ -263,10 +263,10 @@ namespace nslib
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
-            editEntity = _contextMenu->addAction( QString( "Edit" ) );
-            dupEntity = _contextMenu->addAction( QString( "Duplicate" ) );
+            editEntity = _contextMenu->addAction( QString( "Edit" ));
+            dupEntity = _contextMenu->addAction( QString( "Duplicate" ));
             autoEntity = _contextMenu->addAction( QString( "Add Auto Connection"
-            ) );
+            ));
 
           }
           if ( editEntity || dupEntity || autoEntity )
@@ -280,21 +280,21 @@ namespace nslib
           QAction* expandGroupToNewPane = nullptr;
 
           if ( parent != 0 )
-            levelUp = _contextMenu->addAction( QString( "Level up" ) );
+            levelUp = _contextMenu->addAction( QString( "Level up" ));
           if ( children.size( ) > 0 )
-            levelDown = _contextMenu->addAction( QString( "Level down" ) );
+            levelDown = _contextMenu->addAction( QString( "Level down" ));
           if ( groupedEntities.size( ) > 0 )
-            expandGroup = _contextMenu->addAction( QString( "Expand group" ) );
+            expandGroup = _contextMenu->addAction( QString( "Expand group" ));
 
           if ( levelUp || levelDown || expandGroup )
             _contextMenu->addSeparator( );
 
           if ( parent != 0 )
             levelUpToNewPane =
-              _contextMenu->addAction( QString( "Level up [new pane]" ) );
+              _contextMenu->addAction( QString( "Level up [new pane]" ));
           if ( children.size( ) > 0 )
             levelDownToNewPane =
-              _contextMenu->addAction( QString( "Level down [new pane]" ) );
+              _contextMenu->addAction( QString( "Level down [new pane]" ));
           if ( groupedEntities.size( ) > 0 )
             expandGroupToNewPane = _contextMenu->addAction(
               QString( "Expand group [new pane]" ));
@@ -305,7 +305,7 @@ namespace nslib
           {
             shift::Representations representations;
             shift::Entities targetEntities;
-            QAction* selectedAction = _contextMenu->exec( event->screenPos( ) );
+            QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
 
             if ( editEntity && editEntity == selectedAction )
             {
@@ -336,7 +336,7 @@ namespace nslib
             {
               createConnectionRelationship(
                 DataManager::entities( ).at( entityGid ),
-                DataManager::entities( ).at( entityGid ) );
+                DataManager::entities( ).at( entityGid ));
 
             }
             else

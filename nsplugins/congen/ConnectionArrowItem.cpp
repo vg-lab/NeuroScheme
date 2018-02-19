@@ -45,7 +45,7 @@ namespace nslib
         nslib::InteractiveItem( ), _arrowCircleEnd( nullptr )
     {
       this->_parentRep =
-        &( const_cast< ConnectionArrowRep& >( connectionArrowRep ) );
+        &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
 
       this->setAcceptHoverEvents( true );
 
@@ -65,7 +65,7 @@ namespace nslib
     void ConnectionArrowItem::setLine( const QLineF& line_ )
     {
       _line = line_;
-      createArrow( _line.p1( ), _line.p2( ) );
+      createArrow( _line.p1( ), _line.p2( ));
     }
 
     void ConnectionArrowItem::createArrow( const QPointF& origin,
@@ -90,7 +90,7 @@ namespace nslib
       }
 
       QPointF arrowInit = auxLine.pointAt(
-        1.0f - ( arrowLength * lengthInv ) );
+        1.0f - ( arrowLength * lengthInv ));
       QPointF arrowP1 = arrowInit -
         QPointF( sin( angle + M_PI_3 ) * arrowWidth,
           cos( angle + M_PI_3 ) * arrowWidth );
@@ -132,8 +132,8 @@ namespace nslib
           dest.y( ) - size * 0.5f, size, size );
 
         _arrowCircleEnd->setPen( Qt::NoPen );
-        _arrowCircleEnd->setBrush( QBrush( color ) );
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ) );
+        _arrowCircleEnd->setBrush( QBrush( color ));
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
         _arrowCircleEnd->setParentItem( this );
 
         arrowShape << arrowI1
@@ -159,8 +159,8 @@ namespace nslib
       painterPath.moveTo( _arrowDest );
       painterPath.addPolygon( arrowShape );
 
-      this->setBrush( QBrush( color ) );
-      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setBrush( QBrush( color ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
       this->setPath( painterPath );
       this->setZValue( -100.0f );
     }
@@ -183,26 +183,26 @@ namespace nslib
     void ConnectionArrowItem::hoverEnter( void )
     {
       this->setZValue( 100 );
-      this->setBrush( QBrush( hoverColor ) );
-      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ) );
+      this->setBrush( QBrush( hoverColor ));
+      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
 
       if( _arrowCircleEnd != nullptr )
       {
         _arrowCircleEnd
-          ->setPen( QPen( QBrush( hoverColor ), _arrowThickness ) );
-        _arrowCircleEnd->setBrush( QBrush( hoverColor ) );
+          ->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( hoverColor ));
       }
     }
 
     void ConnectionArrowItem::highlight( scoop::Color color_ )
     {
       this->setZValue( 100 );
-      this->setBrush( QBrush( color_ ) );
-      this->setPen( QPen( QBrush( color_ ), _arrowThickness ) );
+      this->setBrush( QBrush( color_ ));
+      this->setPen( QPen( QBrush( color_ ), _arrowThickness ));
       if( _arrowCircleEnd != nullptr )
       {
-        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ) );
-        _arrowCircleEnd->setBrush( QBrush( color_ ) );
+        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color_ ));
       }
     }
 
@@ -219,12 +219,12 @@ namespace nslib
     void ConnectionArrowItem::hoverLeave( void )
     {
       this->setZValue( -100 );
-      this->setBrush( QBrush( color ) );
-      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setBrush( QBrush( color ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
       if( _arrowCircleEnd != nullptr )
       {
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ) );
-        _arrowCircleEnd->setBrush( QBrush( color ) );
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( color ));
       }
     }
 
