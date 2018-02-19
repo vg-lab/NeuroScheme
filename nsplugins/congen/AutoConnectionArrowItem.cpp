@@ -75,8 +75,8 @@ namespace nslib
     void AutoConnectionArrowItem::setLine( const QLineF& line_ )
     {
       _line = line_;
-      createAutoArrow( float( _line.p1( ).x( ) ), _line.p1( ).y( ) == 1.0f ,
-        _line.p2( ) );
+      createAutoArrow( float( _line.p1( ).x( )), _line.p1( ).y( ) == 1.0f ,
+        _line.p2( ));
     }
 
     void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
@@ -99,7 +99,7 @@ namespace nslib
       {
         //Fixes arrow position to the point furthest from the canvas centre
         relativeAngle = atanf(
-          float( glyphCenter_.y( ) / glyphCenter_.x( ) ) );
+          float( glyphCenter_.y( ) / glyphCenter_.x( )));
         if( glyphCenter_.x( ) < 0 )
         {
           relativeAngle += M_PI_Float;
@@ -109,7 +109,7 @@ namespace nslib
       //Arrow arc center
       QPointF arcCenter = QPointF(
         glyphCenter_.x( ) + dist * cosf( relativeAngle ),
-        glyphCenter_.y( ) + dist * sinf( relativeAngle ) );
+        glyphCenter_.y( ) + dist * sinf( relativeAngle ));
 
       //Angle where the arrow arc will start
       relativeAngle = startAngle + M_PI_Float - relativeAngle;
@@ -117,12 +117,12 @@ namespace nslib
       //Arrow start
       _arrowOrigin = QPointF(
         arcCenter.x( ) + arcRadius * cosf( relativeAngle ),
-        arcCenter.y( ) - arcRadius * sinf( relativeAngle ) );
+        arcCenter.y( ) - arcRadius * sinf( relativeAngle ));
 
       //Arrow end
       _arrowDest = QPointF(
         arcCenter.x( ) + arcRadius * cosf( relativeAngle + arcDegrees ),
-        arcCenter.y( ) - arcRadius * sinf( relativeAngle + arcDegrees ) );
+        arcCenter.y( ) - arcRadius * sinf( relativeAngle + arcDegrees ));
 
       //Data necessary to draw the arrow
       float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
@@ -148,11 +148,11 @@ namespace nslib
       {
         QPointF relativeDir = _arrowOrigin - glyphCenter_;
 
-        Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ) );
+        Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ));
         vector.normalize( );
         vector = vector * arrowWidth;
 
-        QPointF arrowBack = QPointF( -vector.y( ), vector.x( ) );
+        QPointF arrowBack = QPointF( -vector.y( ), vector.x( ));
 
         QPointF arrowI1 = _arrowOrigin + arrowBack;
         QPointF arrowI2 = _arrowOrigin - arrowBack;
@@ -170,8 +170,8 @@ namespace nslib
 
       painterPath.addPolygon( arrowShape );
 
-      this->setBrush( QBrush( QColor( 0, 0, 0, 0 ) ) );
-      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setBrush( QBrush( QColor( 0, 0, 0, 0 )));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
       this->setPath( painterPath );
       this->setZValue( -100.0f );
 
@@ -190,7 +190,7 @@ namespace nslib
         //Angle were arcs start
         startAngle = acosf(
           ( arcRadius * arcRadius + dist * dist - glyphRadius * glyphRadius ) /
-            ( 2.0f * arcRadius * dist ) );
+            ( 2.0f * arcRadius * dist ));
       }
       else
       {
@@ -203,14 +203,14 @@ namespace nslib
     void AutoConnectionArrowItem::hoverEnter( void )
     {
       this->setZValue( 100 );
-      this->setBrush( QBrush( Qt::NoBrush ) );
-      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ) );
+      this->setBrush( QBrush( Qt::NoBrush ));
+      this->setPen( QPen( QBrush( hoverColor ), _arrowThickness ));
 
       if( _arrowCircleEnd != nullptr )
       {
         _arrowCircleEnd->setPen(
-          QPen( QBrush( hoverColor ), _arrowThickness ) );
-        _arrowCircleEnd->setBrush( QBrush( hoverColor ) );
+          QPen( QBrush( hoverColor ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( hoverColor ));
       }
     }
 
@@ -227,24 +227,24 @@ namespace nslib
     void AutoConnectionArrowItem::hoverLeave( void )
     {
       this->setZValue( -100 );
-      this->setBrush( QBrush( Qt::NoBrush ) );
-      this->setPen( QPen( QBrush( color ), _arrowThickness ) );
+      this->setBrush( QBrush( Qt::NoBrush ));
+      this->setPen( QPen( QBrush( color ), _arrowThickness ));
       if( _arrowCircleEnd != nullptr )
       {
-        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ) );
-        _arrowCircleEnd->setBrush( QBrush( Qt::NoBrush ) );
+        _arrowCircleEnd->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowCircleEnd->setBrush( QBrush( Qt::NoBrush ));
       }
     }
 
     void AutoConnectionArrowItem::highlight( scoop::Color color_ )
     {
       this->setZValue( 100 );
-      this->setBrush( QBrush( Qt::NoBrush ) );
+      this->setBrush( QBrush( Qt::NoBrush ));
       this->setPen(
-        QPen( QBrush( QColor( 50, 206, 22 )/*Green*/ ), _arrowThickness ) );
+        QPen( QBrush( QColor( 50, 206, 22 )/*Green*/ ), _arrowThickness ));
       if( _arrowCircleEnd != nullptr )
       {
-        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ) );
+        _arrowCircleEnd->setPen( QPen( QBrush( color_ ), _arrowThickness ));
         _arrowCircleEnd->setBrush( QColor( 50, 206, 22 )/*Green*/ );
       }
     }

@@ -47,12 +47,12 @@ namespace nslib
       auto arrowItem = this->item( scene );
 
       //Checks whether the current scene is being animated
-      if ( opConfig->isAnimating( ) )
+      if ( opConfig->isAnimating( ))
       {
         auto originRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _originRep );
 
-        auto originItem = dynamic_cast< Item* >( originRep->item( scene ) );
+        auto originItem = dynamic_cast< Item* >( originRep->item( scene ));
 
         if ( originItem == nullptr )
         {
@@ -78,7 +78,7 @@ namespace nslib
 
         //Radius of the glyph to animate
         float glyphBoundingRect =
-          0.5f * float( originItemB->boundingRect( ).width( ) );
+          0.5f * float( originItemB->boundingRect( ).width( ));
 
         //Change of glyph center position during the animation
         auto originPosAnimStart =
@@ -86,16 +86,16 @@ namespace nslib
         auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
 
         float glyphRadius = glyphScaleStart * glyphBoundingRect;
-        float isGrid = ( opConfig->isGrid( ) ) ? 1.0f : 0.0f;
+        float isGrid = ( opConfig->isGrid( )) ? 1.0f : 0.0f;
 
         //Start values of the animation
         lineAnim.setStartValue( QLineF( QPointF( glyphRadius, isGrid ),
-          QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ) ) ) );
+          QPointF( originPosAnimStart.x( ), originPosAnimStart.y( ))));
 
         //End values of the animation
         glyphRadius = glyphScaleEnd * glyphBoundingRect;
         lineAnim.setEndValue( QLineF( QPointF( glyphRadius, isGrid ),
-          QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ) ) ) );
+          QPointF( originPosAnimEnd.x( ), originPosAnimEnd.y( ))));
 
         //Starts the animation
         lineAnim.start( );
@@ -107,11 +107,11 @@ namespace nslib
           _originRep )->item( scene );
 
         //Calculates glyph Radius
-        float glyphRadius = 0.5f * float( originItem->scale( ) )
-          * float( originItem->boundingRect( ).width( ) );
+        float glyphRadius = 0.5f * float( originItem->scale( ))
+          * float( originItem->boundingRect( ).width( ));
 
         //Calculates center of the Glyph
-        QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ) );
+        QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ));
 
         //Draws the new arrow
         dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->
@@ -122,7 +122,7 @@ namespace nslib
     QGraphicsItem*
     AutoConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-      if ( create && ( _items.find( scene ) == _items.end( ) ) &&
+      if ( create && ( _items.find( scene ) == _items.end( )) &&
         !_items[ scene ] )
       {
         _items[ scene ] = new AutoConnectionArrowItem( *this );
