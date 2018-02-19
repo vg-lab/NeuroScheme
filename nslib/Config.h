@@ -71,6 +71,11 @@ namespace nslib
   };
 
 
+#define NSLIB_CONFIG( TYPE, NAME )                                        \
+  protected: static TYPE _##NAME ;                                        \
+public: NSLIB_API static void NAME( TYPE NAME##_ ) { _##NAME = NAME##_; } \
+public: NSLIB_API static TYPE NAME( void ) { return _##NAME; }
+
   class Config
   {
 
@@ -82,22 +87,16 @@ namespace nslib
     static std::string isArgumentDefined(
       const std::vector< std::string >& argNames );
 
-    NSLIB_API
-    static bool showConnectivity( void );
+    NSLIB_CONFIG( bool, showConnectivity );
+    NSLIB_CONFIG( bool, autoPublishSelection );
+    NSLIB_CONFIG( bool, autoPublishFocusOnSelection );
+    NSLIB_CONFIG( bool, autoPublishFocusOnDisplayed );
+    NSLIB_CONFIG( float, scale );
+    NSLIB_CONFIG( std::string, zeroEQSession );
 
-    NSLIB_API
-    static void showConnectivity( bool showConnectivity_ );
-
-    NSLIB_API
-    static float scale( void );
-
-    NSLIB_API
-    static void scale( float scale );
 
   protected:
     static NeuroSchemeInputArguments _inputArgs;
-    static bool _showConnectivity;
-    static float _scale;
   };
 
 }

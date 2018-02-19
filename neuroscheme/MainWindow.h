@@ -60,7 +60,7 @@ public:
     COLUMN_MAX_COLUMS
   };
 
-  explicit MainWindow( QWidget *parent = 0 );
+  explicit MainWindow( QWidget *parent , bool zeroEQ );
   ~MainWindow( void );
   void selectDomain( void );
 
@@ -74,12 +74,19 @@ public slots:
   void deleteStoredSelection( void );
   void restoreSelection( void );
   void updateLayoutsDock( void );
-  void paneDivisionChanged( void );
   void killActivePane( void );
   void duplicateActivePane( void );
   void home( void );
   void toggleShowConnectivity( void );
-  void saveScene( void );
+  // void saveScene( void );
+  void actionPublishSelectionToggle( void );
+  void actionPublishFocusOnSelectionToggle( void );
+  void actionPublishFocusOnDisplayedToggle( void );
+  void actionPublishSelection( void );
+  void actionPublishFocusOnSelection( void );
+  void actionPublishFocusOnDisplayed( void );
+  void toggleZeroEQ( void );
+  void quit( void );
 
 protected:
 

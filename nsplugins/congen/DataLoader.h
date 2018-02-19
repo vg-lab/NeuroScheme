@@ -27,6 +27,7 @@
 #include <nslib/Loggers.h>
 #include <unordered_map>
 #include <string>
+#include <QXmlStreamReader>
 
 #ifdef NEUROSCHEME_USE_NSOL
 #include <nsol/nsol.h>
@@ -43,8 +44,19 @@ namespace nslib
 
       virtual ~DataLoader( void ) {}
 
-      virtual bool loadData(
+      bool cliLoadData(
         const ::nslib::NeuroSchemeInputArguments& arguments ) final;
+
+      static bool loadNeuroML( const std::string& fileName );
+
+    protected:
+      static bool _loadPopulation(
+        QXmlStreamReader& xml,
+        std::unordered_map< std::string, unsigned int >& popNameToGid );
+
+      static bool _loadProjection(
+        QXmlStreamReader& xml,
+        const std::unordered_map< std::string, unsigned int >& popNameToGid );
 
     };
   }

@@ -27,9 +27,27 @@
 #include "DataLoader.h"
 namespace nslib
 {
-
   namespace cortex
   {
+
+    class DomainGUI : QObject
+    {
+      Q_OBJECT;
+
+    public:
+      DomainGUI( QMainWindow* mw_, QMenuBar* menubar );
+
+    public slots:
+      void loadBlueConfig( void );
+      void loadXmlScene( void );
+
+    protected:
+      QMainWindow* _mw;
+      QString _lastOpenedFileName;
+      std::unique_ptr< QAction > _actionLoadBlueConfig;
+      std::unique_ptr< QAction > _actionLoadXmlScene;
+    };
+
     class NSLIBCORTEX_API Domain
       : public ::nslib::Domain
     {
@@ -49,6 +67,15 @@ namespace nslib
       unsigned int selectableEntityId( shift::Entity* entity ) const;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const;
       static void usageMessage( void );
+
+      void createGUI( QMainWindow* mw, QMenuBar* menubar ) final
+      {
+        _domainGUI.reset( new DomainGUI( mw, menubar ));
+      }
+
+
+    protected:
+      std::unique_ptr< DomainGUI > _domainGUI;
     };
   }
 }

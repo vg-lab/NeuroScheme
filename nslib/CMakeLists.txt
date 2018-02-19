@@ -3,7 +3,7 @@ set( SILO_NAME NEUROSCHEME )
 configure_file( ${CMAKE_SOURCE_DIR}/deps/silo/silo.in.hpp
   ${CMAKE_BINARY_DIR}/include/nslib/Logger.hpp )
 
-set( NSLIB_HEADERS
+set( NSLIB_PUBLIC_HEADERS
   ${CMAKE_BINARY_DIR}/include/nslib/Logger.hpp
   Canvas.h
   Color.h

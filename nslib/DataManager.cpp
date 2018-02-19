@@ -135,7 +135,7 @@ namespace nslib
       //this->closeData( );
       _nsolDataSet.loadBlueConfigHierarchy<
         nsol::Node,
-        nsol::SectionStats,
+        nsol::NeuronMorphologySectionStats,
         nsol::DendriteStats,
         nsol::AxonStats,
         nsol::SomaStats,
@@ -149,7 +149,7 @@ namespace nslib
       {
         _nsolDataSet.loadAllMorphologies<
           nsol::Node,
-          nsol::SectionStats,
+          nsol::NeuronMorphologySectionStats,
           nsol::DendriteStats,
           nsol::AxonStats,
           nsol::SomaStats,
@@ -162,7 +162,7 @@ namespace nslib
       {
         _nsolDataSet.loadBlueConfigConnectivity<
           nsol::Node,
-          nsol::SectionStats,
+          nsol::NeuronMorphologySectionStats,
           nsol::DendriteStats,
           nsol::AxonStats,
           nsol::SomaStats,
@@ -188,14 +188,14 @@ namespace nslib
 
   void DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
   {
-    #ifdef NSOL_USE_QT5CORE
+#ifdef NSOL_USE_QT5CORE
     auto errorMessage = new QErrorMessage;
     try
     {
       // this->CloseData( );
       _nsolDataSet.loadXmlScene<
         nsol::NodeCached,
-        nsol::SectionCachedStats,
+        nsol::NeuronMorphologySectionCachedStats,
         nsol::DendriteCachedStats,
         nsol::AxonCachedStats,
         nsol::SomaStats,
@@ -213,13 +213,14 @@ namespace nslib
       return;
     }
 
-    #else
+#else
     (void) xmlSceneFile;
     Loggers::get( )->log( "nsol not built or built without QtCore",
                          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
-    #endif
+#endif
   }
+
 
 
 } // namespace nslib

@@ -85,15 +85,11 @@ namespace nslib
           auto neuronPop = dynamic_cast< shiftgen::NeuronPop* >( entity );
           auto neuronPopRep = new NeuronPopRep( );
 
-          neuronPopRep->setProperty(
-            "color",
-            neuronModelColorMap.getColor(
-              neuronPop->getProperty( "Neuron model" ).
-                value< shiftgen::NeuronPop::TNeuronModel >( )));
-          neuronPopRep->setProperty(
-            "line perc",
-            neuronsToPercentage.map(
-              neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
+          neuronPopRep->setProperty( "color",
+            neuronModelColorMap.getColor( neuronPop->getProperty(
+            "Neuron model" ).value< shiftgen::NeuronPop::TNeuronModel >( )));
+          neuronPopRep->setProperty( "line perc", neuronsToPercentage.map(
+            neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
 
           // neuronPopRep->setProperty(
           //   "color",
@@ -128,9 +124,8 @@ namespace nslib
       const auto& relatedElements =
         DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
-      MapperFloatToFloat nbConnectionsToWidth(
-        0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
-        1.0f, 5.0f );
+      MapperFloatToFloat nbConnectionsToWidth( 0,
+        _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight, 1.0f, 5.0f );
 
       for( auto& entity : entities.vector( ))
       {
@@ -203,34 +198,27 @@ namespace nslib
                   value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
                   shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
                   relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
-                    value< float >( )
-                    < 0.0f ))
+                    value< float >( ) < 0.0f ))
               {
-                relationRep->setProperty(
-                  "head",
+                relationRep->setProperty( "head" ,
                   shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
               }
               else
               {
-                relationRep->setProperty(
-                  "head",
+                relationRep->setProperty( "head" ,
                   shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
               }
 
               relationRep->setProperty(
-                "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map( fabsf(
-                    relMMapIt->second->getProperty(
-                      "Weight" ).value< float >( )))));
+                "width", ( unsigned int ) roundf( nbConnectionsToWidth.map(
+                 fabsf( relMMapIt->second->getProperty(
+                 "Weight" ).value< float >( )))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
               std::make_pair( combinedKey,
-                std::make_tuple( relationRep,
-                  entity,
-                  other,
-                  srcEntityRep->second.second,
-                  otherRep->second.second )));
+                std::make_tuple( relationRep, entity, other,
+                  srcEntityRep->second.second, otherRep->second.second )));
           }
           relatedEntities
             .push_back( std::get< 0 >( alreadyConnected->second ));
@@ -284,8 +272,7 @@ namespace nslib
             relProperties->getProperty( "Weight Gaussian Mean" )
               .value< float >( )));
 
-        _maxAbsoluteWeight = std::max( newAbsoluteWeight,
-          _maxAbsoluteWeight );
+        _maxAbsoluteWeight = std::max( newAbsoluteWeight, _maxAbsoluteWeight );
 
         needToClear = ( _maxAbsoluteWeight != oldMaxAbsoluteWeight );
       }
