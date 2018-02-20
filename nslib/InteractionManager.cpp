@@ -263,10 +263,9 @@ namespace nslib
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
-            editEntity = _contextMenu->addAction( QString( "Edit" ));
-            dupEntity = _contextMenu->addAction( QString( "Duplicate" ));
-            autoEntity = _contextMenu->addAction( QString( "Add Auto Connection"
-            ));
+            editEntity = _contextMenu->addAction( "Edit" );
+            dupEntity = _contextMenu->addAction( "Duplicate" );
+            autoEntity = _contextMenu->addAction( "Add Auto Connection"  );
 
           }
           if ( editEntity || dupEntity || autoEntity )
@@ -280,24 +279,24 @@ namespace nslib
           QAction* expandGroupToNewPane = nullptr;
 
           if ( parent != 0 )
-            levelUp = _contextMenu->addAction( QString( "Level up" ));
+            levelUp = _contextMenu->addAction( "Level up" );
           if ( children.size( ) > 0 )
-            levelDown = _contextMenu->addAction( QString( "Level down" ));
+            levelDown = _contextMenu->addAction( "Level down" );
           if ( groupedEntities.size( ) > 0 )
-            expandGroup = _contextMenu->addAction( QString( "Expand group" ));
+            expandGroup = _contextMenu->addAction( "Expand group" );
 
           if ( levelUp || levelDown || expandGroup )
             _contextMenu->addSeparator( );
 
           if ( parent != 0 )
             levelUpToNewPane =
-              _contextMenu->addAction( QString( "Level up [new pane]" ));
+              _contextMenu->addAction( "Level up [new pane]" );
           if ( children.size( ) > 0 )
             levelDownToNewPane =
-              _contextMenu->addAction( QString( "Level down [new pane]" ));
+              _contextMenu->addAction( "Level down [new pane]" );
           if ( groupedEntities.size( ) > 0 )
             expandGroupToNewPane = _contextMenu->addAction(
-              QString( "Expand group [new pane]" ));
+              "Expand group [new pane]" );
 
           if ( levelUp || levelDown || expandGroup ||
                levelUpToNewPane || levelDownToNewPane ||

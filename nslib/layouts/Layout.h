@@ -54,7 +54,7 @@ namespace nslib
     virtual ~OpConfig( void ) {};
     GraphicsScene* scene( void ) { return _scene; };
     bool isAnimating(){ return _animating; };
-    bool isGrid(){ return _isGrid; };
+    bool isGrid() const { return _isGrid; };
 
   protected:
     GraphicsScene* _scene;
