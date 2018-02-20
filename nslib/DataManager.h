@@ -24,6 +24,7 @@
 
 #include <nslib/api.h>
 #include <shift/shift.h>
+#include <QErrorMessage>
 
 #ifdef NEUROSCHEME_USE_NSOL
 #include <nsol/nsol.h>

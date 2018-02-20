@@ -25,10 +25,7 @@
 #include "RepresentationCreatorManager.h"
 //#include "domains/domains.h"
 #include "error.h"
-#include <Eigen/Geometry>
-#ifdef NSOL_USE_QT5CORE
 #include <QMessageBox>
-#endif
 
 
 namespace nslib
@@ -130,11 +127,8 @@ namespace nslib
 
     Loggers::get( )->log("Error loading BlueConfig: Brion support not built-in",
                          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-
-#ifdef NSOL_USE_QT5CORE
     QMessageBox::critical(0, "Error loading BlueConfig",
                          "Brion support not built-in");
-#endif
     return;
 #else
     ( void ) csvNeuronStatsFileName;
