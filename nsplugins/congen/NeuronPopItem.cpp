@@ -74,22 +74,7 @@ namespace nslib
       QPainterPath path_;
       QPolygon poly;
 
-      /*int size_2 = roundf( size * 0.5f );
-      int sizeTopBottomX = roundf( size_2 * 0.5f );
-      int sizeTopBottomY = roundf( size_2 * 0.7f );
-      int sizeMiddle = roundf( size_2 * 0.9f );
-      QPoint pTL ( -sizeTopBottomX, -sizeTopBottomY );
-      QPoint pTR (  sizeTopBottomX, -sizeTopBottomY );
-      QPoint pBR (  sizeTopBottomX,  sizeTopBottomY );
-      QPoint pBL ( -sizeTopBottomX,  sizeTopBottomY );
-
-      QPoint pMR (  sizeMiddle,  0           );
-      QPoint pML ( -sizeMiddle,  0           );
-
-      poly << pTL << pTR << pMR << pBR << pBL << pML;*/
-
       float size_2 = roundf( size * 0.5f );
-
 
       poly << QPoint(
         ( size_2 * POSX0 ),
@@ -121,19 +106,6 @@ namespace nslib
         ( size_2 * POSY5 )
       );
 
-      // QPoint pUL (-int(size)/2, -int(size)/24);
-      // QPoint pUM (           0, -int(size)/6);
-      // QPoint pUR ( int(size)/2, -int(size)/24);
-
-      // QPoint pLR ( int(size)/2, +int(size)/24);
-      // QPoint pLM (           0, +int(size)/6);
-      // QPoint pLL (-int(size)/2, +int(size)/24);
-
-      // poly << pLR << pLM
-      //      << pLL
-      //      << pUL //<< pUM
-      //      << pUR;
-
       path_.addPolygon( poly );
       path_.closeSubpath(  );
 
@@ -159,9 +131,9 @@ namespace nslib
       // auto lineWidth = lineContainerWidth; //roundf(  circleItemSize * .85f );
       // auto lineHeight = lineContainerHeight; //roundf( circleItemSize * .09f );
       auto line = new QGraphicsRectItem(
-        POSX4,
-        POSY4 - size_2 * 0.03,
-        roundf( ( POSX5 - POSX4) *
+        size_2 * POSX2,
+        size_2 * POSY2 - size_2 * 0.03,
+        roundf( size_2 * ( POSX1 - POSX2) *
                 neuronRep.getProperty( "line perc" ).value< float >( )),
         size_2 * 0.06 );
 
