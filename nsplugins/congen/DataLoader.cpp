@@ -56,53 +56,6 @@ namespace nslib
           std::string( args.at( "-x" )[0] ));
       } // "-x"
 
-      // ::nslib::Logger::get( )->log(
-      //   "Loading data for congen", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-
-      // auto& _entities = nslib::DataManager::entities( );
-      // auto& _rootEntities = nslib::DataManager::rootEntities( );
-      // fires::PropertyManager::clear( );
-      // _entities.clear( );
-      // _rootEntities.clear( );
-
-      // _entities.relationships( )[ "isParentOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isChildOf" ] =
-      //   new shift::RelationshipOneToOne;
-
-      // _entities.relationships( )[ "isAGroupOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isPartOf" ] =
-      //   new shift::RelationshipOneToN;
-
-      // _entities.relationships( )[ "isSuperEntityOf" ] =
-      //   new shift::RelationshipOneToN;
-      // _entities.relationships( )[ "isSubEntityOf" ] =
-      //   new shift::RelationshipOneToOne;
-
-      // auto& relParentOf =
-      //   *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-      // auto& relChildOf =
-      //   *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
-
-      // shift::Entity* neuronPop = new NeuronPop( 50 );
-      // _rootEntities.add( neuronPop );
-      // _entities.add( neuronPop );
-
-      // std::default_random_engine generator;
-      // std::uniform_int_distribution< int > distribution( 0,100 );
-      // // int dice_roll = distribution( generator );
-      // for ( unsigned int i = 0; i < 10; ++i )
-      // {
-      //   shift::Entity* neuronPop2 = new NeuronPop( distribution( generator ));
-      //   shift::Relationship::Establish( relParentOf, relChildOf,
-      //                                   neuronPop, neuronPop2 );
-      //   _entities.add( neuronPop2 );
-      // }
-
-      // auto repCretor = new RepresentationCreator( );
-      // nslib::RepresentationCreatorManager::addCreator( repCretor );
-
       return true;
     }
 
@@ -111,8 +64,6 @@ namespace nslib
       QXmlStreamReader& xml,
       std::unordered_map< std::string, unsigned int >& popNameToGid )
     {
-      std::cout << "--- Load population" << std::endl;
-
       auto attributes = xml.attributes( );
       std::string popName;
       std::string cellType;
@@ -138,13 +89,9 @@ namespace nslib
       }
       xml.skipCurrentElement( ); // random_arrangement
       xml.skipCurrentElement( ); // population
-      // xml.skipCurrentElement( );
-      // xml.readNextStartElement( );
-      // std::cout << "** Next elememt " << xml.name( ).toString( ).toStdString( ) << std::endl;
+
       NeuronPop::TNeuronModel neuronModel =
         NeuronPop::TNeuronModel::undefined;
-
-      std::cout << "\t\t" << popName << std::endl;
 
       if ( cellType == "iaf psc alpha" )
         neuronModel = NeuronPop::TNeuronModel::iaf_psc_alpha;
@@ -158,8 +105,6 @@ namespace nslib
       entities.add( neuronPop );
       rootEntities.add( neuronPop );
 
-      // xml.skipCurrentElement( );
-
       return true;
     }
 
@@ -167,8 +112,6 @@ namespace nslib
       QXmlStreamReader& xml,
       const std::unordered_map< std::string, unsigned int >& popNameToGid )
     {
-      std::cout << std::endl << "--- Load projection" << std::endl;
-
       std::string projName, targetName, sourceName;
       auto attributes = xml.attributes( );
       if( attributes.hasAttribute( "name" ))
@@ -178,7 +121,6 @@ namespace nslib
       if( attributes.hasAttribute( "source" ))
         sourceName = attributes.value( "source" ).toString( ).toStdString( );
 
-      std::cout << "--- " << projName << std::endl;
       float weight = 1.0f, weightGaussMean = 0.0f, weightGaussSigma = 0.0f,
         delay = 0.0f, delayGaussMean = 0.0f, delayGaussSigma = 0.0f,
         threshold = 0.0f;
@@ -201,80 +143,126 @@ namespace nslib
       }
 
       std::string lastGaussianPossibleElement;
+      bool weightTextProcessed = false, delayTextProcessed = false;
+
       while( !xml.atEnd( ) && !xml.hasError( ) &&
              !( xml.name( ) == "projection" &&
                 xml.tokenType( ) == QXmlStreamReader::EndElement ))
       {
 
-        std::cout << "pos: " << xml.device( )->pos( ) << std::endl;
+        xml.readNext( );
 
-        auto hasChildren = xml.readNextStartElement( );
-        if ( xml.atEnd( ) ||
-             xml.tokenType( ) !=
-             QXmlStreamReader::StartElement )
+        if ( xml.tokenType( ) == QXmlStreamReader::Characters )
+        {
+          if ( lastGaussianPossibleElement == "weight" && !weightTextProcessed )
+          {
+            weight = xml.text( ).toFloat( );
+            weightTextProcessed = true;
+          }
+          if ( lastGaussianPossibleElement == "internal_delay" && !delayTextProcessed )
+          {
+            delay = xml.text( ).toFloat( );
+            delayTextProcessed = true;
+          }
+          continue;
+        }
+        if ( xml.tokenType( ) != QXmlStreamReader::StartElement )
           continue;
 
-        if ( !xml.atEnd( ) && xml.name( ) == "synapse_props" )
+        const auto tokenName = xml.name( );
+
+        if ( tokenName == "synapse_props" )
         {
-          std::cout << "---- Synapse props " << int( hasChildren ) << std::endl;
           attributes = xml.attributes( );
           if( attributes.hasAttribute( "threshold" ))
             threshold = attributes.value( "name" ).toString( ).toFloat( );
-
         }
-
-        if ( !xml.atEnd( ) && xml.name( ) == "weight" )
+        else
+        if ( tokenName == "weight" )
         {
-          std::cout << "---- Weight " << "isCharacters: " << xml.isCharacters( )
-                    << " " << "isStartElement: " << xml.isStartElement( )
-                    << " " << int( hasChildren ) << std::endl;
           lastGaussianPossibleElement = "weight";
-
-          // auto file = xml.device( );
-          // auto pos = file->pos( );
-          // auto et = xml.readElementText(
-          //    QXmlStreamReader::IncludeChildElements );
-          // weight = et.toFloat( );
-          // file->seek( pos );
-          // xml.setDevice( file );
-
-          std::cout << "---- Weight float " << weight << std::endl;
-          // std::cout << xml.tokenString( ).toStdString( ) << std::endl;
-          // std::cout << "---- Weight " << et.size( ) << " "
-          //           << qPrintable( et ) << std::endl;
-
-          // std::cout << xml.errorString( ) << std::endl;
         }
-
-        if ( !xml.atEnd( ) && xml.name( ) == "internal_delay" )
+        else
+        if ( tokenName == "internal_delay" )
         {
-          std::cout << "---- Delay " << "isCharacters: " << xml.isCharacters( ) << " " << "isStartElement: " << xml.isStartElement( ) << " " << int( hasChildren ) << std::endl;
           lastGaussianPossibleElement = "internal_delay";
         }
-
-        if ( !xml.atEnd( ) && xml.name( ) == "GaussianDistribution" )
+        else
+        if ( tokenName == "GaussianDistribution" )
         {
           auto gaussianDistAttrs = xml.attributes( );
 
           if ( lastGaussianPossibleElement == "weight" )
           {
+            weightType = shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian;
             if( gaussianDistAttrs.hasAttribute( "center" ))
               weightGaussMean = gaussianDistAttrs.value( "center" ).toFloat( );
             if( gaussianDistAttrs.hasAttribute( "deviation" ))
               weightGaussSigma = gaussianDistAttrs.value( "deviation" ).toFloat( );
-            std::cout << "--- Gaussian weight " << weightGaussMean << " " << weightGaussSigma << std::endl;
           }
           else if ( lastGaussianPossibleElement == "internal_delay" )
           {
+            delayType = shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian;
             if( gaussianDistAttrs.hasAttribute( "center" ))
               delayGaussMean = gaussianDistAttrs.value( "center" ).toFloat( );
             if( gaussianDistAttrs.hasAttribute( "deviation" ))
               delayGaussSigma = gaussianDistAttrs.value( "deviation" ).toFloat( );
-            std::cout << "--- Gaussian delay " << delayGaussMean << " " << delayGaussSigma << std::endl;
           }
-
+          lastGaussianPossibleElement = "";
         }
-
+        else if ( tokenName == "connectivity_pattern" )
+        {
+          lastGaussianPossibleElement = "connectivity_pattern";
+        }
+        else if ( tokenName == "All-to-all" )
+        {
+          connModel = shiftgen::ConnectsWith::TConnectivityModel::All_to_all;
+          lastGaussianPossibleElement = "";
+        }
+        else if ( tokenName == "On-to-one" )
+        {
+          connModel = shiftgen::ConnectsWith::TConnectivityModel::One_to_one;
+        }
+        else if ( tokenName == "fixed_probability" )
+        {
+          connModel = shiftgen::ConnectsWith::TConnectivityModel::Random;
+          auto fixedProbAttribs = xml.attributes( );
+          if( fixedProbAttribs.hasAttribute( "probability" ))
+              randProb = fixedProbAttribs.value( "probability" ).toFloat( );
+        }
+        else if ( tokenName == "spatial_gaussian" )
+        {
+          connModel = shiftgen::ConnectsWith::TConnectivityModel::Random;
+          auto fixedProbAttribs = xml.attributes( );
+          if( fixedProbAttribs.hasAttribute( "cutoff" ))
+              spatialGaussProb = fixedProbAttribs.value( "cutoff" ).toFloat( );
+          if( fixedProbAttribs.hasAttribute( "sigma" ))
+              spatialGaussSigma = fixedProbAttribs.value( "sigma" ).toFloat( );
+        }
+        else if ( tokenName == "per_cell_connection" )
+        {
+          auto perCellConnAttribs = xml.attributes( );
+          if ( perCellConnAttribs.hasAttribute( "direction" ))
+          {
+            auto perCellDir = perCellConnAttribs.value( "direction" ).toString( );
+            if ( perCellDir == "PreToPost" ) // FanIn
+            {
+              connModel = shiftgen::ConnectsWith::TConnectivityModel::FanIn;
+              if ( perCellConnAttribs.hasAttribute( "num_per_source" ))
+                fanInDegree = perCellConnAttribs.value( "num_per_source" ).toFloat( );
+            }
+            else if ( perCellDir == "PostToPre" ) // FanOut
+            {
+              connModel = shiftgen::ConnectsWith::TConnectivityModel::FanOut;
+              if ( perCellConnAttribs.hasAttribute( "num_per_source" ))
+                fanOutDegree = perCellConnAttribs.value( "num_per_source" ).toFloat( );
+            }
+          }
+        }
+        else
+        {
+          lastGaussianPossibleElement = "";
+        }
       }
 
       auto connProps = new shiftgen::ConnectsWith(
@@ -345,7 +333,6 @@ namespace nslib
         if ( !f )
           continue;
 
-        std::cout << "pos: " << xml.device( )->pos( ) << std::endl;
         if ( xml.name( ) == "population" )
           retVal |= _loadPopulation( xml, popNameToGid );
         else if ( xml.name( ) == "projection" )
