@@ -25,7 +25,7 @@
 #include "RepresentationCreatorManager.h"
 //#include "domains/domains.h"
 #include "error.h"
-#include <Eigen/Geometry>
+#include <QMessageBox>
 
 
 namespace nslib
@@ -118,14 +118,17 @@ namespace nslib
                                     const std::string& csvNeuronStatsFileName,
                                     const bool loadConnectivity )
   {
-    auto  errorMessage = new QErrorMessage;
 #ifndef NSOL_USE_BRION
     ( void ) blueConfig;
     ( void ) targetLabel;
     ( void ) loadMorphologies;
     ( void ) csvNeuronStatsFileName;
     ( void ) loadConnectivity;
-    errorMessage->showMessage( "Brion support not built-in" );
+
+    Loggers::get( )->log("Error loading BlueConfig: Brion support not built-in",
+                         LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+    QMessageBox::critical(0, "Error loading BlueConfig",
+                         "Brion support not built-in");
     return;
 #else
     ( void ) csvNeuronStatsFileName;
@@ -173,10 +176,11 @@ namespace nslib
       }
     } catch ( std::exception& ex )
     {
-      Loggers::get( )->log(
-        std::string( "Error loading BlueConfig: " ) +
-        std::string( ex.what( )), LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-      errorMessage->showMessage( "Error loading BlueConfig" );
+      std::string msg("Error loading BlueConfig: " + std::string( ex.what( )));
+      Loggers::get( )->log(msg, LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+
+      QMessageBox::critical(0, "Error loading BlueConfig",
+                            QString::fromStdString(msg));
       return;
     }
     // createEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,
@@ -189,7 +193,6 @@ namespace nslib
   void DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
   {
 #ifdef NSOL_USE_QT5CORE
-    auto errorMessage = new QErrorMessage;
     try
     {
       // this->CloseData( );
@@ -205,11 +208,11 @@ namespace nslib
         nsol::ColumnStats >( xmlSceneFile );
     } catch ( std::exception& ex )
     {
-      Loggers::get( )->log( std::string( "Error loading scene: " ) +
+      Loggers::get( )->log( "Error loading XML scene: " +
                            std::string( ex.what( )), LOG_LEVEL_ERROR,
                            NEUROSCHEME_FILE_LINE );
-      errorMessage->showMessage( QString("Error loading scene") +
-                                 QString(ex.what( )));
+      QMessageBox::critical(0, "Error loading XML Scene",
+                            QString::fromStdString(xmlSceneFile + " : " + ex.what( )));
       return;
     }
 
@@ -220,7 +223,6 @@ namespace nslib
 
 #endif
   }
-
 
 
 } // namespace nslib
