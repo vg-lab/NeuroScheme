@@ -41,8 +41,11 @@ namespace nslib
 
     ConnectionArrowItem::ConnectionArrowItem(
       const ConnectionArrowRep& connectionArrowRep )
-      : QObject( ), QGraphicsPathItem( ), nslib::Item( ),
-        nslib::InteractiveItem( ), _arrowCircleEnd( nullptr )
+      : QObject( )
+      , QGraphicsPathItem( )
+      , nslib::Item( )
+      , nslib::InteractiveItem( )
+      , _arrowCircleEnd( nullptr )
     {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));

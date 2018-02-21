@@ -241,7 +241,7 @@ namespace nslib
           auto entityGid = ( *entities.begin( ))->entityGid( );
 
           auto& relParentOf = *( DataManager::entities( ).
-                            relationships( )[ "isParentOf" ]->asOneToN( ));
+                                 relationships( )[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
