@@ -54,7 +54,7 @@ namespace nslib
       relationshipPropertiesTypes( void ) const
     { return *_relationshipPropertiesTypes; }
 
-    virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ ) {};
+    virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ ) {}
 
   protected:
     DataLoader* _dataLoader;

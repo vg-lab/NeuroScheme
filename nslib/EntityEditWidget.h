@@ -29,7 +29,6 @@
 #include <QDoubleSpinBox>
 #include <QSpinBox>
 #include <QLabel>
-#include <QErrorMessage>
 #include <QDockWidget>
 
 #include <shift/shift.h>
