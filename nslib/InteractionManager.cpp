@@ -259,13 +259,16 @@ namespace nslib
 
           QAction* editEntity = nullptr;
           QAction* dupEntity = nullptr;
+          QAction* autoEntity = nullptr;
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
-            editEntity = _contextMenu->addAction( QString( "Edit" ));
-            dupEntity = _contextMenu->addAction( QString( "Duplicate" ));
+            editEntity = _contextMenu->addAction( "Edit" );
+            dupEntity = _contextMenu->addAction( "Duplicate" );
+            autoEntity = _contextMenu->addAction( "Add Auto Connection"  );
+
           }
-          if ( editEntity || dupEntity )
+          if ( editEntity || dupEntity || autoEntity )
             _contextMenu->addSeparator( );
 
           QAction* levelUp = nullptr;
@@ -276,24 +279,24 @@ namespace nslib
           QAction* expandGroupToNewPane = nullptr;
 
           if ( parent != 0 )
-            levelUp = _contextMenu->addAction( QString( "Level up" ));
+            levelUp = _contextMenu->addAction( "Level up" );
           if ( children.size( ) > 0 )
-            levelDown = _contextMenu->addAction( QString( "Level down" ));
+            levelDown = _contextMenu->addAction( "Level down" );
           if ( groupedEntities.size( ) > 0 )
-            expandGroup = _contextMenu->addAction( QString( "Expand group" ));
+            expandGroup = _contextMenu->addAction( "Expand group" );
 
           if ( levelUp || levelDown || expandGroup )
             _contextMenu->addSeparator( );
 
           if ( parent != 0 )
             levelUpToNewPane =
-              _contextMenu->addAction( QString( "Level up [new pane]" ));
+              _contextMenu->addAction( "Level up [new pane]" );
           if ( children.size( ) > 0 )
             levelDownToNewPane =
-              _contextMenu->addAction( QString( "Level down [new pane]" ));
+              _contextMenu->addAction( "Level down [new pane]" );
           if ( groupedEntities.size( ) > 0 )
             expandGroupToNewPane = _contextMenu->addAction(
-              QString( "Expand group [new pane]" ));
+              "Expand group [new pane]" );
 
           if ( levelUp || levelDown || expandGroup ||
                levelUpToNewPane || levelDownToNewPane ||
@@ -321,11 +324,18 @@ namespace nslib
                 delete _entityEditWidget;
 
               _entityEditWidget = new EntityEditWidget(
-                DataManager::entities( ).at( entityGid ),
-                EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
+                  DataManager::entities( ).at( entityGid ),
+                  EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
               EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
               EntityEditWidget::parentDock( )->show( );
               _entityEditWidget->show( );
+
+            }
+            else if ( autoEntity && autoEntity == selectedAction )
+            {
+              createConnectionRelationship(
+                DataManager::entities( ).at( entityGid ),
+                DataManager::entities( ).at( entityGid ));
 
             }
             else

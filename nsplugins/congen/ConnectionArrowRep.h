@@ -32,29 +32,34 @@ namespace nslib
   namespace congen
   {
     class ConnectionArrowRep
-      : public shiftgen::ConnectionArrowRep
-      , public QGraphicsItemRepresentation
-      , public ConnectivityRep
+        : public shiftgen::ConnectionArrowRep,
+          public QGraphicsItemRepresentation,
+          public ConnectivityRep
     {
-    public:
+      public:
 
       ConnectionArrowRep( shift::Representation* originRep_,
-                          shift::Representation* destRep_ );
-      ConnectionArrowRep( const ConnectionArrowRep& );
-      virtual ~ConnectionArrowRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                           bool create = true );
+         shift::Representation* destRep_ );
 
-      void preRender( shift::OpConfig* opConfig = nullptr );
+      ConnectionArrowRep( const ConnectionArrowRep& );
+
+      virtual ~ConnectionArrowRep( void ) { }
+
+      virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+        bool create = true );
+
+      virtual void preRender( shift::OpConfig* opConfig = nullptr );
 
       void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+
       void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
       virtual void highlight(
         const scoop::Color& color = scoop::Color( 255, 0, 0 ));
-      virtual void unHighlight( void ) final { hoverLeaveEvent( nullptr ); }
 
-    protected:
+      virtual void unHighlight( void ) final;
+
+      protected:
       shift::Representation* _originRep;
       shift::Representation* _destRep;
     };

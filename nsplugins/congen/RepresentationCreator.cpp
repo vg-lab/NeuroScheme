@@ -29,6 +29,7 @@
 #include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
+#include "AutoConnectionArrowRep.h"
 #include <algorithm>
 
 namespace nslib
@@ -50,10 +51,10 @@ namespace nslib
       shift::TGidToEntitiesReps& gidsToEntitiesReps,
       bool linkEntitiesToReps,
       bool linkRepsToEntities
-      )
+    )
     {
       nslib::Loggers::get( )->log( "create",
-                                   LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+        LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         neuronModelColorMap;
@@ -89,7 +90,7 @@ namespace nslib
             "color",
             neuronModelColorMap.getColor(
               neuronPop->getProperty( "Neuron model" ).
-              value< shiftgen::NeuronPop::TNeuronModel >( )));
+                value< shiftgen::NeuronPop::TNeuronModel >( )));
           neuronPopRep->setProperty(
             "line perc",
             neuronsToPercentage.map(
@@ -122,7 +123,7 @@ namespace nslib
     {
 
       const auto& relatedElements =
-          DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
+        DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
       MapperFloatToFloat nbConnectionsToWidth(
         0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
@@ -141,15 +142,12 @@ namespace nslib
 
         for( auto& other : entities.vector( ))
         {
-          if( other->entityGid( ) == entity->entityGid( ))
-            continue;
-
           auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
           if( otherRep == gidsToEntitiesReps.end( ))
             continue;
 
           auto numberOfConnections =
-              entityRelations->second.count( other->entityGid( ));
+            entityRelations->second.count( other->entityGid( ));
 
           if( numberOfConnections == 0 )
             continue;
@@ -158,18 +156,26 @@ namespace nslib
           // the same elements are imported. Then, create a loop to iterate
           // over the given results and create a new one if not found.
           auto combinedKey = std::make_pair( entity->entityGid( ),
-                                             other->entityGid( ));
+            other->entityGid( ));
           auto alreadyConnected =
-              relatedEntitiesReps.find( combinedKey );
+            relatedEntitiesReps.find( combinedKey );
 
           if( alreadyConnected == relatedEntitiesReps.end( ))
           {
-            ConnectionArrowRep* relationRep =
-              new ConnectionArrowRep( srcEntityRep->second.second,
-                                      otherRep->second.second );
-
+            ConnectionArrowRep* relationRep;
+            if( srcEntityRep->second.second == otherRep->second.second )
+            {
+              relationRep =
+                new AutoConnectionArrowRep( srcEntityRep->second.second );
+            }
+            else
+            {
+              relationRep =
+                new ConnectionArrowRep( srcEntityRep->second.second,
+                  otherRep->second.second );
+            }
             const std::unordered_multimap< shift::Entity::EntityGid,
-                                     shift::RelationshipProperties* >& relMMap =
+              shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
             auto relMMapIt = relMMap.find( other->entityGid( ));
             if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
@@ -177,14 +183,14 @@ namespace nslib
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle
               if (( relMMapIt->second->getProperty( "Weight Type" ).
-                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                    shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
-                    relMMapIt->second->getProperty( "Weight" ).value< float >( )
-                    < 0.0f ) ||
-                  ( relMMapIt->second->getProperty( "Weight Type" ).
-                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                    shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
-                    relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
+                value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
+                relMMapIt->second->getProperty( "Weight" ).value< float >( )
+                  < 0.0f ) ||
+                ( relMMapIt->second->getProperty( "Weight Type" ).
+                  value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                  shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
+                  relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
                     value< float >( )
                     < 0.0f ))
               {
@@ -197,7 +203,7 @@ namespace nslib
                   "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
               }
 
-                relationRep->setProperty(
+              relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map( fabsf(
                     relMMapIt->second->getProperty(
@@ -206,11 +212,11 @@ namespace nslib
 
             alreadyConnected = relatedEntitiesReps.insert(
               std::make_pair( combinedKey,
-                              std::make_tuple( relationRep,
-                                               entity,
-                                               other,
-                                               srcEntityRep->second.second,
-                                               otherRep->second.second )));
+                std::make_tuple( relationRep,
+                  entity,
+                  other,
+                  srcEntityRep->second.second,
+                  otherRep->second.second )));
           }
 
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
@@ -234,7 +240,7 @@ namespace nslib
           entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
 
         _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
-                                            _maxNeuronsPerPopulation );
+          _maxNeuronsPerPopulation );
 
         needToClear = ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation );
 
@@ -258,12 +264,12 @@ namespace nslib
         auto newAbsoluteWeight = fabsf(
           ( relProperties->getProperty( "Weight Type" ).
             value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-            shiftgen::ConnectsWith::TFixedOrDistribution::Fixed  ?
+              shiftgen::ConnectsWith::TFixedOrDistribution::Fixed  ?
             relProperties->getProperty( "Weight" ).value< float >( ) :
             relProperties->getProperty( "Weight Gaussian Mean" ).value< float >( )));
 
         _maxAbsoluteWeight= std::max( newAbsoluteWeight,
-                                      _maxAbsoluteWeight );
+          _maxAbsoluteWeight );
 
         needToClear = ( _maxAbsoluteWeight != oldMaxAbsoluteWeight );
       }

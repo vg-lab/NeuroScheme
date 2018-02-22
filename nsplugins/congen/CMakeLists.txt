@@ -63,6 +63,8 @@ set( NSLIBCONGEN_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
   ConnectionArrowItem.cpp
   ConnectionArrowRep.cpp
+  AutoConnectionArrowItem.cpp
+  AutoConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
   NeuronPopRep.cpp
@@ -76,6 +78,8 @@ set( NSLIBCONGEN_HEADERS
   ${SHIFT_GENERATED_HEADERS_FILES}
   ConnectionArrowItem.h
   ConnectionArrowRep.h
+  AutoConnectionArrowItem.h
+  AutoConnectionArrowRep.h
   DataLoader.h
   Domain.h
   NeuronPopRep.h
