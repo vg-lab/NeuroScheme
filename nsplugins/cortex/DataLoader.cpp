@@ -260,25 +260,25 @@ namespace nslib
       //fires::PropertyManager::clear( );
       _entities.clear( );
 
-      _entities.relationships( )[ "isParentOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne;
+      // _entities.relationships( )[ "isParentOf" ] =
+      //   new shift::RelationshipOneToN( "isParentOf" );
+      // _entities.relationships( )[ "isChildOf" ] =
+      //   new shift::RelationshipOneToOne( "isChildOf" );
 
-      _entities.relationships( )[ "isAGroupOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isPartOf" ] =
-        new shift::RelationshipOneToN;
+      // _entities.relationships( )[ "isAGroupOf" ] =
+      //   new shift::RelationshipOneToN( "isAGroupOf" );
+      // _entities.relationships( )[ "isPartOf" ] =
+      //   new shift::RelationshipOneToN( "isPartOf" );
 
-      _entities.relationships( )[ "isSuperEntityOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isSubEntityOf" ] =
-        new shift::RelationshipOneToOne;
+      // _entities.relationships( )[ "isSuperEntityOf" ] =
+      //   new shift::RelationshipOneToN( "isSuperEntityOf" );
+      // _entities.relationships( )[ "isSubEntityOf" ] =
+      //   new shift::RelationshipOneToOne( "isSubEntityOf" );
 
-      _entities.relationships( )[ "connectsTo" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "connectedBy" ] =
-        new shift::RelationshipOneToN;
+      // _entities.relationships( )[ "connectsTo" ] =
+      //   new shift::RelationshipOneToN( "connectsTo" );
+      // _entities.relationships( )[ "connectedBy" ] =
+      //   new shift::RelationshipOneToN( "connectedBy" );
 
       auto& relParentOf =
         *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
@@ -702,6 +702,7 @@ namespace nslib
         shift::Entity* colEntity =
           new Column(
             uint( col->id( )),
+            0, 0, 0, 0, 0,
             col->numberOfNeurons( false ),
             col->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL ),
             col->numberOfNeurons( false, nsol::Neuron::INTERNEURON ),
@@ -937,10 +938,28 @@ namespace nslib
           // fires::PropertyManager::registerProperty(
           //   mcEntity, "Id", mc->id( ));
 
+          shift::Relationship::Establish(
+            relParentOf, relChildOf, colEntity, mcEntity);
+
           _entities.add( mcEntity );
-          relChildOf[ mcEntity->entityGid( ) ].entity = colEntity->entityGid( );
-          relParentOf[ colEntity->entityGid( ) ].insert(
-            std::make_pair( mcEntity->entityGid( ), nullptr ));
+          // relParentOf[ colEntity->entityGid( ) ].insert(
+          //   std::make_pair( mcEntity->entityGid( ), nullptr ));
+          // relChildOf[ mcEntity->entityGid( ) ].entity = colEntity->entityGid( );
+
+          //colEntity->setRelatedDependencies( "isParentOf", mcEntity );
+          //mcEntity->registerProperty( "Nb of neurons", uint( mc->numberOfNeurons( false )));
+          // fires::DependenciesManager::addDependency( colEntity, "Nb of neurons",
+          //                                            mcEntity, "Num Neurons" );
+
+          // fires::DependenciesManager::setUpdater(
+          //   colEntity, "Nb of neurons",
+          //   ( nslib::cortex::shiftgen::Column* ) colEntity, &Column::autoUpdateProperty );
+
+          // mcEntity->setProperty( "Num Neurons", ( uint ) mc->numberOfNeurons( false ));
+          // mcEntity->setProperty( "Id", ( uint ) mc->id( ));
+          //mcEntity->setProperty( "Nb of neurons", uint( 10 ));
+          //colEntity->getProperty( "Nb of neurons" );
+//          colEntity->getProperty( "Nb of neurons mean" );
 
           ///////////////////////////////////////////
           // Neurons ////////////////////////////////
@@ -1028,10 +1047,14 @@ namespace nslib
 
 
             _entities.add( neuronEntity );
-            relChildOf[ neuronEntity->entityGid( ) ].entity =
-              mcEntity->entityGid( );
-            relParentOf[ mcEntity->entityGid( ) ].insert(
-              std::make_pair( neuronEntity->entityGid( ), nullptr ));
+
+            shift::Relationship::Establish( relParentOf, relChildOf,
+                                            neuronEntity, colEntity);
+
+            // relChildOf[ neuronEntity->entityGid( ) ].entity =
+            //   mcEntity->entityGid( );
+            // relParentOf[ mcEntity->entityGid( ) ].insert(
+            //   std::make_pair( neuronEntity->entityGid( ), nullptr ));
 
             relGroupOf[ mcEntity->entityGid( ) ].insert(
               std::make_pair( neuronEntity->entityGid( ), nullptr ));
@@ -1141,9 +1164,9 @@ namespace nslib
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
       {
-        shift::Entity::EntityGid preNeuronGid =
+        auto preNeuronGid =
           neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )]->entityGid( );
-        shift::Entity::EntityGid postNeuronGid =
+        auto postNeuronGid =
           neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )]->entityGid( );
 
         auto connectsToIt = relConnectsTo.find( preNeuronGid );

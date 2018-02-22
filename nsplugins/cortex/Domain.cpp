@@ -263,24 +263,24 @@ namespace nslib
       _entities.clear( );
 
       _entities.relationships( )[ "isParentOf" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "isParentOf" );
       _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne;
+        new shift::RelationshipOneToOne( "isChildOf" );
 
       _entities.relationships( )[ "isAGroupOf" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "isAGroupOf" );
       _entities.relationships( )[ "isPartOf" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "isPartOf" );
 
       _entities.relationships( )[ "isSuperEntityOf" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "isSuperEntityOf" );
       _entities.relationships( )[ "isSubEntityOf" ] =
-        new shift::RelationshipOneToOne;
+        new shift::RelationshipOneToOne( "isSubEntityOf" );
 
       _entities.relationships( )[ "connectsTo" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "connectsTo" );
       _entities.relationships( )[ "connectedBy" ] =
-        new shift::RelationshipOneToN;
+        new shift::RelationshipOneToN( "connectedBy");
 
     }
 

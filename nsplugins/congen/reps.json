@@ -1,7 +1,7 @@
 {
     "name": "congen",
     "namespace": "nslib::congen::shiftgen",
-    "reps": [
+    "entities": [
         {
             "name": "NeuronPopRep",
             "includes" : [ "<nslib/Color.h>" ],

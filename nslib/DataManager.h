@@ -52,7 +52,7 @@ namespace nslib
 #endif
 
   protected:
-    static shift::EntitiesWithRelationships _entities;
+    //static shift::EntitiesWithRelationships _entities;
     static shift::Entities _rootEntities;
 
 #ifdef NEUROSCHEME_USE_NSOL

@@ -168,7 +168,7 @@ namespace nslib
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
 
-            const std::unordered_multimap< shift::Entity::EntityGid,
+            const std::unordered_multimap< shift::EntityGid,
                                      shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
             auto relMMapIt = relMMap.find( other->entityGid( ));

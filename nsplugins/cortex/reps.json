@@ -1,7 +1,7 @@
 {
     "name": "cortex",
     "namespace": "nslib::cortex::shiftgen",
-    "reps": [
+    "entities": [
         {
             "name": "Ring",
             "includes" : [ "<nslib/Color.h>" ],

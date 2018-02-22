@@ -1,7 +1,7 @@
 {
     "name": "cortex",
     "namespace": "nslib::cortex::shiftgen",
-    "reps": [
+    "entities": [
         {
             "name": "Neuron",
             "namespace": "nslib::cortex::shiftgen",
@@ -136,64 +136,139 @@
                     "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
+                    "name": "Nb of neurons",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "SUM",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Num Neurons",
+                            "entities" : [ "MiniColumn" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Nb of neurons mean",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MEAN",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Num Neurons",
+                            "entities" : [ "MiniColumn" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Nb of neurons max",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MAX",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Num Neurons",
+                            "entities" : [ "MiniColumn" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Nb of neurons min",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MIN",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Num Neurons",
+                            "entities" : [ "MiniColumn" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Nb of minicols",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "COUNT",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Id",
+                            "entities" : [ "MiniColumn" ]
+                        }
+                    }
+                },
+                {
                     "name": "Num Neurons",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyramidals",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Interneurons",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 1",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 2",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 3",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 4",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 5",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 6",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 1",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 2",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 3",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 4",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 5",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 6",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "meanSomaVolume",
@@ -281,63 +356,63 @@
                 },
                 {
                     "name": "Num Neurons",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyramidals",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Interneurons",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 1",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 2",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 3",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 4",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 5",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Pyr Layer 6",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 1",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 2",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 3",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 4",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 5",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "Num Inter Layer 6",
-                    "type": "float"
+                    "type": "uint"
                 },
                 {
                     "name": "meanSomaVolume",
