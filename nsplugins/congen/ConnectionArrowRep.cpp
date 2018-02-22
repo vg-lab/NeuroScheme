@@ -46,12 +46,20 @@ namespace nslib
     QGraphicsItem*
     ConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-      if( create && ( _items.find( scene ) == _items.end( )) &&
-        !_items[ scene ] )
+
+      QGraphicsItem* item;
+      auto it = _items.find( scene );
+      if ( create && it == _items.end())
       {
-        _items[ scene ] = new ConnectionArrowItem( *this );
+        item = new ConnectionArrowItem( *this );
+        _items.insert( std::make_pair( scene, item ));
       }
-      return _items.at( scene );
+      else
+      {
+        item = it->second;
+      }
+
+      return item;
     }
 
     void ConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )

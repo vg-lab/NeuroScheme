@@ -122,12 +122,19 @@ namespace nslib
     QGraphicsItem*
     AutoConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-      if ( create && ( _items.find( scene ) == _items.end( )) &&
-        !_items[ scene ] )
+      QGraphicsItem* item;
+      auto it = _items.find( scene );
+      if ( create && it == _items.end())
       {
-        _items[ scene ] = new AutoConnectionArrowItem( *this );
+        item = new AutoConnectionArrowItem( *this );
+        _items.insert( std::make_pair( scene, item ));
       }
-      return _items.at( scene );
+      else
+      {
+        item = it->second;
+      }
+
+      return item;
     }
 
   } // namespace congen
