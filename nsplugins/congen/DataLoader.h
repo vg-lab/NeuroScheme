@@ -57,6 +57,8 @@ namespace nslib
       static bool _loadProjection(
         QXmlStreamReader& xml,
         const std::unordered_map< std::string, unsigned int >& popNameToGid );
+      static float _maxAbsoluteWeight;
+      static unsigned int _maxNeuronsPerPopulation;
 
     };
   }

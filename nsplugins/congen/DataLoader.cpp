@@ -32,6 +32,10 @@ namespace nslib
 {
   namespace congen
   {
+
+    float DataLoader::_maxAbsoluteWeight = 0.0f;
+    unsigned int DataLoader::_maxNeuronsPerPopulation = 0;
+
     using NeuronPop = shiftgen::NeuronPop;
 
     bool DataLoader::cliLoadData(
@@ -83,7 +87,14 @@ namespace nslib
         {
           attributes = xml.attributes( );
           if( attributes.hasAttribute( "population_size" ))
+          {
             popSize = attributes.value( "population_size" ).toUInt( );
+            if( popSize > _maxNeuronsPerPopulation )
+            {
+              _maxNeuronsPerPopulation=popSize;
+            }
+          }
+
         }
         xml.skipCurrentElement( ); // pop_location
       }
@@ -158,6 +169,10 @@ namespace nslib
           {
             weight = xml.text( ).toFloat( );
             weightTextProcessed = true;
+            if( weight > _maxAbsoluteWeight )
+            {
+              _maxAbsoluteWeight=weight;
+            }
           }
           if ( lastGaussianPossibleElement == "internal_delay" && !delayTextProcessed )
           {
@@ -294,6 +309,8 @@ namespace nslib
       fires::PropertyManager::clear( );
       entities.clear( );
       rootEntities.clear( );
+      _maxAbsoluteWeight = 0.0f;
+      _maxNeuronsPerPopulation = 0;
 
       QFile qFile ( fileName.c_str( ));
       if ( ! qFile.exists( ))
@@ -339,7 +356,13 @@ namespace nslib
           retVal |= _loadProjection( xml, popNameToGid );
       }
 
+      auto repCreator = ( RepresentationCreator*)
+        nslib::RepresentationCreatorManager::getCreator();
+      repCreator->maxAbsoluteWeight( _maxAbsoluteWeight );
+      repCreator->maxNeuronsPerPopulation( _maxNeuronsPerPopulation );
+
       return retVal;
+
 
     }
   } // namespace congen

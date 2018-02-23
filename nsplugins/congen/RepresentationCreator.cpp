@@ -277,5 +277,16 @@ namespace nslib
       return needToClear;
     }
 
+    void RepresentationCreator::maxAbsoluteWeight( float maxAbsoluteWeight_ )
+    {
+      _maxAbsoluteWeight = maxAbsoluteWeight_;
+    }
+
+    void RepresentationCreator::maxNeuronsPerPopulation( float
+    maxNeuronsPerPopulation_)
+    {
+      _maxNeuronsPerPopulation = maxNeuronsPerPopulation_;
+    }
+
   } // namespace congen
 } // namespace nslib
