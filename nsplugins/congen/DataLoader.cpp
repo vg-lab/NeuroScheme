@@ -291,10 +291,10 @@ namespace nslib
         *( entities.relationships( )[ "connectsTo" ]->asOneToN( ));
       auto& relConnectedBy =
         *( entities.relationships( )[ "connectedBy" ]->asOneToN( ));
-      relConnectsTo[ targetGid ].insert(
-        std::make_pair( sourceGid, connProps ));
-      relConnectedBy[ sourceGid ].insert(
-        std::make_pair( targetGid, nullptr ));
+      relConnectsTo[ sourceGid ].insert(
+        std::make_pair( targetGid, connProps ));
+      relConnectedBy[ targetGid ].insert(
+        std::make_pair( sourceGid, nullptr ));
       connProps->label( ) = projName;
 
       return !xml.hasError( );
@@ -302,8 +302,6 @@ namespace nslib
 
     bool DataLoader::loadNeuroML( const std::string& fileName )
     {
-      //TODO: compute maximums
-
       auto& entities = nslib::DataManager::entities( );
       auto& rootEntities = nslib::DataManager::rootEntities( );
       fires::PropertyManager::clear( );
@@ -356,6 +354,7 @@ namespace nslib
           retVal |= _loadProjection( xml, popNameToGid );
       }
 
+      // Sets new maximum and minimum in the RepresentationCreator
       auto repCreator = ( RepresentationCreator*)
         nslib::RepresentationCreatorManager::getCreator();
       repCreator->maxAbsoluteWeight( _maxAbsoluteWeight );
