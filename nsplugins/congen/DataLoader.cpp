@@ -32,10 +32,6 @@ namespace nslib
 {
   namespace congen
   {
-
-    float DataLoader::_maxAbsoluteWeight = 0.0f;
-    unsigned int DataLoader::_maxNeuronsPerPopulation = 0;
-
     using NeuronPop = shiftgen::NeuronPop;
 
     bool DataLoader::cliLoadData(
@@ -66,7 +62,8 @@ namespace nslib
 
     bool DataLoader::_loadPopulation(
       QXmlStreamReader& xml,
-      std::unordered_map< std::string, unsigned int >& popNameToGid )
+      std::unordered_map< std::string, unsigned int >& popNameToGid,
+      unsigned int& maxNeuronsPerPopulation )
     {
       auto attributes = xml.attributes( );
       std::string popName;
@@ -89,9 +86,9 @@ namespace nslib
           if( attributes.hasAttribute( "population_size" ))
           {
             popSize = attributes.value( "population_size" ).toUInt( );
-            if( popSize > _maxNeuronsPerPopulation )
+            if( popSize > maxNeuronsPerPopulation )
             {
-              _maxNeuronsPerPopulation=popSize;
+              maxNeuronsPerPopulation = popSize;
             }
           }
 
@@ -121,7 +118,8 @@ namespace nslib
 
     bool DataLoader::_loadProjection(
       QXmlStreamReader& xml,
-      const std::unordered_map< std::string, unsigned int >& popNameToGid )
+      const std::unordered_map< std::string, unsigned int >& popNameToGid,
+      float& maxAbsoluteWeight)
     {
       std::string projName, targetName, sourceName;
       auto attributes = xml.attributes( );
@@ -169,9 +167,9 @@ namespace nslib
           {
             weight = xml.text( ).toFloat( );
             weightTextProcessed = true;
-            if( weight > _maxAbsoluteWeight )
+            if( weight > maxAbsoluteWeight )
             {
-              _maxAbsoluteWeight=weight;
+              maxAbsoluteWeight = weight;
             }
           }
           if ( lastGaussianPossibleElement == "internal_delay" && !delayTextProcessed )
@@ -307,8 +305,8 @@ namespace nslib
       fires::PropertyManager::clear( );
       entities.clear( );
       rootEntities.clear( );
-      _maxAbsoluteWeight = 0.0f;
-      _maxNeuronsPerPopulation = 0;
+      float maxAbsoluteWeight = 0.0f;
+      unsigned int maxNeuronsPerPopulation = 0;
 
       QFile qFile ( fileName.c_str( ));
       if ( ! qFile.exists( ))
@@ -349,16 +347,16 @@ namespace nslib
           continue;
 
         if ( xml.name( ) == "population" )
-          retVal |= _loadPopulation( xml, popNameToGid );
+          retVal |= _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
         else if ( xml.name( ) == "projection" )
-          retVal |= _loadProjection( xml, popNameToGid );
+          retVal |= _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
       }
 
       // Sets new maximum and minimum in the RepresentationCreator
       auto repCreator = ( RepresentationCreator*)
         nslib::RepresentationCreatorManager::getCreator();
-      repCreator->maxAbsoluteWeight( _maxAbsoluteWeight );
-      repCreator->maxNeuronsPerPopulation( _maxNeuronsPerPopulation );
+      repCreator->maxAbsoluteWeight( maxAbsoluteWeight );
+      repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
 
       return retVal;
 

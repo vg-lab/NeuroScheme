@@ -52,13 +52,13 @@ namespace nslib
     protected:
       static bool _loadPopulation(
         QXmlStreamReader& xml,
-        std::unordered_map< std::string, unsigned int >& popNameToGid );
+        std::unordered_map< std::string, unsigned int >& popNameToGid,
+        unsigned int& maxNeuronsPerPopulation );
 
       static bool _loadProjection(
         QXmlStreamReader& xml,
-        const std::unordered_map< std::string, unsigned int >& popNameToGid );
-      static float _maxAbsoluteWeight;
-      static unsigned int _maxNeuronsPerPopulation;
+        const std::unordered_map< std::string, unsigned int >& popNameToGid,
+        float& maxAbsoluteWeight );
 
     };
   }
