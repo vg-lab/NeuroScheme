@@ -114,7 +114,7 @@ namespace nslib
        * @param arcSizeFactor_ positive float that calculates a size for the arc
        * based on the size of the NeuronPop glyph it's associated with
        */
-      void setArcSizeFactor( float arcSizeFactor_ );
+      void arcSizeFactor( float arcSizeFactor_ );
 
       /**
        * Sets the _centersDistFactor, which determines the distance between
@@ -124,7 +124,7 @@ namespace nslib
        * to. -1.0f hides the arrow inside the glyph, while 1.0f makes its arc
        * tangent to the glyph
        */
-      void setCentersDistFactor( float centersDistFactor_ );
+      void centersDistFactor( float centersDistFactor_ );
 
     protected:
 

@@ -250,13 +250,13 @@ namespace nslib
     }
 
     void
-    AutoConnectionArrowItem::setCentersDistFactor( float centersDistFactor_ )
+    AutoConnectionArrowItem::centersDistFactor( float centersDistFactor_ )
     {
       _centersDistFactor = centersDistFactor_;
       glyphRadius = 0.0f;
     }
 
-    void AutoConnectionArrowItem::setArcSizeFactor( float arcSizeFactor_ )
+    void AutoConnectionArrowItem::arcSizeFactor( float arcSizeFactor_ )
     {
       _arcSizeFactor = arcSizeFactor_;
       glyphRadius = 0.0f;
