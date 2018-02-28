@@ -57,30 +57,9 @@
                             "entities" : [ "NeuronPop", "NeuronSuperPop" ]
                         }
                     }
-                },
-                {
-                    "name": "Neuron model",
-                    "type": "NeuronPop::TNeuronModel",
-                    "flags": [],
-                    "auto":
-                    {
-                        "op": "HISTO",
-                        "children":
-                        [
-                        ]
-                    }
                 }
             ],
-            "types": [
-                {
-                    "class": "enum",
-                    "name": "TNeuronModel",
-                    "values": [
-                        "iaf psc alpha",
-                        "undefined"
-                    ]
-                }
-            ]
+            "types": []
         },
         {
             "name": "ConnectsWith",

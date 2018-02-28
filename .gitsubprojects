@@ -3,6 +3,6 @@
 #git_subproject(ZeroEQ https://github.com/HBPVis/ZeroEQ.git 1e66ee3)
 #git_subproject(Lexis https://github.com/HBPVis/Lexis.git 617eedb)
 #git_subproject(gmrvlex git@gitlab.gmrv.es:nsviz/gmrvlex.git c20b194)
-git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git 02159ad)
+git_subproject(ShiFT git@gitlab.gmrv.es:nsviz/ShiFT.git 06f9510)
 git_subproject(scoop git@gitlab.gmrv.es:gmrv/scoop.git cc02a23)
 #git_subproject(nsol git@gitlab.gmrv.es:nsviz/nsol.git 17a6aaa)

@@ -136,83 +136,52 @@
                     "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
-                    "name": "Nb of neurons",
-                    "type": "uint",
-                    "flags": [],
-                    "auto":
-                    {
-                        "op": "SUM",
-                        "source":
-                        {
-                            "relName" : "isParentOf",
-                            "property" : "Num Neurons",
-                            "entities" : [ "MiniColumn" ]
-                        }
-                    }
-                },
-                {
-                    "name": "Nb of neurons mean",
-                    "type": "uint",
-                    "flags": [],
-                    "auto":
-                    {
-                        "op": "MEAN",
-                        "source":
-                        {
-                            "relName" : "isParentOf",
-                            "property" : "Num Neurons",
-                            "entities" : [ "MiniColumn" ]
-                        }
-                    }
-                },
-                {
-                    "name": "Nb of neurons max",
-                    "type": "uint",
-                    "flags": [],
-                    "auto":
-                    {
-                        "op": "MAX",
-                        "source":
-                        {
-                            "relName" : "isParentOf",
-                            "property" : "Num Neurons",
-                            "entities" : [ "MiniColumn" ]
-                        }
-                    }
-                },
-                {
-                    "name": "Nb of neurons min",
-                    "type": "uint",
-                    "flags": [],
-                    "auto":
-                    {
-                        "op": "MIN",
-                        "source":
-                        {
-                            "relName" : "isParentOf",
-                            "property" : "Num Neurons",
-                            "entities" : [ "MiniColumn" ]
-                        }
-                    }
-                },
-                {
-                    "name": "Nb of minicols",
+                    "name": "Num Minicolumns",
                     "type": "uint",
                     "flags": [],
                     "auto":
                     {
                         "op": "COUNT",
-                        "source":
-                        {
-                            "relName" : "isParentOf",
-                            "property" : "Id",
-                            "entities" : [ "MiniColumn" ]
-                        }
+                        "source": { "relName" : "isParentOf", "property" : "Id", "entities" : [ "MiniColumn" ] }
                     }
                 },
                 {
                     "name": "Num Neurons",
-                    "type": "uint"
+                    "type": "uint",
+                    "auto":
+                    {
+                        "op": "SUM",
+                        "source": { "relName" : "isParentOf", "property" : "Num Neurons", "entities" : [ "MiniColumn" ]  }
+                    }
+                },
+                {
+                    "name": "Num Neurons Mean",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MEAN",
+                        "source": { "relName" : "isParentOf", "property" : "Num Neurons", "entities" : [ "MiniColumn" ] }
+                    }
+                },
+                {
+                    "name": "Num Neurons Max",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MAX",
+                        "source": { "relName" : "isParentOf", "property" : "Num Neurons", "entities" : [ "MiniColumn" ] }
+                    }
+                },
+                {
+                    "name": "Num Neurons Min",
+                    "type": "uint",
+                    "auto":
+                    {
+                        "op": "MIN",
+                        "source": { "relName" : "isParentOf", "property" : "Num Neurons", "entities" : [ "MiniColumn" ] }
+                    }
                 },
                 {
                     "name": "Num Pyramidals",
