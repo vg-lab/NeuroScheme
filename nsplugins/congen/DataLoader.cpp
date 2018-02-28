@@ -62,7 +62,8 @@ namespace nslib
 
     bool DataLoader::_loadPopulation(
       QXmlStreamReader& xml,
-      std::unordered_map< std::string, unsigned int >& popNameToGid )
+      std::unordered_map< std::string, unsigned int >& popNameToGid,
+      unsigned int& maxNeuronsPerPopulation )
     {
       auto attributes = xml.attributes( );
       std::string popName;
@@ -83,7 +84,14 @@ namespace nslib
         {
           attributes = xml.attributes( );
           if( attributes.hasAttribute( "population_size" ))
+          {
             popSize = attributes.value( "population_size" ).toUInt( );
+            if( popSize > maxNeuronsPerPopulation )
+            {
+              maxNeuronsPerPopulation = popSize;
+            }
+          }
+
         }
         xml.skipCurrentElement( ); // pop_location
       }
@@ -110,7 +118,8 @@ namespace nslib
 
     bool DataLoader::_loadProjection(
       QXmlStreamReader& xml,
-      const std::unordered_map< std::string, unsigned int >& popNameToGid )
+      const std::unordered_map< std::string, unsigned int >& popNameToGid,
+      float& maxAbsoluteWeight)
     {
       std::string projName, targetName, sourceName;
       auto attributes = xml.attributes( );
@@ -158,6 +167,10 @@ namespace nslib
           {
             weight = xml.text( ).toFloat( );
             weightTextProcessed = true;
+            if( weight > maxAbsoluteWeight )
+            {
+              maxAbsoluteWeight = weight;
+            }
           }
           if ( lastGaussianPossibleElement == "internal_delay" && !delayTextProcessed )
           {
@@ -276,10 +289,10 @@ namespace nslib
         *( entities.relationships( )[ "connectsTo" ]->asOneToN( ));
       auto& relConnectedBy =
         *( entities.relationships( )[ "connectedBy" ]->asOneToN( ));
-      relConnectsTo[ targetGid ].insert(
-        std::make_pair( sourceGid, connProps ));
-      relConnectedBy[ sourceGid ].insert(
-        std::make_pair( targetGid, nullptr ));
+      relConnectsTo[ sourceGid ].insert(
+        std::make_pair( targetGid, connProps ));
+      relConnectedBy[ targetGid ].insert(
+        std::make_pair( sourceGid, nullptr ));
       connProps->label( ) = projName;
 
       return !xml.hasError( );
@@ -287,13 +300,13 @@ namespace nslib
 
     bool DataLoader::loadNeuroML( const std::string& fileName )
     {
-      //TODO: compute maximums
-
       auto& entities = nslib::DataManager::entities( );
       auto& rootEntities = nslib::DataManager::rootEntities( );
       fires::PropertyManager::clear( );
       entities.clear( );
       rootEntities.clear( );
+      float maxAbsoluteWeight = 0.0f;
+      unsigned int maxNeuronsPerPopulation = 0;
 
       QFile qFile ( fileName.c_str( ));
       if ( ! qFile.exists( ))
@@ -334,12 +347,19 @@ namespace nslib
           continue;
 
         if ( xml.name( ) == "population" )
-          retVal |= _loadPopulation( xml, popNameToGid );
+          retVal |= _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
         else if ( xml.name( ) == "projection" )
-          retVal |= _loadProjection( xml, popNameToGid );
+          retVal |= _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
       }
 
+      // Sets new maximum and minimum in the RepresentationCreator
+      auto repCreator = ( RepresentationCreator*)
+        nslib::RepresentationCreatorManager::getCreator();
+      repCreator->maxAbsoluteWeight( maxAbsoluteWeight );
+      repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
+
       return retVal;
+
 
     }
   } // namespace congen

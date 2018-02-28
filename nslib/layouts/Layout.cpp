@@ -29,6 +29,7 @@
 #include "../RepresentationCreatorManager.h"
 #include "../reps/CollapseButtonItem.h"
 #include "../SelectionManager.h"
+
 namespace nslib
 {
 
@@ -51,6 +52,7 @@ namespace nslib
     , _name( name_ )
     , _toolbox( new QToolBox( _optionsWidget ))
   {
+    _isGrid = false;
     _optionsWidget->layout( )->addWidget( _toolbox, 0, 0 );
 
     _sortWidget = 0;
@@ -221,7 +223,8 @@ namespace nslib
       _arrangeItems( representations, animate );
     }
 
-    OpConfig opConfig( &_canvas->scene( ), animate );
+    OpConfig opConfig( &_canvas->scene( ), animate, _isGrid );
+
     for ( auto& relationshipRep : relationshipReps )
       relationshipRep->preRender( &opConfig );
   }
