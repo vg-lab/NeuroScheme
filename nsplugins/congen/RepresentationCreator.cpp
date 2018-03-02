@@ -26,6 +26,7 @@
 #include <nslib/Loggers.h>
 #include "RepresentationCreator.h"
 #include <shift_NeuronPop.h>
+#include <shift_NeuronSuperPop.h>
 #include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
 #include "ConnectionArrowRep.h"
@@ -81,16 +82,24 @@ namespace nslib
             representations.push_back( rep );
           continue;
         }
-        if ( dynamic_cast< shiftgen::NeuronPop* >( entity ))
+        if ( dynamic_cast< shiftgen::NeuronPop* >( entity ) ||
+             dynamic_cast< shiftgen::NeuronSuperPop* >( entity ))
         {
-          auto neuronPop = dynamic_cast< shiftgen::NeuronPop* >( entity );
+          auto neuronPop = entity; // dynamic_cast< shiftgen::NeuronPop* >( entity );
           auto neuronPopRep = new NeuronPopRep( );
 
+          if ( neuronPop->hasProperty( "Neuron model" ))
+          {
+            neuronPopRep->setProperty(
+              "color",
+              neuronModelColorMap.getColor(
+                neuronPop->getProperty( "Neuron model" ).
+                value< shiftgen::NeuronPop::TNeuronModel >( )));
+          }
           neuronPopRep->setProperty(
             "color",
-            neuronModelColorMap.getColor(
-              neuronPop->getProperty( "Neuron model" ).
-                value< shiftgen::NeuronPop::TNeuronModel >( )));
+            neuronModelColorMap.getColor( shiftgen::NeuronPop::TNeuronModel::undefined ));
+
           neuronPopRep->setProperty(
             "line perc",
             neuronsToPercentage.map(
@@ -174,11 +183,12 @@ namespace nslib
                 new ConnectionArrowRep( srcEntityRep->second.second,
                   otherRep->second.second );
             }
-            const std::unordered_multimap< shift::Entity::EntityGid,
+            const std::unordered_multimap< shift::EntityGid,
               shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
+
             auto relMMapIt = relMMap.find( other->entityGid( ));
-            if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
+            if ( relMMapIt != relMMap.end( ) )
             {
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle

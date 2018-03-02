@@ -1,7 +1,7 @@
 {
     "name": "congen",
     "namespace": "nslib::congen::shiftgen",
-    "reps": [
+    "entities": [
         {
             "name": "NeuronPop",
             "namespace": "nslib::congen::shiftgen",
@@ -30,6 +30,36 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "NeuronSuperPop",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [],
+            "includes" : [ "<shift_NeuronPop.h>" ],
+            "flags" : [],
+            "properties": [
+                {
+                    "name": "Nb of neurons Mean",
+                    "type": "uint",
+                    "flags": []
+                },
+                {
+                    "name": "Nb of neurons",
+                    "type": "uint",
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "SUM",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Nb of neurons",
+                            "entities" : [ "NeuronPop", "NeuronSuperPop" ]
+                        }
+                    }
+                }
+            ],
+            "types": []
         },
         {
             "name": "ConnectsWith",

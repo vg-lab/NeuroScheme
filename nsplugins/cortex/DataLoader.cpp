@@ -260,27 +260,7 @@ namespace nslib
       //fires::PropertyManager::clear( );
       _entities.clear( );
 
-      _entities.relationships( )[ "isParentOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne;
-
-      _entities.relationships( )[ "isAGroupOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isPartOf" ] =
-        new shift::RelationshipOneToN;
-
-      _entities.relationships( )[ "isSuperEntityOf" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "isSubEntityOf" ] =
-        new shift::RelationshipOneToOne;
-
-      _entities.relationships( )[ "connectsTo" ] =
-        new shift::RelationshipOneToN;
-      _entities.relationships( )[ "connectedBy" ] =
-        new shift::RelationshipOneToN;
-
-      auto& relParentOf =
+      auto& relParentOf=
         *( _entities.relationships( )[ "isParentOf" ]->asOneToN( ));
       auto& relChildOf =
         *( _entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
@@ -671,10 +651,6 @@ namespace nslib
         } // if stats loaded from file
         else if ( withMorphologies )
         {
-          // column_->stats( )->getStat(
-          // nsol::ColumnStats::DENDRITIC_BIFURCATIONS,
-          // nsol::TAggregation::MEAN,
-          // nsol::TAggregation::MEAN ),
           meanSomaArea = col->stats( )->getStat(
             nsol::ColumnStats::SOMA_SURFACE,
             nsol::TAggregation::MEAN,
@@ -692,17 +668,16 @@ namespace nslib
             nsol::TAggregation::MEAN,
             nsol::TAggregation::MEAN );
         }
-        // std::cout << "Creating col with"
-        //           << meanSomaVolume << " "
-        //           << meanSomaArea << " "
-        //           << meanDendsVolume << " "
-        //           << meanDendsArea <<  " "
-        //           << meanCenter << std::endl;
+
 
         shift::Entity* colEntity =
           new Column(
-            uint( col->id( )),
+            uint( col->id( )), // Id
+            0, // Num Minicolumns
             col->numberOfNeurons( false ),
+            0, // Num Neurons Mean
+            0, // Num Neurons Max
+            0, // Num Neurons Min
             col->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL ),
             col->numberOfNeurons( false, nsol::Neuron::INTERNEURON ),
             col->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL, 1 ),
@@ -778,9 +753,6 @@ namespace nslib
           neuronTypeAggregationEntity->label( ) = "c" +
             std::to_string( uint( col->id( ))) + "i" + std::to_string( i );
         }
-
-        // fires::PropertyManager::registerProperty(
-        //     colEntity, "Id", col->id( ));
 
         _entities.add( colEntity );
         relParentOf[ 0 ].insert( std::make_pair( colEntity->entityGid( ),
@@ -934,13 +906,10 @@ namespace nslib
               std::to_string( uint( mc->id( ))) + "i" + std::to_string( i );
           }
 
-          // fires::PropertyManager::registerProperty(
-          //   mcEntity, "Id", mc->id( ));
+          shift::Relationship::Establish(
+            relParentOf, relChildOf, colEntity, mcEntity);
 
           _entities.add( mcEntity );
-          relChildOf[ mcEntity->entityGid( ) ].entity = colEntity->entityGid( );
-          relParentOf[ colEntity->entityGid( ) ].insert(
-            std::make_pair( mcEntity->entityGid( ), nullptr ));
 
           ///////////////////////////////////////////
           // Neurons ////////////////////////////////
@@ -1028,10 +997,9 @@ namespace nslib
 
 
             _entities.add( neuronEntity );
-            relChildOf[ neuronEntity->entityGid( ) ].entity =
-              mcEntity->entityGid( );
-            relParentOf[ mcEntity->entityGid( ) ].insert(
-              std::make_pair( neuronEntity->entityGid( ), nullptr ));
+
+            shift::Relationship::Establish( relParentOf, relChildOf,
+                                            neuronEntity, colEntity);
 
             relGroupOf[ mcEntity->entityGid( ) ].insert(
               std::make_pair( neuronEntity->entityGid( ), nullptr ));
@@ -1053,16 +1021,7 @@ namespace nslib
               shift::Relationship::Establish(
               relGroupOf, relPartOf,
                 colLayerEntities[ layer ], neuronEntity );
-              // relGroupOf[ mcLayerEntities[ layer ]->entityGid( ) ].insert(
-              //   neuronEntity->entityGid( ));
-              // relPartOf[ neuronEntity->entityGid( ) ].insert(
-              //   mcLayerEntities[ layer ]->entityGid( ));
-
-              // relGroupOf[ colLayerEntities[ layer ]->entityGid( ) ].insert(
-              //   neuronEntity->entityGid( ));
-              // relPartOf[ neuronEntity->entityGid( ) ].insert(
-              //   colLayerEntities[ layer ]->entityGid( ));
-            }
+              }
             }
 
 
@@ -1110,11 +1069,6 @@ namespace nslib
               }
             }
 
-            // ( void ) mcLayerEntities;
-            // ( void ) colLayerEntities;
-            // ( void ) relPartOf;
-            // ( void ) relGroupOf;
-
             neuronEntitiesByGid[ neuron->gid( )] = neuronEntity;
           } // for all neurons
 
@@ -1141,9 +1095,9 @@ namespace nslib
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
       {
-        shift::Entity::EntityGid preNeuronGid =
+        auto preNeuronGid =
           neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )]->entityGid( );
-        shift::Entity::EntityGid postNeuronGid =
+        auto postNeuronGid =
           neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )]->entityGid( );
 
         auto connectsToIt = relConnectsTo.find( preNeuronGid );

@@ -30,8 +30,6 @@
 
 namespace nslib
 {
-  shift::EntitiesWithRelationships DataManager::_entities =
-    shift::EntitiesWithRelationships( );
   shift::Entities DataManager::_rootEntities =
     shift::Entities( );
 #ifdef NEUROSCHEME_USE_NSOL
@@ -40,7 +38,8 @@ namespace nslib
 
   shift::EntitiesWithRelationships& DataManager::entities( void )
   {
-    return _entities;
+    return shift::EntitiesWithRelationships::entities( );
+    // return _entities;
   }
 
 #ifdef NEUROSCHEME_USE_NSOL

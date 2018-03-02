@@ -393,7 +393,7 @@ namespace nslib
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
 
-            std::unordered_multimap< shift::Entity::EntityGid,
+            std::unordered_multimap< shift::EntityGid,
                                      shift::RelationshipProperties* > relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
             auto relMMapIt = relMMap.find( other->entityGid( ));
@@ -502,13 +502,13 @@ namespace nslib
         roundf(
           neuronsToPercentage.map(
             entity->getProperty( "Num Pyramidals" ).
-            value< float >( ))));
+            value< uint >( ))));
       layerRep->setProperty(
         "rightPerc",
         roundf(
           neuronsToPercentage.map(
             entity->getProperty( "Num Interneurons" ).
-            value< float >( ))));
+            value< uint >( ))));
       layersReps.push_back( layerRep );
 
 
@@ -536,14 +536,14 @@ namespace nslib
               entity->getProperty(
                 std::string( "Num Pyr Layer " ) +
                 std::to_string( layer )).
-              value< float >( )));
+              value< uint >( )));
         layerRep->setProperty(
           "rightPerc",
             layerNeuronsToPercentage.map(
               entity->getProperty(
                 std::string( "Num Inter Layer " ) +
                 std::to_string( layer )).
-              value< float >( )));
+              value< uint >( )));
         layersReps.push_back( layerRep );
       }
       rep->registerProperty( "layers", layersReps );

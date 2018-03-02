@@ -87,7 +87,7 @@ namespace nslib
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
       typedef std::map<
-        std::pair< shift::Entity::EntityGid,
+        std::pair< shift::EntityGid,
                    std::pair< unsigned int,
                               std::pair< unsigned int, unsigned int>>>,
       LayerRep* > LayersMap;
@@ -99,7 +99,7 @@ namespace nslib
                                          c, std::make_pair( d, e ))))
 
       typedef std::map<
-        std::pair< shift::Entity::EntityGid,
+        std::pair< shift::EntityGid,
                    std::pair< unsigned int,
                               std::pair< unsigned int,
                                          std::pair< unsigned int,
@@ -109,7 +109,7 @@ namespace nslib
       void _createColumnOrMiniColumn(
         shift::Entity *obj,
         shift::Representation* rep,
-        shift::Entity::EntityGid entityGid,
+        shift::EntityGid entityGid,
         unsigned int id,
         unsigned int columnOrMiniColumn,
         MapperFloatToFloat& somaAreaToAngle,
