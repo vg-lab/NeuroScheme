@@ -60,7 +60,7 @@ namespace nslib
     }
 
 
-    bool DataLoader::_loadPopulation(
+    void DataLoader::_loadPopulation(
       QXmlStreamReader& xml,
       std::unordered_map< std::string, unsigned int >& popNameToGid,
       unsigned int& maxNeuronsPerPopulation )
@@ -113,10 +113,9 @@ namespace nslib
       entities.add( neuronPop );
       rootEntities.add( neuronPop );
 
-      return true;
     }
 
-    bool DataLoader::_loadProjection(
+    void DataLoader::_loadProjection(
       QXmlStreamReader& xml,
       const std::unordered_map< std::string, unsigned int >& popNameToGid,
       float& maxAbsoluteWeight)
@@ -295,7 +294,6 @@ namespace nslib
         std::make_pair( sourceGid, nullptr ));
       connProps->label( ) = projName;
 
-      return !xml.hasError( );
     }
 
     bool DataLoader::loadNeuroML( const std::string& fileName )
@@ -337,8 +335,6 @@ namespace nslib
       std::unordered_map< std::string, unsigned int > popNameToGid;
       xml.readNextStartElement( ); // to skip neuroml
 
-      bool retVal = true;
-
       while( !xml.atEnd( ) && !xml.hasError( ))
       {
         bool f = xml.readNextStartElement( );
@@ -347,9 +343,9 @@ namespace nslib
           continue;
 
         if ( xml.name( ) == "population" )
-          retVal |= _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
+          _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
         else if ( xml.name( ) == "projection" )
-          retVal |= _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
+          _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
       }
 
       // Sets new maximum and minimum in the RepresentationCreator
@@ -358,7 +354,7 @@ namespace nslib
       repCreator->maxAbsoluteWeight( maxAbsoluteWeight );
       repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
 
-      return retVal;
+      return true;
 
 
     }

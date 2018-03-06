@@ -50,12 +50,12 @@ namespace nslib
       static bool loadNeuroML( const std::string& fileName );
 
     protected:
-      static bool _loadPopulation(
+      static void _loadPopulation(
         QXmlStreamReader& xml,
         std::unordered_map< std::string, unsigned int >& popNameToGid,
         unsigned int& maxNeuronsPerPopulation );
 
-      static bool _loadProjection(
+      static void _loadProjection(
         QXmlStreamReader& xml,
         const std::unordered_map< std::string, unsigned int >& popNameToGid,
         float& maxAbsoluteWeight );
