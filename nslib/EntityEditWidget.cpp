@@ -43,6 +43,7 @@ namespace nslib
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
   bool EntityEditWidget::_autoCloseChecked = false;
   bool EntityEditWidget::_checkUniquenessChecked = false;
+  std::map<std::string,int> EntityEditWidget::nameMap;
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
@@ -204,6 +205,7 @@ namespace nslib
       numEles = _numNewEntities->text( ).toInt( );
     }
 
+    std::string originalNewEntityLabel = _entityLabel->text( ).toStdString( );
     for (unsigned int i=0;i<numEles;++i)
     {
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
@@ -215,11 +217,73 @@ namespace nslib
 
       assert ( _entity );
 
-      if ( numEles > 1 )
-        _entity->label( ) = QString( _entityLabel->text( ) + "_" +
-                                     QString::number( i )).toStdString( );
+      std::string newEntityLabel;
+
+       newEntityLabel = originalNewEntityLabel;
+
+      /**/
+      //Check string uniquenes, map complexity
+      auto mapSearch = nameMap.find( originalNewEntityLabel );
+      if( mapSearch == nameMap.end( ) )
+      {
+        //name not already used so it's added a new string to the map
+        nameMap.insert(
+            std::pair<std::string, int>( originalNewEntityLabel, 0 ));
+        newEntityLabel = originalNewEntityLabel;
+      }
       else
-        _entity->label( ) = _entityLabel->text( ).toStdString( );
+      {
+        //name already used so its label and map are modified
+
+        int newEntityNumber = 1 + mapSearch->second;
+        newEntityLabel = originalNewEntityLabel + "_" +
+                         QString::number( newEntityNumber ).toStdString( );
+        //check that new label neither it's already found in the map
+        auto mapSecondSearch = nameMap.find( newEntityLabel );
+        while( mapSecondSearch != nameMap.end( ))
+        {
+          if( mapSecondSearch->second == 0 )
+          {
+            nameMap.erase( mapSecondSearch );
+          }
+          ++newEntityNumber;
+          newEntityLabel = originalNewEntityLabel + "_" +
+                           QString::number( newEntityNumber ).toStdString( );
+          mapSecondSearch = nameMap.find( newEntityLabel );
+        }
+        mapSearch->second = newEntityNumber;
+        std::cout << "ERROR NAME: " << originalNewEntityLabel
+                  << " DUPLICATED INSTEAD USING NAME: "
+                  << newEntityLabel << std::endl;
+      }
+
+      //*/
+      /**
+      //check string uniqueness (excesive complexity)
+      bool continueSearch = true, nameEdited = false;
+      for( int a = 0; continueSearch; a++ )
+      {
+        continueSearch = false;
+        for( auto existingEntity : DataManager::entities( ).vector( ))
+        {
+          if( newEntityLabel == existingEntity->label( ))
+          {
+            newEntityLabel = originalNewEntityLabel + "_" +
+              QString::number( i + a ).toStdString( );
+            nameEdited = true;
+            continueSearch = true;
+            break;
+
+          }
+        }
+      }
+      if( nameEdited )
+      {
+        std::cout << "ERROR NAME: " << originalNewEntityLabel
+                  << " DUPLICATED INSTEAD USING NAME: "
+                  << newEntityLabel << std::endl;
+      }//*/
+      _entity->label( ) = newEntityLabel;
 
       for ( const auto& entityParam: _entityParamCont )
       {
@@ -229,8 +293,7 @@ namespace nslib
         bool isEditable = origEntity->hasPropertyFlag(
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
-        if ( ( _action == EDIT_ENTITY ) &&
-             !isEditable )
+        if ( ( _action == EDIT_ENTITY ) && !isEditable )
         {
           continue;
         }

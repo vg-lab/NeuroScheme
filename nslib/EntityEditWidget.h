@@ -77,6 +77,8 @@ namespace nslib
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
     static bool _checkUniquenessChecked;
+
+    static std::map<std::string,int> nameMap;
   };
 }
 
