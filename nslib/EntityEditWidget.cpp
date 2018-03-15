@@ -43,7 +43,6 @@ namespace nslib
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
   bool EntityEditWidget::_autoCloseChecked = false;
   bool EntityEditWidget::_checkUniquenessChecked = false;
-  std::map<std::string,int> EntityEditWidget::nameMap;
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
@@ -73,7 +72,8 @@ namespace nslib
         widgetType = TWidgetType::LINE_EDIT;
         _entityLabel.reset( new QLineEdit( ));
         widget = _entityLabel.get( );
-        QString propName( QString::fromStdString( entity->label( )));
+        QString propName( QString::fromStdString(
+          entity->getProperty( "shiftLabel" ).value< std::string >( )));
         _entityLabel->setText( propName );
         _entityLabel->setEnabled( true );
         gridLayout->addWidget( widget, element, 1 );
@@ -122,7 +122,7 @@ namespace nslib
             auto lineEditwidget = new QLineEdit;
             widget = lineEditwidget;
             lineEditwidget->setText( QString::fromStdString(
-                                       caster->toString( propPair.second )));
+              caster->toString( propPair.second )));
             lineEditwidget->setEnabled( isEditable );
           }
           gridLayout->addWidget( widget, element, 1 );
@@ -205,7 +205,6 @@ namespace nslib
       numEles = _numNewEntities->text( ).toInt( );
     }
 
-    std::string originalNewEntityLabel = _entityLabel->text( ).toStdString( );
     for (unsigned int i=0;i<numEles;++i)
     {
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
@@ -216,74 +215,18 @@ namespace nslib
       QList< QString > errorMessages;
 
       assert ( _entity );
+      std::string labelString;
 
-      std::string newEntityLabel;
-
-       newEntityLabel = originalNewEntityLabel;
-
-      /**/
-      //Check string uniquenes, map complexity
-      auto mapSearch = nameMap.find( originalNewEntityLabel );
-      if( mapSearch == nameMap.end( ) )
+      if ( numEles > 1 )
       {
-        //name not already used so it's added a new string to the map
-        nameMap.insert(
-            std::pair<std::string, int>( originalNewEntityLabel, 0 ));
-        newEntityLabel = originalNewEntityLabel;
+        labelString = QString( _entityLabel->text( ) + "_" +
+          QString::number( i )).toStdString( );
       }
       else
       {
-        //name already used so its label and map are modified
-
-        int newEntityNumber = 1 + mapSearch->second;
-        newEntityLabel = originalNewEntityLabel + "_" +
-                         QString::number( newEntityNumber ).toStdString( );
-        //check that new label neither it's already found in the map
-        auto mapSecondSearch = nameMap.find( newEntityLabel );
-        while( mapSecondSearch != nameMap.end( ))
-        {
-          if( mapSecondSearch->second == 0 )
-          {
-            nameMap.erase( mapSecondSearch );
-          }
-          ++newEntityNumber;
-          newEntityLabel = originalNewEntityLabel + "_" +
-                           QString::number( newEntityNumber ).toStdString( );
-          mapSecondSearch = nameMap.find( newEntityLabel );
-        }
-        mapSearch->second = newEntityNumber;
-        std::cout << "ERROR NAME: " << originalNewEntityLabel
-                  << " DUPLICATED INSTEAD USING NAME: "
-                  << newEntityLabel << std::endl;
+        labelString = _entityLabel->text( ).toStdString( );
       }
-
-      //*/
-      /**
-      //check string uniqueness (excesive complexity)
-      bool continueSearch = true, nameEdited = false;
-      for( int a = 0; continueSearch; a++ )
-      {
-        continueSearch = false;
-        for( auto existingEntity : DataManager::entities( ).vector( ))
-        {
-          if( newEntityLabel == existingEntity->label( ))
-          {
-            newEntityLabel = originalNewEntityLabel + "_" +
-              QString::number( i + a ).toStdString( );
-            nameEdited = true;
-            continueSearch = true;
-            break;
-
-          }
-        }
-      }
-      if( nameEdited )
-      {
-        std::cout << "ERROR NAME: " << originalNewEntityLabel
-                  << " DUPLICATED INSTEAD USING NAME: "
-                  << newEntityLabel << std::endl;
-      }//*/
-      _entity->label( ) = newEntityLabel;
+      _entity->setProperty( "shiftLabel", labelString );
 
       for ( const auto& entityParam: _entityParamCont )
       {
@@ -384,7 +327,7 @@ namespace nslib
 
       bool needToClearCache = false;
       for ( const auto& creatorPair :
-              nslib::RepresentationCreatorManager::creators( ))
+          nslib::RepresentationCreatorManager::creators( ))
       {
         needToClearCache = needToClearCache ||
           creatorPair.second->entityUpdatedOrCreated( _entity );
@@ -393,8 +336,8 @@ namespace nslib
       // TODO improvemente: check if cache needs to be cleared or if just the
       // items related to the entity under edition
       // if ( needToClearCache ) {
-        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
-        nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+      nslib::RepresentationCreatorManager::clearEntitiesToReps( );
+      nslib::RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
@@ -431,7 +374,7 @@ namespace nslib
       if ( _action == EDIT_ENTITY )
       {
         for ( const auto& repPair :
-                nslib::RepresentationCreatorManager::repsToEntities( ))
+            nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;

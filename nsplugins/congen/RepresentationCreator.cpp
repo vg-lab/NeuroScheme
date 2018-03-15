@@ -248,7 +248,6 @@ namespace nslib
         auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
         auto newNeuronsPerPopulation =
           entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
-
         _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
           _maxNeuronsPerPopulation );
 

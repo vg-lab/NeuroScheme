@@ -94,9 +94,9 @@ namespace nslib
       _entityLabel.reset( new QLineEdit( ));
       widget = _entityLabel.get( );
       QString propName( QString::fromStdString(
-                          ( propertyObjExists ? propObject->label( ) :
-                            originEntity_->label( ) + "-" +
-                            destinationEntity_->label( ))));
+        ( propertyObjExists ? propObject->label( ) :
+          originEntity_->getProperty( "shiftLabel" ).value< std::string >( ) + "-" +
+          destinationEntity_->getProperty( "shiftLabel" ).value< std::string >( ))));
       _entityLabel->setText( propName );
       _entityLabel->setEnabled( true );
       myLayout->addWidget( widget, numProp, 1 );

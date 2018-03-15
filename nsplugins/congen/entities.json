@@ -9,6 +9,12 @@
             "flags" : [],
             "properties": [
                 {
+                    "name": "shiftLabel",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+
+                },
+                {
                     "name": "Nb of neurons",
                     "type": "uint",
                     "flags": [ "EDITABLE" ]
