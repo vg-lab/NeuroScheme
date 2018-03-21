@@ -3,8 +3,7 @@
 ## Introduction
 
 NeuroScheme is a tool for navigating, exploring and interacting with
-NeuroScience data using abstract, schematic or expressive representations. This
-project is a refactor of https://gitlab.gmrv.es/nsviz/neuroscheme.git
+NeuroScience data using abstract, schematic or expressive representations.
 
 ## Dependencies
 
