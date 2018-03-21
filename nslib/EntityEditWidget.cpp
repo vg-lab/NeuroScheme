@@ -83,6 +83,7 @@ namespace nslib
       for ( const auto& propPair : entity->properties( ))
       {
         const auto prop = propPair.first;
+
         auto caster = fires::PropertyManager::getPropertyCaster( prop );
         if ( caster )
         {
@@ -272,6 +273,7 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
+
           bool isUnique = _entity->hasPropertyFlag(
             label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )

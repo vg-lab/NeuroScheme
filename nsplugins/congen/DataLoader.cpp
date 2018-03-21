@@ -105,7 +105,6 @@ namespace nslib
         neuronModel = NeuronPop::TNeuronModel::iaf_psc_alpha;
 
       shift::Entity* neuronPop = new NeuronPop( popName, popSize, neuronModel );
-      neuronPop->setProperty( "shiftLabel",popName );
       popNameToGid[ popName ] = neuronPop->entityGid( );
 
       auto& entities = nslib::DataManager::entities( );

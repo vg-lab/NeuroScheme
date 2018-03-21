@@ -25,6 +25,7 @@
                     "type": "TNeuronModel",
                     "flags": [ "EDITABLE" ]
                 }
+
             ],
             "types": [
                 {
@@ -44,6 +45,12 @@
             "includes" : [ "<shift_NeuronPop.h>" ],
             "flags" : [],
             "properties": [
+                {
+                    "name": "shiftLabel",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+
+                },
                 {
                     "name": "Nb of neurons Mean",
                     "type": "uint",

@@ -698,7 +698,7 @@ namespace nslib
             meanDendsArea,
             meanCenter );
 
-        colEntity->label( ) = "c" + std::to_string( uint( col->id( )));
+        colEntity->setProperty( "shiftLabel", "c" + std::to_string( uint( col->id( ))));
 
         shift::Entity* colLayerEntities[ 6 ];
         for ( auto i = 0; i < 6; ++i )
@@ -716,8 +716,8 @@ namespace nslib
             colEntity->entityGid( );
           _entities.add( layerEntity );
 
-          layerEntity->label( ) = "c" + std::to_string( uint( col->id( ))) +
-            "l" + std::to_string( i );
+          layerEntity->setProperty( "shiftLabel", "c" + std::to_string( uint( col->id( ))) +
+            "l" + std::to_string( i ));
 
         }
 
@@ -736,8 +736,8 @@ namespace nslib
             colEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
 
-          neuronTypeAggregationEntity->label( ) = "c" +
-            std::to_string( uint( col->id( ))) + "p" + std::to_string( i );
+          neuronTypeAggregationEntity->setProperty( "shiftLabel", "c" +
+            std::to_string( uint( col->id( ))) + "p" + std::to_string( i ));
 
           neuronTypeAggregationEntity =
             new NeuronTypeAggregation(
@@ -750,8 +750,8 @@ namespace nslib
             colEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
 
-          neuronTypeAggregationEntity->label( ) = "c" +
-            std::to_string( uint( col->id( ))) + "i" + std::to_string( i );
+          neuronTypeAggregationEntity->setProperty( "shiftLabel", "c" +
+            std::to_string( uint( col->id( ))) + "i" + std::to_string( i ));
         }
 
         _entities.add( colEntity );
@@ -849,7 +849,8 @@ namespace nslib
               meanDendsArea,
               mcMeanCenter );
 
-          mcEntity->label( ) = "mc" + std::to_string( uint( mc->id( )));
+          mcEntity->setProperty( "shiftLabel",
+           "mc" + std::to_string( uint( mc->id( ))));
 
           shift::Entity* mcLayerEntities[ 6 ];
           for ( auto i = 0; i < 6; ++i )
@@ -868,8 +869,8 @@ namespace nslib
               mcEntity->entityGid( );
             _entities.add( layerEntity );
 
-            layerEntity->label( ) = "mc" + std::to_string( uint( mc->id( ))) +
-              "l" + std::to_string( i + 1 );
+            layerEntity->setProperty( "shiftLabel", "mc" +
+             std::to_string( uint( mc->id( ))) + "l" + std::to_string( i + 1 ));
           }
 
           // Pos 0 and 7 will be used for whole minicolumn
@@ -887,8 +888,8 @@ namespace nslib
               mcEntity, neuronTypeAggregationEntity );
             _entities.add( neuronTypeAggregationEntity );
 
-            neuronTypeAggregationEntity->label( ) = "mc" +
-              std::to_string( uint( mc->id( ))) + "p" + std::to_string( i );
+            neuronTypeAggregationEntity->setProperty( "shiftLabel", "mc" +
+              std::to_string( uint( mc->id( ))) + "p" + std::to_string( i ));
 
             neuronTypeAggregationEntity =
               new NeuronTypeAggregation(
@@ -902,8 +903,8 @@ namespace nslib
               mcEntity, neuronTypeAggregationEntity );
             _entities.add( neuronTypeAggregationEntity );
 
-            neuronTypeAggregationEntity->label( ) = "mc" +
-              std::to_string( uint( mc->id( ))) + "i" + std::to_string( i );
+            neuronTypeAggregationEntity->setProperty( "shiftLabel","mc" +
+              std::to_string( uint( mc->id( ))) + "i" + std::to_string( i ));
           }
 
           shift::Relationship::Establish(
@@ -958,7 +959,8 @@ namespace nslib
                 neuron->transform( ).col( 3 ).transpose( ));
             }
 
-            neuronEntity->label( ) = "n" + std::to_string( uint( neuron->gid( )));
+            neuronEntity->setProperty( "shiftLabel",
+             "n" + std::to_string( uint( neuron->gid( )));
 
             if ( neuron->morphology( ) && withMorphologies &&
                 csvNeuronStatsFileName.empty( ))
