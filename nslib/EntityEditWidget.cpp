@@ -65,20 +65,6 @@ namespace nslib
       TWidgetType widgetType;
       QWidget* widget;
 
-      {
-        auto label = new QLabel( "Entity name" );
-        gridLayout->addWidget( label, element, 0 );
-
-        widgetType = TWidgetType::LINE_EDIT;
-        _entityLabel.reset( new QLineEdit( ));
-        widget = _entityLabel.get( );
-        QString propName( QString::fromStdString(
-          entity->getProperty( "shiftLabel" ).value< std::string >( )));
-        _entityLabel->setText( propName );
-        _entityLabel->setEnabled( true );
-        gridLayout->addWidget( widget, element, 1 );
-        ++element;
-      }
 
       for ( const auto& propPair : entity->properties( ))
       {
@@ -216,18 +202,8 @@ namespace nslib
       QList< QString > errorMessages;
 
       assert ( _entity );
-      std::string labelString;
 
-      if ( numEles > 1 )
-      {
-        labelString = QString( _entityLabel->text( ) + "_" +
-          QString::number( i )).toStdString( );
-      }
-      else
-      {
-        labelString = _entityLabel->text( ).toStdString( );
-      }
-      _entity->setProperty( "shiftLabel", labelString );
+
 
       for ( const auto& entityParam: _entityParamCont )
       {
@@ -241,7 +217,6 @@ namespace nslib
         {
           continue;
         }
-
         const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
@@ -254,6 +229,11 @@ namespace nslib
         {
           auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
+          //change name if multiple are created silmultaneus
+          if(numEles>1 && label == "Entity name")
+          {
+            paramString=paramString+QString("_")+QString::number(i);
+          }
         }
         else
           assert( false );

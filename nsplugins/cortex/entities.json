@@ -14,7 +14,7 @@
                     "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
-                    "name": "shiftLabel",
+                    "name": "Entity name",
                     "type": "std::string",
                     "flags": [  ]
 

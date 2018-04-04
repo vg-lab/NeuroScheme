@@ -51,7 +51,7 @@ namespace nslib
              entitiesGids.push_back( entity->entityGid( ));
              exporter_->addPopulation( "http://morphml.org/networkml/schema",
                QString::fromStdString( entity->getProperty(
-               "shiftLabel" ).value<std::string>( )),
+               "Entity name" ).value<std::string>( )),
                QString::fromStdString( caster->toString(
                entity->getProperty( "Neuron model" ))),
                QString::fromStdString( std::to_string( entity->getProperty(
@@ -72,12 +72,12 @@ namespace nslib
             params[ "xmlns" ] = "http://morphml.org/networkml/schema";
             params[ "source" ] = DataManager::entities( ).map( ).find(
               relIt->first)->second->getProperty(
-              "shiftLabel" ).value< std::string >( );
+              "Entity name" ).value< std::string >( );
             params[ "target" ] = DataManager::entities( ).map( ).find(
               relPropIt->first)->second->getProperty(
-              "shiftLabel" ).value< std::string >( );
+              "Entity name" ).value< std::string >( );
             params[ "name" ] = relPropIt->second->getProperty(
-              "shiftLabel" ).value< std::string >( );
+              "Entity name" ).value< std::string >( );
             params[ "synapse_type" ] = "StaticSynapse";
             params[ "Threshold" ] = std::to_string( relPropIt->second->
               getProperty( "Threshold" ).value< float >( ));

@@ -9,7 +9,7 @@
             "flags" : [],
             "properties": [
                 {
-                    "name": "shiftLabel",
+                    "name": "Entity name",
                     "type": "std::string",
                     "flags": [ "UNIQUE", "EDITABLE" ]
 
@@ -46,9 +46,9 @@
             "flags" : [],
             "properties": [
                 {
-                    "name": "shiftLabel",
+                    "name": "Entity name",
                     "type": "std::string",
-                    "flags": [ "UNIQUE", "EDITABLE" ]
+                    "flags": [ "EDITABLE" ]
 
                 },
                 {
