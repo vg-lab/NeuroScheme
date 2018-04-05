@@ -17,7 +17,6 @@
                     "name": "Entity name",
                     "type": "std::string",
                     "flags": [  ]
-
                 },
                 {
                     "name": "Morpho Type",
@@ -58,7 +57,6 @@
                     "name": "Layer",
                     "type": "uint",
                     "flags": [ "EDITABLE" ]
-
                 }
             ],
             "types": [

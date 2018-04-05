@@ -25,7 +25,6 @@
                     "type": "TNeuronModel",
                     "flags": [ "EDITABLE" ]
                 }
-
             ],
             "types": [
                 {
@@ -49,7 +48,6 @@
                     "name": "Entity name",
                     "type": "std::string",
                     "flags": [ "EDITABLE" ]
-
                 },
                 {
                     "name": "Nb of neurons Mean",

@@ -42,7 +42,7 @@ namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
   bool EntityEditWidget::_autoCloseChecked = false;
-  bool EntityEditWidget::_checkUniquenessChecked = false;
+  bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
@@ -65,11 +65,9 @@ namespace nslib
       TWidgetType widgetType;
       QWidget* widget;
 
-
       for ( const auto& propPair : entity->properties( ))
       {
         const auto prop = propPair.first;
-
         auto caster = fires::PropertyManager::getPropertyCaster( prop );
         if ( caster )
         {
@@ -185,7 +183,7 @@ namespace nslib
   void EntityEditWidget::validateDialog( void )
   {
     auto origEntity = _entity;
-    unsigned int numEles=1;
+    unsigned int numEles = 1;
 
     if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
     {
@@ -202,8 +200,6 @@ namespace nslib
       QList< QString > errorMessages;
 
       assert ( _entity );
-
-
 
       for ( const auto& entityParam: _entityParamCont )
       {
@@ -230,9 +226,9 @@ namespace nslib
           auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
           //change name if multiple are created silmultaneus
-          if(numEles>1 && label == "Entity name")
+          if( numEles > 1 && label == "Entity name" )
           {
-            paramString=paramString+QString("_")+QString::number(i);
+            paramString = paramString+QString( "_" )+QString::number( i );
           }
         }
         else
@@ -347,11 +343,10 @@ namespace nslib
         }
 
         // nslib::PaneManager::activePane( )->refreshProperties(
-        //   nslib::PaneManager::activePane( )->entities( ));
+        // nslib::PaneManager::activePane( )->entities( ));
         // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
         nslib::PaneManager::activePane( )->displayEntities(
-          nslib::PaneManager::activePane( )->entities( ),
-          false, true );
+          nslib::PaneManager::activePane( )->entities( ), false, true );
       }
       if ( _action == EDIT_ENTITY )
       {
