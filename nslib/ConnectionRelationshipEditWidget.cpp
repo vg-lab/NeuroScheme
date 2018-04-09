@@ -96,8 +96,8 @@ namespace nslib
       QString propName( QString::fromStdString(
         ( propertyObjExists ? propObject->label( ) :
           originEntity_->getProperty( "Entity name" ).value< std::string >( )
-          + "-" + destinationEntity_->getProperty( "Entity name" )
-          .value< std::string >( ))));
+          + std::string( "-" ) + destinationEntity_->
+          getProperty( "Entity name" ).value< std::string >( ))));
       _entityLabel->setText( propName );
       _entityLabel->setEnabled( true );
       myLayout->addWidget( widget, numProp, 1 );
