@@ -486,6 +486,10 @@
             "includes" : [ ],
             "properties": [
                 {
+                    "name": "Name",
+                    "type": "std::string"
+                },
+                {
                     "name": "count",
                     "type": "uint"
                 }

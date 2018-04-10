@@ -86,24 +86,6 @@ namespace nslib
 
     unsigned int numProp = 1;
 
-    {
-      QWidget* widget;
-      auto label = new QLabel( "Name" );
-      myLayout->addWidget( label, numProp, 0 );
-
-      _entityLabel.reset( new QLineEdit( ));
-      widget = _entityLabel.get( );
-      QString propName( QString::fromStdString(
-        ( propertyObjExists ? propObject->label( ) :
-          originEntity_->getProperty( "Entity name" ).value< std::string >( )
-          + std::string( "-" ) + destinationEntity_->
-          getProperty( "Entity name" ).value< std::string >( ))));
-      _entityLabel->setText( propName );
-      _entityLabel->setEnabled( true );
-      myLayout->addWidget( widget, numProp, 1 );
-      ++numProp;
-    }
-
     for( const auto& propPair: propObject->properties( ))
     {
       const auto prop = propPair.first;
@@ -115,7 +97,6 @@ namespace nslib
         myLayout->addWidget( label, numProp, 0 );
 
         const auto& categories = caster->categories( );
-
         TWidgetType widgetType;
         QWidget* widget;
         if ( !categories.empty( ) )
@@ -144,16 +125,28 @@ namespace nslib
           widgetType = TWidgetType::LINE_EDIT;
           auto lineEditwidget = new QLineEdit;
           widget = lineEditwidget;
-          lineEditwidget->setText( QString::fromStdString(
-                                     caster->toString( propPair.second )));
-
+          if( propName == "Name" )
+          {
+            QString connectionName( QString::fromStdString(
+              ( propertyObjExists ? propObject->getProperty(
+               "Name" ).value<std::string>( ) : originEntity_->getProperty(
+                "Entity name" ).value<std::string>( ) + "-" +
+                 destinationEntity_->getProperty(
+                "Entity name" ).value<std::string>( ))));
+            lineEditwidget->setText( connectionName );
+          }
+          else
+          {
+            lineEditwidget->setText( QString::fromStdString(
+              caster->toString( propPair.second )));
+          }
           lineEditwidget->setEnabled( true );
         }
 
         myLayout->addWidget( widget, numProp, 1 );
 
         if ( !propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-                                          propName ))
+          propName ))
         {
           label->hide( );
           widget->hide( );
@@ -245,7 +238,6 @@ namespace nslib
 
       caster->fromString( prop, paramString.toStdString( ));
     }
-    propObject->label( ) = _entityLabel->text( ).toStdString( );
 
     bool needToClearCache = false;
     for ( const auto& creatorPair :

@@ -40,7 +40,6 @@
         {
             "name": "NeuronSuperPop",
             "namespace": "nslib::congen::shiftgen",
-            "includes" : [],
             "includes" : [ "<shift_NeuronPop.h>" ],
             "flags" : [],
             "properties": [
@@ -78,6 +77,10 @@
             "namespace": "nslib::congen::shiftgen",
             "includes" : [ ],
             "properties": [
+                {
+                    "name": "Name",
+                    "type": "std::string"
+                },
                 {
                     "name": "Connectivity Model",
                     "type": "TConnectivityModel"

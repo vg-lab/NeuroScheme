@@ -276,7 +276,7 @@ namespace nslib
       }
 
       auto connProps = new shiftgen::ConnectsWith(
-        connModel, randProb, fanOutDegree, fanInDegree,
+          projName, connModel, randProb, fanOutDegree, fanInDegree,
         spatialGaussProb, spatialGaussSigma,
         weightType, weight, weightGaussMean, weightGaussSigma,
         delayType, delay, delayGaussMean, delayGaussSigma, threshold );

@@ -77,7 +77,7 @@ namespace nslib
               relPropIt->first)->second->getProperty(
               "Entity name" ).value< std::string >( );
             params[ "name" ] = relPropIt->second->getProperty(
-              "Entity name" ).value< std::string >( );
+              "Name" ).value< std::string >( );
             params[ "synapse_type" ] = "StaticSynapse";
             params[ "Threshold" ] = std::to_string( relPropIt->second->
               getProperty( "Threshold" ).value< float >( ));
