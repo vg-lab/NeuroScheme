@@ -9,14 +9,14 @@
             "flags" : [],
             "properties": [
                 {
-                    "name": "gid",
-                    "type": "uint",
+                    "name": "Entity name",
+                    "type": "std::string",
                     "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
-                    "name": "Entity name",
-                    "type": "std::string",
-                    "flags": [  ]
+                    "name": "gid",
+                    "type": "uint",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
                     "name": "Morpho Type",
@@ -134,6 +134,11 @@
                 }
             ],
             "properties": [
+                {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
                 {
                     "name": "Id",
                     "type": "uint",
@@ -324,6 +329,11 @@
             ],
             "properties": [
                 {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
+                {
                     "name": "Id",
                     "type": "uint"
                 },
@@ -434,6 +444,10 @@
                 {
                     "name": "Layer",
                     "type": "uint"
+                },
+                {
+                    "name": "Name",
+                    "type": "std::string"
                 }
             ],
             "types":
@@ -473,6 +487,10 @@
                 {
                     "name": "Morpho Type",
                     "type": "Neuron::TMorphologicalType"
+                },
+                {
+                    "name": "Name",
+                    "type": "std::string"
                 }
             ],
             "types":
