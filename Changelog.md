@@ -1,8 +1,31 @@
 # NeuroScheme
 
 ## git master
+
+## version 0.2
+
+* [!64] Updated Changelog and version. Release 0.2 preparation
+* [!63] Fixed style of load menu using static QFileDialog::getOpenFileName. Fixed return value of DataLoader::loadNeuroML.
+* [!62] First approach to auto-computed properties
+* [!60] NeuroML maximums bug fix
+* [!54] Auto-connections implementation
+* [!59] Fixed hexagon bottom line in congen
+* [!57] Bugfix: Unreferenced memory
+* [!56] Improved NeuroML congen reader.
+* [!55] New UI for pane Split/Close
+* [!47] Improvements on README.md
+* [!53] Added focus on selection. Bump nsol and deps. Changed icons with svg tango-based ones. Added menu entries for loading BlueConfig and XML in cortex and NeuroML in congen.
+* [!52] Fixed hexagon points in NeuronPopItem.
+* [!51] Fixed small bug from congen building.
+* [!49] Changed log to silo.
+* [!48] Remove warnings
 * [!45] Rewrite about dialog to make it verbose about built components version.
-* [!39] OSX Sierra building fixes.
+* [!46] Bump ShiFT.
+* [!44] Added input dialog for selection domain in case its not defined via CLI.
+* [!42] Member shadowing bugfix
+* [!43] Added warning in case no domain is defined via CLI. Fixes for Log.
+* [!41] Bump nsol
+* [!40] OSX Sierra fixes and moved CI config to Sierra.
 * [!10] Added first implementation for congen domain
 * [!38] Added contraints for subproperties in congen
 * [!37] Added basic NeuroML exportation for congen
@@ -28,4 +51,8 @@
 * [!6] Added home button. Added circular layout. Fixed bugs.
 * [!5] Added scoop for color mappers.
 * [!4] Enabled horizontal and vertical splitting of panes.
+
+
+# version 0.1
+
 * First version of the refactor of legacy neuroscheme.
