@@ -9,6 +9,11 @@
             "flags" : [],
             "properties": [
                 {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
+                {
                     "name": "gid",
                     "type": "uint",
                     "flags": [ "UNIQUE", "EDITABLE" ]
@@ -52,7 +57,6 @@
                     "name": "Layer",
                     "type": "uint",
                     "flags": [ "EDITABLE" ]
-
                 }
             ],
             "types": [
@@ -130,6 +134,11 @@
                 }
             ],
             "properties": [
+                {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
                 {
                     "name": "Id",
                     "type": "uint",
@@ -320,6 +329,11 @@
             ],
             "properties": [
                 {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
+                {
                     "name": "Id",
                     "type": "uint"
                 },
@@ -430,6 +444,10 @@
                 {
                     "name": "Layer",
                     "type": "uint"
+                },
+                {
+                    "name": "Name",
+                    "type": "std::string"
                 }
             ],
             "types":
@@ -469,6 +487,10 @@
                 {
                     "name": "Morpho Type",
                     "type": "Neuron::TMorphologicalType"
+                },
+                {
+                    "name": "Name",
+                    "type": "std::string"
                 }
             ],
             "types":
@@ -481,6 +503,10 @@
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],
             "properties": [
+                {
+                    "name": "Name",
+                    "type": "std::string"
+                },
                 {
                     "name": "count",
                     "type": "uint"

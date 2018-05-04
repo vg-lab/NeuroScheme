@@ -672,6 +672,7 @@ namespace nslib
 
         shift::Entity* colEntity =
           new Column(
+            "c" + std::to_string( uint( col->id( ))),
             uint( col->id( )), // Id
             0, // Num Minicolumns
             col->numberOfNeurons( false ),
@@ -698,8 +699,6 @@ namespace nslib
             meanDendsArea,
             meanCenter );
 
-        colEntity->label( ) = "c" + std::to_string( uint( col->id( )));
-
         shift::Entity* colLayerEntities[ 6 ];
         for ( auto i = 0; i < 6; ++i )
         {
@@ -716,8 +715,8 @@ namespace nslib
             colEntity->entityGid( );
           _entities.add( layerEntity );
 
-          layerEntity->label( ) = "c" + std::to_string( uint( col->id( ))) +
-            "l" + std::to_string( i );
+          layerEntity->setProperty( "Name", "c" + std::to_string( uint( col->id( ))) +
+            "l" + std::to_string( i ));
 
         }
 
@@ -736,8 +735,8 @@ namespace nslib
             colEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
 
-          neuronTypeAggregationEntity->label( ) = "c" +
-            std::to_string( uint( col->id( ))) + "p" + std::to_string( i );
+          neuronTypeAggregationEntity->setProperty( "Name", "c" +
+            std::to_string( uint( col->id( ))) + "p" + std::to_string( i ));
 
           neuronTypeAggregationEntity =
             new NeuronTypeAggregation(
@@ -750,8 +749,8 @@ namespace nslib
             colEntity, neuronTypeAggregationEntity );
           _entities.add( neuronTypeAggregationEntity );
 
-          neuronTypeAggregationEntity->label( ) = "c" +
-            std::to_string( uint( col->id( ))) + "i" + std::to_string( i );
+          neuronTypeAggregationEntity->setProperty( "Name", "c" +
+            std::to_string( uint( col->id( ))) + "i" + std::to_string( i ));
         }
 
         _entities.add( colEntity );
@@ -827,6 +826,7 @@ namespace nslib
 
           shift::Entity* mcEntity =
             new MiniColumn(
+              "mc" + std::to_string( uint( mc->id( ))),
               mc->id( ),
               mc->numberOfNeurons( false ),
               mc->numberOfNeurons( false, nsol::Neuron::PYRAMIDAL ),
@@ -849,8 +849,6 @@ namespace nslib
               meanDendsArea,
               mcMeanCenter );
 
-          mcEntity->label( ) = "mc" + std::to_string( uint( mc->id( )));
-
           shift::Entity* mcLayerEntities[ 6 ];
           for ( auto i = 0; i < 6; ++i )
           {
@@ -868,8 +866,8 @@ namespace nslib
               mcEntity->entityGid( );
             _entities.add( layerEntity );
 
-            layerEntity->label( ) = "mc" + std::to_string( uint( mc->id( ))) +
-              "l" + std::to_string( i + 1 );
+            layerEntity->setProperty( "Name", "mc" +
+             std::to_string( uint( mc->id( ))) + "l" + std::to_string( i + 1 ));
           }
 
           // Pos 0 and 7 will be used for whole minicolumn
@@ -887,8 +885,8 @@ namespace nslib
               mcEntity, neuronTypeAggregationEntity );
             _entities.add( neuronTypeAggregationEntity );
 
-            neuronTypeAggregationEntity->label( ) = "mc" +
-              std::to_string( uint( mc->id( ))) + "p" + std::to_string( i );
+            neuronTypeAggregationEntity->setProperty( "Name", "mc" +
+              std::to_string( uint( mc->id( ))) + "p" + std::to_string( i ));
 
             neuronTypeAggregationEntity =
               new NeuronTypeAggregation(
@@ -902,8 +900,8 @@ namespace nslib
               mcEntity, neuronTypeAggregationEntity );
             _entities.add( neuronTypeAggregationEntity );
 
-            neuronTypeAggregationEntity->label( ) = "mc" +
-              std::to_string( uint( mc->id( ))) + "i" + std::to_string( i );
+            neuronTypeAggregationEntity->setProperty( "Name","mc" +
+              std::to_string( uint( mc->id( ))) + "i" + std::to_string( i ));
           }
 
           shift::Relationship::Establish(
@@ -923,7 +921,7 @@ namespace nslib
 #define MORPHO_STATS neuronsStats[neuronGid].morphologyStats
               neuronEntity =
                 new shiftgen::Neuron(
-                  neuronGid,
+                  "n" + std::to_string( uint( neuronGid )), neuronGid,
                   nsolToShiftMorphologicalType( neuron->morphologicalType( )),
                   nsolToShiftFunctionalType( neuron->functionalType( )),
                   MORPHO_STATS[NNMS::SOMA_VOLUME],
@@ -938,7 +936,7 @@ namespace nslib
               nsol::NeuronMorphologyStats* nms = neuron->morphology( )->stats( );
               neuronEntity =
                 new shiftgen::Neuron(
-              neuron->gid( ),
+                "n" + std::to_string( uint( neuron->gid( ))), neuron->gid( ),
                 nsolToShiftMorphologicalType( neuron->morphologicalType( )),
                 nsolToShiftFunctionalType( neuron->functionalType( )),
                 nms->getStat( nsol::NeuronMorphologyStats::SOMA_VOLUME ),
@@ -951,14 +949,12 @@ namespace nslib
             {
               neuronEntity =
                 new shiftgen::Neuron(
-              neuron->gid( ),
+                "n" + std::to_string( uint( neuron->gid( ))),neuron->gid( ),
                 nsolToShiftMorphologicalType( neuron->morphologicalType( )),
                 nsolToShiftFunctionalType( neuron->functionalType( )),
                 .0f, .0f, .0f, .0f,
                 neuron->transform( ).col( 3 ).transpose( ));
             }
-
-            neuronEntity->label( ) = "n" + std::to_string( uint( neuron->gid( )));
 
             if ( neuron->morphology( ) && withMorphologies &&
                 csvNeuronStatsFileName.empty( ))
@@ -1116,16 +1112,30 @@ namespace nslib
           }
           else
           {
+            std::string connectionName = neuronEntitiesByGid[ preSynapse->
+              preSynapticNeuron( )]->getProperty( "Entity name" ).
+              value<std::string>( ) + std::string("-") +
+              neuronEntitiesByGid[ preSynapse->
+              postSynapticNeuron( )]->getProperty( "Entity name" ).
+              value<std::string>( );
             relConnectsTo[ preNeuronGid ].insert(
-              std::make_pair( postNeuronGid, new ConnectsWith( 1 )));
+              std::make_pair( postNeuronGid, new ConnectsWith(
+              connectionName, 1 )));
             relConnectedBy[ postNeuronGid ].insert(
               std::make_pair( preNeuronGid, nullptr ));
           }
         }
         else
         {
+          std::string connectionName = neuronEntitiesByGid[ preSynapse->
+            preSynapticNeuron( )]->getProperty( "Entity name" ).
+            value<std::string>( ) + std::string("-") +
+            neuronEntitiesByGid[ preSynapse->
+            postSynapticNeuron( )]->getProperty( "Entity name" ).
+            value<std::string>( );
           relConnectsTo[ preNeuronGid ].insert(
-            std::make_pair( postNeuronGid, new ConnectsWith( 1 )));
+            std::make_pair( postNeuronGid, new ConnectsWith(
+              connectionName, 1 )));
           relConnectedBy[ postNeuronGid ].insert(
             std::make_pair( preNeuronGid, nullptr ));
         }

@@ -67,7 +67,6 @@ namespace nslib
     TEntityEditWidgetAction _action;
 
     std::unique_ptr< QLineEdit > _numNewEntities;
-    std::unique_ptr< QLineEdit > _entityLabel;
 
     bool _isNew;
 

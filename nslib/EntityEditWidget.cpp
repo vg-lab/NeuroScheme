@@ -42,7 +42,7 @@ namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
   bool EntityEditWidget::_autoCloseChecked = false;
-  bool EntityEditWidget::_checkUniquenessChecked = false;
+  bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
@@ -64,20 +64,6 @@ namespace nslib
     {
       TWidgetType widgetType;
       QWidget* widget;
-
-      {
-        auto label = new QLabel( "Entity name" );
-        gridLayout->addWidget( label, element, 0 );
-
-        widgetType = TWidgetType::LINE_EDIT;
-        _entityLabel.reset( new QLineEdit( ));
-        widget = _entityLabel.get( );
-        QString propName( QString::fromStdString( entity->label( )));
-        _entityLabel->setText( propName );
-        _entityLabel->setEnabled( true );
-        gridLayout->addWidget( widget, element, 1 );
-        ++element;
-      }
 
       for ( const auto& propPair : entity->properties( ))
       {
@@ -121,7 +107,7 @@ namespace nslib
             auto lineEditwidget = new QLineEdit;
             widget = lineEditwidget;
             lineEditwidget->setText( QString::fromStdString(
-                                       caster->toString( propPair.second )));
+              caster->toString( propPair.second )));
             lineEditwidget->setEnabled( isEditable );
           }
           gridLayout->addWidget( widget, element, 1 );
@@ -197,7 +183,7 @@ namespace nslib
   void EntityEditWidget::validateDialog( void )
   {
     auto origEntity = _entity;
-    unsigned int numEles=1;
+    unsigned int numEles = 1;
 
     if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
     {
@@ -215,12 +201,6 @@ namespace nslib
 
       assert ( _entity );
 
-      if ( numEles > 1 )
-        _entity->label( ) = QString( _entityLabel->text( ) + "_" +
-                                     QString::number( i )).toStdString( );
-      else
-        _entity->label( ) = _entityLabel->text( ).toStdString( );
-
       for ( const auto& entityParam: _entityParamCont )
       {
         const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
@@ -229,12 +209,10 @@ namespace nslib
         bool isEditable = origEntity->hasPropertyFlag(
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
-        if ( ( _action == EDIT_ENTITY ) &&
-             !isEditable )
+        if ( ( _action == EDIT_ENTITY ) && !isEditable )
         {
           continue;
         }
-
         const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
@@ -247,6 +225,11 @@ namespace nslib
         {
           auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
+          //change name if multiple are created silmultaneus
+          if( numEles > 1 && label == "Entity name" )
+          {
+            paramString = paramString+QString( "_" )+QString::number( i );
+          }
         }
         else
           assert( false );
@@ -266,6 +249,7 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
+
           bool isUnique = _entity->hasPropertyFlag(
             label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
@@ -321,7 +305,7 @@ namespace nslib
 
       bool needToClearCache = false;
       for ( const auto& creatorPair :
-              nslib::RepresentationCreatorManager::creators( ))
+          nslib::RepresentationCreatorManager::creators( ))
       {
         needToClearCache = needToClearCache ||
           creatorPair.second->entityUpdatedOrCreated( _entity );
@@ -330,8 +314,8 @@ namespace nslib
       // TODO improvemente: check if cache needs to be cleared or if just the
       // items related to the entity under edition
       // if ( needToClearCache ) {
-        nslib::RepresentationCreatorManager::clearEntitiesToReps( );
-        nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+      nslib::RepresentationCreatorManager::clearEntitiesToReps( );
+      nslib::RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
@@ -359,16 +343,15 @@ namespace nslib
         }
 
         // nslib::PaneManager::activePane( )->refreshProperties(
-        //   nslib::PaneManager::activePane( )->entities( ));
+        // nslib::PaneManager::activePane( )->entities( ));
         // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
         nslib::PaneManager::activePane( )->displayEntities(
-          nslib::PaneManager::activePane( )->entities( ),
-          false, true );
+          nslib::PaneManager::activePane( )->entities( ), false, true );
       }
       if ( _action == EDIT_ENTITY )
       {
         for ( const auto& repPair :
-                nslib::RepresentationCreatorManager::repsToEntities( ))
+            nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;

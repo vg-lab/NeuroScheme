@@ -50,14 +50,13 @@ namespace nslib
            {
              entitiesGids.push_back( entity->entityGid( ));
              exporter_->addPopulation( "http://morphml.org/networkml/schema",
-                                       QString::fromStdString( entity->label( )),
-                                       QString::fromStdString( caster->toString(
-                                           entity->getProperty( "Neuron model" ))),
-                                       QString::fromStdString(std::to_string(
-                                           entity->getProperty( "Nb of neurons" ).
-                                           value< unsigned int >( ))),
-                                       "0", "0", "0",
-                                       "0", "0", "0" );
+               QString::fromStdString( entity->getProperty(
+               "Entity name" ).value<std::string>( )),
+               QString::fromStdString( caster->toString(
+               entity->getProperty( "Neuron model" ))),
+               QString::fromStdString( std::to_string( entity->getProperty(
+               "Nb of neurons" ).value<unsigned int>( ))),
+               "0", "0", "0", "0", "0", "0" );
            }
         }
         const auto& relConnectsTo = *( DataManager::entities( ).
@@ -72,13 +71,16 @@ namespace nslib
             params[ "units" ] = "Physiological Units";
             params[ "xmlns" ] = "http://morphml.org/networkml/schema";
             params[ "source" ] = DataManager::entities( ).map( ).find(
-                                  relIt->first)->second->label( );
+              relIt->first)->second->getProperty(
+              "Entity name" ).value< std::string >( );
             params[ "target" ] = DataManager::entities( ).map( ).find(
-                                  relPropIt->first)->second->label( );
-            params[ "name" ] = relPropIt->second->label( );
+              relPropIt->first)->second->getProperty(
+              "Entity name" ).value< std::string >( );
+            params[ "name" ] = relPropIt->second->getProperty(
+              "Name" ).value< std::string >( );
             params[ "synapse_type" ] = "StaticSynapse";
             params[ "Threshold" ] = std::to_string( relPropIt->second->
-                                      getProperty( "Threshold" ).value< float >( ));
+              getProperty( "Threshold" ).value< float >( ));
 
             //Dependent parameters
             auto casterCM = fires::PropertyManager::getPropertyCaster( "Connectivity Model" );

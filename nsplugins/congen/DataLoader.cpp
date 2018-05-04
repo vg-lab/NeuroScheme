@@ -104,15 +104,13 @@ namespace nslib
       if ( cellType == "iaf psc alpha" )
         neuronModel = NeuronPop::TNeuronModel::iaf_psc_alpha;
 
-      shift::Entity* neuronPop = new NeuronPop( popSize, neuronModel );
-      neuronPop->label( ) = popName;
+      shift::Entity* neuronPop = new NeuronPop( popName, popSize, neuronModel );
       popNameToGid[ popName ] = neuronPop->entityGid( );
 
       auto& entities = nslib::DataManager::entities( );
       auto& rootEntities = nslib::DataManager::rootEntities( );
       entities.add( neuronPop );
       rootEntities.add( neuronPop );
-
     }
 
     void DataLoader::_loadProjection(
@@ -278,7 +276,7 @@ namespace nslib
       }
 
       auto connProps = new shiftgen::ConnectsWith(
-        connModel, randProb, fanOutDegree, fanInDegree,
+          projName, connModel, randProb, fanOutDegree, fanInDegree,
         spatialGaussProb, spatialGaussSigma,
         weightType, weight, weightGaussMean, weightGaussSigma,
         delayType, delay, delayGaussMean, delayGaussSigma, threshold );
@@ -292,7 +290,7 @@ namespace nslib
         std::make_pair( targetGid, connProps ));
       relConnectedBy[ targetGid ].insert(
         std::make_pair( sourceGid, nullptr ));
-      connProps->label( ) = projName;
+      connProps->setProperty( "Entity name",projName );
 
     }
 
@@ -310,7 +308,7 @@ namespace nslib
       if ( ! qFile.exists( ))
       {
         Loggers::get( )->log( "NeuroML file not found",
-                              nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -319,7 +317,7 @@ namespace nslib
       if ( !qFile.isOpen( ))
       {
         Loggers::get( )->log( "NeuroML file not readable",
-                              nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -328,7 +326,7 @@ namespace nslib
       if ( xml.hasError( ))
       {
         Loggers::get( )->log( "NeuroML file has errors",
-                              nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 

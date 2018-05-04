@@ -96,13 +96,13 @@ namespace nslib
                 neuronPop->getProperty( "Neuron model" ).
                 value< shiftgen::NeuronPop::TNeuronModel >( )));
           }
-          neuronPopRep->setProperty(
-            "color",
-            neuronModelColorMap.getColor( shiftgen::NeuronPop::TNeuronModel::undefined ));
+          else
+          {
+            neuronPopRep->setProperty( "color", neuronModelColorMap.getColor(
+              shiftgen::NeuronPop::TNeuronModel::undefined ) );
+          }
 
-          neuronPopRep->setProperty(
-            "line perc",
-            neuronsToPercentage.map(
+          neuronPopRep->setProperty( "line perc", neuronsToPercentage.map(
               neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
 
           // neuronPopRep->setProperty(
@@ -248,7 +248,6 @@ namespace nslib
         auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
         auto newNeuronsPerPopulation =
           entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
-
         _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
           _maxNeuronsPerPopulation );
 
