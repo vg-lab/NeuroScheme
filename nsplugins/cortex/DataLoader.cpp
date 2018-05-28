@@ -995,7 +995,7 @@ namespace nslib
             _entities.add( neuronEntity );
 
             shift::Relationship::Establish( relParentOf, relChildOf,
-                                            neuronEntity, colEntity);
+                                            mcEntity, neuronEntity );
 
             relGroupOf[ mcEntity->entityGid( ) ].insert(
               std::make_pair( neuronEntity->entityGid( ), nullptr ));
