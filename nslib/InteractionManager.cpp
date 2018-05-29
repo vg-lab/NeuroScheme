@@ -238,7 +238,7 @@ namespace nslib
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          auto entityGid = ( *entities.begin( ))->entityGid( );
+          auto entityGid = ( *entities.begin( ) )->entityGid( );
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
@@ -260,15 +260,24 @@ namespace nslib
           QAction* editEntity = nullptr;
           QAction* dupEntity = nullptr;
           QAction* autoEntity = nullptr;
+          QAction* childrenEntity = nullptr;
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
             editEntity = _contextMenu->addAction( "Edit" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
-            autoEntity = _contextMenu->addAction( "Add Auto Connection"  );
 
-          }
-          if ( editEntity || dupEntity || autoEntity )
+              if(entity->hasProperty( "Neuron model" ) )
+              {
+                autoEntity = _contextMenu->addAction( "Add Auto Connection" );
+              }
+              else if( entity->hasProperty( "Nb of neurons Mean" ) )
+              {
+                childrenEntity = _contextMenu->addAction( "Add children" );
+              }
+            }
+
+          if ( editEntity || dupEntity || autoEntity || childrenEntity )
             _contextMenu->addSeparator( );
 
           QAction* levelUp = nullptr;
@@ -335,12 +344,16 @@ namespace nslib
             {
               createConnectionRelationship(
                 DataManager::entities( ).at( entityGid ),
-                DataManager::entities( ).at( entityGid ));
+                DataManager::entities( ).at( entityGid )
+              );
 
+            } else if ( childrenEntity && childrenEntity == selectedAction )
+            {
+              //Todo add children
+              std::cout << "TODO add children" << std::endl;
             }
             else
             {
-
               if (( levelUpToNewPane &&
                     levelUpToNewPane == selectedAction ) ||
                   ( levelDownToNewPane &&
@@ -660,9 +673,10 @@ namespace nslib
   {
     if ( _conRelationshipEditWidget != nullptr )
       delete _conRelationshipEditWidget;
-
+    std::cout << "Creada autoConexion" << std::endl;
     _conRelationshipEditWidget =
-      new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_ );
+      new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
+        &PaneManager::activePane()->view(), true);
     _conRelationshipEditWidget->show( );
   }
 

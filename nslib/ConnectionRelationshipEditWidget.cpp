@@ -37,13 +37,14 @@ namespace nslib
 {
 
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
-    shift::Entity* originEntity_,
-    shift::Entity* destinationEntity_,
-    QWidget* parent_ )
-    : QWidget( parent_ )
+    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+    QWidget* parent_, bool modal )
+    : QDialog ( parent_ )
     , _originEntity( originEntity_ )
     , _destinationEntity( destinationEntity_ )
   {
+
+    this->setModal(modal);
     auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
     shift::Properties* propObject;
@@ -118,7 +119,7 @@ namespace nslib
           comboBoxWidget->setCurrentIndex( index );
           comboBoxWidget->setEnabled( true );
           connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-                   this, SLOT( refreshSubproperties( )));
+            this, SLOT( refreshSubproperties( )));
         }
         else
         {
@@ -152,7 +153,6 @@ namespace nslib
           widget->hide( );
         }
         numProp++;
-
         _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
       }
     }
