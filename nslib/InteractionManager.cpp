@@ -263,6 +263,8 @@ namespace nslib
           QAction* dupEntity = nullptr;
           QAction* autoEntity = nullptr;
           QAction* childrenEntity = nullptr;
+          QAction* superPopChildEntity = nullptr;
+          QAction* popChildEntity = nullptr;
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
@@ -275,11 +277,17 @@ namespace nslib
               }
               else if( entity->hasProperty( "Nb of neurons Mean" ) )
               {
-                childrenEntity = _contextMenu->addAction( "Add children" );
+                childrenEntity =
+                  _contextMenu->addAction( "Add selection as children" );
+                superPopChildEntity =
+                  _contextMenu->addAction( "Add NeuronSuperPops as children" );
+                popChildEntity =
+                  _contextMenu->addAction( "Add NeuronPops as children" );
               }
             }
 
-          if ( editEntity || dupEntity || autoEntity || childrenEntity )
+          if ( editEntity || dupEntity || autoEntity || childrenEntity ||
+              popChildEntity || superPopChildEntity )
             _contextMenu->addSeparator( );
 
           QAction* levelUp = nullptr;
@@ -349,10 +357,36 @@ namespace nslib
                 DataManager::entities( ).at( entityGid )
               );
 
-            } else if ( childrenEntity && childrenEntity == selectedAction )
+            }
+            else if ( childrenEntity && childrenEntity == selectedAction )
             {
-              editChildrenRelationship(entity,SelectionManager::getActiveSelection());
-              std::cout << "TODO add children" << std::endl;
+              editChildrenRelationship(
+                entity,SelectionManager::getActiveSelection());
+            }
+            else if ( popChildEntity && popChildEntity == selectedAction )
+            {
+              _entityEditWidget = new EntityEditWidget(
+                std::get< shift::EntitiesTypes::OBJECT >(
+                DomainManager::getActiveDomain( )->
+                entitiesTypes( ).entitiesTypes( )[0]),
+                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
+                0, entity );
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show();
+            }
+            else if ( superPopChildEntity &&
+              superPopChildEntity == selectedAction )
+            {
+              _entityEditWidget = new EntityEditWidget(
+                std::get< shift::EntitiesTypes::OBJECT >(
+                DomainManager::getActiveDomain( )->
+                entitiesTypes( ).entitiesTypes( )[1]),
+                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
+                0, entity );
+              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
+              EntityEditWidget::parentDock( )->show( );
+              _entityEditWidget->show();
             }
             else
             {

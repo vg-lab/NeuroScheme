@@ -45,7 +45,6 @@ namespace nslib
   public slots:
     void validateDialog( );
     void cancelDialog( );
-    void refreshSubproperties( void );
 
   private:
     shift::Entity* _parentEntity;

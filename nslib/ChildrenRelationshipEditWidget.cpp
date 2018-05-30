@@ -59,10 +59,10 @@ namespace nslib
 
 
       setLayout( myLayout );
-      setWindowTitle( tr( "Children added:" ) );
+      setWindowTitle( tr( "Children to add:" ) );
       int posGrid = 1;
       for(auto entity : _childrenEntities){
-        std::string stringLabel =  "Added " + entity->getProperty("Entity name").value<std::string>() + " as child (ID " + std::to_string( entity->entityGid() ) + ")";
+        std::string stringLabel =  "Add " + entity->getProperty("Entity name").value<std::string>() + " as child (ID " + std::to_string( entity->entityGid() ) + ")";
         auto label = new QLabel( QString::fromStdString( stringLabel));
         myLayout->addWidget( label, posGrid++, 0 );
       }
@@ -81,80 +81,23 @@ namespace nslib
 
   void ChildrenRelationshipEditWidget::validateDialog( void )
   {
-    shift::RelationshipProperties* propObject;
-
-    auto& relConnectsTo =
-      *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
-    auto& relConnectedBy =
-      *( DataManager::entities( ).relationships( )["connectedBy"]->asOneToN( ));
-
-    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-      ->relationshipPropertiesTypes( );
-    auto connectsToIt = relConnectsTo.find( _parentEntity->entityGid( ));
-    if( !( connectsToIt != relConnectsTo.end( )))
+    auto& entities = nslib::DataManager::entities( );
+    auto& relParentOf=
+      *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+    auto& relChildOf =
+      *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+    for(auto childEntity : _childrenEntities )
     {
-      propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" )->create( );
-      relConnectsTo[ _parentEntity->entityGid( )].insert(
-        std::make_pair( _parentEntity->entityGid( ), propObject ));
-      relConnectedBy[ _parentEntity->entityGid( )].insert(
-        std::make_pair( _parentEntity->entityGid( ), nullptr ));
-    }
-    else
-    {
-      auto connectsToMMIt =
-        connectsToIt->second.find( _parentEntity->entityGid( ));
-      if( !( connectsToMMIt != connectsToIt->second.end( )))
-      {
-        propObject = relationshipPropertiesTypes.getRelationshipProperties(
-          "connectsTo" )->create( );
-        relConnectsTo[ _parentEntity->entityGid( )].insert(
-          std::make_pair( _parentEntity->entityGid( ), propObject ));
-        relConnectedBy[ _parentEntity->entityGid( )].insert(
-          std::make_pair( _parentEntity->entityGid( ), nullptr ));
-      }
-      else
-      {
-        propObject = connectsToMMIt->second;
-      }
+      shift::Relationship::Establish( relParentOf, relChildOf, _parentEntity,childEntity );
     }
 
-
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
-
-    bool needToClearCache = false;
-    for ( const auto& creatorPair :
-            nslib::RepresentationCreatorManager::creators( ))
-    {
-      needToClearCache = needToClearCache ||
-        creatorPair.second->relationshipUpdatedOrCreated( propObject );
-    }
+//    bool needToClearCache = false;
+//    for ( const auto& creatorPair :
+//            nslib::RepresentationCreatorManager::creators( ))
+//    {
+//      needToClearCache = needToClearCache ||
+//        creatorPair.second->relationshipUpdatedOrCreated( propObject );
+//    }
 
     // TODO improvemente: check if cache needs to be cleared or if just the
     // items related to the entity under edition
@@ -173,59 +116,6 @@ namespace nslib
   void ChildrenRelationshipEditWidget::cancelDialog(  )
   {
     this->hide( );
-  }
-
-  void ChildrenRelationshipEditWidget::refreshSubproperties( void )
-  {
-    // First set all values via caster
-    // TODO this code is the same as in validate
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = _propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
-
-    // Now hide/show widgets depending on the values set before
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-
-      if ( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-                                         label ))
-      {
-        labelWidget->hide( );
-        widget->hide( );
-      }
-      else
-      {
-        labelWidget->show( );
-        widget->show( );
-      }
-    }
   }
 
 }

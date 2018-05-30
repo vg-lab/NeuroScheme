@@ -45,9 +45,11 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
+    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_,
+    shift::Entity* parentEntity_)
     : QWidget( parent_ )
     , _entity( nullptr )
+    , _parentEntity( parentEntity_ )
     , _action( action )
     , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
@@ -213,10 +215,11 @@ namespace nslib
         {
           continue;
         }
-        const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
+        const auto& editType =
+          std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
-        if ( editType ==  TWidgetType::COMBO )
+        if ( editType == TWidgetType::COMBO )
         {
           auto comboWidget = dynamic_cast< QComboBox* >( widget );
           paramString = comboWidget->currentText( );
@@ -228,7 +231,7 @@ namespace nslib
           //change name if multiple are created silmultaneus
           if( numEles > 1 && label == "Entity name" )
           {
-            paramString = paramString+QString( "_" )+QString::number( i );
+            paramString = paramString + QString( "_" ) + QString::number( i );
           }
         }
         else
@@ -237,8 +240,8 @@ namespace nslib
         auto caster = fires::PropertyManager::getPropertyCaster( label );
         if ( !_entity->hasProperty( label ))
         {
-          // WAR: This is to force create/copy properties not defined in the JSON
-          // but defined in when loading data, but does not solve all cases
+          // WAR: This is to force create/copy properties not defined in the
+          // JSON but defined in when loading data, but does not solve all cases
           auto prop = origEntity->getProperty( label );
           _entity->registerProperty( label, prop );
         }
@@ -249,7 +252,6 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
-
           bool isUnique = _entity->hasPropertyFlag(
             label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
@@ -261,13 +263,13 @@ namespace nslib
               for( const auto entity: entities )
               {
                 if ( entity->isSameEntityType( _entity ) &&
-                     entity->hasProperty( label ))
+                    entity->hasProperty( label ))
                 {
                   if ( caster->toString( entity->getProperty( label )) == pStr )
                   {
                     errorMessages.push_back(
-                      QString( "Property '" ) + QString::fromStdString( label ) +
-                      QString( "' is repeated" ));
+                      QString( "Property '" ) + QString::fromStdString( label )
+                      + QString( "' is repeated" ));
                     saveNewPropValue = false;
                     break;
                   }
@@ -276,7 +278,6 @@ namespace nslib
             }
           }
         }
-
         if ( saveNewPropValue )
         {
           caster->fromString( prop, paramString.toStdString( ));
@@ -336,8 +337,7 @@ namespace nslib
         for ( const auto& subentity : subentities )
         {
           shift::Relationship::Establish(
-            relSuperEntityOf, relSubEntityOf,
-            _entity, subentity );
+            relSuperEntityOf, relSubEntityOf, _entity, subentity );
           nslib::DataManager::entities( ).add( subentity );
           nslib::PaneManager::activePane( )->entities( ).add( subentity );
         }
@@ -351,7 +351,7 @@ namespace nslib
       if ( _action == EDIT_ENTITY )
       {
         for ( const auto& repPair :
-            nslib::RepresentationCreatorManager::repsToEntities( ))
+          nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;
@@ -361,9 +361,18 @@ namespace nslib
           pane->reps( ).clear( );
           // pane->resizeEvent( nullptr );
           pane->displayEntities(
-            nslib::PaneManager::activePane( )->entities( ),
-            false, true );
+            nslib::PaneManager::activePane( )->entities( ), false, true );
         }
+        }
+      if( _parentEntity )
+      {
+        auto& entities = nslib::DataManager::entities( );
+        auto& relParentOf =
+          *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
+        auto& relChildOf =
+          *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+        shift::Relationship::Establish( relParentOf, relChildOf,
+          _parentEntity, _entity );
       }
     }
   }
