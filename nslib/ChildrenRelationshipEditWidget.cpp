@@ -20,7 +20,7 @@
  *
  */
 
-#include "ConnectionRelationshipEditWidget.h"
+#include "ChildrenRelationshipEditWidget.h"
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "PaneManager.h"
@@ -36,141 +36,50 @@
 namespace nslib
 {
 
-  ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
-    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+  ChildrenRelationshipEditWidget::ChildrenRelationshipEditWidget(
+    shift::Entity* parentEntity_,
+    std::vector< shift::Entity* > childrenEntities_,
     QWidget* parent_, bool modal )
     : QDialog ( parent_ )
-    , _originEntity( originEntity_ )
-    , _destinationEntity( destinationEntity_ )
+    , _parentEntity( parentEntity_ )
+    , _childrenEntities( childrenEntities_ )
   {
-
-    this->setModal(modal);
-    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-      ->relationshipPropertiesTypes( );
-    shift::Properties* propObject;
-
-    bool propertyObjExists = true;
-
+    this->setModal( modal );
     auto& relConnectsTo =
-      *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
-    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
-    if( connectsToIt != relConnectsTo.end( ))
+        *( DataManager::entities( ).relationships( )[ "isParentOf" ]->asOneToN( ) );
+    auto connectsToIt = relConnectsTo.find( _parentEntity->entityGid( ) );
+    if( connectsToIt != relConnectsTo.end( ) )
     {
-      auto connectsToMMIt =
-        connectsToIt->second.find( _destinationEntity->entityGid( ));
-      if( connectsToMMIt != connectsToIt->second.end( ))
-      {
-        propObject = connectsToMMIt->second;
+      QGridLayout* myLayout = new QGridLayout;
+      myLayout->setAlignment( Qt::AlignTop );
+
+      auto labelRel = new QLabel( QString( "ParentShip Parameters" ) );
+      myLayout->addWidget( labelRel, 0, 0, 1, 0 );
+
+
+
+      setLayout( myLayout );
+      setWindowTitle( tr( "Children added:" ) );
+      int posGrid = 1;
+      for(auto entity : _childrenEntities){
+        std::string stringLabel =  "Added " + entity->getProperty("Entity name").value<std::string>() + " as child (ID " + std::to_string( entity->entityGid() ) + ")";
+        auto label = new QLabel( QString::fromStdString( stringLabel));
+        myLayout->addWidget( label, posGrid++, 0 );
       }
-      else
-      {
-        propObject = relationshipPropertiesTypes.getRelationshipProperties(
-          "connectsTo" );
-        propertyObjExists = false;
-      }
+
+      QPushButton* cancelButton = new QPushButton( QString( "Cancel" ) );
+      myLayout->addWidget( cancelButton, posGrid, 0 );
+      QPushButton* validationButton = new QPushButton( QString( "Create" ) );
+      myLayout->addWidget( validationButton, posGrid, 1 );
+
+      connect( cancelButton, SIGNAL( clicked( ) ), this,
+               SLOT( cancelDialog( ) ) );
+      connect( validationButton, SIGNAL( clicked( ) ),
+               this, SLOT( validateDialog( ) ) );
     }
-    else
-    {
-      propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" );
-      propertyObjExists = false;
-    }
-    _propObject = propObject;
-
-    assert( propObject );
-
-    QGridLayout* myLayout = new QGridLayout;
-    myLayout->setAlignment( Qt::AlignTop );
-
-    auto labelRel = new QLabel( QString( "Relationship Parameters" ));
-    myLayout->addWidget( labelRel, 0, 0, 1, 0 );
-
-    unsigned int numProp = 1;
-
-    for( const auto& propPair: propObject->properties( ))
-    {
-      const auto prop = propPair.first;
-      auto caster = fires::PropertyManager::getPropertyCaster( prop );
-      if ( caster )
-      {
-        auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-        auto label = new QLabel( QString::fromStdString( propName ));
-        myLayout->addWidget( label, numProp, 0 );
-
-        const auto& categories = caster->categories( );
-        TWidgetType widgetType;
-        QWidget* widget;
-        if ( !categories.empty( ) )
-        {
-          widgetType = TWidgetType::COMBO;
-          auto comboBoxWidget = new QComboBox;
-          widget = comboBoxWidget;
-          auto currentCategory = caster->toString( propPair.second );
-          unsigned int index = 0;
-          for ( const auto& category : categories )
-            comboBoxWidget->addItem( QString::fromStdString( category ));
-          for ( const auto& category : categories )
-          {
-            if ( category != currentCategory )
-              ++index;
-            else
-              break;
-          }
-          comboBoxWidget->setCurrentIndex( index );
-          comboBoxWidget->setEnabled( true );
-          connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-            this, SLOT( refreshSubproperties( )));
-        }
-        else
-        {
-          widgetType = TWidgetType::LINE_EDIT;
-          auto lineEditwidget = new QLineEdit;
-          widget = lineEditwidget;
-          if( propName == "Name" )
-          {
-            QString connectionName( QString::fromStdString(
-              ( propertyObjExists ? propObject->getProperty(
-                "Name" ).value<std::string>( ) : originEntity_->getProperty(
-                "Entity name" ).value<std::string>( ) + "-" +
-                destinationEntity_->getProperty(
-                "Entity name" ).value<std::string>( ))));
-            lineEditwidget->setText( connectionName );
-          }
-          else
-          {
-            lineEditwidget->setText( QString::fromStdString(
-              caster->toString( propPair.second )));
-          }
-          lineEditwidget->setEnabled( true );
-        }
-
-        myLayout->addWidget( widget, numProp, 1 );
-
-        if ( !propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-          propName ))
-        {
-          label->hide( );
-          widget->hide( );
-        }
-        numProp++;
-        _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
-      }
-    }
-
-    QPushButton* cancelButton = new QPushButton( QString( "Cancel" ));
-    myLayout->addWidget( cancelButton, numProp, 0 );
-    QPushButton* validationButton = new QPushButton( QString( "Create" ));
-    myLayout->addWidget( validationButton, numProp, 1 );
-
-    connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
-    connect( validationButton, SIGNAL( clicked( )),
-             this, SLOT( validateDialog( )));
-
-    setLayout( myLayout );
-    setWindowTitle( tr( "Create connection relationship" ));
   }
 
-  void ConnectionRelationshipEditWidget::validateDialog( void )
+  void ChildrenRelationshipEditWidget::validateDialog( void )
   {
     shift::RelationshipProperties* propObject;
 
@@ -181,28 +90,28 @@ namespace nslib
 
     auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
-    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
+    auto connectsToIt = relConnectsTo.find( _parentEntity->entityGid( ));
     if( !( connectsToIt != relConnectsTo.end( )))
     {
       propObject = relationshipPropertiesTypes.getRelationshipProperties(
         "connectsTo" )->create( );
-      relConnectsTo[ _originEntity->entityGid( )].insert(
-        std::make_pair( _destinationEntity->entityGid( ), propObject ));
-      relConnectedBy[ _destinationEntity->entityGid( )].insert(
-        std::make_pair( _originEntity->entityGid( ), nullptr ));
+      relConnectsTo[ _parentEntity->entityGid( )].insert(
+        std::make_pair( _parentEntity->entityGid( ), propObject ));
+      relConnectedBy[ _parentEntity->entityGid( )].insert(
+        std::make_pair( _parentEntity->entityGid( ), nullptr ));
     }
     else
     {
       auto connectsToMMIt =
-        connectsToIt->second.find( _destinationEntity->entityGid( ));
+        connectsToIt->second.find( _parentEntity->entityGid( ));
       if( !( connectsToMMIt != connectsToIt->second.end( )))
       {
         propObject = relationshipPropertiesTypes.getRelationshipProperties(
           "connectsTo" )->create( );
-        relConnectsTo[ _originEntity->entityGid( )].insert(
-          std::make_pair( _destinationEntity->entityGid( ), propObject ));
-        relConnectedBy[ _destinationEntity->entityGid( )].insert(
-          std::make_pair( _originEntity->entityGid( ), nullptr ));
+        relConnectsTo[ _parentEntity->entityGid( )].insert(
+          std::make_pair( _parentEntity->entityGid( ), propObject ));
+        relConnectedBy[ _parentEntity->entityGid( )].insert(
+          std::make_pair( _parentEntity->entityGid( ), nullptr ));
       }
       else
       {
@@ -261,12 +170,12 @@ namespace nslib
     this->hide( );
   }
 
-  void ConnectionRelationshipEditWidget::cancelDialog(  )
+  void ChildrenRelationshipEditWidget::cancelDialog(  )
   {
     this->hide( );
   }
 
-  void ConnectionRelationshipEditWidget::refreshSubproperties( void )
+  void ChildrenRelationshipEditWidget::refreshSubproperties( void )
   {
     // First set all values via caster
     // TODO this code is the same as in validate

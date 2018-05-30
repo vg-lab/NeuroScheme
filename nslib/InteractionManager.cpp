@@ -41,6 +41,8 @@ namespace nslib
   QMenu* InteractionManager::_contextMenu = nullptr;
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
+  ChildrenRelationshipEditWidget*
+    InteractionManager::_editChildrenRelationship = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
   Qt::MouseButtons InteractionManager::_buttons = 0;
@@ -349,7 +351,7 @@ namespace nslib
 
             } else if ( childrenEntity && childrenEntity == selectedAction )
             {
-              //Todo add children
+              editChildrenRelationship(entity,SelectionManager::getActiveSelection());
               std::cout << "TODO add children" << std::endl;
             }
             else
@@ -673,11 +675,21 @@ namespace nslib
   {
     if ( _conRelationshipEditWidget != nullptr )
       delete _conRelationshipEditWidget;
-    std::cout << "Creada autoConexion" << std::endl;
     _conRelationshipEditWidget =
       new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
         &PaneManager::activePane()->view(), true);
     _conRelationshipEditWidget->show( );
+  }
+
+  void InteractionManager::editChildrenRelationship(
+      shift::Entity* parentEntity_,  std::vector< shift::Entity* > childrenEntities_ )
+  {
+    if ( _editChildrenRelationship != nullptr )
+      delete _editChildrenRelationship;
+    _editChildrenRelationship =
+        new ChildrenRelationshipEditWidget( parentEntity_, childrenEntities_,
+          &PaneManager::activePane()->view(), true);
+    _editChildrenRelationship->show( );
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(

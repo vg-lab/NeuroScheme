@@ -46,7 +46,7 @@
                 {
                     "name": "Entity name",
                     "type": "std::string",
-                    "flags": [ "EDITABLE" ]
+                    "flags": [ "EDITABLE", "UNIQUE" ]
                 },
                 {
                     "name": "Nb of neurons Mean",
@@ -179,6 +179,5 @@
                 }
             ]
         }
-
     ]
 }
