@@ -44,7 +44,7 @@ namespace nslib
     , _destinationEntity( destinationEntity_ )
   {
 
-    this->setModal(modal);
+    this->setModal( modal );
     auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
     shift::Properties* propObject;
@@ -184,6 +184,7 @@ namespace nslib
     auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
     if( !( connectsToIt != relConnectsTo.end( )))
     {
+
       propObject = relationshipPropertiesTypes.getRelationshipProperties(
         "connectsTo" )->create( );
       relConnectsTo[ _originEntity->entityGid( )].insert(

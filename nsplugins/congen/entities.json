@@ -178,6 +178,48 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "ParentOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TParentOfConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "ChildOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronSuperPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TChildOfConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
         }
     ]
 }

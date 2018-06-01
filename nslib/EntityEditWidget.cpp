@@ -322,7 +322,10 @@ namespace nslib
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
         nslib::DataManager::entities( ).add( _entity );
-        nslib::PaneManager::activePane( )->entities( ).add( _entity );
+        if ( !_parentEntity )
+        {
+          nslib::PaneManager::activePane( )->entities( ).add( _entity );
+        }
 
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
@@ -373,6 +376,7 @@ namespace nslib
           *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
         shift::Relationship::Establish( relParentOf, relChildOf,
           _parentEntity, _entity );
+
       }
     }
   }
