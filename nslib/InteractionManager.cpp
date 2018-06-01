@@ -219,10 +219,34 @@ namespace nslib
           if ( _entityEditWidget != nullptr )
             delete _entityEditWidget;
 
+          //TODO MAKE CONGEN EXCLUSIVE FER IAGO
+          auto& relChildOf = *( DataManager::entities( ).relationships( )
+            [ "isChildOf" ]->asOneToOne( ));
+          const auto& sceneEntities = PaneManager::activePane( )->entities( ).vector();
+          int commonParent = -1;
+          if ( !sceneEntities.empty( ))
+          {
+            commonParent = ( int ) relChildOf[ sceneEntities.front( )
+              ->entityGid( ) ].entity;
+
+            for ( auto sceneEntity : sceneEntities )
+            {
+              if ( commonParent !=
+                ( int ) relChildOf[ sceneEntity->entityGid( ) ].entity )
+              {
+                commonParent = -1;
+                break;
+              }
+
+            }
+          }
+          shift::Entity* parentEntity = (commonParent <= 0) ? nullptr : DataManager::entities( ).at( commonParent );
+          //TODO MAKE CONGEN EXCLUSIVE
+
           _entityEditWidget = new EntityEditWidget(
             std::get< shift::EntitiesTypes::OBJECT >(
               entitiesTypes[actionToIdx[selectedAction]]),
-            EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY );
+            EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY, 0, parentEntity );
           EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
           EntityEditWidget::parentDock( )->show( );
           _entityEditWidget->show();
@@ -378,6 +402,7 @@ namespace nslib
             else if ( superPopChildEntity &&
               superPopChildEntity == selectedAction )
             {
+
               _entityEditWidget = new EntityEditWidget(
                 std::get< shift::EntitiesTypes::OBJECT >(
                 DomainManager::getActiveDomain( )->

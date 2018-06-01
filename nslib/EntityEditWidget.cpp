@@ -23,6 +23,7 @@
 #include "DataManager.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "DomainManager.h"
 
 #include <QtGui>
 #include <QPushButton>
@@ -366,18 +367,26 @@ namespace nslib
           pane->displayEntities(
             nslib::PaneManager::activePane( )->entities( ), false, true );
         }
-        }
+      }
+
       if( _parentEntity )
       {
+
         auto& entities = nslib::DataManager::entities( );
         auto& relParentOf =
           *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
         auto& relChildOf =
           *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+
         shift::Relationship::Establish( relParentOf, relChildOf,
           _parentEntity, _entity );
-
       }
+      //TODO MAKE CONGEN EXCLUSIVE FER IAGO
+      else
+      {
+        nslib::DataManager::rootEntities( ).add( _entity );
+      }
+      //TODO MAKE CONGEN EXCLUSIVE
     }
   }
 
