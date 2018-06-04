@@ -47,10 +47,11 @@ namespace nslib
 
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_,
-    shift::Entity* parentEntity_)
+    bool addToScene_, shift::Entity* parentEntity_)
     : QWidget( parent_ )
     , _entity( nullptr )
     , _parentEntity( parentEntity_ )
+    , _addToScene( addToScene_ )
     , _action( action )
     , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
@@ -323,7 +324,7 @@ namespace nslib
       if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
       {
         nslib::DataManager::entities( ).add( _entity );
-        if ( !_parentEntity )
+        if ( _addToScene )
         {
           nslib::PaneManager::activePane( )->entities( ).add( _entity );
         }

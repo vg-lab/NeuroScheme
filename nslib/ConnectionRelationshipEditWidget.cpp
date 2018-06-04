@@ -184,7 +184,6 @@ namespace nslib
     auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
     if( !( connectsToIt != relConnectsTo.end( )))
     {
-
       propObject = relationshipPropertiesTypes.getRelationshipProperties(
         "connectsTo" )->create( );
       relConnectsTo[ _originEntity->entityGid( )].insert(
