@@ -209,8 +209,8 @@ namespace nslib
 
             actionToIdx[ action ] = entityIdx;
             ++entityIdx;
-          }
 
+          }
         }
         QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
         if ( selectedAction )
@@ -219,7 +219,6 @@ namespace nslib
           if ( _entityEditWidget )
             delete _entityEditWidget;
 
-          //TODO MAKE CONGEN EXCLUSIVE FER IAGO
           auto& relChildOf = *( DataManager::entities( ).relationships( )
             [ "isChildOf" ]->asOneToOne( ));
           const auto& sceneEntities = PaneManager::activePane( )->entities( ).vector();
@@ -242,7 +241,6 @@ namespace nslib
           }
           shift::Entity* parentEntity = (commonParent <= 0)
             ? nullptr : DataManager::entities( ).at( commonParent );
-          //TODO MAKE CONGEN EXCLUSIVE
 
           _entityEditWidget = new EntityEditWidget(
             std::get< shift::EntitiesTypes::OBJECT >(
@@ -266,7 +264,7 @@ namespace nslib
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          auto entityGid = ( *entities.begin( ) )->entityGid( );
+          auto entityGid = ( *entities.begin( ))->entityGid( );
 
           auto& relParentOf = *( DataManager::entities( ).
                                  relationships( )[ "isParentOf" ]->asOneToN( ));
@@ -294,29 +292,37 @@ namespace nslib
           {
             editEntity = _contextMenu->addAction( "Edit" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
-
-              if(entity->hasProperty( "Neuron model" ) )
+              //TODO connection restricition support
+              if(entity->hasProperty( "Neuron model" ))
               {
                 autoEntity = _contextMenu->addAction( "Add Auto Connection" );
               }
+
               /** TODO add drag and drop-esque functionality
               else if( entity->hasProperty( "Nb of neurons Mean" ) )
               {
                 childrenEntities =
                   _contextMenu->addAction( "Add selection as children" );
               }*/
+
             }
 
+         /* shift::RelationshipPropertiesTypes::rel_constr_range n;
+          n = shift::RelationshipPropertiesTypes::constraints( "ParentOf","NeuronSuperPop");
+          for (auto it=n.first; it!=n.second; ++it){
+            std::cout << "child: ";
+            std::cout << it->second << std::endl;
+          }*/
           if ( editEntity || dupEntity || autoEntity
             /** || childrenEntity //TODO add drag and drop-esque functionality*/)
             _contextMenu->addSeparator( );
 
-
           QAction* childAction = nullptr;
-          shift::EntitiesTypes::TEntitiesTypes entitiesTypes;
+
           unsigned int entityIdx = 0;
           std::unordered_map< QAction*, unsigned int > actionToIdx;
 
+		  /*
           if( entity->hasProperty( "Nb of neurons Mean" ) )
           {
             auto domain = DomainManager::getActiveDomain( );
@@ -340,6 +346,28 @@ namespace nslib
               }
             }
             _contextMenu->addSeparator( );
+          }*/
+          auto domain = DomainManager::getActiveDomain( );
+          auto entitiesTypes = new std::vector<shift::Entity*>;
+          if ( domain ) {
+            auto domainEntitiesTypes = domain->entitiesTypes();
+            std::cout << "Type detected: " << domainEntitiesTypes.entityTypeName(entity) << std::endl;
+            shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
+            childrenTypesNames = shift::RelationshipPropertiesTypes::constraints("ParentOf",
+              domainEntitiesTypes.entityTypeName( entity ));
+            for (auto childTypeName = childrenTypesNames.first;
+                 childTypeName != childrenTypesNames.second; ++childTypeName) {
+              std::cout << "child: " << childTypeName->second << std::endl;
+              childAction = _contextMenu->addAction(
+                      QString("Add ") + QString::fromStdString(
+                              childTypeName->second) + QString(" as child"));
+              actionToIdx[childAction] = entityIdx;
+                entitiesTypes->push_back(domainEntitiesTypes.getEntityObject(childTypeName->second));
+              ++entityIdx;
+            }
+            if (childAction) {
+              _contextMenu->addSeparator();
+            }
           }
 
           QAction* levelUp = ( parent != 0 )
@@ -412,7 +440,7 @@ namespace nslib
               if( levelUpToNewPane && levelUpToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
-                  nslib::PaneManager::newPaneFromActivePane( ) );
+                  nslib::PaneManager::newPaneFromActivePane( ));
               }
               if ( parentSiblings.size( ) > 0 )
               {
@@ -444,8 +472,7 @@ namespace nslib
               }
 
               for ( const auto& child : children )
-                targetEntities.add(
-                    DataManager::entities( ).at( child.first ) );
+                targetEntities.add( DataManager::entities( ).at( child.first ));
             }
             else if ( ( expandGroup && expandGroup == selectedAction ) ||
               ( expandGroupToNewPane &&
@@ -468,8 +495,7 @@ namespace nslib
                 delete _entityEditWidget;
               }
               _entityEditWidget = new EntityEditWidget(
-                std::get< shift::EntitiesTypes::OBJECT >(
-                entitiesTypes[ actionToIdx[ selectedAction ] ] ),
+                entitiesTypes->at( actionToIdx[ selectedAction ] ),
                 EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY, nullptr,
                 false, entity );
 
@@ -498,9 +524,9 @@ namespace nslib
       }
     }
 
-    if( _tmpConnectionLine && _tmpConnectionLine->scene( ) )
+    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
     {
-      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ) );
+      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
     }
 
   } // context menu
@@ -761,6 +787,7 @@ namespace nslib
   {
     if ( _conRelationshipEditWidget )
       delete _conRelationshipEditWidget;
+
     _conRelationshipEditWidget =
       new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
         &PaneManager::activePane()->view(), true);

@@ -520,7 +520,6 @@
            "includes" : [ ],
            "constraints":
            [
-               { "srcEntity": "Neuron", "dstEntity": "" },
                { "srcEntity": "MiniColumn", "dstEntity": "Neuron" },
                { "srcEntity": "Column", "dstEntity": "MiniColumn" }
            ],
@@ -543,8 +542,7 @@
            "constraints":
            [
                { "srcEntity": "Neuron", "dstEntity": "MiniColumn" },
-               { "srcEntity": "MiniColumn", "dstEntity": "Column" },
-               { "srcEntity": "Column", "dstEntity": "" }
+               { "srcEntity": "MiniColumn", "dstEntity": "Column" }
            ],
            "flags": [ ],
            "properties": [ ],

@@ -36,6 +36,7 @@
 #include <QMessageBox>
 
 #include <memory>
+#include <ShiFT/shift/Relationship.h>
 
 //TODO?: Add relations to entities (parentOf, childOf ...)
 
@@ -122,7 +123,7 @@ namespace nslib
         }
       }
 
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         QFrame* sep3 = new QFrame( );
         QFrame* sep4 = new QFrame( );
@@ -189,14 +190,14 @@ namespace nslib
     auto origEntity = _entity;
     unsigned int numEles = 1;
 
-    if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+    if ( _action == DUPLICATE_ENTITY || _isNew )
     {
       numEles = _numNewEntities->text( ).toInt( );
     }
 
-    for (unsigned int i=0;i<numEles;++i)
+    for ( unsigned int i = 0; i < numEles; ++i )
     {
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         _entity = _entity->create( );
       }
@@ -207,18 +208,19 @@ namespace nslib
 
       for ( const auto& entityParam: _entityParamCont )
       {
-        const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
+        const auto
+          &labelWidget = std::get< TEditTuple::LABEL >( entityParam );
         const auto& label = labelWidget->text( ).toStdString( );
 
-        bool isEditable = origEntity->hasPropertyFlag(
-          label, shift::Entity::TPropertyFlag::EDITABLE );
+        bool isEditable = origEntity
+          ->hasPropertyFlag ( label, shift::Entity::TPropertyFlag::EDITABLE );
 
         if ( ( _action == EDIT_ENTITY ) && !isEditable )
         {
           continue;
         }
-        const auto& editType =
-          std::get< TEditTuple::WIDGET_TYPE >( entityParam );
+        const auto
+          & editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
         if ( editType == TWidgetType::COMBO )
@@ -231,7 +233,7 @@ namespace nslib
           auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
           //change name if multiple are created silmultaneus
-          if( numEles > 1 && label == "Entity name" )
+          if ( numEles > 1 && label == "Entity name" )
           {
             paramString = paramString + QString( "_" ) + QString::number( i );
           }
@@ -254,29 +256,36 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
-          bool isUnique = _entity->hasPropertyFlag(
-            label, shift::Entity::TPropertyFlag::UNIQUE );
+          bool isUnique = _entity
+            ->hasPropertyFlag ( label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
           {
             std::string pStr = paramString.toStdString( );
-            if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
+            if ( _isNew ||
+               caster->toString( prop ) != pStr ) // If value changed
             {
-              const auto &entities = nslib::DataManager::entities( ).vector( );
-              for( const auto entity: entities )
+              const auto
+                &entities = nslib::DataManager::entities( ).vector( );
+              for ( const auto entity: entities )
               {
                 if ( entity->isSameEntityType( _entity ) &&
-                    entity->hasProperty( label ))
+                     entity->hasProperty( label ))
                 {
                   if ( caster->toString( entity->getProperty( label )) == pStr )
                   {
-                    errorMessages.push_back(
-                      QString( "Property '" ) + QString::fromStdString( label )
-                      + QString( "' is repeated" ));
+                    errorMessages.push_back(QString( "Property '" ) +
+                       QString::fromStdString( label ) +
+                       QString( "' is repeated" ));
                     saveNewPropValue = false;
                     break;
                   }
                 }
               }
+              /*if( _parentEntity )
+              {
+                _parentEntity->setRelatedDependencies ( "isParentOf",_entity );
+              }*/
+
             }
           }
         }
@@ -289,7 +298,7 @@ namespace nslib
       if ( !errorMessages.empty( ))
       {
         QString errors = "<p><strong>Errors: </strong></p><ul>";
-        for( const auto& err: errorMessages )
+        for ( const auto& err: errorMessages )
         {
           errors += QString( "<li>" ) + err + QString( "</li>" );
         }
@@ -308,10 +317,10 @@ namespace nslib
 
       bool needToClearCache = false;
       for ( const auto& creatorPair :
-          nslib::RepresentationCreatorManager::creators( ))
+        nslib::RepresentationCreatorManager::creators( ))
       {
-        needToClearCache = needToClearCache ||
-          creatorPair.second->entityUpdatedOrCreated( _entity );
+        needToClearCache = needToClearCache || creatorPair.second
+          ->entityUpdatedOrCreated( _entity );
       }
 
       // TODO improvemente: check if cache needs to be cleared or if just the
@@ -321,7 +330,7 @@ namespace nslib
       nslib::RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         nslib::DataManager::entities( ).add( _entity );
         if ( _addToScene )
@@ -341,8 +350,8 @@ namespace nslib
         //TODO: improve this set of adds which will do push_backs
         for ( const auto& subentity : subentities )
         {
-          shift::Relationship::Establish(
-            relSuperEntityOf, relSubEntityOf, _entity, subentity );
+          shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
+            _entity, subentity );
           nslib::DataManager::entities( ).add( subentity );
           nslib::PaneManager::activePane( )->entities( ).add( subentity );
         }
@@ -352,9 +361,36 @@ namespace nslib
         // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
         nslib::PaneManager::activePane( )->displayEntities(
           nslib::PaneManager::activePane( )->entities( ), false, true );
+
+        if ( _parentEntity )
+        {
+
+          auto& entities = nslib::DataManager::entities( );
+          auto& relParentOf =
+            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
+          auto& relChildOf =
+            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+
+          shift::Relationship::Establish( relParentOf, relChildOf,
+            _parentEntity, _entity );
+          nslib::PaneManager::activePane( )->refreshProperties (
+            nslib::PaneManager::activePane( )->entities( ));
+        }
+        else
+        {
+          nslib::DataManager::rootEntities( ).add( _entity );
+        }
       }
       if ( _action == EDIT_ENTITY )
       {
+        auto& relChildOf = *( DataManager::entities( ).relationships( )
+          [ "isChildOf" ]->asOneToOne ( ));
+        auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
+        if ( parentID > 0 )
+        {
+          auto parent = DataManager::entities( ).at( parentID );
+          parent->autoUpdateProperty ( nullptr, "Nb of neurons" );
+        }
         for ( const auto& repPair :
           nslib::RepresentationCreatorManager::repsToEntities( ))
         {
@@ -369,26 +405,24 @@ namespace nslib
             nslib::PaneManager::activePane( )->entities( ), false, true );
         }
       }
+    }/*
+    unsigned int nOfNeuron =
+      _entity->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
+    std::cout << "Nb of Neurons: " << nOfNeuron << std::endl;
+    auto& relChildOf =
+      *( DataManager::entities ( ).relationships ( )[ "isChildOf" ]
+        ->asOneToOne ( ) );
+    auto parentID = relChildOf[ _entity->entityGid ( ) ].entity;
+    if ( parentID > 0 ) {
+    auto parent = DataManager::entities ( ).at ( parentID );
+    unsigned int nOfParent =
+      parent->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
+      unsigned int nOfParent2 =
+        _parentEntity->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
+    std::cout << "Nb of Neurons parent 1: " << nOfParent << " parent 2: "<< nOfParent2 << std::endl;
+  }
+*/
 
-      if( _parentEntity )
-      {
-
-        auto& entities = nslib::DataManager::entities( );
-        auto& relParentOf =
-          *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
-        auto& relChildOf =
-          *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
-
-        shift::Relationship::Establish( relParentOf, relChildOf,
-          _parentEntity, _entity );
-      }
-      //TODO MAKE CONGEN EXCLUSIVE FER IAGO
-      else
-      {
-        nslib::DataManager::rootEntities( ).add( _entity );
-      }
-      //TODO MAKE CONGEN EXCLUSIVE
-    }
   }
 
 
