@@ -36,7 +36,7 @@
 #include <QMessageBox>
 
 #include <memory>
-#include <ShiFT/shift/Relationship.h>
+#include <shift/Relationship.h>
 
 namespace nslib
 {

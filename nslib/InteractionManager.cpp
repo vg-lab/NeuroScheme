@@ -192,25 +192,71 @@ namespace nslib
       auto domain = DomainManager::getActiveDomain( );
       if ( domain )
       {
-        const auto& entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
+        shift::EntitiesTypes domainEntitiesTypes = domain->entitiesTypes( );
+        const auto& entitiesTypes = domainEntitiesTypes.entitiesTypes( );
 
-        std::unordered_map< QAction*, unsigned int > actionToIdx;
-        unsigned int entityIdx = 0;
 
-        for ( const auto& type : entitiesTypes )
+        //Detect scene parent
+        auto& relChildOf = *( DataManager::entities( ).relationships( )
+          [ "isChildOf" ]->asOneToOne( ));
+        const auto& sceneEntities =
+          PaneManager::activePane( )->entities( ).vector( );
+        int commonParent = -1;
+        if ( !sceneEntities.empty( ))
         {
-          QAction* action = nullptr;
+          commonParent = ( int ) relChildOf[ sceneEntities.front( )
+            ->entityGid( ) ].entity;
 
-          if ( !std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
+          for ( auto sceneEntity : sceneEntities )
           {
-            action = _contextMenu->addAction(
-              QString( "Add " ) +QString::fromStdString(
-              std::get< shift::EntitiesTypes::ENTITY_NAME >( type )));
-
-            actionToIdx[ action ] = entityIdx;
-            ++entityIdx;
-
+            if ( commonParent !=
+                 ( int ) relChildOf[ sceneEntity->entityGid( ) ].entity )
+            {
+              commonParent = -1;
+              break;
+            }
           }
+        }
+        auto childrenTypes = new std::vector < std::string >;
+        std::unordered_map < QAction*, unsigned int > actionToIdx;
+        QAction* action = nullptr;
+        shift::Entity* parentEntity = nullptr;
+        unsigned int entityIdx = 0;
+        if ( commonParent <= 0 )
+        {
+          for ( const auto &type : entitiesTypes )
+          {
+            if ( !std::get < shift::EntitiesTypes::IS_SUBENTITY >( type ) )
+            {
+              std::string childType =
+                std::get < shift::EntitiesTypes::ENTITY_NAME >( type );
+              action = _contextMenu->addAction(
+                QString( "Add " ) + QString::fromStdString( childType ) );
+              childrenTypes->push_back( childType );
+              actionToIdx[ action ] = entityIdx;
+              ++entityIdx;
+            }
+          }
+        }
+        else
+        {
+          parentEntity = DataManager::entities( ).at( commonParent );
+
+          shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
+          childrenTypesNames =
+            shift::RelationshipPropertiesTypes::constraints( "ParentOf",
+            domainEntitiesTypes.entityTypeName( parentEntity ));
+          for (auto childTypeName = childrenTypesNames.first;
+               childTypeName != childrenTypesNames.second; ++childTypeName) {
+            std::cout << "child: " << childTypeName->second << std::endl;
+            action = _contextMenu->addAction(
+              QString("Add ") + QString::fromStdString(
+                childTypeName->second) + QString(" as child"));
+            actionToIdx[action] = entityIdx;
+            childrenTypes->push_back(childTypeName->second);
+            ++entityIdx;
+          }
+
         }
         QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
         if ( selectedAction )
@@ -219,32 +265,11 @@ namespace nslib
           if ( _entityEditWidget )
             delete _entityEditWidget;
 
-          auto& relChildOf = *( DataManager::entities( ).relationships( )
-            [ "isChildOf" ]->asOneToOne( ));
-          const auto& sceneEntities = PaneManager::activePane( )->entities( ).vector();
-          int commonParent = -1;
-          if ( !sceneEntities.empty( ))
-          {
-            commonParent = ( int ) relChildOf[ sceneEntities.front( )
-              ->entityGid( ) ].entity;
 
-            for ( auto sceneEntity : sceneEntities )
-            {
-              if ( commonParent !=
-                ( int ) relChildOf[ sceneEntity->entityGid( ) ].entity )
-              {
-                commonParent = -1;
-                break;
-              }
-
-            }
-          }
-          shift::Entity* parentEntity = (commonParent <= 0)
-            ? nullptr : DataManager::entities( ).at( commonParent );
 
           _entityEditWidget = new EntityEditWidget(
-            std::get< shift::EntitiesTypes::OBJECT >(
-              entitiesTypes[actionToIdx[selectedAction]]),
+            domainEntitiesTypes.getEntityObject(childrenTypes->at(
+            actionToIdx[ selectedAction ] )),
             EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
             nullptr, true, parentEntity );
           EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
@@ -267,11 +292,11 @@ namespace nslib
           auto entityGid = ( *entities.begin( ))->entityGid( );
 
           auto& relParentOf = *( DataManager::entities( ).
-                                 relationships( )[ "isParentOf" ]->asOneToN( ));
+            relationships( )[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
 
           auto& relChildOf = *( DataManager::entities( ).relationships( )
-                                [ "isChildOf" ]->asOneToOne( ));
+            [ "isChildOf" ]->asOneToOne( ));
           const auto& parent = relChildOf[ entityGid ].entity;
 
           const auto& grandParent =
@@ -280,7 +305,7 @@ namespace nslib
           const auto& parentSiblings = relParentOf[ grandParent ];
 
           auto& relAGroupOf = *( DataManager::entities( ).relationships( )
-                                [ "isAGroupOf" ]->asOneToN( ));
+            [ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
 
           QAction* editEntity = nullptr;
@@ -499,8 +524,8 @@ namespace nslib
               _entityEditWidget = new EntityEditWidget(
                 domainEntitiesTypes.getEntityObject(childrenTypes->at(
                   actionToIdx[ selectedAction ] )),
-                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY, nullptr,
-                false, entity );
+                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
+                nullptr, false, entity );
 
               EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
               EntityEditWidget::parentDock( )->show( );
