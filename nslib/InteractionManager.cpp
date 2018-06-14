@@ -348,21 +348,23 @@ namespace nslib
             _contextMenu->addSeparator( );
           }*/
           auto domain = DomainManager::getActiveDomain( );
-          auto entitiesTypes = new std::vector<shift::Entity*>;
+          shift::EntitiesTypes domainEntitiesTypes;
+          auto childrenTypes = new std::vector<std::string>;
           if ( domain ) {
-            auto domainEntitiesTypes = domain->entitiesTypes();
+            domainEntitiesTypes = domain->entitiesTypes( );
             std::cout << "Type detected: " << domainEntitiesTypes.entityTypeName(entity) << std::endl;
             shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
-            childrenTypesNames = shift::RelationshipPropertiesTypes::constraints("ParentOf",
+            childrenTypesNames =
+              shift::RelationshipPropertiesTypes::constraints( "ParentOf",
               domainEntitiesTypes.entityTypeName( entity ));
             for (auto childTypeName = childrenTypesNames.first;
                  childTypeName != childrenTypesNames.second; ++childTypeName) {
               std::cout << "child: " << childTypeName->second << std::endl;
               childAction = _contextMenu->addAction(
-                      QString("Add ") + QString::fromStdString(
-                              childTypeName->second) + QString(" as child"));
+                 QString("Add ") + QString::fromStdString(
+                 childTypeName->second) + QString(" as child"));
               actionToIdx[childAction] = entityIdx;
-                entitiesTypes->push_back(domainEntitiesTypes.getEntityObject(childTypeName->second));
+              childrenTypes->push_back(childTypeName->second);
               ++entityIdx;
             }
             if (childAction) {
@@ -488,14 +490,15 @@ namespace nslib
                 targetEntities.add(
                   DataManager::entities( ).at( groupedEntity.first ));
             }
-            else if ( selectedAction )
+            else if ( selectedAction && childAction )
             {
               if ( _entityEditWidget )
               {
                 delete _entityEditWidget;
               }
               _entityEditWidget = new EntityEditWidget(
-                entitiesTypes->at( actionToIdx[ selectedAction ] ),
+                domainEntitiesTypes.getEntityObject(childrenTypes->at(
+                  actionToIdx[ selectedAction ] )),
                 EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY, nullptr,
                 false, entity );
 

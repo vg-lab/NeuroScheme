@@ -38,8 +38,6 @@
 #include <memory>
 #include <ShiFT/shift/Relationship.h>
 
-//TODO?: Add relations to entities (parentOf, childOf ...)
-
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
@@ -281,11 +279,6 @@ namespace nslib
                   }
                 }
               }
-              /*if( _parentEntity )
-              {
-                _parentEntity->setRelatedDependencies ( "isParentOf",_entity );
-              }*/
-
             }
           }
         }
@@ -384,12 +377,12 @@ namespace nslib
       if ( _action == EDIT_ENTITY )
       {
         auto& relChildOf = *( DataManager::entities( ).relationships( )
-          [ "isChildOf" ]->asOneToOne ( ));
+          [ "isChildOf" ]->asOneToOne( ));
         auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
         if ( parentID > 0 )
         {
           auto parent = DataManager::entities( ).at( parentID );
-          parent->autoUpdateProperty ( nullptr, "Nb of neurons" );
+          parent->autoUpdateProperties( );
         }
         for ( const auto& repPair :
           nslib::RepresentationCreatorManager::repsToEntities( ))

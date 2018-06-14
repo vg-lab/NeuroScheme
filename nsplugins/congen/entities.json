@@ -51,7 +51,17 @@
                 {
                     "name": "Nb of neurons Mean",
                     "type": "uint",
-                    "flags": []
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MEAN",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Nb of neurons",
+                            "entities" : [ "NeuronPop", "NeuronSuperPop" ]
+                        }
+                    }
                 },
                 {
                     "name": "Nb of neurons",
