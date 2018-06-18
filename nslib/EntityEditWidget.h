@@ -45,7 +45,7 @@ namespace nslib
     TEntityEditWidgetAction;
 
     EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-      QWidget *parent = 0, bool addToScene_ = true,
+      QWidget *parentWidget_ = 0, bool addToScene_ = true,
       shift::Entity* parentEntity_= nullptr);
 
     ~EntityEditWidget( void );

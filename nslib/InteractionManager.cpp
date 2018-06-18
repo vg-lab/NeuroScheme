@@ -41,8 +41,6 @@ namespace nslib
   QMenu* InteractionManager::_contextMenu = nullptr;
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
-  ChildrenRelationshipEditWidget*
-    InteractionManager::_editChildrenRelationship = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
   Qt::MouseButtons InteractionManager::_buttons = 0;
@@ -195,7 +193,6 @@ namespace nslib
         shift::EntitiesTypes domainEntitiesTypes = domain->entitiesTypes( );
         const auto& entitiesTypes = domainEntitiesTypes.entitiesTypes( );
 
-
         //Detect scene parent
         auto& relChildOf = *( DataManager::entities( ).relationships( )
           [ "isChildOf" ]->asOneToOne( ));
@@ -206,7 +203,6 @@ namespace nslib
         {
           commonParent = ( int ) relChildOf[ sceneEntities.front( )
             ->entityGid( ) ].entity;
-
           for ( auto sceneEntity : sceneEntities )
           {
             if ( commonParent !=
@@ -217,14 +213,14 @@ namespace nslib
             }
           }
         }
-        auto childrenTypes = new std::vector < std::string >;
-        std::unordered_map < QAction*, unsigned int > actionToIdx;
+        auto childrenTypes = new std::vector< std::string >;
+        std::unordered_map< QAction*, unsigned int > actionToIdx;
         QAction* action = nullptr;
         shift::Entity* parentEntity = nullptr;
         unsigned int entityIdx = 0;
         if ( commonParent <= 0 )
         {
-          for ( const auto &type : entitiesTypes )
+          for ( const auto& type : entitiesTypes )
           {
             if ( !std::get < shift::EntitiesTypes::IS_SUBENTITY >( type ) )
             {
@@ -233,8 +229,7 @@ namespace nslib
               action = _contextMenu->addAction(
                 QString( "Add " ) + QString::fromStdString( childType ) );
               childrenTypes->push_back( childType );
-              actionToIdx[ action ] = entityIdx;
-              ++entityIdx;
+              actionToIdx[ action ] = entityIdx++;
             }
           }
         }
@@ -245,16 +240,14 @@ namespace nslib
           shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
           childrenTypesNames =
             shift::RelationshipPropertiesTypes::constraints( "ParentOf",
-            domainEntitiesTypes.entityTypeName( parentEntity ));
+              parentEntity->entityName( ));
           for (auto childTypeName = childrenTypesNames.first;
                childTypeName != childrenTypesNames.second; ++childTypeName) {
-            std::cout << "child: " << childTypeName->second << std::endl;
             action = _contextMenu->addAction(
-              QString("Add ") + QString::fromStdString(
-                childTypeName->second) + QString(" as child"));
-            actionToIdx[action] = entityIdx;
+              QString( "Add " ) + QString::fromStdString(
+                childTypeName->second) + QString(" as child" ));
+            actionToIdx[ action ] = entityIdx++;
             childrenTypes->push_back(childTypeName->second);
-            ++entityIdx;
           }
 
         }
@@ -264,8 +257,6 @@ namespace nslib
 
           if ( _entityEditWidget )
             delete _entityEditWidget;
-
-
 
           _entityEditWidget = new EntityEditWidget(
             domainEntitiesTypes.getEntityObject(childrenTypes->at(
@@ -311,92 +302,48 @@ namespace nslib
           QAction* editEntity = nullptr;
           QAction* dupEntity = nullptr;
           QAction* autoEntity = nullptr;
-          //QAction* childrenEntity = nullptr; TODO add drag and drop-esque functionality
           auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
             editEntity = _contextMenu->addAction( "Edit" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
               //TODO connection restricition support
-              if(entity->hasProperty( "Neuron model" ))
+              if(entity->hasProperty( "Nb of neurons" ))
               {
                 autoEntity = _contextMenu->addAction( "Add Auto Connection" );
               }
-
-              /** TODO add drag and drop-esque functionality
-              else if( entity->hasProperty( "Nb of neurons Mean" ) )
-              {
-                childrenEntities =
-                  _contextMenu->addAction( "Add selection as children" );
-              }*/
-
             }
-
-         /* shift::RelationshipPropertiesTypes::rel_constr_range n;
-          n = shift::RelationshipPropertiesTypes::constraints( "ParentOf","NeuronSuperPop");
-          for (auto it=n.first; it!=n.second; ++it){
-            std::cout << "child: ";
-            std::cout << it->second << std::endl;
-          }*/
-          if ( editEntity || dupEntity || autoEntity
-            /** || childrenEntity //TODO add drag and drop-esque functionality*/)
+          if ( editEntity || dupEntity || autoEntity )
             _contextMenu->addSeparator( );
 
           QAction* childAction = nullptr;
 
           unsigned int entityIdx = 0;
           std::unordered_map< QAction*, unsigned int > actionToIdx;
-
-		  /*
-          if( entity->hasProperty( "Nb of neurons Mean" ) )
-          {
-            auto domain = DomainManager::getActiveDomain( );
-
-            if ( domain )
-            {
-              entitiesTypes = domain->entitiesTypes( ).entitiesTypes( );
-
-              for ( const auto& type : entitiesTypes )
-              {
-                if ( !std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ) )
-                {
-                  childAction = _contextMenu->addAction(
-                    QString( "Add " ) +  QString::fromStdString(
-                    std::get< shift::EntitiesTypes::ENTITY_NAME >( type ) ) +
-                    QString( " as child" ) );
-
-                  actionToIdx[ childAction ] = entityIdx;
-                  ++entityIdx;
-                }
-              }
-            }
-            _contextMenu->addSeparator( );
-          }*/
           auto domain = DomainManager::getActiveDomain( );
           shift::EntitiesTypes domainEntitiesTypes;
-          auto childrenTypes = new std::vector<std::string>;
-          if ( domain ) {
+          auto childrenTypes = new std::vector< std::string >;
+          if ( domain )
+          {
             domainEntitiesTypes = domain->entitiesTypes( );
-            std::cout << "Type detected: " << domainEntitiesTypes.entityTypeName(entity) << std::endl;
             shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
             childrenTypesNames =
               shift::RelationshipPropertiesTypes::constraints( "ParentOf",
-              domainEntitiesTypes.entityTypeName( entity ));
+              entity->entityName( ));
             for (auto childTypeName = childrenTypesNames.first;
-                 childTypeName != childrenTypesNames.second; ++childTypeName) {
-              std::cout << "child: " << childTypeName->second << std::endl;
-              childAction = _contextMenu->addAction(
+              childTypeName != childrenTypesNames.second; ++childTypeName)
+            {
+               childAction = _contextMenu->addAction(
                  QString("Add ") + QString::fromStdString(
                  childTypeName->second) + QString(" as child"));
-              actionToIdx[childAction] = entityIdx;
-              childrenTypes->push_back(childTypeName->second);
-              ++entityIdx;
+               actionToIdx[childAction] = entityIdx++;
+               childrenTypes->push_back(childTypeName->second);
             }
-            if (childAction) {
-              _contextMenu->addSeparator();
+            if ( childAction )
+            {
+              _contextMenu->addSeparator( );
             }
           }
-
           QAction* levelUp = ( parent != 0 )
             ? _contextMenu->addAction( "Level up" ) : nullptr;
           QAction* levelDown = ( !children.empty( ))
@@ -417,12 +364,11 @@ namespace nslib
             ? _contextMenu->addAction( "Expand group [new pane]" ) : nullptr;
 
           if ( levelUp || levelDown || expandGroup || levelUpToNewPane ||
-              levelDownToNewPane || expandGroupToNewPane || editEntity )
+            levelDownToNewPane || expandGroupToNewPane || editEntity )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
-
             if ( editEntity && editEntity == selectedAction )
             {
               if ( _entityEditWidget )
@@ -452,32 +398,26 @@ namespace nslib
             {
               createConnectionRelationship(
                 DataManager::entities( ).at( entityGid ),
-                DataManager::entities( ).at( entityGid )
-              );
+                DataManager::entities( ).at( entityGid ));
+
             }
-            /** TODO add drag and drop-esque functionality
-            else if ( childrenEntity && childrenEntity == selectedAction )
-            {
-              editChildrenRelationship(
-                entity,SelectionManager::getActiveSelection());
-            }*/
             else if ( ( levelUp && levelUp == selectedAction ) ||
               ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
             {
-              if( levelUpToNewPane && levelUpToNewPane == selectedAction )
+              if ( levelUpToNewPane && levelUpToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              if ( parentSiblings.size( ) > 0 )
+              if ( !parentSiblings.empty( ))
               {
-                for( const auto& parentSibling : parentSiblings )
+                for ( const auto& parentSibling : parentSiblings )
                   targetEntities.add(
                     DataManager::entities( ).at( parentSibling.first ));
               }
               else if ( grandParent == 0 )
               {
-                for( const auto& rootEntity
+                for ( const auto& rootEntity
                   : DataManager::rootEntities( ).vector( ))
                 {
                   targetEntities.add( rootEntity );
@@ -495,7 +435,7 @@ namespace nslib
                   levelDownToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
-                    nslib::PaneManager::newPaneFromActivePane( ) );
+                    nslib::PaneManager::newPaneFromActivePane( ));
               }
 
               for ( const auto& child : children )
@@ -523,7 +463,7 @@ namespace nslib
               }
               _entityEditWidget = new EntityEditWidget(
                 domainEntitiesTypes.getEntityObject(childrenTypes->at(
-                  actionToIdx[ selectedAction ] )),
+                actionToIdx[ selectedAction ] )),
                 EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
                 nullptr, false, entity );
 
@@ -818,19 +758,8 @@ namespace nslib
 
     _conRelationshipEditWidget =
       new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
-        &PaneManager::activePane()->view(), true);
+        &PaneManager::activePane( )->view( ), true );
     _conRelationshipEditWidget->show( );
-  }
-
-  void InteractionManager::editChildrenRelationship(
-      shift::Entity* parentEntity_,  std::vector< shift::Entity* > childrenEntities_ )
-  {
-    if ( _editChildrenRelationship )
-      delete _editChildrenRelationship;
-    _editChildrenRelationship =
-        new ChildrenRelationshipEditWidget( parentEntity_, childrenEntities_,
-          &PaneManager::activePane()->view(), true);
-    _editChildrenRelationship->show( );
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
@@ -843,10 +772,8 @@ namespace nslib
     if ( relParentOf.count( entityGid ) == 0 )
       return;
     const auto& childrenIds = relParentOf.at( entityGid );
-    // std::cout << " -- Parent of: ";
     for ( auto const& childId : childrenIds )
     {
-      // std::cout << childId << " ";
       if ( relSuperEntityOf.count( childId.first ) > 0 )
       {
         const auto& subEntities = relSuperEntityOf.at( childId.first );

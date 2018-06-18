@@ -39,12 +39,12 @@ namespace nslib
 
   public:
     ConnectionRelationshipEditWidget(shift::Entity*  originEntity_,
-      shift::Entity* destinationEntity_, QWidget* parent_ = 0,
+      shift::Entity* destinationEntity_, QWidget* parent_ = nullptr,
       bool modal = false );
 
   public slots:
-    void validateDialog( );
-    void cancelDialog( );
+    void validateDialog( void );
+    void cancelDialog( void );
     void refreshSubproperties( void );
 
   private:

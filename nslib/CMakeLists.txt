@@ -9,7 +9,6 @@ set( NSLIB_PUBLIC_HEADERS
   Color.h
   Config.h
   ConnectionRelationshipEditWidget.h
-  ChildrenRelationshipEditWidget.h
   DataLoader.h
   DataManager.h
   DomainManager.cpp
@@ -47,7 +46,6 @@ set( NSLIB_SOURCES
   Canvas.cpp
   Config.cpp
   ConnectionRelationshipEditWidget.cpp
-  ChildrenRelationshipEditWidget.cpp
   DataManager.cpp
   DomainManager.cpp
   FilterWidget.cpp

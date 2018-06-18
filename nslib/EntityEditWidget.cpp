@@ -38,6 +38,8 @@
 #include <memory>
 #include <shift/Relationship.h>
 
+//TODO: Add realtion of parent of to entities
+
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
@@ -45,9 +47,9 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_,
+    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parentWidget_,
     bool addToScene_, shift::Entity* parentEntity_)
-    : QWidget( parent_ )
+    : QWidget( parentWidget_ )
     , _entity( nullptr )
     , _parentEntity( parentEntity_ )
     , _addToScene( addToScene_ )
@@ -206,19 +208,18 @@ namespace nslib
 
       for ( const auto& entityParam: _entityParamCont )
       {
-        const auto
-          &labelWidget = std::get< TEditTuple::LABEL >( entityParam );
+        const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
         const auto& label = labelWidget->text( ).toStdString( );
 
-        bool isEditable = origEntity
-          ->hasPropertyFlag ( label, shift::Entity::TPropertyFlag::EDITABLE );
+        bool isEditable = origEntity->hasPropertyFlag(
+          label, shift::Entity::TPropertyFlag::EDITABLE );
 
         if ( ( _action == EDIT_ENTITY ) && !isEditable )
         {
           continue;
         }
-        const auto
-          & editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
+        const auto& editType =
+          std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
         if ( editType == TWidgetType::COMBO )
@@ -254,17 +255,16 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
-          bool isUnique = _entity
-            ->hasPropertyFlag ( label, shift::Entity::TPropertyFlag::UNIQUE );
+          bool isUnique = _entity->hasPropertyFlag(
+            label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
           {
             std::string pStr = paramString.toStdString( );
             if ( _isNew ||
-               caster->toString( prop ) != pStr ) // If value changed
+              caster->toString( prop ) != pStr ) // If value changed
             {
-              const auto
-                &entities = nslib::DataManager::entities( ).vector( );
-              for ( const auto entity: entities )
+              const auto &entities = nslib::DataManager::entities( ).vector( );
+              for( const auto entity: entities )
               {
                 if ( entity->isSameEntityType( _entity ) &&
                      entity->hasProperty( label ))
@@ -312,8 +312,8 @@ namespace nslib
       for ( const auto& creatorPair :
         nslib::RepresentationCreatorManager::creators( ))
       {
-        needToClearCache = needToClearCache || creatorPair.second
-          ->entityUpdatedOrCreated( _entity );
+        needToClearCache = needToClearCache ||
+          creatorPair.second->entityUpdatedOrCreated( _entity );
       }
 
       // TODO improvemente: check if cache needs to be cleared or if just the
@@ -398,24 +398,7 @@ namespace nslib
             nslib::PaneManager::activePane( )->entities( ), false, true );
         }
       }
-    }/*
-    unsigned int nOfNeuron =
-      _entity->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
-    std::cout << "Nb of Neurons: " << nOfNeuron << std::endl;
-    auto& relChildOf =
-      *( DataManager::entities ( ).relationships ( )[ "isChildOf" ]
-        ->asOneToOne ( ) );
-    auto parentID = relChildOf[ _entity->entityGid ( ) ].entity;
-    if ( parentID > 0 ) {
-    auto parent = DataManager::entities ( ).at ( parentID );
-    unsigned int nOfParent =
-      parent->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
-      unsigned int nOfParent2 =
-        _parentEntity->getProperty ( "Nb of neurons" ).value < unsigned int > ( );
-    std::cout << "Nb of Neurons parent 1: " << nOfParent << " parent 2: "<< nOfParent2 << std::endl;
-  }
-*/
-
+    }
   }
 
 

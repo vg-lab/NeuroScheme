@@ -65,7 +65,6 @@ namespace nslib
       neuronModelColorMap.setColor(
         shiftgen::NeuronPop::TNeuronModel::undefined,
         scoop::Color( "#e7ba83" ));
-
       MapperFloatToFloat
         neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
 
@@ -82,46 +81,66 @@ namespace nslib
             representations.push_back( rep );
           continue;
         }
-        if ( dynamic_cast< shiftgen::NeuronPop* >( entity ) ||
-             dynamic_cast< shiftgen::NeuronSuperPop* >( entity ))
-        {
-          auto neuronPop = entity; // dynamic_cast< shiftgen::NeuronPop* >( entity );
-          auto neuronPopRep = new NeuronPopRep( );
+        shiftgen::NeuronPop* neuronPopEntity =
+          dynamic_cast< shiftgen::NeuronPop* >( entity );
+        shiftgen::NeuronSuperPop* neuronSuperPopEntity;
+        NeuronPopRep* neuronRep = nullptr;
 
-          if ( neuronPop->hasProperty( "Neuron model" ))
+        if ( neuronPopEntity )
+        {
+          neuronRep = new NeuronPopRep( );
+          if ( neuronPopEntity->hasProperty( "Neuron model" ))
           {
-            neuronPopRep->setProperty(
-              "color",
-              neuronModelColorMap.getColor(
-                neuronPop->getProperty( "Neuron model" ).
-                value< shiftgen::NeuronPop::TNeuronModel >( )));
+            neuronRep->setProperty(
+              "color", neuronModelColorMap.getColor(
+              neuronPopEntity->getProperty( "Neuron model" ).
+              value< shiftgen::NeuronPop::TNeuronModel >( )));
           }
           else
           {
-            neuronPopRep->setProperty( "color", neuronModelColorMap.getColor(
+            neuronRep->setProperty( "color", neuronModelColorMap.getColor(
               shiftgen::NeuronPop::TNeuronModel::undefined ) );
           }
-
-          neuronPopRep->setProperty( "line perc", neuronsToPercentage.map(
-              neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
-
-          // neuronPopRep->setProperty(
-          //   "color",
-          //   neuronTypeColorMapper.getColor(
-          //     neuronPop->getProperty( "Nb of neurons" ).value< uint >( )));
-          representations.push_back( neuronPopRep );
+          neuronRep->setProperty( "line perc", neuronsToPercentage.map(
+            neuronPopEntity->getProperty( "Nb of neurons" ).value< uint >( )));
+        }
+        else
+        {
+          neuronSuperPopEntity =
+            dynamic_cast< shiftgen::NeuronSuperPop* >( entity );
+          if ( neuronSuperPopEntity ){
+            neuronRep = new NeuronPopRep( );
+            if ( neuronSuperPopEntity->hasProperty( "Neuron model" ))
+            {
+              neuronRep->setProperty(
+                "color", neuronModelColorMap.getColor(
+                  neuronSuperPopEntity->getProperty( "Neuron model" ).
+                    value< shiftgen::NeuronPop::TNeuronModel >( )));
+            }
+            else
+            {
+              //TODO: neuron superPop color
+              neuronRep->setProperty( "color", neuronModelColorMap.getColor(
+                shiftgen::NeuronPop::TNeuronModel::undefined ) );
+            }
+            neuronRep->setProperty( "line perc", neuronsToPercentage.map(
+              neuronSuperPopEntity->getProperty( "Nb of neurons Mean" ).value< uint >( )));
+          }
+        }
+        if ( neuronPopEntity || neuronSuperPopEntity )
+        {
+          representations.push_back( neuronRep );
           // Link entity and rep
           if ( linkEntitiesToReps )
-            entitiesToReps[ entity ].insert( neuronPopRep );
+            entitiesToReps[ entity ].insert( neuronRep );
           if ( linkRepsToEntities )
-            repsToEntities[ neuronPopRep ].insert( entity );
+            repsToEntities[ neuronRep ].insert( entity );
 
-          gidsToEntitiesReps.insert( TripleKey( entity->entityGid( ), entity, neuronPopRep ));
-
+          gidsToEntitiesReps
+            .insert( TripleKey( entity->entityGid( ), entity, neuronRep ) );
         }
       }
     }
-
 
     void RepresentationCreator::generateRelations(
       const shift::Entities& entities,
@@ -130,7 +149,6 @@ namespace nslib
       shift::Representations& relatedEntities,
       const std::string& relationName )
     {
-
       const auto& relatedElements =
         DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
 
@@ -228,16 +246,10 @@ namespace nslib
                   srcEntityRep->second.second,
                   otherRep->second.second )));
           }
-
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
-
         }
-
-
       }
-
     } // generateRelations
-
 
     bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
     {
@@ -254,13 +266,11 @@ namespace nslib
         needToClear = ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation );
 
       }
-
       if ( needToClear )
         this->clear( );
 
       return needToClear;
     }
-
 
     bool RepresentationCreator::relationshipUpdatedOrCreated(
       shift::RelationshipProperties* relProperties )
