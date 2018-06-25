@@ -91,14 +91,14 @@ namespace nslib
           args.at( "-bc" )[0],
           args.at( "-target" )[0],
           args.count( "-nm" ) == 0 && args.count( "--no-morphologies" ) == 0,
-          ( args.count( "-cns" ) == 1 ? args.at( "cns" )[0] : std::string( )),
+          ( args.count( "-cns" ) == 1 ? args.at( "-cns" )[0] : std::string( )),
           args.count( "-lc" ) == 1 || args.count( "--load-connectivity" ) == 1 );
 
         createEntitiesFromNsolColumns(
           nslib::DataManager::nsolDataSet( ).columns( ),
           nslib::DataManager::nsolDataSet( ).circuit( ),
           args.count( "-nm" ) == 0,
-          ( args.count( "-cns" ) == 1 ? args.at( "cns" )[0] : std::string( )));
+          ( args.count( "-cns" ) == 1 ? args.at( "-cns" )[0] : std::string( )));
 
       }
 
