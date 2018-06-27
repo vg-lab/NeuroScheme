@@ -64,6 +64,9 @@
      <string>&amp;File</string>
     </property>
     <addaction name="separator"/>
+    <addaction name="actionJSONImporter"/>
+    <addaction name="actionJSONExporter"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -313,6 +316,24 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionJSONImporter">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/open.svg</normaloff>:/icons/open.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Import from JSON</string>
+   </property>
+  </action>
+  <action name="actionJSONExporter">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/save.svg</normaloff>:/icons/save.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Export from JSON</string>
    </property>
   </action>
  </widget>

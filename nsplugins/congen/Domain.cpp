@@ -82,7 +82,7 @@ namespace nslib
         auto fileName = path.toStdString( );
 
         Loggers::get( )->log( "Loading blue config",
-                              nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+          nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
         nslib::congen::DataLoader::loadNeuroML( fileName );
 

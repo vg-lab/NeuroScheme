@@ -26,6 +26,7 @@
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
 #include <scoop/version.h>
+
 #ifdef NEUROSCHEME_USE_GMRVLEX
 #include <gmrvlex/version.h>
 #endif
@@ -46,6 +47,7 @@
 #include <QLineEdit>
 #include <QDateTime>
 #include <QLabel>
+#include <QFileDialog>
 
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
@@ -67,6 +69,12 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 // #ifdef NSOL_USE_QT5CORE
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
+
+  connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
+           this, SLOT( JsonImport( )));
+
+  connect( _ui->actionJSONExporter, SIGNAL( triggered( )),
+           this, SLOT( JsonExport( )));
 
   connect( _ui->actionQuit, SIGNAL( triggered( )),
            this, SLOT( quit( )));
@@ -688,4 +696,33 @@ void MainWindow::toggleZeroEQ( void )
 void MainWindow::quit( void )
 {
   QCoreApplication::quit( );
+}
+
+void MainWindow::JsonExport( void )
+{
+  QString path =  QFileDialog::getSaveFileName( this, "Save JSON File",
+    _lastOpenedFileName, tr(  "JSON File ( *.JSON *.json );; All files (*)" ));
+
+  if ( !path.isEmpty( ))
+  {
+    _lastOpenedFileName = QFileInfo( path ).path( );
+    auto fileName = path.toStdString( );
+
+    std::cout << "export JSON: " << fileName << std::endl;
+
+  }
+}
+
+void MainWindow::JsonImport( void )
+{
+  QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
+    _lastOpenedFileName, tr("JSON File ( *.JSON *.json );; All files (*)" ));
+
+  if ( !path.isEmpty( ))
+  {
+  _lastOpenedFileName = QFileInfo( path ).path( );
+  auto fileName = path.toStdString( );
+
+  std::cout << "import JSON: " << fileName << std::endl;
+  }
 }
