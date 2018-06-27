@@ -45,7 +45,6 @@ namespace nslib
     public slots:
       void loadNeuroML( void );
       void saveNeuroML( void );
-
     protected:
       QMainWindow* _mw;
       QString _lastOpenedFileName;

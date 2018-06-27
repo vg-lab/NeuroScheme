@@ -708,14 +708,16 @@ void MainWindow::JsonExport( void )
     _lastOpenedFileName = QFileInfo( path ).path( );
     auto fileName = path.toStdString( );
 
-    std::cout << "export JSON: " << fileName << std::endl;
+    std::ofstream outfile (fileName);
+    nslib::DomainManager::getActiveDomain( )->exportJSON( outfile );
 
   }
+
 }
 
 void MainWindow::JsonImport( void )
 {
-  QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
+  /*QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
     _lastOpenedFileName, tr("JSON File ( *.JSON *.json );; All files (*)" ));
 
   if ( !path.isEmpty( ))
@@ -724,5 +726,5 @@ void MainWindow::JsonImport( void )
   auto fileName = path.toStdString( );
 
   std::cout << "import JSON: " << fileName << std::endl;
-  }
+  }*/
 }
