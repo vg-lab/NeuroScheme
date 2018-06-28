@@ -170,44 +170,18 @@ namespace nslib
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    shift::RelationshipProperties* propObject;
+    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+      ->relationshipPropertiesTypes( );
+    shift::RelationshipProperties* propObject = relationshipPropertiesTypes
+      .getRelationshipProperties( "connectsTo" )->create( );
 
     auto& relConnectsTo =
       *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
     auto& relConnectedBy =
       *( DataManager::entities( ).relationships( )["connectedBy"]->asOneToN( ));
 
-    auto relationshipPropertiesTypes =
-      DomainManager::getActiveDomain( )->relationshipPropertiesTypes( );
-    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
-    if( !( connectsToIt != relConnectsTo.end( )))
-    {
-      propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" )->create( );
-      relConnectsTo[ _originEntity->entityGid( )].insert(
-        std::make_pair( _destinationEntity->entityGid( ), propObject ));
-      relConnectedBy[ _destinationEntity->entityGid( )].insert(
-        std::make_pair( _originEntity->entityGid( ), nullptr ));
-    }
-    else
-    {
-      auto connectsToMMIt =
-        connectsToIt->second.find( _destinationEntity->entityGid( ));
-      if( !( connectsToMMIt != connectsToIt->second.end( )))
-      {
-        propObject = relationshipPropertiesTypes.getRelationshipProperties(
-          "connectsTo" )->create( );
-        relConnectsTo[ _originEntity->entityGid( )].insert(
-          std::make_pair( _destinationEntity->entityGid( ), propObject ));
-        relConnectedBy[ _destinationEntity->entityGid( )].insert(
-          std::make_pair( _originEntity->entityGid( ), nullptr ));
-      }
-      else
-      {
-        propObject = connectsToMMIt->second;
-      }
-    }
-
+    shift::Relationship::Establish( relConnectsTo,relConnectedBy,
+      _originEntity,_destinationEntity, propObject );
 
     for ( const auto& propParam: _propParamCont )
     {

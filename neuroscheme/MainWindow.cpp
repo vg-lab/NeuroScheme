@@ -49,7 +49,6 @@
 #include <QLabel>
 #include <QFileDialog>
 
-
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
   , _ui( new Ui::MainWindow )
@@ -678,7 +677,7 @@ void MainWindow::toggleZeroEQ( void )
   {
     bool ok;
     QString text = QInputDialog::getText(
-      this, tr("Please select ZeroEQ session"),
+      this, tr("Please select ZeroEQ session" ),
       tr("ZeroEQ session:"), QLineEdit::Normal,
       QString::fromStdString( nslib::Config::zeroEQSession( )), &ok );
     if ( ok && !text.isEmpty( ))
@@ -708,7 +707,7 @@ void MainWindow::JsonExport( void )
     _lastOpenedFileName = QFileInfo( path ).path( );
     auto fileName = path.toStdString( );
 
-    std::ofstream outfile (fileName);
+    std::ofstream outfile ( fileName );
     nslib::DomainManager::getActiveDomain( )->exportJSON( outfile );
 
   }
@@ -717,14 +716,17 @@ void MainWindow::JsonExport( void )
 
 void MainWindow::JsonImport( void )
 {
-  /*QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
+  QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
     _lastOpenedFileName, tr("JSON File ( *.JSON *.json );; All files (*)" ));
 
   if ( !path.isEmpty( ))
   {
-  _lastOpenedFileName = QFileInfo( path ).path( );
-  auto fileName = path.toStdString( );
+    _lastOpenedFileName = QFileInfo( path ).path( );
+    auto fileName = path.toStdString( );
 
-  std::cout << "import JSON: " << fileName << std::endl;
-  }*/
+    std::ifstream inputfile ( fileName );
+    nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
+  }
+
+
 }

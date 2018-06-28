@@ -27,6 +27,7 @@
 #include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>
 #include <shift_NeuronPop.h>
+#include <shift_NeuronSuperPop.h>
 #include <shift_congen_entities.h>
 #include <shift_congen_relationshipProperties.h>
 #include <QFileDialog>
@@ -106,6 +107,8 @@ namespace nslib
 
     Domain::Domain( void )
     {
+      this->_exportRelations = { "connectsTo", "isParentOf" };
+      this->_domainName = "congen";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
@@ -156,7 +159,23 @@ namespace nslib
     {
     }
 
-
+    void Domain::addRelationsOfType( std::istream &inputStream,
+      std::string relationName, std::unordered_map < unsigned int,
+      shift::Entity* >* oldGUIToEntity )
+    {
+      if ( relationName == "connectsTo")
+      {
+        addConnectsToRelationsToJSON( inputStream, oldGUIToEntity );
+      }
+      else if ( relationName == "isParentOf" )
+      {
+        addIsParentOfRelationshipsToJSON( inputStream, oldGUIToEntity  );
+      }
+      else
+      {
+        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
+      }
+    }
 
   }
 }

@@ -30,6 +30,44 @@ namespace nslib
   namespace cortex
   {
 
+    class Eigen4VectorCaster : public fires::PropertyCaster
+    {
+    public:
+
+      virtual ~Eigen4VectorCaster( void )
+      {
+      }
+
+
+      int toInt( const fires::Property&, TIntRounding  ) override
+      {
+        return 0;
+      };
+      std::string toString( const fires::Property& prop) override
+      {
+        Eigen::Vector4f vector = prop.value< Eigen::Vector4f >( );
+
+        float array[] = {vector[ 0 ], vector[ 1 ], vector[ 2 ], vector[ 3 ]};
+        auto space = std::string( " " );
+        return std::to_string( array[ 0 ] ) + space + std::to_string( array[ 1 ] ) + space + std::to_string( array[ 2 ] )
+               + space + std::to_string( array[ 3 ] );
+      };
+      void fromString(
+        fires::Property& property, const std::string& value_ ) override
+      {
+        float x, y, z, w;
+        int nItemsRead = sscanf( value_.c_str( ),"%f %f %f %f\n", &x, &y, &z, &w);
+        SHIFT_CHECK_THROW( 3 != nItemsRead, "ERROR: Cast to eigen::Vector4f failed" )
+        Eigen::Vector4f vector( x, y, z, w);
+        property.set( vector );
+      };
+
+      std::vector< std::string > categories( void ) override
+      {
+        return std::vector< std::string >( );
+      }
+    };
+
     class DomainGUI : QObject
     {
       Q_OBJECT;
@@ -76,6 +114,17 @@ namespace nslib
 
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
+
+      void addRelationsOfType( std::istream &inputStream,
+        std::string relationName, std::unordered_map
+        < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
+
+      void addIsAGroupOfRelationshipsToJSON( std::istream &inputStream,
+        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+
+      void addIsSuperEntityOfRelationshipsToJSON( std::istream &inputStream,
+        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+
     };
   }
 }

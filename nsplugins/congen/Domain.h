@@ -77,9 +77,12 @@ namespace nslib
         _domainGUI.reset( new DomainGUI( mw, menubar ));
       }
 
-
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
+
+      void addRelationsOfType( std::istream& inputStream,
+        std::string relationName, std::unordered_map
+        < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
     };
 
   }

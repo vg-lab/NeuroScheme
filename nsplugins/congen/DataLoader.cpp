@@ -290,7 +290,7 @@ namespace nslib
         std::make_pair( targetGid, connProps ));
       relConnectedBy[ targetGid ].insert(
         std::make_pair( sourceGid, nullptr ));
-      connProps->setProperty( "Entity name",projName );
+      connProps->setProperty( "Name",projName );
 
     }
 

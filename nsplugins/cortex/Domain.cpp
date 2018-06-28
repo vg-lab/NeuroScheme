@@ -33,6 +33,7 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QtWidgets/QGridLayout>
 
 namespace nslib
 {
@@ -252,6 +253,12 @@ namespace nslib
 
     Domain::Domain( void )
     {
+      fires::PropertyManager::setTypePropertyCaster( typeid( Eigen::Vector4f ),
+        new Eigen4VectorCaster());
+
+      this->_exportRelations =
+        { "connectsTo", "isParentOf", "isAGroupOf", "isSuperEntityOf" };
+      this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
@@ -317,6 +324,122 @@ namespace nslib
                 << std::endl << std::endl
                 << "\t\t(*1) only for BlueConfig files" << std::endl;
 
+    }
+
+    void Domain::addRelationsOfType( std::istream &inputStream,
+      std::string relationName, std::unordered_map < unsigned int,
+      shift::Entity* >* oldGUIToEntity )
+    {
+      if ( relationName == "connectsTo")
+      {
+        addConnectsToRelationsToJSON( inputStream, oldGUIToEntity );
+      }
+      else if ( relationName == "isParentOf" )
+      {
+        addIsParentOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+      }
+      else if ( relationName == "isAGroupOf" )
+      {
+        addIsAGroupOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+      }
+      else if ( relationName == "isSuperEntityOf" )
+      {
+        addIsSuperEntityOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+      }
+      else
+      {
+        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
+      }
+    }
+
+    void Domain::addIsAGroupOfRelationshipsToJSON( std::istream& inputStream,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    {
+      auto& relGroupOf = *( DataManager::entities( )
+        .relationships( )[ "isAGroupOf" ]->asOneToN( ) );
+      auto& relGroupBy = *( DataManager::entities( )
+        .relationships( )[ "isPartOf" ]->asOneToN( ) );
+
+      std::string line;
+      while ( std::getline( inputStream, line ) )
+      {
+        auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
+        if ( line[ firstNotWhiteSpace ] == ']' )
+        {
+          break;
+        }
+        else
+        {
+          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
+            "ERROR parsing object: this line must be a '{' for start the"
+            " JSONobject of the entity or an ] to close the JSONArray of the"
+            " entites, instead does: \"" + line + "\"." );
+
+          shift::Entity* origEntity = nullptr;
+          shift::Entity* destEntity = nullptr;
+          importJSONRelationGIDS(inputStream, oldGUIToEntity,
+            origEntity, destEntity);
+
+          shift::Relationship::Establish( relGroupOf, relGroupBy,
+            origEntity,destEntity );
+
+          SHIFT_CHECK_THROW( std::getline( inputStream, line ),
+            "ERROR parsing object: this line must close the JSONObject"
+            " but instead it doesn't exit" );
+
+          firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
+
+          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
+            "ERROR parsing object: this line must be a '}' for close the "
+            "JSONObject, instead does: \"" + line + "\"." );
+        }
+      }
+    }
+
+    void
+    Domain::addIsSuperEntityOfRelationshipsToJSON( std::istream &inputStream,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    {
+      auto& relSuperEntity = *( DataManager::entities( )
+        .relationships( )[ "isSuperEntityOf" ]->asOneToN( ) );
+      auto& relSubEntity = *( DataManager::entities( )
+        .relationships( )[ "isSubEntityOf" ]->asOneToOne( ) );
+
+      std::string line;
+      while ( std::getline( inputStream, line ) )
+      {
+        auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
+        if ( line[ firstNotWhiteSpace ] == ']' )
+        {
+          break;
+        }
+        else
+        {
+          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
+            "ERROR parsing object: this line must be a '{' for start the "
+            "JSONobject of the entity or an ] to close the JSONArray of the"
+            " entites, instead does: \"" + line + "\"." );
+
+          shift::Entity* origEntity = nullptr;
+          shift::Entity* destEntity = nullptr;
+
+          importJSONRelationGIDS(inputStream, oldGUIToEntity,
+            origEntity, destEntity);
+
+          shift::Relationship::Establish( relSuperEntity, relSubEntity,
+            origEntity,destEntity );
+
+          SHIFT_CHECK_THROW( std::getline( inputStream, line ),
+            "ERROR parsing object: this line must close the JSONObject"
+            " but instead it doesn't exit" );
+
+          firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
+
+          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
+            "ERROR parsing object: this line must be a '}' for close the "
+            "JSONObject, instead does: \"" + line + "\"." );
+        }
+      }
     }
 
   }
