@@ -80,7 +80,7 @@ namespace nslib
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
 
-      void addRelationsOfType( std::istream& inputStream,
+      void addRelationsOfType( boost::property_tree::ptree  relations,
         std::string relationName, std::unordered_map
         < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
     };

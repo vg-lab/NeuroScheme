@@ -326,25 +326,25 @@ namespace nslib
 
     }
 
-    void Domain::addRelationsOfType( std::istream &inputStream,
-      std::string relationName, std::unordered_map < unsigned int,
-      shift::Entity* >* oldGUIToEntity )
+    void Domain::addRelationsOfType( boost::property_tree::ptree  relations,
+      std::string relationName,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
       if ( relationName == "connectsTo")
       {
-        addConnectsToRelationsToJSON( inputStream, oldGUIToEntity );
+        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
       }
       else if ( relationName == "isParentOf" )
       {
-        addIsParentOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
       }
       else if ( relationName == "isAGroupOf" )
       {
-        addIsAGroupOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+        addIsAGroupOfRelationshipsToJSON( relations, oldGUIToEntity );
       }
       else if ( relationName == "isSuperEntityOf" )
       {
-        addIsSuperEntityOfRelationshipsToJSON( inputStream, oldGUIToEntity );
+        addIsSuperEntityOfRelationshipsToJSON( relations, oldGUIToEntity );
       }
       else
       {
@@ -352,7 +352,8 @@ namespace nslib
       }
     }
 
-    void Domain::addIsAGroupOfRelationshipsToJSON( std::istream& inputStream,
+    void Domain::addIsAGroupOfRelationshipsToJSON(
+      boost::property_tree::ptree  relations,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
       auto& relGroupOf = *( DataManager::entities( )
@@ -360,86 +361,42 @@ namespace nslib
       auto& relGroupBy = *( DataManager::entities( )
         .relationships( )[ "isPartOf" ]->asOneToN( ) );
 
-      std::string line;
-      while ( std::getline( inputStream, line ) )
+      for ( const auto& relation : relations )
       {
-        auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-        if ( line[ firstNotWhiteSpace ] == ']' )
-        {
-          break;
-        }
-        else
-        {
-          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-            "ERROR parsing object: this line must be a '{' for start the"
-            " JSONobject of the entity or an ] to close the JSONArray of the"
-            " entites, instead does: \"" + line + "\"." );
+        shift::Entity* origEntity;
+        shift::Entity* destEntity;
 
-          shift::Entity* origEntity = nullptr;
-          shift::Entity* destEntity = nullptr;
-          importJSONRelationGIDS(inputStream, oldGUIToEntity,
-            origEntity, destEntity);
+        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+          destEntity, "isParentOf" );
 
-          shift::Relationship::Establish( relGroupOf, relGroupBy,
-            origEntity,destEntity );
-
-          SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-            "ERROR parsing object: this line must close the JSONObject"
-            " but instead it doesn't exit" );
-
-          firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-            "ERROR parsing object: this line must be a '}' for close the "
-            "JSONObject, instead does: \"" + line + "\"." );
-        }
+        shift::Relationship::Establish( relGroupOf, relGroupBy,
+          origEntity, destEntity );
       }
+
     }
 
     void
-    Domain::addIsSuperEntityOfRelationshipsToJSON( std::istream &inputStream,
+    Domain::addIsSuperEntityOfRelationshipsToJSON(
+      boost::property_tree::ptree  relations,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
       auto& relSuperEntity = *( DataManager::entities( )
-        .relationships( )[ "isSuperEntityOf" ]->asOneToN( ) );
+        .relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
       auto& relSubEntity = *( DataManager::entities( )
-        .relationships( )[ "isSubEntityOf" ]->asOneToOne( ) );
+        .relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
 
-      std::string line;
-      while ( std::getline( inputStream, line ) )
+      for ( const auto& relation : relations )
       {
-        auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-        if ( line[ firstNotWhiteSpace ] == ']' )
-        {
-          break;
-        }
-        else
-        {
-          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-            "ERROR parsing object: this line must be a '{' for start the "
-            "JSONobject of the entity or an ] to close the JSONArray of the"
-            " entites, instead does: \"" + line + "\"." );
+        shift::Entity* origEntity;
+        shift::Entity* destEntity;
 
-          shift::Entity* origEntity = nullptr;
-          shift::Entity* destEntity = nullptr;
+        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+          destEntity, "isParentOf" );
 
-          importJSONRelationGIDS(inputStream, oldGUIToEntity,
-            origEntity, destEntity);
-
-          shift::Relationship::Establish( relSuperEntity, relSubEntity,
-            origEntity,destEntity );
-
-          SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-            "ERROR parsing object: this line must close the JSONObject"
-            " but instead it doesn't exit" );
-
-          firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-          SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-            "ERROR parsing object: this line must be a '}' for close the "
-            "JSONObject, instead does: \"" + line + "\"." );
-        }
+        shift::Relationship::Establish( relSuperEntity, relSubEntity,
+          origEntity, destEntity );
       }
+
     }
 
   }

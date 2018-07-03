@@ -145,12 +145,12 @@ namespace nslib
       return dynamic_cast< NeuronPop* >( entity );
     }
 
-    unsigned int Domain::selectableEntityId( shift::Entity* /* entity */ ) const
+    unsigned int Domain::selectableEntityId( shift::Entity* /* entity*/ ) const
     {
       return 0;
     }
 
-    const Vector4f Domain::entity3DPosition ( shift::Entity* /* entity */ ) const
+    const Vector4f Domain::entity3DPosition ( shift::Entity* /* entity*/ ) const
     {
       return Vector4f( 0.f, 0.f, 0.f, 0.f  );
     }
@@ -159,17 +159,17 @@ namespace nslib
     {
     }
 
-    void Domain::addRelationsOfType( std::istream &inputStream,
+    void Domain::addRelationsOfType( boost::property_tree::ptree  relations,
       std::string relationName, std::unordered_map < unsigned int,
       shift::Entity* >* oldGUIToEntity )
     {
       if ( relationName == "connectsTo")
       {
-        addConnectsToRelationsToJSON( inputStream, oldGUIToEntity );
+        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
       }
       else if ( relationName == "isParentOf" )
       {
-        addIsParentOfRelationshipsToJSON( inputStream, oldGUIToEntity  );
+        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
       }
       else
       {

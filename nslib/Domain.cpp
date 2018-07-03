@@ -109,151 +109,58 @@ namespace nslib
 
   void Domain::importJSON( std::istream &inputStream )
   {
-    std::string line;
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: Empty File." );
 
-    auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
+    boost::property_tree::ptree root;
+    try
+    {
+      boost::property_tree::read_json( inputStream, root );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: reading JSON: " + std::string( ex.what( )));
+    };
 
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-      "ERROR parsing object: First line must be a '{' for start the "
-      "JSONobject, instead does: \"" + line + "\"." );
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find_last_not_of( "  \r\t" ),
-      "ERROR parsing object: in line \"" + line +
-      "\" nothing must come after '{'." );
+    SHIFT_CHECK_THROW( !root.empty( ),"ERROR: empty JSON file" );
+    try
+    {
+      std::string domainValue = root.get< std::string >( "domain" );
+      SHIFT_CHECK_THROW( domainValue == _domainName, "ERROR parsing object:"
+         "the domain must specify a " + _domainName + " domain." );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting Domain from JSON: "
+        + std::string( ex.what( )));
+    };
 
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: next line after initial '{' must"
-      " specify the domain but it doesn't exist" );
-
-    std::string labelString = std::string( "\"domain\": \"" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: next line after initial '{'"
-      " must specify the domain, instead does: " + line );
-
-    auto startString = firstNotWhiteSpace + labelString.size( );
-    auto endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-    std::string objectLabel =
-      line.substr( startString, endString - startString );
-
-    SHIFT_CHECK_THROW( objectLabel == _domainName,
-      "ERROR parsing object: line: \"" + line +
-      "\", must specify a congen domain." );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: next line after the declaration of the domain "
-      "must declare the entities, but it doesn't exist" );
-
-    labelString = std::string( "\"entities\":" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: next line after the declaration of "
-      "the domain must declare the entities, instead does: " + line );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) + 1 ==
-      firstNotWhiteSpace + labelString.size( ), "ERROR parsing object: line: \""
-      + line + "\", it must end in: '\"entities\":'." );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: Next line after the declaration of entities must"
-      " declare the  JSONarray of the entities, instead it doesn't exit." );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '[',
-      "ERROR parsing object: Next line after the declaration of entities must"
-      " declare the  JSONarray of the entities, instead does: \""
-      + line + "\"." );
+    boost::property_tree::ptree entities;
+    try
+    {
+      entities = root.get_child( "entities" );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting entities Array from JSON: "
+        + std::string( ex.what( )));
+    };
 
      auto oldGUIToEntity =
        new std::unordered_map <unsigned int,shift::Entity*>( );
 
-    while ( std::getline( inputStream, line ) )
+    importEntititiesJSON( entities, oldGUIToEntity );
+
+    boost::property_tree::ptree relationships;
+    try
     {
-      firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-      if ( line[ firstNotWhiteSpace ] == ']' )
-      {
-        break;
-      }
-      else
-      {
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-          "ERROR parsing object: this line must be a '{' for start the "
-          "JSONobject of the entity or an ] to close the JSONArray of the "
-          "entites, instead does: \"" + line + "\"." );
-
-        shift::Entity* entity = nullptr;
-        bool isRootEntity = false;
-        unsigned int oldGUI = 0;
-
-        importEntityJSON( inputStream, entity, isRootEntity, oldGUI );
-
-        oldGUIToEntity->insert( std::make_pair( oldGUI, entity ));
-        DataManager::entities( ).add( entity );
-        if ( isRootEntity )
-        {
-          DataManager::rootEntities( ).add( entity );
-        }
-      }
+      relationships = root.get_child( "relationships" );
     }
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: this line  must declare the relationships,"
-      " but it doesn't exist." );
-
-    labelString = std::string( "\"relationships\":" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: this line must declare the relationships,"
-      " instead does: " + line );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) + 1 ==
-      firstNotWhiteSpace + labelString.size( ), "ERROR parsing object: line: \""
-      + line + "\", it must end in: '\"relationships\":'." );
-
-
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: Next line after the declaration of "
-      "relationships must  declare the  JSONarray of the relationships,"
-      " instead it doesn't exit." );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '[',
-       "ERROR parsing object: Next line after the declaration of relationships "
-       "must declare the  JSONarray of the relationships, instead does: \"" +
-       line + "\"." );
-
-
-    while ( std::getline( inputStream, line ) )
+    catch ( std::exception const& ex )
     {
-      firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-      if ( line[ firstNotWhiteSpace ] == ']' )
-      {
-        break;
-      }
-      else
-      {
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-          "ERROR parsing object: this line must be a '{' for start the "
-          "JSONobject of the entity or an ] to close the JSONArray of the"
-          " entites, instead does: \"" + line + "\"." );
+      SHIFT_THROW( "ERROR: getting relationships Array from JSON: "
+        + std::string( ex.what( )));
+    };
 
-        importRelationshipType( inputStream, oldGUIToEntity );
-      }
-
-    }
+    importRelationshipsJSON( relationships, oldGUIToEntity );
 
     auto canvas = nslib::PaneManager::activePane( );
     canvas->displayEntities( nslib::DataManager::rootEntities( ), false, true );
@@ -262,11 +169,10 @@ namespace nslib
 
 
   void Domain::exportRelationTypeToJSON( std::string relationName,
-                                 std::ostream &outputStream )
+    std::ostream &outputStream )
   {
-    const auto &relationOneToN =
-      *( DataManager::entities( ).relationships( )[ relationName ]
-        ->asOneToN( ) );
+    const auto &relationOneToN = *( DataManager::entities( )
+      .relationships( )[ relationName ]->asOneToN( ));
 
     outputStream << "      {" << std::endl << "        \"relationType\": \""
       << relationName << "\"," << std::endl
@@ -311,332 +217,209 @@ namespace nslib
 
   }
 
-  void Domain::importEntityJSON( std::istream &inputStream,
+  void Domain::importEntityJSON( boost::property_tree::ptree entityJSON,
     shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID )
   {
 
-    std::string line;
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after the property '{'"
-      " must specify the entityType, instead it doesn't exit." );
-
-    std::string labelString = std::string( "\"EntityType\": \"" );
-    auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: this line must specify the entityType,"
-      " instead it does: " + line );
-
-    auto startString = firstNotWhiteSpace + labelString.size( );
-    auto endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-    std::string entityType =
-      line.substr( startString, endString - startString );
-
-
-
-    entity = _entitiesTypes[ 0 ].getEntityObject( entityType )->create( );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after entityType"
-      " must specify if isRoot, instead it doesn't exit." );
-    labelString = std::string( "\"RootEntity\": \"" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: next line after entityType"
-      " must specify if isRoot, instead it does: " + line );
-
-    startString = firstNotWhiteSpace + labelString.size( );
-    endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-
-    isRootEntity =
-      line.substr( startString, endString - startString )[ 0 ] == 't';
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after isRoot"
-      " must specify the entityGID, instead it doesn't exit." );
-
-    labelString = std::string( "\"EntityGID\": \"" );
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "ERROR parsing object: this line must specify the entityGID,"
-      " instead it does: " + line );
-
-    startString = firstNotWhiteSpace + labelString.size( );
-    endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-    entityGID = boost::lexical_cast< unsigned int >
-      ( line.substr( startString, endString - startString ));
-
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: next line after the declaration of the GID "
-      "must declare the entityData, but it doesn't exist" );
-
-    labelString = std::string( "\"EntityData\":" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: next line after the declaration of "
-      "the GID must declare the entityData, instead does: " + line );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) + 1 ==
-      firstNotWhiteSpace + labelString.size( ),
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\"EntityData\":'." );
-
-
-    entity->deserialize( inputStream );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: This line must"
-      " close the  JSONObjec of the EntityData, instead it doesn't exit." );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-      "ERROR parsing object: This line must close the  "
-      "JSONObject of the EntityData, instead does: \"" + line + "\"." );
-  }
-
-  void Domain::importRelationshipType( std::istream &inputStream,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
-  {
-    std::string line;
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after the relationShip '{'"
-      " must specify the relationType, instead it doesn't exit." );
-
-    std::string labelString = std::string( "\"relationType\": \"" );
-    auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "ERROR parsing object: this line must specify the relationType,"
-      " instead it does: " + line );
-
-    auto startString = firstNotWhiteSpace + labelString.size( );
-    auto endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-
-    std::string relationType =
-      line.substr( startString, endString - startString );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: next line after the declaration of the domain "
-      "must declare the entities, but it doesn't exist" );
-
-    labelString = std::string( "\"relations\":" );
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: next line after the declaration of "
-      "the relationType must declare the relations, instead does: " + line );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) + 1 ==
-       firstNotWhiteSpace + labelString.size( ),
-       "ERROR parsing object: line: \"" + line +
-       "\", it must end in: '\"entities\":'." );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: Next line after the declaration"
-      " of the relationType must declare the  JSONarray of the relations,"
-      " instead it doesn't exit." );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '[',
-      "ERROR parsing object: Next line after the declaration of the"
-      " relationType must declare the  JSONarray of the relations,"
-      " instead does: \"" + line + "\"." );
-
-    addRelationsOfType( inputStream, relationType, oldGUIToEntity );
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "ERROR parsing object: this line must close the JSONObject"
-      " but instead it doesn't exit" );
-
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-      "ERROR parsing object: this line must be a '}' for close the JSONObject,"
-      " instead does: \"" + line + "\"." );
-  }
-
-  void Domain::importJSONRelationGIDS( std::istream &inputStream,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
-    shift::Entity*& origEntity, shift::Entity*& destEntity )
-  {
-    std::string line;
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after the relation '{'"
-      " must specify the Source, instead it doesn't exit." );
-
-    std::string labelString = std::string( "\"Source\": \"" );
-    auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: this line must specify the Source,"
-      " instead it does: " + line );
-    auto startString = firstNotWhiteSpace + labelString.size( );
-    auto endString = line.rfind( "\"," );
-
-    SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) - 1 == endString,
-      "ERROR parsing object: line: \"" + line +
-      "\", it must end in: '\",'." );
-    unsigned int origGID = boost::lexical_cast< unsigned int >
-      ( line.substr( startString, endString - startString ));
-
-    SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-      "\"ERROR parsing object: next line after the relation '{'"
-      " must specify the Source, instead it doesn't exit." );
-    labelString = std::string( "\"Dest\": \"" );
-    firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-    SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-      "\"ERROR parsing object: this line must specify the Dest,"
-      " instead it does: " + line );
-    startString = firstNotWhiteSpace + labelString.size( );
-    endString = line.rfind( "\"" );
-
-    unsigned int destGID = boost::lexical_cast< unsigned int >
-      ( line.substr( startString, endString - startString ));
-
-    auto search = oldGUIToEntity->find( origGID );
-    SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
-      "ERROR: old GUI doesn't exist");
-    origEntity = search->second;
-
-    search = oldGUIToEntity->find( destGID );
-    SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
-      "ERROR: old GUI doesn't exist");
-    destEntity = search->second;
-  }
-
-  void Domain::addConnectsToRelationsToJSON( std::istream &inputStream,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
-  {
-    auto& relConnectsTo =
-      *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
-    auto& relConnectedBy =
-      *( DataManager::entities( ).relationships( )["connectedBy"]->asOneToN( ));
-
-    std::string line;
-    while ( std::getline( inputStream, line ) )
+    try
     {
-      auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-      if ( line[ firstNotWhiteSpace ] == ']' )
+      std::string entityType = entityJSON.get< std::string >( "EntityType" );
+      entity = ( *_entitiesTypes ).getEntityObject( entityType )->create( );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting EntityType from JSON: "
+                   + std::string( ex.what( )));
+    };
+
+    try
+    {
+      isRootEntity = entityJSON.get< std::string >( "RootEntity" )[ 0 ] == 't';
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting RootEntity from JSON: "
+        + std::string( ex.what( )));
+    };
+
+    try
+    {
+      entityGID = entityJSON.get< unsigned int >( "EntityGID" );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting EntityGID from JSON: "
+        + std::string( ex.what( )));
+    };
+
+    try
+    {
+      entityGID = entityJSON.get< unsigned int >( "EntityGID" );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting EntityGID from JSON: "
+        + std::string( ex.what( )));
+    };
+
+    boost::property_tree::ptree firesJSON;
+
+    try
+    {
+      firesJSON = entityJSON.get_child( "EntityData" );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting EntityData from JSON: "
+        + std::string( ex.what( )));
+    };
+
+    entity->deserialize( firesJSON );
+  }
+
+  void Domain::importRelationshipsJSON(
+    boost::property_tree::ptree relationships,
+    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+  {
+
+    for ( const auto& relation : relationships )
+    {
+      std::string relationType;
+      try
       {
-        break;
+        relationType = relation.second.get< std::string >( "relationType");
       }
-      else
+      catch ( std::exception const& ex )
       {
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-          "ERROR parsing object: this line must be a '{' for start the "
-          "JSONobject of the entity or an ] to close the JSONArray of the"
-          " entites, instead does: \"" + line + "\"." );
+        SHIFT_THROW( "ERROR: getting relationType for JSON: "
+          + std::string( ex.what( )));
+      };
 
-        shift::Entity* origEntity = nullptr;
-        shift::Entity* destEntity = nullptr;
-
-        importJSONRelationGIDS(inputStream, oldGUIToEntity,
-           origEntity, destEntity);
-
-        shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
-          ->getRelationshipProperties( "connectsTo" )->create( );
-
-        shift::Relationship::Establish( relConnectsTo,relConnectedBy,
-          origEntity,destEntity,propObject );
-
-        SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-          "ERROR parsing object: this line "
-          "must declare the RelationData, but it doesn't exist" );
-
-        std::string labelString = std::string( "\"RelationData\":" );
-
-        firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-        SHIFT_CHECK_THROW( firstNotWhiteSpace == line.find( labelString ),
-          "\"ERROR parsing object: this line must declare the RelationData,"
-          " instead does: " + line );
-
-        SHIFT_CHECK_THROW( line.find_last_not_of( "  \r\t" ) + 1 ==
-          firstNotWhiteSpace + labelString.size( ),
-          "ERROR parsing object: line: \"" + line +
-          "\", it must end in: '\"RelationData\":'." );
-
-        propObject->deserialize( inputStream );
-
-        SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-          "ERROR parsing object: this line must close the JSONObject"
-          " but instead it doesn't exit" );
-
-        firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-          "ERROR parsing object: this line must be a '}' for close the JSONObject"
-          ", instead does: \"" + line + "\"." );
+      boost::property_tree::ptree relations;
+      try
+      {
+        relations = relation.second.get_child( "relations" );
       }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting relations array for JSON: "
+          + std::string( ex.what( )));
+      };
+      addRelationsOfType( relations, relationType, oldGUIToEntity );
     }
   }
 
-  void Domain::addIsParentOfRelationshipsToJSON( std::istream &inputStream,
+  void Domain::importJSONRelationGIDS( boost::property_tree::ptree relation,
+    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
+    shift::Entity*& origEntity, shift::Entity*& destEntity,
+    const std::string& /*relationName*/ )
+  {
+
+    try
+    {
+      unsigned int origGID = relation.get< unsigned int >( "Source" );
+      auto search = oldGUIToEntity->find( origGID );
+      SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
+        "ERROR: old origGUI doesn't exist");
+      origEntity = search->second;
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting Source for JSON: "
+        + std::string( ex.what( )));
+    };
+    try
+    {
+      unsigned int destGID = relation.get< unsigned int >( "Dest");
+      auto search = oldGUIToEntity->find( destGID );
+      SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
+        "ERROR: old destGUI doesn't exist");
+      destEntity = search->second;
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting Dest for JSON: "
+        + std::string( ex.what( )));
+    };
+
+    //TODO: add relationships constraints
+    //SHIFT_CHECK_THROW( !shift::RelationshipPropertiesTypes::constraints(
+    //  relationName, origEntity->entityName( ), destEntity->entityName( )),
+    //  "\"ERROR: relation: " + relationName+" not supported between: " +
+    //  origEntity->entityName( ) +" - " + destEntity->entityName( ));
+  }
+
+  void Domain::addConnectsToRelationsToJSON(
+    boost::property_tree::ptree relations,
+    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+  {
+    auto& relConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "connectsTo" ]->asOneToN( ));
+    auto& relConnectedBy = *( DataManager::entities( )
+      .relationships( )[ "connectedBy" ]->asOneToN( ));
+
+    for ( const auto& relation : relations )
+    {
+      shift::Entity* origEntity;
+      shift::Entity* destEntity;
+
+      importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+        destEntity, "connectsTo" );
+      boost::property_tree::ptree firesData;
+      try
+      {
+        firesData = relation.second.get_child( "RelationData" );
+      }
+      catch( std::exception ex )
+      {
+        SHIFT_THROW( "ERROR: getting RelationData for JSON: "
+         + std::string( ex.what( )));
+      }
+      shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
+        ->getRelationshipProperties( "connectsTo" )->create( );
+      shift::Relationship::Establish( relConnectsTo, relConnectedBy,
+        origEntity, destEntity, propObject );
+      propObject->deserialize( firesData );
+    }
+  }
+
+  void Domain::addIsParentOfRelationshipsToJSON(
+    boost::property_tree::ptree relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
     auto& relParentOf = *( DataManager::entities( )
-      .relationships( )[ "isParentOf" ]->asOneToN( ) );
+      .relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf = *( DataManager::entities( )
-      .relationships( )[ "isChildOf" ]->asOneToOne( ) );
+      .relationships( )[ "isChildOf" ]->asOneToOne( ));
 
-
-    std::string line;
-    while ( std::getline( inputStream, line ) )
+    for ( const auto& relation : relations )
     {
-      auto firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-      if ( line[ firstNotWhiteSpace ] == ']' )
+      shift::Entity* origEntity;
+      shift::Entity* destEntity;
+
+      importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+        destEntity, "isParentOf" );
+
+      shift::Relationship::Establish( relParentOf, relChildOf,
+        origEntity, destEntity );
+    }
+  }
+
+  void Domain::importEntititiesJSON( boost::property_tree::ptree entities,
+                                     std::unordered_map < unsigned int,
+                                       shift::Entity* >* oldGUIToEntity )
+  {
+    for ( const auto& entityJSON : entities )
+    {
+      shift::Entity* entity ;
+      bool isRootEntity;
+      unsigned int oldGUI;
+      importEntityJSON( entityJSON.second, entity, isRootEntity, oldGUI );
+      oldGUIToEntity->insert( std::make_pair( oldGUI, entity ));
+      DataManager::entities( ).add( entity );
+      if ( isRootEntity )
       {
-        break;
-      }
-      else
-      {
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '{',
-          "ERROR parsing object: this line must be a '{' for start the"
-          " JSONobject of the entity or an ] to close the JSONArray of the"
-          " entites, instead does: \"" + line + "\"." );
-
-        shift::Entity* origEntity = nullptr;
-        shift::Entity* destEntity = nullptr;
-
-        importJSONRelationGIDS(inputStream, oldGUIToEntity, origEntity, destEntity);
-
-        shift::Relationship::Establish( relParentOf, relChildOf,
-          origEntity,destEntity );
-
-        SHIFT_CHECK_THROW( std::getline( inputStream, line ),
-          "ERROR parsing object: this line must close the JSONObject"
-          " but instead it doesn't exit" );
-
-        firstNotWhiteSpace = line.find_first_not_of( "  \r\t" );
-
-        SHIFT_CHECK_THROW( line[ firstNotWhiteSpace ] == '}',
-          "ERROR parsing object: this line must be a '}' for close the JSONObject"
-          ", instead does: \"" + line + "\"." );
+        DataManager::rootEntities( ).add( entity );
       }
     }
   }
