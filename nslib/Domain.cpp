@@ -49,46 +49,44 @@ namespace nslib
     return *_relationshipPropertiesTypes;
   }
 
-  void Domain::exportJSON( std::ostream &outputStream )
+  void Domain::exportJSON( std::ostream& outputStream, bool minimizeStream )
   {
     auto entities = nslib::DataManager::entities( ).vector( );
     SHIFT_CHECK_THROW( !entities.empty( ),
       "ERROR: Exporting scene without entities." );
 
-    outputStream << "{" << std::endl << "  \"domain\": \"" << _domainName
-       << "\"," << std::endl << "  \"entities\":" << std::endl
-       << "    [" << std::endl;
+    std::string domainLabel;
+    std::string entitiesLabel;
+    std::string continueBracket;
 
-    auto rootEntitiesMap = DataManager::rootEntities( ).map( );
-    bool firstIteration = true;
-    for ( auto entity : entities )
+    std::string relationshipsLabel;
+    if ( minimizeStream )
     {
-      if ( firstIteration )
-      {
-        firstIteration = false;
-      }
-      else
-      {
-        outputStream << "      }," << std::endl;
-      }
-      auto entityGID = entity->entityGid( );
-      char isRoot = ( rootEntitiesMap.find( entityGID )
-        != rootEntitiesMap.end( )) ? 't' : 'f';
-
-      outputStream << "      {" << std::endl << "        \"EntityType\": \""
-        << entity->entityName( ) << "\"," << std::endl
-        << "        \"RootEntity\": \"" << isRoot << "\","
-        << std::endl << "        \"EntityGID\": \"" << entityGID
-        << "\"," << std::endl << "        \"EntityData\":" << std::endl;
-
-      entity->serialize( outputStream, "          " );
+      domainLabel = "{\"domain\":\"";
+      entitiesLabel = "\",\"entities\":[";
+      continueBracket = "},";
+      relationshipsLabel =  "}],\"relationships\":[";
     }
-    outputStream << "      }" << std::endl << "    ]," << std::endl
-                 << "  \"relationships\":" << std::endl << "    [" << std::endl;
+    else
+    {
+      domainLabel = "{\n  \"domain\": \"";
+      entitiesLabel = "\",\n  \"entities\": [\n";
+      continueBracket = "\n    },\n";
+      relationshipsLabel =  "    }\n  ],\n  \"relationships\": [\n";
+
+    }
+
+
+    outputStream << domainLabel << _domainName
+       << entitiesLabel;
+
+    exportEntitiesJSON( outputStream, minimizeStream );
+
+    outputStream << relationshipsLabel;
 
     if ( !_exportRelations.empty( ) )
     {
-      firstIteration = true;
+      bool firstIteration = true;
       for ( auto relationName : _exportRelations )
       {
         if ( firstIteration )
@@ -97,17 +95,32 @@ namespace nslib
         }
         else
         {
-          outputStream << "      }," << std::endl;
+          outputStream << continueBracket;
         }
-        exportRelationTypeToJSON( relationName, outputStream );
+        exportRelationTypeToJSON( relationName, outputStream, minimizeStream );
       }
-      outputStream << "      }" << std::endl;
-    }
-    outputStream << "    ]" << std::endl << "}" << std::endl;
+      if ( minimizeStream )
+      {
+        outputStream << "}";
 
+      }
+      else
+      {
+        outputStream << "    }" << std::endl;
+      }
+    }
+    if ( minimizeStream )
+    {
+      outputStream << "]}";
+
+    }
+    else
+    {
+      outputStream << "  ]" << std::endl << "}" << std::endl;
+    }
   }
 
-  void Domain::importJSON( std::istream &inputStream )
+  void Domain::importJSON( std::istream& inputStream )
   {
 
     boost::property_tree::ptree root;
@@ -168,15 +181,42 @@ namespace nslib
   }
 
 
-  void Domain::exportRelationTypeToJSON( std::string relationName,
-    std::ostream &outputStream )
+  void Domain::exportRelationTypeToJSON( const std::string& relationName,
+    std::ostream &outputStream, bool minimizeStream )
   {
+    std::string relationTypeLabel;
+    std::string relationsLabel;
+    std::string sourceLabel;
+    std::string destLabel;
+    std::string relationDataLabel;
+    std::string continueBracket;
+    std::string closeQuotations;
+
+    if ( minimizeStream )
+    {
+      relationTypeLabel = "{\"relationType\":\"";
+      relationsLabel = "\",\"relations\":[";
+      sourceLabel =  "{\"Source\":\"";
+      destLabel = "\",\"Dest\":\"";
+      relationDataLabel = "\",\"RelationData\":";
+      continueBracket =  "},";
+      closeQuotations =  "\"";
+    }
+    else
+    {
+      relationTypeLabel = "      {\n      \"relationType\": \"";
+      relationsLabel = "\",\n      \"relations\": [\n";
+      sourceLabel =  "          {\n            \"Source\": \"";
+      destLabel = "\",\n            \"Dest\": \"";
+      relationDataLabel = "\",\n            \"RelationData\":\n";
+      continueBracket =  "\n          },\n";
+      closeQuotations =  "\"\n";
+    }
     const auto &relationOneToN = *( DataManager::entities( )
       .relationships( )[ relationName ]->asOneToN( ));
 
-    outputStream << "      {" << std::endl << "        \"relationType\": \""
-      << relationName << "\"," << std::endl
-      << "        \"relations\":" << std::endl << "          [" << std::endl;
+    outputStream << relationTypeLabel
+      << relationName << relationsLabel;
 
     bool firstIteration = true;
     for ( auto relOrigIt = relationOneToN.begin( );
@@ -191,30 +231,50 @@ namespace nslib
         }
         else
         {
-          outputStream << "            }," << std::endl;
+          outputStream << continueBracket;
         }
-        outputStream << "            {" << std::endl
-          << "              \"Source\": \"" << relOrigIt->first
-          << "\"," << std::endl << "              \"Dest\": \""
+        outputStream << sourceLabel << relOrigIt->first
+          << destLabel
           << relDestIt->first;
         if ( relationName == "connectsTo" )
         {
-          outputStream << "\"," << std::endl
-            << "              \"RelationData\":" << std::endl;
-          relDestIt->second->serialize( outputStream, "              " );
+          outputStream << relationDataLabel;
+          relDestIt->second->serialize( outputStream,
+            minimizeStream, "            " );
+          if ( !minimizeStream )
+          {
+            outputStream << std::endl;
+          }
         }
         else
         {
-          outputStream << "\"" << std::endl;
+          outputStream << closeQuotations;
         }
       }
     }
-    if ( !firstIteration )
+    if ( minimizeStream )
     {
-      outputStream << "            }" << std::endl;
+      if ( !firstIteration )
+      {
+        outputStream << "}]";
+      }
+      else
+      {
+        outputStream << "]";
+      }
     }
-    outputStream << "          ]" << std::endl;
-
+    else
+    {
+      if ( !firstIteration )
+      {
+        outputStream << "            }" << std::endl
+          << "          ]" << std::endl;
+      }
+      else
+      {
+        outputStream <<  "          ]" << std::endl;
+      }
+    }
   }
 
   void Domain::importEntityJSON( boost::property_tree::ptree entityJSON,
@@ -229,7 +289,7 @@ namespace nslib
     catch ( std::exception const& ex )
     {
       SHIFT_THROW( "ERROR: getting EntityType from JSON: "
-                   + std::string( ex.what( )));
+        + std::string( ex.what( )));
     };
 
     try
@@ -406,8 +466,7 @@ namespace nslib
   }
 
   void Domain::importEntititiesJSON( boost::property_tree::ptree entities,
-                                     std::unordered_map < unsigned int,
-                                       shift::Entity* >* oldGUIToEntity )
+    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
     for ( const auto& entityJSON : entities )
     {
@@ -421,6 +480,55 @@ namespace nslib
       {
         DataManager::rootEntities( ).add( entity );
       }
+    }
+  }
+
+  void
+  Domain::exportEntitiesJSON( std::ostream &outputStream, bool minimizeStream )
+  {
+    std::string continueBracket;
+    std::string entityTypeLabel;
+    std::string rootEntityLabel;
+    std::string entityGIDLabel;
+    std::string entityDataLabel;
+    if ( minimizeStream )
+    {
+      continueBracket = "},";
+      entityTypeLabel = "{\"EntityType\":\"";
+      rootEntityLabel = "\",\"RootEntity\":\"";
+      entityGIDLabel = "\",\"EntityGID\":\"";
+      entityDataLabel = "\",\"EntityData\":";
+    }
+    else
+    {
+      continueBracket = "\n    },\n";
+      entityTypeLabel = "    {\n      \"EntityType\": \"";
+      rootEntityLabel = "\",\n      \"RootEntity\": \"";
+      entityGIDLabel = "\",\n      \"EntityGID\": \"";
+      entityDataLabel = "\",\n      \"EntityData\":\n";
+    }
+    auto entities = nslib::DataManager::entities( ).vector( );
+    auto rootEntitiesMap = DataManager::rootEntities( ).map( );
+    bool firstIteration = true;
+    for ( auto entity : entities )
+    {
+      if ( firstIteration )
+      {
+        firstIteration = false;
+      }
+      else
+      {
+        outputStream << continueBracket;
+      }
+      auto entityGID = entity->entityGid( );
+      char isRoot = ( rootEntitiesMap.find( entityGID )
+        != rootEntitiesMap.end( )) ? 't' : 'f';
+
+      outputStream << entityTypeLabel  << entity->entityName( )
+        << rootEntityLabel << isRoot << entityGIDLabel
+        << entityGID << entityDataLabel;
+
+      entity->serialize( outputStream, minimizeStream, "        " );
     }
   }
 }

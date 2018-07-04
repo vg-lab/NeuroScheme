@@ -64,9 +64,10 @@ namespace nslib
     const shift::RelationshipPropertiesTypes &
     relationshipPropertiesTypes( void ) const;
 
-    virtual void exportJSON( std::ostream &outputStream );
+    virtual void exportJSON( std::ostream& outputStream,
+      bool minimizeStream = false );
 
-    virtual void importJSON( std::istream &inputStream );
+    virtual void importJSON( std::istream& inputStream );
 
 
     virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ )
@@ -80,11 +81,11 @@ namespace nslib
     shift::RelationshipPropertiesTypes* _relationshipPropertiesTypes;
     std::string _domainName;
 
-    virtual void exportRelationTypeToJSON( std::string relationName,
-      std::ostream& outputStream );
+    virtual void exportRelationTypeToJSON( const std::string& relationName,
+      std::ostream& outputStream, bool minimizeStream );
+
     virtual void importEntityJSON( boost::property_tree::ptree entityJSON,
       shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID );
-
 
     virtual void importRelationshipsJSON(
       boost::property_tree::ptree relationships,
@@ -109,6 +110,8 @@ namespace nslib
 
     void importEntititiesJSON( boost::property_tree::ptree entities,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+
+    void exportEntitiesJSON( std::ostream& outputStream, bool minimizeStream );
   };
 }
 
