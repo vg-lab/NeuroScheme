@@ -30,7 +30,6 @@ namespace nslib
   Domain::Domain( void )
     : _dataLoader( nullptr ), _entitiesTypes( nullptr )
   {
-
   }
 
   DataLoader* Domain::dataLoader( void )
@@ -49,7 +48,8 @@ namespace nslib
     return *_relationshipPropertiesTypes;
   }
 
-  void Domain::exportJSON( std::ostream& outputStream, bool minimizeStream )
+  void Domain::exportJSON( std::ostream& outputStream,
+    bool minimizeStream )  const
   {
     auto entities = nslib::DataManager::entities( ).vector( );
     SHIFT_CHECK_THROW( !entities.empty( ),
@@ -57,29 +57,33 @@ namespace nslib
 
     std::string domainLabel;
     std::string entitiesLabel;
+    std::string maximumsLabel;
     std::string continueBracket;
-
     std::string relationshipsLabel;
+    
     if ( minimizeStream )
     {
       domainLabel = "{\"domain\":\"";
-      entitiesLabel = "\",\"entities\":[";
+      maximumsLabel = "\",\"maximums\":{";
+      entitiesLabel = "},\"entities\":[";
       continueBracket = "},";
       relationshipsLabel =  "}],\"relationships\":[";
     }
     else
     {
       domainLabel = "{\n  \"domain\": \"";
-      entitiesLabel = "\",\n  \"entities\": [\n";
+      maximumsLabel = "\",\n  \"maximums\": {\n";
+      entitiesLabel = "  },\n  \"entities\": [\n";
       continueBracket = "\n    },\n";
       relationshipsLabel =  "    }\n  ],\n  \"relationships\": [\n";
 
     }
 
-
     outputStream << domainLabel << _domainName
-       << entitiesLabel;
+       << maximumsLabel;
+    exportRepresentationMaxMin( outputStream, minimizeStream );
 
+    outputStream << entitiesLabel;
     exportEntitiesJSON( outputStream, minimizeStream );
 
     outputStream << relationshipsLabel;
@@ -122,7 +126,6 @@ namespace nslib
 
   void Domain::importJSON( std::istream& inputStream )
   {
-
     boost::property_tree::ptree root;
     try
     {
@@ -145,6 +148,18 @@ namespace nslib
       SHIFT_THROW( "ERROR: getting Domain from JSON: "
         + std::string( ex.what( )));
     };
+
+    boost::property_tree::ptree maximums;
+    try
+    {
+      maximums = root.get_child( "maximums" );
+    }
+    catch ( std::exception const& ex )
+    {
+      SHIFT_THROW( "ERROR: getting maximums object from JSON: "
+        + std::string( ex.what( )));
+    };
+    importMaximumsJSON( maximums );
 
     boost::property_tree::ptree entities;
     try
@@ -177,12 +192,10 @@ namespace nslib
 
     auto canvas = nslib::PaneManager::activePane( );
     canvas->displayEntities( nslib::DataManager::rootEntities( ), false, true );
-
   }
 
-
   void Domain::exportRelationTypeToJSON( const std::string& relationName,
-    std::ostream &outputStream, bool minimizeStream )
+    std::ostream &outputStream, bool minimizeStream ) const
   {
     std::string relationTypeLabel;
     std::string relationsLabel;
@@ -220,10 +233,10 @@ namespace nslib
 
     bool firstIteration = true;
     for ( auto relOrigIt = relationOneToN.begin( );
-          relOrigIt != relationOneToN.end( ); ++relOrigIt )
+      relOrigIt != relationOneToN.end( ); ++relOrigIt )
     {
       for ( auto relDestIt = relOrigIt->second.begin( );
-            relDestIt != relOrigIt->second.end( ); ++relDestIt )
+        relDestIt != relOrigIt->second.end( ); ++relDestIt )
       {
         if ( firstIteration )
         {
@@ -277,10 +290,9 @@ namespace nslib
     }
   }
 
-  void Domain::importEntityJSON( boost::property_tree::ptree entityJSON,
+  void Domain::importEntityJSON( const boost::property_tree::ptree& entityJSON,
     shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID )
   {
-
     try
     {
       std::string entityType = entityJSON.get< std::string >( "EntityType" );
@@ -321,9 +333,7 @@ namespace nslib
       SHIFT_THROW( "ERROR: getting EntityGID from JSON: "
         + std::string( ex.what( )));
     };
-
     boost::property_tree::ptree firesJSON;
-
     try
     {
       firesJSON = entityJSON.get_child( "EntityData" );
@@ -333,12 +343,11 @@ namespace nslib
       SHIFT_THROW( "ERROR: getting EntityData from JSON: "
         + std::string( ex.what( )));
     };
-
     entity->deserialize( firesJSON );
   }
 
   void Domain::importRelationshipsJSON(
-    boost::property_tree::ptree relationships,
+    const boost::property_tree::ptree& relationships,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
 
@@ -369,12 +378,12 @@ namespace nslib
     }
   }
 
-  void Domain::importJSONRelationGIDS( boost::property_tree::ptree relation,
+  void Domain::importJSONRelationGIDS(
+    const  boost::property_tree::ptree& relation,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
     shift::Entity*& origEntity, shift::Entity*& destEntity,
     const std::string& /*relationName*/ )
   {
-
     try
     {
       unsigned int origGID = relation.get< unsigned int >( "Source" );
@@ -388,6 +397,7 @@ namespace nslib
       SHIFT_THROW( "ERROR: getting Source for JSON: "
         + std::string( ex.what( )));
     };
+
     try
     {
       unsigned int destGID = relation.get< unsigned int >( "Dest");
@@ -410,7 +420,7 @@ namespace nslib
   }
 
   void Domain::addConnectsToRelationsToJSON(
-    boost::property_tree::ptree relations,
+    const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
     auto& relConnectsTo = *( DataManager::entities( )
@@ -444,7 +454,7 @@ namespace nslib
   }
 
   void Domain::addIsParentOfRelationshipsToJSON(
-    boost::property_tree::ptree relations,
+    const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
     auto& relParentOf = *( DataManager::entities( )
@@ -456,16 +466,15 @@ namespace nslib
     {
       shift::Entity* origEntity;
       shift::Entity* destEntity;
-
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
         destEntity, "isParentOf" );
-
       shift::Relationship::Establish( relParentOf, relChildOf,
         origEntity, destEntity );
     }
   }
 
-  void Domain::importEntititiesJSON( boost::property_tree::ptree entities,
+  void Domain::importEntititiesJSON(
+    const boost::property_tree::ptree& entities,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
     for ( const auto& entityJSON : entities )
@@ -483,8 +492,8 @@ namespace nslib
     }
   }
 
-  void
-  Domain::exportEntitiesJSON( std::ostream &outputStream, bool minimizeStream )
+  void Domain::exportEntitiesJSON( std::ostream &outputStream,
+    bool minimizeStream ) const
   {
     std::string continueBracket;
     std::string entityTypeLabel;
@@ -531,4 +540,5 @@ namespace nslib
       entity->serialize( outputStream, minimizeStream, "        " );
     }
   }
+
 }

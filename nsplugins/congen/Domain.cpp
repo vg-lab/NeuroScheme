@@ -74,8 +74,8 @@ namespace nslib
     void DomainGUI::loadNeuroML( void )
     {
       QString path = QFileDialog::getOpenFileName(
-        _mw, "Open Xml Scene", _lastOpenedFileName,
-        tr("Xml Scene ( *.xml );; All files (*)" ));
+        _mw, tr( "Open Xml Scene" ), _lastOpenedFileName,
+        tr( "Xml Scene") + " ( *.xml );; " + tr( "All files" )+ " (*)" );
 
       if ( !path.isEmpty( ))
       {
@@ -159,11 +159,12 @@ namespace nslib
     {
     }
 
-    void Domain::addRelationsOfType( boost::property_tree::ptree  relations,
-      std::string relationName, std::unordered_map < unsigned int,
-      shift::Entity* >* oldGUIToEntity )
+    void Domain::addRelationsOfType(
+      const  boost::property_tree::ptree&  relations,
+      std::string relationName,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
-      if ( relationName == "connectsTo")
+      if ( relationName == "connectsTo" )
       {
         addConnectsToRelationsToJSON( relations, oldGUIToEntity );
       }
@@ -173,8 +174,63 @@ namespace nslib
       }
       else
       {
-        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
+        SHIFT_THROW( "ERROR: unknown type of relation: " + relationName );
       }
+    }
+
+    void Domain::exportRepresentationMaxMin( std::ostream& outputStream,
+      bool minimizeStream ) const
+    {
+      std::string maxWeightLabel;
+      std::string maxNbNeuronsLabel;
+      std::string closeQuotationsLabel;
+      if ( minimizeStream )
+      {
+        maxWeightLabel = "\"maxWeight\":\"";
+        maxNbNeuronsLabel = "\",\"maxNbNeurons\":\"";
+        closeQuotationsLabel = "\"";
+      }
+      else
+      {
+        maxWeightLabel = "    \"maxWeight\": \"";
+        maxNbNeuronsLabel = "\",\n    \"maxNbNeurons\": \"";
+        closeQuotationsLabel = "\"\n";
+      }
+      auto repCreator = ( RepresentationCreator* )
+        nslib::RepresentationCreatorManager::getCreator( );
+      outputStream << maxWeightLabel << repCreator->maxAbsoluteWeight( )
+        << maxNbNeuronsLabel << repCreator->maxNeuronsPerPopulation( )
+        << closeQuotationsLabel;
+    }
+
+    void Domain::importMaximumsJSON( const boost::property_tree::ptree& maximums )
+    {
+      auto repCreator = ( RepresentationCreator* )
+        nslib::RepresentationCreatorManager::getCreator( );
+
+      try
+      {
+        unsigned int maxNeuronsPerPopulation =
+          maximums.get< unsigned int >( "maxNbNeurons" );
+        repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNbNeurons for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        float maxAbsoluteWeight =
+          maximums.get< float >( "maxWeight" );
+        repCreator->maxAbsoluteWeight( maxAbsoluteWeight, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxWeight for JSON: "
+          + std::string( ex.what( )));
+      };
     }
 
   }

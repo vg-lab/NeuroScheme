@@ -101,9 +101,9 @@ namespace nslib
         delete this->_relationshipPropertiesTypes;
       }
 
-      bool isSelectableEntity( shift::Entity* entity ) const;
-      unsigned int selectableEntityId( shift::Entity* entity ) const;
-      const Vector4f entity3DPosition ( shift::Entity* entity ) const;
+      bool isSelectableEntity( shift::Entity* entity ) const override;
+      unsigned int selectableEntityId( shift::Entity* entity ) const override;
+      const Vector4f entity3DPosition ( shift::Entity* entity ) const override;
       static void usageMessage( void );
 
       void createGUI( QMainWindow* mw, QMenuBar* menubar ) final
@@ -115,17 +115,22 @@ namespace nslib
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
 
-      void addRelationsOfType( boost::property_tree::ptree  relations,
+      virtual void exportRepresentationMaxMin(
+        std::ostream& outputStream, bool minimizeStream ) const override;
+
+      void addRelationsOfType( const boost::property_tree::ptree&  relations,
         std::string relationName, std::unordered_map
         < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
 
       void addIsAGroupOfRelationshipsToJSON(
-        boost::property_tree::ptree  relations,
+        const boost::property_tree::ptree&  relations,
         std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
 
       void addIsSuperEntityOfRelationshipsToJSON(
-        boost::property_tree::ptree  relations,
+        const boost::property_tree::ptree&  relations,
         std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+
+      void importMaximumsJSON( const boost::property_tree::ptree& maximums ) override;
 
     };
   }

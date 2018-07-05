@@ -87,8 +87,8 @@ public slots:
   void actionPublishFocusOnDisplayed( void );
   void toggleZeroEQ( void );
   void quit( void );
-  void JsonExport( void );
-  void JsonImport( void );
+  void exportToJSON( void );
+  void importFromJSON( void );
 
 protected:
 

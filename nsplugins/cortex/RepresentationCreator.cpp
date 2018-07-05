@@ -612,6 +612,119 @@ namespace nslib
       return true;
     }
 
+    float RepresentationCreator::maxNeuronSomaVolume( void ) const
+    {
+      return _maxNeuronSomaVolume;
+    }
+
+    float RepresentationCreator::maxNeuronSomaArea( void ) const
+    {
+      return _maxNeuronSomaArea;
+    }
+
+    float RepresentationCreator::maxNeuronDendsVolume( void ) const
+    {
+      return _maxNeuronDendsVolume;
+    }
+
+    float RepresentationCreator::maxNeuronDendsArea( void ) const
+    {
+      return _maxNeuronDendsArea;
+    }
+
+    unsigned int RepresentationCreator::maxNeurons( void ) const
+    {
+      return _maxNeurons;
+    }
+
+    unsigned int RepresentationCreator::maxNeuronsPerColumn( void ) const
+    {
+      return _maxNeuronsPerColumn;
+    }
+
+    unsigned int RepresentationCreator::maxNeuronsPerMiniColumn( void ) const
+    {
+      return _maxNeuronsPerMiniColumn;
+    }
+
+    unsigned int RepresentationCreator::maxConnectionsPerEntity( void ) const
+    {
+      return _maxConnectionsPerEntity;
+    }
+
+    void RepresentationCreator::maxNeuronSomaVolume(
+      float maxNeuronSomaVolume_, bool compare )
+    {
+      if ( !compare || maxNeuronSomaVolume_ > _maxNeuronSomaVolume )
+      {
+        _maxNeuronSomaVolume = maxNeuronSomaVolume_;
+      }
+    }
+
+    void RepresentationCreator::maxConnectionsPerEntity(
+      unsigned int maxConnectionsPerEntity_, bool compare )
+    {
+      if ( !compare || maxConnectionsPerEntity_ > _maxConnectionsPerEntity  )
+      {
+        _maxConnectionsPerEntity = maxConnectionsPerEntity_;
+      }
+    }
+
+    void RepresentationCreator::maxNeuronsPerMiniColumn(
+      unsigned int maxNeuronsPerMiniColumn_, bool compare )
+    {
+      if ( !compare || maxNeuronsPerMiniColumn_ > _maxNeuronsPerMiniColumn )
+      {
+        _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
+      }
+    }
+
+    void RepresentationCreator::maxNeuronsPerColumn(
+      unsigned int maxNeuronsPerColumn_, bool compare )
+    {
+      if ( !compare || maxNeuronsPerColumn_ > _maxNeuronsPerColumn )
+      {
+        _maxNeuronsPerColumn = maxNeuronsPerColumn_;
+      }
+    }
+
+    void
+    RepresentationCreator::maxNeurons( unsigned int maxNeurons_, bool compare )
+    {
+      if ( !compare || maxNeurons_ > _maxNeurons )
+      {
+        _maxNeurons = maxNeurons_;
+      }
+    }
+
+    void RepresentationCreator::maxNeuronDendsArea(
+      float maxNeuronDendsArea_, bool compare )
+    {
+      if ( !compare || maxNeuronDendsArea_ > _maxNeuronDendsArea )
+      {
+        _maxNeuronDendsArea = maxNeuronDendsArea_;
+      }
+    }
+
+    void
+    RepresentationCreator::maxNeuronDendsVolume(
+      float maxNeuronDendsVolume_, bool compare )
+    {
+      if ( !compare || maxNeuronDendsVolume_ > _maxNeuronDendsVolume )
+      {
+        _maxNeuronDendsVolume = maxNeuronDendsVolume_;
+      }
+    }
+
+    void
+    RepresentationCreator::maxNeuronSomaArea(
+      float maxNeuronSomaArea_, bool compare )
+    {
+      if ( !compare || maxNeuronSomaArea_ > _maxNeuronSomaArea )
+      {
+        _maxNeuronSomaArea = maxNeuronSomaArea_;
+      }
+    }
 
   } // namespace cortex
 } // namespace nslib

@@ -296,15 +296,32 @@ namespace nslib
       return needToClear;
     }
 
-    void RepresentationCreator::maxAbsoluteWeight( float maxAbsoluteWeight_ )
+    void RepresentationCreator::maxAbsoluteWeight(
+      float maxAbsoluteWeight_, bool compare )
     {
-      _maxAbsoluteWeight = maxAbsoluteWeight_;
+      if ( !compare || maxAbsoluteWeight_ > _maxAbsoluteWeight )
+      {
+        _maxAbsoluteWeight = maxAbsoluteWeight_;
+      }
     }
 
-    void RepresentationCreator::maxNeuronsPerPopulation( float
-    maxNeuronsPerPopulation_)
+    void RepresentationCreator::maxNeuronsPerPopulation(
+      unsigned int maxNeuronsPerPopulation_, bool compare )
     {
-      _maxNeuronsPerPopulation = maxNeuronsPerPopulation_;
+      if ( !compare || maxNeuronsPerPopulation_ > _maxNeuronsPerPopulation )
+      {
+        _maxNeuronsPerPopulation = maxNeuronsPerPopulation_;
+      }
+    }
+
+    float RepresentationCreator::maxAbsoluteWeight( void ) const
+    {
+      return _maxAbsoluteWeight;
+    }
+
+    unsigned int RepresentationCreator::maxNeuronsPerPopulation( void ) const
+    {
+      return _maxNeuronsPerPopulation;
     }
 
   } // namespace congen

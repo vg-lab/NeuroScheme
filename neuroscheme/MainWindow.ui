@@ -324,7 +324,7 @@
      <normaloff>:/icons/open.svg</normaloff>:/icons/open.svg</iconset>
    </property>
    <property name="text">
-    <string>Import from JSON</string>
+    <string>Import JSON</string>
    </property>
   </action>
   <action name="actionJSONExporter">
@@ -333,7 +333,7 @@
      <normaloff>:/icons/save.svg</normaloff>:/icons/save.svg</iconset>
    </property>
    <property name="text">
-    <string>Export from JSON</string>
+    <string>Export JSON</string>
    </property>
   </action>
  </widget>

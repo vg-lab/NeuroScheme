@@ -70,10 +70,10 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 // #endif
 
   connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
-           this, SLOT( JsonImport( )));
+           this, SLOT( importFromJSON( )));
 
   connect( _ui->actionJSONExporter, SIGNAL( triggered( )),
-           this, SLOT( JsonExport( )));
+           this, SLOT( exportToJSON( )));
 
   connect( _ui->actionQuit, SIGNAL( triggered( )),
            this, SLOT( quit( )));
@@ -697,36 +697,34 @@ void MainWindow::quit( void )
   QCoreApplication::quit( );
 }
 
-void MainWindow::JsonExport( void )
+void MainWindow::exportToJSON( void )
 {
-  QString path =  QFileDialog::getSaveFileName( this, "Save JSON File",
-    _lastOpenedFileName, tr(  "JSON File ( *.JSON *.json );; All files (*)" ));
+  QString path = QFileDialog::getSaveFileName( this, tr( "Save JSON File" ),
+    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
+    + tr( "All files" ) + " (*)" );
 
   if ( !path.isEmpty( ))
   {
     _lastOpenedFileName = QFileInfo( path ).path( );
     auto fileName = path.toStdString( );
 
-    std::ofstream outfile ( fileName );
+    std::ofstream outfile( fileName );
     nslib::DomainManager::getActiveDomain( )->exportJSON( outfile );
-
   }
-
 }
 
-void MainWindow::JsonImport( void )
+void MainWindow::importFromJSON( void )
 {
-  QString path = QFileDialog::getOpenFileName( this, "Open JSON File",
-    _lastOpenedFileName, tr("JSON File ( *.JSON *.json );; All files (*)" ));
+  QString path = QFileDialog::getOpenFileName( this, tr( "Open JSON File" ),
+    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
+    + tr( "All files" ) + " (*)" );
 
   if ( !path.isEmpty( ))
   {
     _lastOpenedFileName = QFileInfo( path ).path( );
     auto fileName = path.toStdString( );
 
-    std::ifstream inputfile ( fileName );
+    std::ifstream inputfile( fileName );
     nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
   }
-
-
 }

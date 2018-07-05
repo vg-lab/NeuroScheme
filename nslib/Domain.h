@@ -65,10 +65,9 @@ namespace nslib
     relationshipPropertiesTypes( void ) const;
 
     virtual void exportJSON( std::ostream& outputStream,
-      bool minimizeStream = false );
+      bool minimizeStream = false ) const;
 
     virtual void importJSON( std::istream& inputStream );
-
 
     virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ )
     {
@@ -82,36 +81,45 @@ namespace nslib
     std::string _domainName;
 
     virtual void exportRelationTypeToJSON( const std::string& relationName,
-      std::ostream& outputStream, bool minimizeStream );
+      std::ostream& outputStream, bool minimizeStream ) const;
 
-    virtual void importEntityJSON( boost::property_tree::ptree entityJSON,
+    virtual void importEntityJSON( const boost::property_tree::ptree& entityJSON,
       shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID );
 
     virtual void importRelationshipsJSON(
-      boost::property_tree::ptree relationships,
+      const boost::property_tree::ptree& relationships,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
 
-    virtual void addRelationsOfType( boost::property_tree::ptree  /*relations*/,
+    virtual void addRelationsOfType( const boost::property_tree::ptree&  /*relations*/,
       std::string /*relationName*/, std::unordered_map
       < unsigned int, shift::Entity* >* /*oldGUIToEntity*/ ) = 0;
 
-    virtual void importJSONRelationGIDS( boost::property_tree::ptree relation,
+    virtual void importJSONRelationGIDS(
+      const  boost::property_tree::ptree& relation,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
       shift::Entity*& origEntity, shift::Entity*& destEntity,
       const std::string& /*relationName*/ );
 
     virtual void addConnectsToRelationsToJSON(
-      boost::property_tree::ptree relations,
+      const boost::property_tree::ptree& relations,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
 
     virtual void addIsParentOfRelationshipsToJSON(
-      boost::property_tree::ptree relations,
+      const boost::property_tree::ptree& relations,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
 
-    void importEntititiesJSON( boost::property_tree::ptree entities,
+    virtual void importEntititiesJSON(
+      const boost::property_tree::ptree& entities,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
 
-    void exportEntitiesJSON( std::ostream& outputStream, bool minimizeStream );
+    virtual void exportEntitiesJSON( std::ostream& outputStream,
+      bool minimizeStream ) const;
+
+    virtual void exportRepresentationMaxMin( std::ostream& /*outputStream*/,
+      bool /*minimizeStream*/ ) const = 0;
+
+    virtual void importMaximumsJSON(
+      const boost::property_tree::ptree& maximums ) = 0;
   };
 }
 

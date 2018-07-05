@@ -49,8 +49,12 @@ namespace nslib
         shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false ) final;
-        void maxAbsoluteWeight( float maxAbsoluteWeight_ );
-        void maxNeuronsPerPopulation( float maxNeuronsPerPopulation_) ;
+        void maxAbsoluteWeight(
+          float maxAbsoluteWeight_, bool compare = false );
+        void maxNeuronsPerPopulation(
+          unsigned int maxNeuronsPerPopulation_, bool compare = false ) ;
+        float maxAbsoluteWeight( void ) const;
+        unsigned int maxNeuronsPerPopulation( void ) const;
 
       void generateRelations(
         const shift::Entities& entities,
