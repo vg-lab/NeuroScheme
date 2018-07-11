@@ -32,26 +32,25 @@
 #include <QLineEdit>
 #include <assert.h>
 
-
 namespace nslib
 {
 
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
-    shift::Entity* originEntity_,
-    shift::Entity* destinationEntity_,
-    QWidget* parent_ )
-    : QWidget( parent_ )
+    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+    QWidget* parent_, bool modal )
+    : QDialog ( parent_ )
     , _originEntity( originEntity_ )
     , _destinationEntity( destinationEntity_ )
   {
+    this->setModal( modal );
     auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
     shift::Properties* propObject;
 
     bool propertyObjExists = true;
 
-    auto& relConnectsTo =
-      *( DataManager::entities( ).relationships( )["connectsTo"]->asOneToN( ));
+    auto& relConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "connectsTo" ]->asOneToN( ));
     auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
     if( connectsToIt != relConnectsTo.end( ))
     {
@@ -78,7 +77,7 @@ namespace nslib
 
     assert( propObject );
 
-    QGridLayout* myLayout = new QGridLayout;
+    QGridLayout* myLayout = new QGridLayout( );
     myLayout->setAlignment( Qt::AlignTop );
 
     auto labelRel = new QLabel( QString( "Relationship Parameters" ));
@@ -118,7 +117,7 @@ namespace nslib
           comboBoxWidget->setCurrentIndex( index );
           comboBoxWidget->setEnabled( true );
           connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-                   this, SLOT( refreshSubproperties( )));
+            this, SLOT( refreshSubproperties( )));
         }
         else
         {
@@ -129,9 +128,9 @@ namespace nslib
           {
             QString connectionName( QString::fromStdString(
               ( propertyObjExists ? propObject->getProperty(
-               "Name" ).value<std::string>( ) : originEntity_->getProperty(
+                "Name" ).value<std::string>( ) : originEntity_->getProperty(
                 "Entity name" ).value<std::string>( ) + "-" +
-                 destinationEntity_->getProperty(
+                destinationEntity_->getProperty(
                 "Entity name" ).value<std::string>( ))));
             lineEditwidget->setText( connectionName );
           }
@@ -152,7 +151,6 @@ namespace nslib
           widget->hide( );
         }
         numProp++;
-
         _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
       }
     }
@@ -179,8 +177,8 @@ namespace nslib
     auto& relConnectedBy =
       *( DataManager::entities( ).relationships( )["connectedBy"]->asOneToN( ));
 
-    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-      ->relationshipPropertiesTypes( );
+    auto relationshipPropertiesTypes =
+      DomainManager::getActiveDomain( )->relationshipPropertiesTypes( );
     auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
     if( !( connectsToIt != relConnectsTo.end( )))
     {
@@ -240,8 +238,7 @@ namespace nslib
     }
 
     bool needToClearCache = false;
-    for ( const auto& creatorPair :
-            nslib::RepresentationCreatorManager::creators( ))
+    for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
     {
       needToClearCache = needToClearCache ||
         creatorPair.second->relationshipUpdatedOrCreated( propObject );
@@ -250,10 +247,10 @@ namespace nslib
     // TODO improvemente: check if cache needs to be cleared or if just the
     // items related to the entity under edition
     // if ( needToClearCache ) {
-    nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+    RepresentationCreatorManager::clearRelationshipsCache( );
     // }
 
-    for ( auto pane : nslib::PaneManager::panes( ))
+    for ( auto pane : PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
     }
@@ -305,8 +302,8 @@ namespace nslib
       const auto& label = labelWidget->text( ).toStdString( );
       const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
 
-      if ( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-                                         label ))
+      if ( !_propObject->evalConstraint(
+        shift::Properties::SUBPROPERTY, label ))
       {
         labelWidget->hide( );
         widget->hide( );

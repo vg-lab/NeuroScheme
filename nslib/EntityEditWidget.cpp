@@ -23,6 +23,7 @@
 #include "DataManager.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "DomainManager.h"
 
 #include <QtGui>
 #include <QPushButton>
@@ -35,8 +36,9 @@
 #include <QMessageBox>
 
 #include <memory>
+#include <shift/Relationship.h>
 
-//TODO?: Add relations to entities (parentOf, childOf ...)
+//TODO: Add realtion of parent of to entities
 
 namespace nslib
 {
@@ -45,9 +47,12 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parent_ )
-    : QWidget( parent_ )
+    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parentWidget_,
+    bool addToScene_, shift::Entity* parentEntity_)
+    : QWidget( parentWidget_ )
     , _entity( nullptr )
+    , _parentEntity( parentEntity_ )
+    , _addToScene( addToScene_ )
     , _action( action )
     , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
@@ -118,7 +123,7 @@ namespace nslib
         }
       }
 
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         QFrame* sep3 = new QFrame( );
         QFrame* sep4 = new QFrame( );
@@ -185,14 +190,14 @@ namespace nslib
     auto origEntity = _entity;
     unsigned int numEles = 1;
 
-    if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+    if ( _action == DUPLICATE_ENTITY || _isNew )
     {
       numEles = _numNewEntities->text( ).toInt( );
     }
 
-    for (unsigned int i=0;i<numEles;++i)
+    for ( unsigned int i = 0; i < numEles; ++i )
     {
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         _entity = _entity->create( );
       }
@@ -213,10 +218,11 @@ namespace nslib
         {
           continue;
         }
-        const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( entityParam );
+        const auto& editType =
+          std::get< TEditTuple::WIDGET_TYPE >( entityParam );
         const auto& widget = std::get< TEditTuple::WIDGET >( entityParam );
         QString paramString;
-        if ( editType ==  TWidgetType::COMBO )
+        if ( editType == TWidgetType::COMBO )
         {
           auto comboWidget = dynamic_cast< QComboBox* >( widget );
           paramString = comboWidget->currentText( );
@@ -226,9 +232,9 @@ namespace nslib
           auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
           //change name if multiple are created silmultaneus
-          if( numEles > 1 && label == "Entity name" )
+          if ( numEles > 1 && label == "Entity name" )
           {
-            paramString = paramString+QString( "_" )+QString::number( i );
+            paramString = paramString + QString( "_" ) + QString::number( i );
           }
         }
         else
@@ -237,8 +243,8 @@ namespace nslib
         auto caster = fires::PropertyManager::getPropertyCaster( label );
         if ( !_entity->hasProperty( label ))
         {
-          // WAR: This is to force create/copy properties not defined in the JSON
-          // but defined in when loading data, but does not solve all cases
+          // WAR: This is to force create/copy properties not defined in the
+          // JSON but defined in when loading data, but does not solve all cases
           auto prop = origEntity->getProperty( label );
           _entity->registerProperty( label, prop );
         }
@@ -249,13 +255,13 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
-
           bool isUnique = _entity->hasPropertyFlag(
             label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
           {
             std::string pStr = paramString.toStdString( );
-            if ( _isNew || caster->toString( prop ) != pStr ) // If value changed
+            if ( _isNew ||
+              caster->toString( prop ) != pStr ) // If value changed
             {
               const auto &entities = nslib::DataManager::entities( ).vector( );
               for( const auto entity: entities )
@@ -265,9 +271,9 @@ namespace nslib
                 {
                   if ( caster->toString( entity->getProperty( label )) == pStr )
                   {
-                    errorMessages.push_back(
-                      QString( "Property '" ) + QString::fromStdString( label ) +
-                      QString( "' is repeated" ));
+                    errorMessages.push_back(QString( "Property '" ) +
+                       QString::fromStdString( label ) +
+                       QString( "' is repeated" ));
                     saveNewPropValue = false;
                     break;
                   }
@@ -276,7 +282,6 @@ namespace nslib
             }
           }
         }
-
         if ( saveNewPropValue )
         {
           caster->fromString( prop, paramString.toStdString( ));
@@ -286,7 +291,7 @@ namespace nslib
       if ( !errorMessages.empty( ))
       {
         QString errors = "<p><strong>Errors: </strong></p><ul>";
-        for( const auto& err: errorMessages )
+        for ( const auto& err: errorMessages )
         {
           errors += QString( "<li>" ) + err + QString( "</li>" );
         }
@@ -305,7 +310,7 @@ namespace nslib
 
       bool needToClearCache = false;
       for ( const auto& creatorPair :
-          nslib::RepresentationCreatorManager::creators( ))
+        nslib::RepresentationCreatorManager::creators( ))
       {
         needToClearCache = needToClearCache ||
           creatorPair.second->entityUpdatedOrCreated( _entity );
@@ -318,10 +323,13 @@ namespace nslib
       nslib::RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
-      if ( _action == DUPLICATE_ENTITY || _action == NEW_ENTITY )
+      if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         nslib::DataManager::entities( ).add( _entity );
-        nslib::PaneManager::activePane( )->entities( ).add( _entity );
+        if ( _addToScene )
+        {
+          nslib::PaneManager::activePane( )->entities( ).add( _entity );
+        }
 
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
@@ -335,8 +343,7 @@ namespace nslib
         //TODO: improve this set of adds which will do push_backs
         for ( const auto& subentity : subentities )
         {
-          shift::Relationship::Establish(
-            relSuperEntityOf, relSubEntityOf,
+          shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
           nslib::DataManager::entities( ).add( subentity );
           nslib::PaneManager::activePane( )->entities( ).add( subentity );
@@ -347,11 +354,38 @@ namespace nslib
         // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
         nslib::PaneManager::activePane( )->displayEntities(
           nslib::PaneManager::activePane( )->entities( ), false, true );
+
+        if ( _parentEntity )
+        {
+
+          auto& entities = nslib::DataManager::entities( );
+          auto& relParentOf =
+            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
+          auto& relChildOf =
+            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+
+          shift::Relationship::Establish( relParentOf, relChildOf,
+            _parentEntity, _entity );
+          nslib::PaneManager::activePane( )->refreshProperties (
+            nslib::PaneManager::activePane( )->entities( ));
+        }
+        else
+        {
+          nslib::DataManager::rootEntities( ).add( _entity );
+        }
       }
       if ( _action == EDIT_ENTITY )
       {
+        auto& relChildOf = *( DataManager::entities( ).relationships( )
+          [ "isChildOf" ]->asOneToOne( ));
+        auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
+        if ( parentID > 0 )
+        {
+          auto parent = DataManager::entities( ).at( parentID );
+          parent->autoUpdateProperties( );
+        }
         for ( const auto& repPair :
-            nslib::RepresentationCreatorManager::repsToEntities( ))
+          nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;
@@ -361,8 +395,7 @@ namespace nslib
           pane->reps( ).clear( );
           // pane->resizeEvent( nullptr );
           pane->displayEntities(
-            nslib::PaneManager::activePane( )->entities( ),
-            false, true );
+            nslib::PaneManager::activePane( )->entities( ), false, true );
         }
       }
     }

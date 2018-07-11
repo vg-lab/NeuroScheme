@@ -23,7 +23,7 @@
 #ifndef __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 #define __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 
-#include <QWidget>
+#include <QDialog>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLabel>
@@ -33,18 +33,18 @@
 namespace nslib
 {
   class ConnectionRelationshipEditWidget:
-    public QWidget
+    public QDialog
   {
     Q_OBJECT
 
   public:
     ConnectionRelationshipEditWidget(shift::Entity*  originEntity_,
-                                      shift::Entity* destinationEntity_,
-                                      QWidget* parent_ = 0);
+      shift::Entity* destinationEntity_, QWidget* parent_ = nullptr,
+      bool modal = false );
 
   public slots:
-    void validateDialog( );
-    void cancelDialog( );
+    void validateDialog( void );
+    void cancelDialog( void );
     void refreshSubproperties( void );
 
   private:

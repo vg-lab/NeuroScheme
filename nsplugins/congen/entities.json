@@ -46,12 +46,22 @@
                 {
                     "name": "Entity name",
                     "type": "std::string",
-                    "flags": [ "EDITABLE" ]
+                    "flags": [ "EDITABLE", "UNIQUE" ]
                 },
                 {
                     "name": "Nb of neurons Mean",
                     "type": "uint",
-                    "flags": []
+                    "flags": [],
+                    "auto":
+                    {
+                        "op": "MEAN",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "Nb of neurons",
+                            "entities" : [ "NeuronPop", "NeuronSuperPop" ]
+                        }
+                    }
                 },
                 {
                     "name": "Nb of neurons",
@@ -178,7 +188,48 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "ParentOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TParentOfConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "ChildOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronSuperPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TChildOfConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
         }
-
     ]
 }

@@ -45,7 +45,8 @@ namespace nslib
     TEntityEditWidgetAction;
 
     EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-                      QWidget *parent = 0 );
+      QWidget *parentWidget_ = 0, bool addToScene_ = true,
+      shift::Entity* parentEntity_= nullptr);
 
     ~EntityEditWidget( void );
 
@@ -64,6 +65,8 @@ namespace nslib
     typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
     shift::Entity* _entity;
+    shift::Entity* _parentEntity;
+    bool _addToScene;
     TEntityEditWidgetAction _action;
 
     std::unique_ptr< QLineEdit > _numNewEntities;

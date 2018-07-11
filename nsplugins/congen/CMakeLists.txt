@@ -9,7 +9,7 @@ shift_generate_cxx(
   "Entity"
   ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_congen_entities.h
+  ${SHIFT_GENERATED_DIR}/shift_congen_entities
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -29,7 +29,7 @@ shift_generate_cxx(
   "Relationship"
   ${CMAKE_CURRENT_SOURCE_DIR}/entities.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_congen_relationshipProperties.h
+  ${SHIFT_GENERATED_DIR}/shift_congen_relationshipProperties
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
@@ -40,6 +40,8 @@ foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
 endforeach( )
 list( APPEND SHIFT_GENERATED_HEADER_FILES
   ${SHIFT_GENERATED_DIR}/shift_congen_relationshipProperties.h )
+list( APPEND SHIFT_GENERATED_IMPL_FILES
+  ${SHIFT_GENERATED_DIR}/shift_congen_relationshipProperties.cpp )
 
 # Generate representations
 set( SHIFT_GENERATED_OBJECTS NeuronPopRep ConnectionArrowRep )
@@ -49,7 +51,7 @@ shift_generate_cxx(
   "Representation"
   ${CMAKE_CURRENT_SOURCE_DIR}/reps.json
   ${SHIFT_GENERATED_DIR}
-  ${SHIFT_GENERATED_DIR}/shift_congen_reps.h
+  ${SHIFT_GENERATED_DIR}/shift_congen_reps
   "${SHIFT_GENERATED_OBJECTS}"
   )
 foreach( GENERATED_OBJECT ${SHIFT_GENERATED_OBJECTS} )
