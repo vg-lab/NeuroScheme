@@ -22,50 +22,15 @@
 #ifndef __NSLIB__DOMAIN_MANAGER__
 #define __NSLIB__DOMAIN_MANAGER__
 
+#include "Domain.h"
 #include <nslib/api.h>
-#include <shift/shift.h>
-#include <Eigen/Dense>
-#include <QMenuBar>
-#include <QMainWindow>
-#include "DataLoader.h"
 
 namespace nslib
 {
-  using Matrix4f = ::Eigen::Matrix4f;
-  using Vector4f = ::Eigen::Vector4f;
-
-  class NSLIB_API Domain
-  {
-
-  public:
-    Domain( void )
-      : _dataLoader( nullptr )
-      , _entitiesTypes( nullptr )
-    {
-    }
-    virtual ~Domain( void ) {}
-    virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
-    virtual unsigned int selectableEntityId( shift::Entity* entity ) const = 0;
-    virtual const Vector4f entity3DPosition ( shift::Entity* entity ) const = 0;
-    DataLoader* dataLoader( void ) { return _dataLoader; }
-    const shift::EntitiesTypes& entitiesTypes( void ) const {
-      return *_entitiesTypes; }
-    const shift::RelationshipPropertiesTypes&
-      relationshipPropertiesTypes( void ) const
-    { return *_relationshipPropertiesTypes; }
-
-    virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ ) {}
-
-  protected:
-    DataLoader* _dataLoader;
-    shift::EntitiesTypes* _entitiesTypes;
-    shift::RelationshipPropertiesTypes* _relationshipPropertiesTypes;
-  };
 
   class NSLIB_API DomainManager
   {
   public:
-
     static Domain* getActiveDomain( void )
     {
       return _domain;

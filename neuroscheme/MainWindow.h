@@ -87,6 +87,8 @@ public slots:
   void actionPublishFocusOnDisplayed( void );
   void toggleZeroEQ( void );
   void quit( void );
+  void exportToJSON( void );
+  void importFromJSON( void );
 
 protected:
 
@@ -94,6 +96,7 @@ protected:
   StoredSelections _storedSelections;
   QDockWidget* _layoutsDock;
   QDockWidget* _entityEditDock;
+  QString _lastOpenedFileName;
 
 private:
 

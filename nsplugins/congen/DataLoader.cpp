@@ -116,7 +116,7 @@ namespace nslib
     void DataLoader::_loadProjection(
       QXmlStreamReader& xml,
       const std::unordered_map< std::string, unsigned int >& popNameToGid,
-      float& maxAbsoluteWeight)
+      float& maxAbsoluteWeight )
     {
       std::string projName, targetName, sourceName;
       auto attributes = xml.attributes( );
@@ -290,7 +290,7 @@ namespace nslib
         std::make_pair( targetGid, connProps ));
       relConnectedBy[ targetGid ].insert(
         std::make_pair( sourceGid, nullptr ));
-      connProps->setProperty( "Entity name",projName );
+      connProps->setProperty( "Name",projName );
 
     }
 
@@ -347,8 +347,8 @@ namespace nslib
       }
 
       // Sets new maximum and minimum in the RepresentationCreator
-      auto repCreator = ( RepresentationCreator*)
-        nslib::RepresentationCreatorManager::getCreator();
+      auto repCreator = ( RepresentationCreator* )
+        nslib::RepresentationCreatorManager::getCreator( );
       repCreator->maxAbsoluteWeight( maxAbsoluteWeight );
       repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
 

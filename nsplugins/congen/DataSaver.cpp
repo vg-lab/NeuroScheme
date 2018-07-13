@@ -36,8 +36,9 @@ namespace nslib
     void DataSaver::saveXmlScene( QWidget* ptr )
     {
       QString fileName = QFileDialog::getSaveFileName( ptr,
-                          "Save Scene to NeuroML format","",
-                          QObject::tr("NeuroML (*.xml);;All Files (*)"));
+         QObject::tr( "Save Scene to NeuroML format" ),"",
+         QObject::tr( "NeuroML" ) + " (*.xml);;"
+         + QObject::tr( "All Files" ) + " (*)" );
       if ( fileName != "" )
       {
         XMLExporter* exporter_ = new XMLExporter;
@@ -60,7 +61,7 @@ namespace nslib
            }
         }
         const auto& relConnectsTo = *( DataManager::entities( ).
-                                 relationships( )[ "connectsTo" ]->asOneToN( ));
+          relationships( )[ "connectsTo" ]->asOneToN( ));
         std::unordered_map< std::string, std::string > params;
         for ( auto relIt = relConnectsTo.begin( ); relIt != relConnectsTo.end( ); ++relIt )
         {

@@ -26,6 +26,7 @@
 #include <cortex/Domain.h>
 #include <congen/Domain.h>
 #include <scoop/version.h>
+
 #ifdef NEUROSCHEME_USE_GMRVLEX
 #include <gmrvlex/version.h>
 #endif
@@ -46,7 +47,7 @@
 #include <QLineEdit>
 #include <QDateTime>
 #include <QLabel>
-
+#include <QFileDialog>
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
@@ -67,6 +68,12 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 // #ifdef NSOL_USE_QT5CORE
 //   _ui->actionOpenXmlScene->setEnabled( true );
 // #endif
+
+  connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
+           this, SLOT( importFromJSON( )));
+
+  connect( _ui->actionJSONExporter, SIGNAL( triggered( )),
+           this, SLOT( exportToJSON( )));
 
   connect( _ui->actionQuit, SIGNAL( triggered( )),
            this, SLOT( quit( )));
@@ -670,7 +677,7 @@ void MainWindow::toggleZeroEQ( void )
   {
     bool ok;
     QString text = QInputDialog::getText(
-      this, tr("Please select ZeroEQ session"),
+      this, tr("Please select ZeroEQ session" ),
       tr("ZeroEQ session:"), QLineEdit::Normal,
       QString::fromStdString( nslib::Config::zeroEQSession( )), &ok );
     if ( ok && !text.isEmpty( ))
@@ -688,4 +695,36 @@ void MainWindow::toggleZeroEQ( void )
 void MainWindow::quit( void )
 {
   QCoreApplication::quit( );
+}
+
+void MainWindow::exportToJSON( void )
+{
+  QString path = QFileDialog::getSaveFileName( this, tr( "Save JSON File" ),
+    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
+    + tr( "All files" ) + " (*)" );
+
+  if ( !path.isEmpty( ))
+  {
+    _lastOpenedFileName = QFileInfo( path ).path( );
+    auto fileName = path.toStdString( );
+
+    std::ofstream outfile( fileName );
+    nslib::DomainManager::getActiveDomain( )->exportJSON( outfile );
+  }
+}
+
+void MainWindow::importFromJSON( void )
+{
+  QString path = QFileDialog::getOpenFileName( this, tr( "Open JSON File" ),
+    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
+    + tr( "All files" ) + " (*)" );
+
+  if ( !path.isEmpty( ))
+  {
+    _lastOpenedFileName = QFileInfo( path ).path( );
+    auto fileName = path.toStdString( );
+
+    std::ifstream inputfile( fileName );
+    nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
+  }
 }

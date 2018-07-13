@@ -33,6 +33,7 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QtWidgets/QGridLayout>
 
 namespace nslib
 {
@@ -252,6 +253,12 @@ namespace nslib
 
     Domain::Domain( void )
     {
+      fires::PropertyManager::setTypePropertyCaster( typeid( Eigen::Vector4f ),
+        new Eigen4VectorCaster( ));
+
+      this->_exportRelations =
+        { "connectsTo", "isParentOf", "isAGroupOf", "isSuperEntityOf" };
+      this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
       this->_relationshipPropertiesTypes =
@@ -317,6 +324,233 @@ namespace nslib
                 << std::endl << std::endl
                 << "\t\t(*1) only for BlueConfig files" << std::endl;
 
+    }
+
+    void Domain::addRelationsOfType(
+      const boost::property_tree::ptree&  relations,
+      std::string relationName,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    {
+      if ( relationName == "connectsTo")
+      {
+        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
+      }
+      else if ( relationName == "isParentOf" )
+      {
+        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
+      }
+      else if ( relationName == "isAGroupOf" )
+      {
+        addIsAGroupOfRelationshipsToJSON( relations, oldGUIToEntity );
+      }
+      else if ( relationName == "isSuperEntityOf" )
+      {
+        addIsSuperEntityOfRelationshipsToJSON( relations, oldGUIToEntity );
+      }
+      else
+      {
+        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
+      }
+    }
+
+    void Domain::addIsAGroupOfRelationshipsToJSON(
+      const boost::property_tree::ptree&  relations,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    {
+      auto& relGroupOf = *( DataManager::entities( )
+        .relationships( )[ "isAGroupOf" ]->asOneToN( ) );
+      auto& relGroupBy = *( DataManager::entities( )
+        .relationships( )[ "isPartOf" ]->asOneToN( ) );
+
+      for ( const auto& relation : relations )
+      {
+        shift::Entity* origEntity;
+        shift::Entity* destEntity;
+
+        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+          destEntity, "isParentOf" );
+
+        shift::Relationship::Establish( relGroupOf, relGroupBy,
+          origEntity, destEntity );
+      }
+
+    }
+
+    void
+    Domain::addIsSuperEntityOfRelationshipsToJSON(
+      const boost::property_tree::ptree&  relations,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    {
+      auto& relSuperEntity = *( DataManager::entities( )
+        .relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+      auto& relSubEntity = *( DataManager::entities( )
+        .relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+
+      for ( const auto& relation : relations )
+      {
+        shift::Entity* origEntity;
+        shift::Entity* destEntity;
+
+        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+          destEntity, "isParentOf" );
+
+        shift::Relationship::Establish( relSuperEntity, relSubEntity,
+          origEntity, destEntity );
+      }
+    }
+
+    void Domain::exportRepresentationMaxMin( std::ostream& outputStream,
+      bool minimizeStream ) const
+    {
+      std::string maxNeuronSomaVolumeLabel;
+      std::string maxNeuronSomaAreaLabel;
+      std::string maxNeuronDendsVolumeLabel;
+      std::string maxNeuronDendsAreaLabel;
+      std::string maxNeuronsLabel;
+      std::string maxNeuronsPerColumnLabel;
+      std::string maxNeuronsPerMiniColumnLabel;
+      std::string maxConnsPerEntityLabel;
+      std::string closeQuotationsLabel;
+      if ( minimizeStream )
+      {
+        maxNeuronSomaVolumeLabel = "\"maxNeuronSomaVolume\":\"";
+        maxNeuronSomaAreaLabel = "\",\"maxNeuronSomaArea\":\"";
+        maxNeuronDendsVolumeLabel = "\",\"maxNeuronDendsVolume\":\"";
+        maxNeuronDendsAreaLabel = "\",\"maxNeuronDendsArea\":\"";
+        maxNeuronsLabel = "\",\"maxNeurons\":\"";
+        maxNeuronsPerColumnLabel = "\",\"maxNeuronsPerColumn\":\"";
+        maxNeuronsPerMiniColumnLabel = "\",\"maxNeuronsPerMiniColumn\":\"";
+        maxConnsPerEntityLabel = "\",\"maxConnectionsPerEntity\":\"";
+        closeQuotationsLabel = "\"";
+
+      }
+      else
+      {
+        maxNeuronSomaVolumeLabel = "    \"maxNeuronSomaVolume\": \"";
+        maxNeuronSomaAreaLabel = "\",\n    \"maxNeuronSomaArea\": \"";
+        maxNeuronDendsVolumeLabel = "\",\n    \"maxNeuronDendsVolume\": \"";
+        maxNeuronDendsAreaLabel = "\",\n    \"maxNeuronDendsArea\": \"";
+        maxNeuronsLabel = "\",\n    \"maxNeurons\": \"";
+        maxNeuronsPerColumnLabel = "\",\n    \"maxNeuronsPerColumn\": \"";
+        maxNeuronsPerMiniColumnLabel = "\",\n    \"maxNeuronsPerMiniColumn\": \"";
+        maxConnsPerEntityLabel = "\",\n    \"maxConnectionsPerEntity\": \"";
+        closeQuotationsLabel = "\"\n";
+      }
+      auto repCreator = ( RepresentationCreator* )
+        nslib::RepresentationCreatorManager::getCreator( );
+
+      outputStream << maxNeuronSomaVolumeLabel
+        << repCreator->maxNeuronSomaVolume( ) << maxNeuronSomaAreaLabel
+        << repCreator->maxNeuronSomaArea( ) << maxNeuronDendsVolumeLabel
+        << repCreator->maxNeuronDendsVolume( ) << maxNeuronDendsAreaLabel
+        << repCreator->maxNeuronDendsArea( )  << maxNeuronsLabel
+        << repCreator->maxNeurons( ) << maxNeuronsPerColumnLabel
+        << repCreator->maxNeuronsPerColumn( ) << maxNeuronsPerMiniColumnLabel
+        << repCreator->maxNeuronsPerMiniColumn( ) << maxConnsPerEntityLabel
+        << repCreator->maxConnectionsPerEntity( ) << closeQuotationsLabel;
+    }
+
+    void Domain::importMaximumsJSON(
+      const boost::property_tree::ptree& maximums )
+    {
+      auto repCreator = ( RepresentationCreator* )
+        nslib::RepresentationCreatorManager::getCreator( );
+
+      try
+      {
+        float maxNeuronSomaVolume =
+          maximums.get< float >( "maxNeuronSomaVolume" );
+        repCreator->maxNeuronSomaVolume( maxNeuronSomaVolume, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronSomaVolume for JSON: "
+           + std::string( ex.what( )));
+      };
+
+      try
+      {
+        float maxNeuronSomaArea =
+          maximums.get< float >( "maxNeuronSomaArea" );
+        repCreator->maxNeuronSomaArea( maxNeuronSomaArea, true);
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronSomaArea for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        float maxNeuronDendsVolume =
+          maximums.get< float >( "maxNeuronDendsVolume" );
+        repCreator->maxNeuronDendsVolume( maxNeuronDendsVolume, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronDendsVolume for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        float maxNeuronDendsArea =
+          maximums.get< float >( "maxNeuronDendsArea" );
+        repCreator->maxNeuronDendsArea( maxNeuronDendsArea, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronDendsArea for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        unsigned int maxNeurons =
+          maximums.get< unsigned int >( "maxNeurons" );
+        repCreator->maxNeurons( maxNeurons, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeurons for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        unsigned int maxNeuronsPerColumn =
+          maximums.get< unsigned int >( "maxNeuronsPerColumn" );
+        repCreator->maxNeuronsPerColumn( maxNeuronsPerColumn, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronsPerColumn for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        unsigned int maxNeuronsPerMiniColumn =
+          maximums.get< unsigned int >( "maxNeuronsPerMiniColumn" );
+        repCreator->maxNeuronsPerMiniColumn( maxNeuronsPerMiniColumn, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxNeuronsPerMiniColumn for JSON: "
+          + std::string( ex.what( )));
+      };
+
+      try
+      {
+        unsigned int maxConnsPerEntity =
+          maximums.get< unsigned int >( "maxConnectionsPerEntity" );
+        repCreator->maxConnectionsPerEntity( maxConnsPerEntity, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        SHIFT_THROW( "ERROR: getting maxConnsPerEntity for JSON: "
+          + std::string( ex.what( )));
+      };
     }
 
   }

@@ -84,6 +84,45 @@ namespace nslib
 
       bool entityUpdatedOrCreated( shift::Entity* entity ) override;
 
+      float maxNeuronSomaVolume( void ) const;
+
+      float maxNeuronSomaArea( void ) const;
+
+      float maxNeuronDendsVolume( void ) const;
+
+      float maxNeuronDendsArea( void ) const;
+
+      unsigned int maxNeurons( void ) const;
+
+      unsigned int maxNeuronsPerColumn( void ) const;
+
+      unsigned int maxNeuronsPerMiniColumn( void ) const;
+
+      unsigned int maxConnectionsPerEntity( void ) const;
+
+      void maxNeuronSomaVolume(
+        float maxNeuronSomaVolume_, bool compare = false );
+
+      void maxNeuronSomaArea(
+        float maxNeuronSomaArea_, bool compare = false );
+
+      void maxNeuronDendsVolume(
+        float maxNeuronDendsVolume_, bool compare = false );
+
+      void maxNeuronDendsArea(
+        float maxNeuronDendsArea_, bool compare = false );
+
+      void maxNeurons( unsigned int maxNeurons_, bool compare = false );
+
+      void maxNeuronsPerColumn(
+        unsigned int maxNeuronsPerColumn_, bool compare = false );
+
+      void maxNeuronsPerMiniColumn(
+        unsigned int maxNeuronsPerMiniColumn_, bool compare = false );
+
+      void maxConnectionsPerEntity(
+        unsigned int maxConnectionsPerEntity_, bool compare = false );
+
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
       typedef std::map<

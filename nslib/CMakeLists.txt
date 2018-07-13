@@ -11,7 +11,8 @@ set( NSLIB_PUBLIC_HEADERS
   ConnectionRelationshipEditWidget.h
   DataLoader.h
   DataManager.h
-  DomainManager.cpp
+  Domain.h
+  DomainManager.h
   error.h
   FilterWidget.h
   InteractionManager.h
@@ -47,6 +48,7 @@ set( NSLIB_SOURCES
   Config.cpp
   ConnectionRelationshipEditWidget.cpp
   DataManager.cpp
+  Domain.cpp
   DomainManager.cpp
   FilterWidget.cpp
   InteractionManager.cpp
