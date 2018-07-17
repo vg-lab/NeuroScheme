@@ -344,27 +344,35 @@ namespace nslib
               _contextMenu->addSeparator( );
             }
           }
-          QAction* levelUp = ( parent != 0 )
-            ? _contextMenu->addAction( "Level up" ) : nullptr;
-          QAction* levelDown = ( !children.empty( ))
-            ? _contextMenu->addAction( "Level down" ) : nullptr;
-          QAction* expandGroup = ( !groupedEntities.empty( ))
-            ? _contextMenu->addAction( "Expand group" ) : nullptr;
+          const bool hasChildren = !children.empty( );
+          const bool grouped = !groupedEntities.empty( );
 
-          if ( levelUp || levelDown || expandGroup )
+          const QAction* levelUp = ( parent != 0 )
+            ? _contextMenu->addAction( "Level up" ) : nullptr;
+          const QAction* levelDown = ( hasChildren )
+            ? _contextMenu->addAction( "Level down" ) : nullptr;
+          const QAction* expandGroup = ( grouped )
+            ? _contextMenu->addAction( "Expand group" ) : nullptr;
+          const QAction* expandChildren = ( hasChildren )
+            ? _contextMenu->addAction( "Expand children" ) : nullptr;
+
+          if ( levelUp || levelDown || expandGroup || expandChildren )
           {
             _contextMenu->addSeparator( );
           }
 
-          QAction* levelUpToNewPane = ( parent != 0 )
+          const QAction* levelUpToNewPane = ( parent != 0 )
             ? _contextMenu->addAction( "Level up [new pane]" ) : nullptr;
-          QAction* levelDownToNewPane = ( !children.empty( ))
+          const QAction* levelDownToNewPane = ( hasChildren )
             ? _contextMenu->addAction( "Level down [new pane]" ) : nullptr;
-          QAction* expandGroupToNewPane = ( !groupedEntities.empty( ))
+          const QAction* expandGroupToNewPane = ( grouped )
             ? _contextMenu->addAction( "Expand group [new pane]" ) : nullptr;
+          const QAction* expandChildrenToNewPane = ( hasChildren )
+            ? _contextMenu->addAction( "Expand children [new pane]" ) : nullptr;
 
-          if ( levelUp || levelDown || expandGroup || levelUpToNewPane ||
-            levelDownToNewPane || expandGroupToNewPane || editEntity )
+          if ( levelUp || levelDown || expandGroup || expandChildren ||
+            levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane ||
+            expandChildrenToNewPane || editEntity )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
@@ -432,10 +440,25 @@ namespace nslib
               ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
             {
               if ( levelDownToNewPane &&
-                  levelDownToNewPane == selectedAction )
+                levelDownToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
-                    nslib::PaneManager::newPaneFromActivePane( ));
+                  nslib::PaneManager::newPaneFromActivePane( ));
+              }
+              for ( const auto& child : children )
+                targetEntities.add( DataManager::entities( ).at( child.first ));
+            }
+            else if ( ( expandChildren && expandChildren == selectedAction ) ||
+              ( expandChildrenToNewPane
+              && expandChildrenToNewPane == selectedAction ))
+            {
+              targetEntities = PaneManager::activePane( )->entities( );
+              targetEntities.remove( entity );
+              if ( expandChildrenToNewPane
+                && expandChildrenToNewPane == selectedAction )
+              {
+                nslib::PaneManager::activePane(
+                  nslib::PaneManager::newPaneFromActivePane( ));
               }
 
               for ( const auto& child : children )
