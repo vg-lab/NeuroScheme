@@ -368,7 +368,7 @@ namespace nslib
         shift::Entity* destEntity;
 
         importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "isParentOf" );
+          destEntity, "GroupOf" );
 
         shift::Relationship::Establish( relGroupOf, relGroupBy,
           origEntity, destEntity );
@@ -392,7 +392,7 @@ namespace nslib
         shift::Entity* destEntity;
 
         importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "isParentOf" );
+          destEntity, "SuperEntityOf" );
 
         shift::Relationship::Establish( relSuperEntity, relSubEntity,
           origEntity, destEntity );

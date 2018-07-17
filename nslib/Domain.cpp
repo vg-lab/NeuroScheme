@@ -382,7 +382,7 @@ namespace nslib
     const  boost::property_tree::ptree& relation,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
     shift::Entity*& origEntity, shift::Entity*& destEntity,
-    const std::string& /*relationName*/ )
+    const std::string& relationName )
   {
     try
     {
@@ -412,11 +412,10 @@ namespace nslib
         + std::string( ex.what( )));
     };
 
-    //TODO: add relationships constraints
-    //SHIFT_CHECK_THROW( !shift::RelationshipPropertiesTypes::constraints(
-    //  relationName, origEntity->entityName( ), destEntity->entityName( )),
-    //  "\"ERROR: relation: " + relationName+" not supported between: " +
-    //  origEntity->entityName( ) +" - " + destEntity->entityName( ));
+    SHIFT_CHECK_THROW( shift::RelationshipPropertiesTypes::isConstrained(
+      relationName, origEntity->entityName( ), destEntity->entityName( )),
+      "ERROR: relation: " + relationName + " not supported between: " +
+      origEntity->entityName( ) +" - " + destEntity->entityName( ));
   }
 
   void Domain::addConnectsToRelationsToJSON(
@@ -434,13 +433,13 @@ namespace nslib
       shift::Entity* destEntity;
 
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-        destEntity, "connectsTo" );
+        destEntity, "ConnectedTo" );
       boost::property_tree::ptree firesData;
       try
       {
         firesData = relation.second.get_child( "RelationData" );
       }
-      catch( std::exception ex )
+      catch( std::exception& ex )
       {
         SHIFT_THROW( "ERROR: getting RelationData for JSON: "
          + std::string( ex.what( )));
@@ -467,7 +466,7 @@ namespace nslib
       shift::Entity* origEntity;
       shift::Entity* destEntity;
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-        destEntity, "isParentOf" );
+        destEntity, "ParentOf" );
       shift::Relationship::Establish( relParentOf, relChildOf,
         origEntity, destEntity );
     }

@@ -697,7 +697,7 @@ namespace nslib
             else
             {
               Loggers::get( )->log( "item without entity",
-                                    LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
               return;
             }
           }
@@ -753,13 +753,25 @@ namespace nslib
   void InteractionManager::createConnectionRelationship(
     shift::Entity* originEntity_, shift::Entity* destinationEntity_ )
   {
-    if ( _conRelationshipEditWidget )
-      delete _conRelationshipEditWidget;
-
-    _conRelationshipEditWidget =
-      new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
+    if ( shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
+      originEntity_->entityName( ), destinationEntity_->entityName( )))
+    {
+      if ( _conRelationshipEditWidget )
+      {
+        delete _conRelationshipEditWidget;
+      }
+      _conRelationshipEditWidget =
+        new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
         &PaneManager::activePane( )->view( ), true );
-    _conRelationshipEditWidget->show( );
+      _conRelationshipEditWidget->show( );
+    }
+    else
+    {
+      Loggers::get( )->log( "A " + originEntity_->entityName( ) +
+        " cannot be connected to a " + destinationEntity_->entityName( ) + '.',
+        LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+    }
+
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
@@ -885,7 +897,6 @@ namespace nslib
            SelectedState::SELECTED )
         noChildrenSelected = false;
     }
-    return;
   }
 
   void InteractionManager::_queryGroupedSelectedState(
