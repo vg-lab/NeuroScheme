@@ -176,6 +176,8 @@ namespace nslib
       // Generate relationship representations
       nslib::RepresentationCreatorManager::generateRelations(
         filteredAndSortedEntities, relationshipReps, "connectsTo" );
+      nslib::RepresentationCreatorManager::generateRelations(
+        filteredAndSortedEntities, relationshipReps, "aggregatedConnectsTo" );
 
     }
     else
@@ -192,8 +194,9 @@ namespace nslib
       // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
       // Generate relationship representations
       nslib::RepresentationCreatorManager::generateRelations( entities,
-                                                            relationshipReps,
-                                                            "connectsTo" );
+        relationshipReps, "connectsTo" );
+      nslib::RepresentationCreatorManager::generateRelations( entities,
+        relationshipReps, "aggregatedConnectsTo" );
     }
 
     // shift::Representations relationshipReps;

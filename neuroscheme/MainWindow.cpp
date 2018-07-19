@@ -348,7 +348,17 @@ void MainWindow::selectDomain( void )
   nslib::PaneManager::panes( ).insert( canvas );
 
   if ( domain )
+  {
     domain->createGUI( this, _ui->menubar );
+
+    auto fileJSON = nslib::Config::isArgumentDefined( { "--JSONFile" } );
+    if ( !fileJSON.empty( ))
+    {
+    auto filePath = nslib::Config::inputArgs( )[ fileJSON ][0] ;
+      std::ifstream inputfile( filePath );
+      nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
+    }
+  }
 
   resizeEvent( 0 );
 } // MainWindow::selectDomain

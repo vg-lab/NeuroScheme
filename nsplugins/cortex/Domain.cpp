@@ -257,7 +257,7 @@ namespace nslib
         new Eigen4VectorCaster( ));
 
       this->_exportRelations =
-        { "connectsTo", "isParentOf", "isAGroupOf", "isSuperEntityOf" };
+        { "isParentOf", "isAGroupOf", "isSuperEntityOf", "connectsTo", };
       this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
@@ -288,6 +288,11 @@ namespace nslib
         new shift::RelationshipOneToN( "connectsTo" );
       _entities.relationships( )[ "connectedBy" ] =
         new shift::RelationshipOneToN( "connectedBy");
+
+      _entities.relationships( )[ "aggregatedConnectsTo" ] =
+        new shift::RelationshipOneToN( "aggregatedConnectsTo" );
+      _entities.relationships( )[ "aggregatedConnectedBy" ] =
+        new shift::RelationshipOneToN( "aggregatedConnectedBy" );
 
     }
 
@@ -326,31 +331,22 @@ namespace nslib
 
     }
 
-    void Domain::addRelationsOfType(
-      const boost::property_tree::ptree&  relations,
-      std::string relationName,
+    void Domain::importRelationshipsJSON(
+      const boost::property_tree::ptree& relationships,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
-      if ( relationName == "connectsTo")
-      {
-        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isParentOf" )
-      {
-        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isAGroupOf" )
-      {
-        addIsAGroupOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isSuperEntityOf" )
-      {
-        addIsSuperEntityOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else
-      {
-        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
-      }
+
+      addIsParentOfRelationshipsToJSON( getRelationsOfType(
+        "isParentOf", relationships), oldGUIToEntity );
+
+      addConnectsToRelationsToJSON( getRelationsOfType(
+        "connectsTo", relationships), oldGUIToEntity );
+
+      addIsAGroupOfRelationshipsToJSON( getRelationsOfType(
+        "connectsTo", relationships), oldGUIToEntity );
+
+      addIsSuperEntityOfRelationshipsToJSON( getRelationsOfType(
+        "connectsTo", relationships), oldGUIToEntity );
     }
 
     void Domain::addIsAGroupOfRelationshipsToJSON(

@@ -107,7 +107,7 @@ namespace nslib
 
     Domain::Domain( void )
     {
-      this->_exportRelations = { "connectsTo", "isParentOf" };
+      this->_exportRelations = { "isParentOf", "connectsTo" };
       this->_domainName = "congen";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
@@ -138,6 +138,11 @@ namespace nslib
         new shift::RelationshipOneToN( "connectsTo" );
       _entities.relationships( )[ "connectedBy" ] =
         new shift::RelationshipOneToN( "connectedBy" );
+
+      _entities.relationships( )[ "aggregatedConnectsTo" ] =
+        new shift::RelationshipOneToN( "aggregatedConnectsTo" );
+      _entities.relationships( )[ "aggregatedConnectedBy" ] =
+        new shift::RelationshipOneToN( "aggregatedConnectedBy" );
     }
 
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
@@ -159,23 +164,16 @@ namespace nslib
     {
     }
 
-    void Domain::addRelationsOfType(
-      const  boost::property_tree::ptree&  relations,
-      std::string relationName,
+    void Domain::importRelationshipsJSON(
+      const boost::property_tree::ptree& relationships,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
-      if ( relationName == "connectsTo" )
-      {
-        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isParentOf" )
-      {
-        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else
-      {
-        SHIFT_THROW( "ERROR: unknown type of relation: " + relationName );
-      }
+      addIsParentOfRelationshipsToJSON( getRelationsOfType(
+        "isParentOf", relationships), oldGUIToEntity );
+
+      addConnectsToRelationsToJSON( getRelationsOfType(
+        "connectsTo", relationships), oldGUIToEntity );
+
     }
 
     void Domain::exportRepresentationMaxMin( std::ostream& outputStream,

@@ -80,11 +80,11 @@ namespace nslib
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
 
-      void addRelationsOfType( const boost::property_tree::ptree& relations,
-        std::string relationName, std::unordered_map
-        < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
+      void importRelationshipsJSON(
+        const boost::property_tree::ptree& relationships,
+        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
 
-      virtual void exportRepresentationMaxMin(
+      void exportRepresentationMaxMin(
         std::ostream& outputStream, bool minimizeStream ) const override;
 
       void importMaximumsJSON(

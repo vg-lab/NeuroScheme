@@ -346,9 +346,9 @@ namespace nslib
     entity->deserialize( firesJSON );
   }
 
-  void Domain::importRelationshipsJSON(
-    const boost::property_tree::ptree& relationships,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+  boost::property_tree::ptree& Domain::getRelationsOfType(
+    const std::string& relationName,
+    const  boost::property_tree::ptree& relationships )
   {
 
     for ( const auto& relation : relationships )
@@ -364,18 +364,21 @@ namespace nslib
           + std::string( ex.what( )));
       };
 
-      boost::property_tree::ptree relations;
-      try
+      if ( relationType == relationName )
       {
-        relations = relation.second.get_child( "relations" );
+        try
+        {
+          return ( boost::property_tree::ptree& )
+            relation.second.get_child( "relations" );
+        }
+        catch ( std::exception const& ex )
+        {
+          SHIFT_THROW( "ERROR: getting relations array for JSON: "
+            + std::string( ex.what( )));
+        };
       }
-      catch ( std::exception const& ex )
-      {
-        SHIFT_THROW( "ERROR: getting relations array for JSON: "
-          + std::string( ex.what( )));
-      };
-      addRelationsOfType( relations, relationType, oldGUIToEntity );
     }
+    return *new boost::property_tree::ptree( );
   }
 
   void Domain::importJSONRelationGIDS(
@@ -427,6 +430,16 @@ namespace nslib
     auto& relConnectedBy = *( DataManager::entities( )
       .relationships( )[ "connectedBy" ]->asOneToN( ));
 
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
+
+    auto& relParentOf = *( DataManager::entities( )
+      .relationships( )[ "isParentOf" ]->asOneToN( ));
+    auto& relChildOf = *( DataManager::entities( )
+      .relationships( )[ "isChildOf" ]->asOneToOne( ));
+
     for ( const auto& relation : relations )
     {
       shift::Entity* origEntity;
@@ -446,8 +459,9 @@ namespace nslib
       }
       shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
         ->getRelationshipProperties( "connectsTo" )->create( );
-      shift::Relationship::Establish( relConnectsTo, relConnectedBy,
-        origEntity, destEntity, propObject );
+      shift::Relationship::AggregatedEstablish( relConnectsTo, relConnectedBy,
+        relAggregatedConnectsTo,relAggregatedConnectedBy, relParentOf, relChildOf,
+        DataManager::entities( ), origEntity, destEntity, propObject );
       propObject->deserialize( firesData );
     }
   }

@@ -180,8 +180,19 @@ namespace nslib
     auto& relConnectedBy = *( DataManager::entities( )
       .relationships( )[ "connectedBy" ]->asOneToN( ));
 
-    shift::Relationship::Establish( relConnectsTo, relConnectedBy,
-      _originEntity, _destinationEntity, propObject );
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
+
+    auto& relParentOf = *( DataManager::entities( )
+      .relationships( )[ "isParentOf" ]->asOneToN( ));
+    auto& relChildOf = *( DataManager::entities( )
+      .relationships( )[ "isChildOf" ]->asOneToOne( ));
+
+    shift::Relationship::AggregatedEstablish( relConnectsTo, relConnectedBy,
+      relAggregatedConnectsTo,relAggregatedConnectedBy, relParentOf, relChildOf,
+      DataManager::entities( ), _originEntity, _destinationEntity, propObject );
 
     for ( const auto& propParam: _propParamCont )
     {

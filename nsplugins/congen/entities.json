@@ -195,7 +195,10 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronSuperPop" }
             ],
             "flags": [ ],
             "properties": [ ],
@@ -215,7 +218,10 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronSuperPop" },
+                { "srcEntity": "NeuronSuperPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronSuperPop" }
             ],
             "flags": [ ],
             "properties": [ ],

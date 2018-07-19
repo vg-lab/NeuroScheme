@@ -53,18 +53,28 @@ namespace nslib
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
   {
     auto& relConnectsTo = *( DataManager::entities( ).
-                             relationships( )[ "connectsTo" ]->asOneToN( ));
+      relationships( )[ "connectsTo" ]->asOneToN( ));
     auto& relConnectedBy = *( DataManager::entities( ).
-                              relationships( )[ "connectedBy" ]->asOneToN( ));
+      relationships( )[ "connectedBy" ]->asOneToN( ));
+
+    auto& relAggregatedConnectsTo = *( DataManager::entities( ).
+      relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( ).
+      relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
 
     // Third parameter indicates if the relationship has to be inverted
     enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
     std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
-    rels.reserve( 2 );
-    rels.push_back(
-      std::make_tuple( &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
-    rels.push_back(
-      std::make_tuple( &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+    rels.reserve( 4 );
+    rels.push_back( std::make_tuple(
+      &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+    rels.push_back( std::make_tuple(
+      &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+
+    rels.push_back( std::make_tuple(
+      &relAggregatedConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+    rels.push_back( std::make_tuple(
+      &relAggregatedConnectedBy, scoop::Color( 255, 204, 0 ), true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -293,8 +303,6 @@ namespace nslib
           const auto& grandParent =
             relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
-          const auto& parentSiblings = relParentOf[ grandParent ];
-
           auto& relAGroupOf = *( DataManager::entities( ).relationships( )
             [ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
@@ -417,13 +425,7 @@ namespace nslib
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              if ( !parentSiblings.empty( ))
-              {
-                for ( const auto& parentSibling : parentSiblings )
-                  targetEntities.add(
-                    DataManager::entities( ).at( parentSibling.first ));
-              }
-              else if ( grandParent == 0 )
+              if ( grandParent == 0 )
               {
                 for ( const auto& rootEntity
                   : DataManager::rootEntities( ).vector( ))
@@ -433,7 +435,12 @@ namespace nslib
               }
               else
               {
-                targetEntities.add( DataManager::entities( ).at( parent ));
+                targetEntities.addRelatedEntitiesOneToOne( relChildOf, entity,
+                  DataManager::entities( ), 1 );
+                if ( targetEntities.size( ) == 0 )
+                {
+                  targetEntities.add( DataManager::entities( ).at( parent ) );
+                }
               }
             }
             else if ( ( levelDown && levelDown == selectedAction ) ||
@@ -445,8 +452,8 @@ namespace nslib
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child.first ));
+              targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
+                DataManager::entities( ), 1 );
             }
             else if ( ( expandChildren && expandChildren == selectedAction ) ||
               ( expandChildrenToNewPane
@@ -454,15 +461,15 @@ namespace nslib
             {
               targetEntities = PaneManager::activePane( )->entities( );
               targetEntities.remove( entity );
+              targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
+                DataManager::entities( ), 1 );
+
               if ( expandChildrenToNewPane
                 && expandChildrenToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-
-              for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child.first ));
             }
             else if ( ( expandGroup && expandGroup == selectedAction ) ||
               ( expandGroupToNewPane &&
@@ -474,9 +481,8 @@ namespace nslib
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              for ( const auto& groupedEntity : groupedEntities )
-                targetEntities.add(
-                  DataManager::entities( ).at( groupedEntity.first ));
+              targetEntities.addRelatedEntitiesOneToN( relAGroupOf, entity,
+                DataManager::entities( ), 1 );
             }
             else if ( selectedAction && childAction )
             {

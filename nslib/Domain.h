@@ -88,11 +88,11 @@ namespace nslib
 
     virtual void importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity ) = 0;
 
-    virtual void addRelationsOfType( const boost::property_tree::ptree&  /*relations*/,
-      std::string /*relationName*/, std::unordered_map
-      < unsigned int, shift::Entity* >* /*oldGUIToEntity*/ ) = 0;
+    virtual boost::property_tree::ptree& getRelationsOfType(
+      const std::string& relationName,
+      const  boost::property_tree::ptree& relationships );
 
     virtual void importJSONRelationGIDS(
       const  boost::property_tree::ptree& relation,
