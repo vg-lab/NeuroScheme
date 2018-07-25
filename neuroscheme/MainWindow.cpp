@@ -706,6 +706,11 @@ void MainWindow::exportToJSON( void )
   if ( !path.isEmpty( ))
   {
     _lastOpenedFileName = QFileInfo( path ).path( );
+
+    if (!path.endsWith(".json"))
+    {
+      path += ".json";
+    }
     auto fileName = path.toStdString( );
 
     std::ofstream outfile( fileName );
