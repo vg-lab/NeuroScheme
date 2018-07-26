@@ -348,7 +348,7 @@ namespace nslib
 
   boost::property_tree::ptree& Domain::getRelationsOfType(
     const std::string& relationName,
-    const  boost::property_tree::ptree& relationships )
+    const boost::property_tree::ptree& relationships )
   {
 
     for ( const auto& relation : relationships )
@@ -425,20 +425,10 @@ namespace nslib
     const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
-    auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-    auto& relConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "connectedBy" ]->asOneToN( ));
-
     auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
-
-    auto& relParentOf = *( DataManager::entities( )
-      .relationships( )[ "isParentOf" ]->asOneToN( ));
-    auto& relChildOf = *( DataManager::entities( )
-      .relationships( )[ "isChildOf" ]->asOneToOne( ));
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     for ( const auto& relation : relations )
     {
@@ -459,8 +449,8 @@ namespace nslib
       }
       shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
         ->getRelationshipProperties( "connectsTo" )->create( );
-      shift::Relationship::AggregatedEstablish( relConnectsTo, relConnectedBy,
-        relAggregatedConnectsTo,relAggregatedConnectedBy, relParentOf, relChildOf,
+      shift::Relationship::EstablishAndAggregate(
+        relAggregatedConnectsTo,relAggregatedConnectedBy,
         DataManager::entities( ), origEntity, destEntity, propObject );
       propObject->deserialize( firesData );
     }
@@ -470,10 +460,15 @@ namespace nslib
     const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
-    auto& relParentOf = *( DataManager::entities( )
+    auto entities = DataManager::entities( );
+    auto& relParentOf = *( entities
       .relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf = *( DataManager::entities( )
       .relationships( )[ "isChildOf" ]->asOneToOne( ));
+    auto& relAggregatedConnectsTo = *(entities
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( entities
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     for ( const auto& relation : relations )
     {
@@ -481,7 +476,8 @@ namespace nslib
       shift::Entity* destEntity;
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
         destEntity, "ParentOf" );
-      shift::Relationship::Establish( relParentOf, relChildOf,
+      shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
+        relAggregatedConnectsTo, relAggregatedConnectedBy,
         origEntity, destEntity );
     }
   }

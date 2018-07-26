@@ -50,7 +50,8 @@ namespace nslib
 
     static void generateRelations( const shift::Entities& entities,
                                    shift::Representations& representations,
-                                   const std::string& relationName,
+                                   const std::string& name,
+                                   bool aggregated = false,
                                    unsigned int repCreatorId = 0 );
 
     static const shift::TEntitiesToReps& entitiesToReps(

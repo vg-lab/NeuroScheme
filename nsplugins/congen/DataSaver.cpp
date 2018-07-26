@@ -63,11 +63,7 @@ namespace nslib
         }
         const auto& relConnectsTo = *( DataManager::entities( ).
           relationships( )[ "connectsTo" ]->asOneToN( ));
-
         saveXmlConnections( relConnectsTo, exporter_ );
-        auto& relAggregatedConnectsTo = *( DataManager::entities( ).
-          relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
-        saveXmlConnections( relAggregatedConnectsTo, exporter_ );
 
         //Add inputs here!
 

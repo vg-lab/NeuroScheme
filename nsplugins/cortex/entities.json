@@ -563,14 +563,6 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "Column", "dstEntity": "Column" },
-                { "srcEntity": "Column", "dstEntity": "MiniColumn" },
-                { "srcEntity": "Column", "dstEntity": "Neuron" },
-                { "srcEntity": "MiniColumn", "dstEntity": "Column" },
-                { "srcEntity": "MiniColumn", "dstEntity": "MiniColumn" },
-                { "srcEntity": "MiniColumn", "dstEntity": "Neuron" },
-                { "srcEntity": "Neuron", "dstEntity": "Column" },
-                { "srcEntity": "Neuron", "dstEntity": "MiniColumn" },
                 { "srcEntity": "Neuron", "dstEntity": "Neuron" }
             ],
             "flags": [ ],
@@ -591,14 +583,6 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "Column", "dstEntity": "Column" },
-                { "srcEntity": "Column", "dstEntity": "MiniColumn" },
-                { "srcEntity": "Column", "dstEntity": "Neuron" },
-                { "srcEntity": "MiniColumn", "dstEntity": "Column" },
-                { "srcEntity": "MiniColumn", "dstEntity": "MiniColumn" },
-                { "srcEntity": "MiniColumn", "dstEntity": "Neuron" },
-                { "srcEntity": "Neuron", "dstEntity": "Column" },
-                { "srcEntity": "Neuron", "dstEntity": "MiniColumn" },
                 { "srcEntity": "Neuron", "dstEntity": "Neuron" }
             ],
             "flags": [ ],

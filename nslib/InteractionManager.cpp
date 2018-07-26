@@ -57,10 +57,10 @@ namespace nslib
     auto& relConnectedBy = *( DataManager::entities( ).
       relationships( )[ "connectedBy" ]->asOneToN( ));
 
-    auto& relAggregatedConnectsTo = *( DataManager::entities( ).
-      relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
-    auto& relAggregatedConnectedBy = *( DataManager::entities( ).
-      relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
+//    auto& relAggregatedConnectsTo = *( DataManager::entities( ).
+//      relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+//    auto& relAggregatedConnectedBy = *( DataManager::entities( ).
+//      relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     // Third parameter indicates if the relationship has to be inverted
     enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
@@ -71,10 +71,10 @@ namespace nslib
     rels.push_back( std::make_tuple(
       &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
 
-    rels.push_back( std::make_tuple(
-      &relAggregatedConnectsTo, scoop::Color( 0, 204, 255 ), false ));
-    rels.push_back( std::make_tuple(
-      &relAggregatedConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+//    rels.push_back( std::make_tuple(
+//      &relAggregatedConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+//    rels.push_back( std::make_tuple(
+//      &relAggregatedConnectedBy, scoop::Color( 255, 204, 0 ), true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -435,7 +435,8 @@ namespace nslib
               }
               else
               {
-                targetEntities.addRelatedEntitiesOneToOne( relChildOf, entity,
+                targetEntities.addRelatedEntitiesOneToN( relParentOf,
+                  DataManager::entities().at(grandParent),
                   DataManager::entities( ), 1 );
                 if ( targetEntities.size( ) == 0 )
                 {

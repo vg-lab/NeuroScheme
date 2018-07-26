@@ -21,6 +21,7 @@
  */
 #include "RepresentationCreatorManager.h"
 #include "reps/QGraphicsItemRepresentation.h"
+#include "DataManager.h"
 
 namespace nslib
 {
@@ -92,15 +93,31 @@ namespace nslib
   void RepresentationCreatorManager::generateRelations(
       const shift::Entities& entities,
       shift::Representations& representations,
-      const std::string& relationName,
+      const std::string& name,
+      const bool aggregated,
       unsigned int repCreatorId )
   {
     if( _repCreators.count( repCreatorId ) == 1 )
-      _repCreators[ repCreatorId ]->generateRelations( entities,
-                                                       _gidsToEntitiesReps[ repCreatorId],
-                                                       _relatedEntitiesReps[ repCreatorId ],
-                                                       representations,
-                                                       relationName );
+    {
+      if ( aggregated )
+      {
+        auto relations =  DataManager::entities( ).
+          relationships( )[ name ]->asAggregatedOneToN( );
+        _repCreators[ repCreatorId ]
+          ->generateRelations( entities, _gidsToEntitiesReps[ repCreatorId ],
+                               _relatedEntitiesReps[ repCreatorId ],
+                               representations, relations );
+      }
+      else
+      {
+        auto relations =  DataManager::entities( ).
+          relationships( )[ name ]->asOneToN( );
+        _repCreators[ repCreatorId ]
+          ->generateRelations( entities, _gidsToEntitiesReps[ repCreatorId ],
+                               _relatedEntitiesReps[ repCreatorId ],
+                               representations, relations );
+      }
+    }
   }
 
   const shift::TEntitiesToReps& RepresentationCreatorManager::entitiesToReps(

@@ -271,8 +271,8 @@ namespace nslib
 
       _entities.relationships( )[ "isParentOf" ] =
         new shift::RelationshipOneToN( "isParentOf" );
-      _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne( "isChildOf" );
+      auto relChildOf = new shift::RelationshipOneToOne( "isChildOf" );
+      _entities.relationships( )[ "isChildOf" ] = relChildOf;
 
       _entities.relationships( )[ "isAGroupOf" ] =
         new shift::RelationshipOneToN( "isAGroupOf" );
@@ -284,15 +284,18 @@ namespace nslib
       _entities.relationships( )[ "isSubEntityOf" ] =
         new shift::RelationshipOneToOne( "isSubEntityOf" );
 
-      _entities.relationships( )[ "connectsTo" ] =
-        new shift::RelationshipOneToN( "connectsTo" );
-      _entities.relationships( )[ "connectedBy" ] =
-        new shift::RelationshipOneToN( "connectedBy");
+      auto relConnectsTo = new shift::RelationshipOneToN( "connectsTo" );
+      auto relConnectedBy = new shift::RelationshipOneToN( "connectedBy" );
+      _entities.relationships( )[ "connectsTo" ] = relConnectsTo;
+      _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
+
+      shift::RelationshipProperties* connectsToObj = _relationshipPropertiesTypes->getRelationshipProperties(
+        "connectsTo" );
 
       _entities.relationships( )[ "aggregatedConnectsTo" ] =
-        new shift::RelationshipOneToN( "aggregatedConnectsTo" );
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo", connectsToObj, relChildOf, relConnectsTo );
       _entities.relationships( )[ "aggregatedConnectedBy" ] =
-        new shift::RelationshipOneToN( "aggregatedConnectedBy" );
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy", connectsToObj, relChildOf,relConnectedBy);
 
     }
 

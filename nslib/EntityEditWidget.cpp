@@ -360,11 +360,17 @@ namespace nslib
 
           auto& entities = nslib::DataManager::entities( );
           auto& relParentOf =
-            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
+            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
           auto& relChildOf =
-            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+          auto& relAggregatedConnectsTo = *( entities.relationships( )
+            [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+          auto& relAggregatedConnectedBy = *( entities.relationships( )
+            [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-          shift::Relationship::Establish( relParentOf, relChildOf,
+
+          shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
+            relAggregatedConnectsTo, relAggregatedConnectedBy,
             _parentEntity, _entity );
           nslib::PaneManager::activePane( )->refreshProperties (
             nslib::PaneManager::activePane( )->entities( ));

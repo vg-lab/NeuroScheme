@@ -175,23 +175,13 @@ namespace nslib
     shift::RelationshipProperties* propObject = relationshipPropertiesTypes
       .getRelationshipProperties( "connectsTo" )->create( );
 
-    auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-    auto& relConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "connectedBy" ]->asOneToN( ));
-
     auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asOneToN( ));
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectedBy" ]->asOneToN( ));
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-    auto& relParentOf = *( DataManager::entities( )
-      .relationships( )[ "isParentOf" ]->asOneToN( ));
-    auto& relChildOf = *( DataManager::entities( )
-      .relationships( )[ "isChildOf" ]->asOneToOne( ));
-
-    shift::Relationship::AggregatedEstablish( relConnectsTo, relConnectedBy,
-      relAggregatedConnectsTo,relAggregatedConnectedBy, relParentOf, relChildOf,
+    shift::Relationship::EstablishAndAggregate(
+      relAggregatedConnectsTo,relAggregatedConnectedBy,
       DataManager::entities( ), _originEntity, _destinationEntity, propObject );
 
     for ( const auto& propParam: _propParamCont )
