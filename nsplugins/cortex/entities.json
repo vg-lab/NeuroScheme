@@ -499,6 +499,7 @@
         },
         {
             "name": "ConnectsWith",
+            "relationship": "connectsTo",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],
             "properties": [
@@ -534,8 +535,8 @@
                     "element": "std::string"
                 }
             ]
-       },
-       {
+        },
+        {
            "name": "ChildOf",
            "namespace": "nslib::cortex::shiftgen",
            "includes" : [ ],
@@ -555,7 +556,130 @@
                     "element": "std::string"
                 }
            ]
-       }
-
+       },
+        {
+            "name": "ConnectedTo",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "Neuron", "dstEntity": "Neuron" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TConnectsToConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "ConnectedBy",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "Neuron", "dstEntity": "Neuron" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TConnectsByConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "GroupOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TGroupOfConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "GroupBy",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TGroupByConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "SuperEntityOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "Column", "dstEntity": "Layer" },
+                { "srcEntity": "MiniColumn", "dstEntity": "Layer" },
+                { "srcEntity": "Column", "dstEntity": "NeuronTypeAggregation" },
+                { "srcEntity": "MiniColumn", "dstEntity": "NeuronTypeAggregation" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TSuperEntityConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "SubEntitityOf",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "Layer", "dstEntity": "Column" },
+                { "srcEntity": "NeuronTypeAggregation", "dstEntity": "Column" },
+                { "srcEntity": "Layer", "dstEntity": "MiniColumn" },
+                { "srcEntity": "NeuronTypeAggregation", "dstEntity": "MiniColumn" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TSubEntityConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        }
     ]
 }

@@ -346,9 +346,9 @@ namespace nslib
     entity->deserialize( firesJSON );
   }
 
-  void Domain::importRelationshipsJSON(
-    const boost::property_tree::ptree& relationships,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+  boost::property_tree::ptree& Domain::getRelationsOfType(
+    const std::string& relationName,
+    const boost::property_tree::ptree& relationships )
   {
 
     for ( const auto& relation : relationships )
@@ -364,25 +364,28 @@ namespace nslib
           + std::string( ex.what( )));
       };
 
-      boost::property_tree::ptree relations;
-      try
+      if ( relationType == relationName )
       {
-        relations = relation.second.get_child( "relations" );
+        try
+        {
+          return ( boost::property_tree::ptree& )
+            relation.second.get_child( "relations" );
+        }
+        catch ( std::exception const& ex )
+        {
+          SHIFT_THROW( "ERROR: getting relations array for JSON: "
+            + std::string( ex.what( )));
+        };
       }
-      catch ( std::exception const& ex )
-      {
-        SHIFT_THROW( "ERROR: getting relations array for JSON: "
-          + std::string( ex.what( )));
-      };
-      addRelationsOfType( relations, relationType, oldGUIToEntity );
     }
+    return *new boost::property_tree::ptree( );
   }
 
   void Domain::importJSONRelationGIDS(
     const  boost::property_tree::ptree& relation,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
     shift::Entity*& origEntity, shift::Entity*& destEntity,
-    const std::string& /*relationName*/ )
+    const std::string& relationName )
   {
     try
     {
@@ -412,21 +415,20 @@ namespace nslib
         + std::string( ex.what( )));
     };
 
-    //TODO: add relationships constraints
-    //SHIFT_CHECK_THROW( !shift::RelationshipPropertiesTypes::constraints(
-    //  relationName, origEntity->entityName( ), destEntity->entityName( )),
-    //  "\"ERROR: relation: " + relationName+" not supported between: " +
-    //  origEntity->entityName( ) +" - " + destEntity->entityName( ));
+    SHIFT_CHECK_THROW( shift::RelationshipPropertiesTypes::isConstrained(
+      relationName, origEntity->entityName( ), destEntity->entityName( )),
+      "ERROR: relation: " + relationName + " not supported between: " +
+      origEntity->entityName( ) +" - " + destEntity->entityName( ));
   }
 
   void Domain::addConnectsToRelationsToJSON(
     const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
-    auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-    auto& relConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "connectedBy" ]->asOneToN( ));
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     for ( const auto& relation : relations )
     {
@@ -434,21 +436,22 @@ namespace nslib
       shift::Entity* destEntity;
 
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-        destEntity, "connectsTo" );
+        destEntity, "ConnectedTo" );
       boost::property_tree::ptree firesData;
       try
       {
         firesData = relation.second.get_child( "RelationData" );
       }
-      catch( std::exception ex )
+      catch( std::exception& ex )
       {
         SHIFT_THROW( "ERROR: getting RelationData for JSON: "
          + std::string( ex.what( )));
       }
       shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
         ->getRelationshipProperties( "connectsTo" )->create( );
-      shift::Relationship::Establish( relConnectsTo, relConnectedBy,
-        origEntity, destEntity, propObject );
+      shift::Relationship::EstablishAndAggregate(
+        relAggregatedConnectsTo,relAggregatedConnectedBy,
+        DataManager::entities( ), origEntity, destEntity, propObject );
       propObject->deserialize( firesData );
     }
   }
@@ -457,18 +460,24 @@ namespace nslib
     const boost::property_tree::ptree& relations,
     std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
   {
-    auto& relParentOf = *( DataManager::entities( )
+    auto entities = DataManager::entities( );
+    auto& relParentOf = *( entities
       .relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf = *( DataManager::entities( )
       .relationships( )[ "isChildOf" ]->asOneToOne( ));
+    auto& relAggregatedConnectsTo = *(entities
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( entities
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     for ( const auto& relation : relations )
     {
       shift::Entity* origEntity;
       shift::Entity* destEntity;
       importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-        destEntity, "isParentOf" );
-      shift::Relationship::Establish( relParentOf, relChildOf,
+        destEntity, "ParentOf" );
+      shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
+        relAggregatedConnectsTo, relAggregatedConnectedBy,
         origEntity, destEntity );
     }
   }

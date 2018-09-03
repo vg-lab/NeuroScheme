@@ -190,6 +190,46 @@
             ]
         },
         {
+            "name": "ConnectedTo",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TConnectsToConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
+            "name": "ConnectedBy",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "constraints":
+            [
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+            ],
+            "flags": [ ],
+            "properties": [ ],
+            "types":
+            [
+                {
+                    "class": "multimap",
+                    "name": "TConnectsByConnections",
+                    "key": "std::string",
+                    "element": "std::string"
+                }
+            ]
+        },
+        {
             "name": "ParentOf",
             "namespace": "nslib::cortex::shiftgen",
             "includes" : [ ],

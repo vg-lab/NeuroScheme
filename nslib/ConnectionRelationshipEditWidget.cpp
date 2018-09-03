@@ -175,13 +175,14 @@ namespace nslib
     shift::RelationshipProperties* propObject = relationshipPropertiesTypes
       .getRelationshipProperties( "connectsTo" )->create( );
 
-    auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-    auto& relConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "connectedBy" ]->asOneToN( ));
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-    shift::Relationship::Establish( relConnectsTo, relConnectedBy,
-      _originEntity, _destinationEntity, propObject );
+    shift::Relationship::EstablishAndAggregate(
+      relAggregatedConnectsTo,relAggregatedConnectedBy,
+      DataManager::entities( ), _originEntity, _destinationEntity, propObject );
 
     for ( const auto& propParam: _propParamCont )
     {

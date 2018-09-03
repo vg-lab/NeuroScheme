@@ -147,11 +147,8 @@ namespace nslib
       const shift::TGidToEntitiesReps& gidsToEntitiesReps,
       shift::TRelatedEntitiesReps& relatedEntitiesReps,
       shift::Representations& relatedEntities,
-      const std::string& relationName )
+      shift::RelationshipOneToN* relatedElements )
     {
-      const auto& relatedElements =
-        DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
-
       MapperFloatToFloat nbConnectionsToWidth(
         0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
         1.0f, 5.0f );
@@ -245,6 +242,107 @@ namespace nslib
                   other,
                   srcEntityRep->second.second,
                   otherRep->second.second )));
+          }
+          relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
+        }
+      }
+    } // generateRelations
+
+    void RepresentationCreator::generateRelations(
+      const shift::Entities& entities,
+      const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+      shift::TRelatedEntitiesReps& relatedEntitiesReps,
+      shift::Representations& relatedEntities,
+      shift::RelationshipAggregatedOneToN* relatedElements )
+    {
+      MapperFloatToFloat nbConnectionsToWidth(
+        0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
+        1.0f, 5.0f );
+
+      for( auto& entity : entities.vector( ))
+      {
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
+          continue;
+
+        auto entityRelations = relatedElements->mapRelations->find( entity->entityGid( ));
+
+        if( entityRelations == relatedElements->mapRelations->end( ))
+          continue;
+
+        for( auto& other : entities.vector( ))
+        {
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
+            continue;
+
+          auto otherEntityConnection = entityRelations->second->find( other->entityGid( ));
+          if( otherEntityConnection == entityRelations->second->end( ))
+            continue;
+
+          // TODO: Change to equal_range whenever multiple relationships between
+          // the same elements are imported. Then, create a loop to iterate
+          // over the given results and create a new one if not found.
+          auto combinedKey = std::make_pair( entity->entityGid( ),
+                                             other->entityGid( ));
+          auto alreadyConnected =
+            relatedEntitiesReps.find( combinedKey );
+
+          if( alreadyConnected == relatedEntitiesReps.end( ))
+          {
+            ConnectionArrowRep* relationRep;
+            if( srcEntityRep->second.second == otherRep->second.second )
+            {
+              relationRep =
+                new AutoConnectionArrowRep( srcEntityRep->second.second );
+            }
+            else
+            {
+              relationRep =
+                new ConnectionArrowRep( srcEntityRep->second.second,
+                                        otherRep->second.second );
+            }
+
+            shift::RelationshipProperties* relationProperties = otherEntityConnection->second.relationshipAggregatedProperties;
+            if ( relationProperties )
+            {
+              // If fixed weight over zero or if gaussian and mean over zero
+              // then circle
+              if (( relationProperties->getProperty( "Weight Type" ).
+                value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                    shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
+                relationProperties->getProperty( "Weight" ).value< float >( )
+                    < 0.0f ) ||
+                  ( relationProperties->getProperty( "Weight Type" ).
+                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+                    shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
+                    relationProperties->getProperty( "Weight Gaussian Mean" ).
+                      value< float >( )
+                    < 0.0f ))
+              {
+                relationRep->setProperty(
+                  "head", shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
+              }
+              else
+              {
+                relationRep->setProperty(
+                  "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
+              }
+
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                  nbConnectionsToWidth.map( fabsf(
+                    relationProperties->getProperty(
+                      "Weight" ).value< float >( )))));
+            }
+
+            alreadyConnected = relatedEntitiesReps.insert(
+              std::make_pair( combinedKey,
+                              std::make_tuple( relationRep,
+                                               entity,
+                                               other,
+                                               srcEntityRep->second.second,
+                                               otherRep->second.second )));
           }
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
         }

@@ -53,18 +53,28 @@ namespace nslib
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
   {
     auto& relConnectsTo = *( DataManager::entities( ).
-                             relationships( )[ "connectsTo" ]->asOneToN( ));
+      relationships( )[ "connectsTo" ]->asOneToN( ));
     auto& relConnectedBy = *( DataManager::entities( ).
-                              relationships( )[ "connectedBy" ]->asOneToN( ));
+      relationships( )[ "connectedBy" ]->asOneToN( ));
+
+//    auto& relAggregatedConnectsTo = *( DataManager::entities( ).
+//      relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+//    auto& relAggregatedConnectedBy = *( DataManager::entities( ).
+//      relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     // Third parameter indicates if the relationship has to be inverted
     enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
     std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
-    rels.reserve( 2 );
-    rels.push_back(
-      std::make_tuple( &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
-    rels.push_back(
-      std::make_tuple( &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+    rels.reserve( 4 );
+    rels.push_back( std::make_tuple(
+      &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+    rels.push_back( std::make_tuple(
+      &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+
+//    rels.push_back( std::make_tuple(
+//      &relAggregatedConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+//    rels.push_back( std::make_tuple(
+//      &relAggregatedConnectedBy, scoop::Color( 255, 204, 0 ), true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -293,8 +303,6 @@ namespace nslib
           const auto& grandParent =
             relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
-          const auto& parentSiblings = relParentOf[ grandParent ];
-
           auto& relAGroupOf = *( DataManager::entities( ).relationships( )
             [ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
@@ -344,27 +352,35 @@ namespace nslib
               _contextMenu->addSeparator( );
             }
           }
-          QAction* levelUp = ( parent != 0 )
-            ? _contextMenu->addAction( "Level up" ) : nullptr;
-          QAction* levelDown = ( !children.empty( ))
-            ? _contextMenu->addAction( "Level down" ) : nullptr;
-          QAction* expandGroup = ( !groupedEntities.empty( ))
-            ? _contextMenu->addAction( "Expand group" ) : nullptr;
+          const bool hasChildren = !children.empty( );
+          const bool grouped = !groupedEntities.empty( );
 
-          if ( levelUp || levelDown || expandGroup )
+          const QAction* levelUp = ( parent != 0 )
+            ? _contextMenu->addAction( "Level up" ) : nullptr;
+          const QAction* levelDown = ( hasChildren )
+            ? _contextMenu->addAction( "Level down" ) : nullptr;
+          const QAction* expandGroup = ( grouped )
+            ? _contextMenu->addAction( "Expand group" ) : nullptr;
+          const QAction* expandChildren = ( hasChildren )
+            ? _contextMenu->addAction( "Expand children" ) : nullptr;
+
+          if ( levelUp || levelDown || expandGroup || expandChildren )
           {
             _contextMenu->addSeparator( );
           }
 
-          QAction* levelUpToNewPane = ( parent != 0 )
+          const QAction* levelUpToNewPane = ( parent != 0 )
             ? _contextMenu->addAction( "Level up [new pane]" ) : nullptr;
-          QAction* levelDownToNewPane = ( !children.empty( ))
+          const QAction* levelDownToNewPane = ( hasChildren )
             ? _contextMenu->addAction( "Level down [new pane]" ) : nullptr;
-          QAction* expandGroupToNewPane = ( !groupedEntities.empty( ))
+          const QAction* expandGroupToNewPane = ( grouped )
             ? _contextMenu->addAction( "Expand group [new pane]" ) : nullptr;
+          const QAction* expandChildrenToNewPane = ( hasChildren )
+            ? _contextMenu->addAction( "Expand children [new pane]" ) : nullptr;
 
-          if ( levelUp || levelDown || expandGroup || levelUpToNewPane ||
-            levelDownToNewPane || expandGroupToNewPane || editEntity )
+          if ( levelUp || levelDown || expandGroup || expandChildren ||
+            levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane ||
+            expandChildrenToNewPane || editEntity )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
@@ -409,13 +425,7 @@ namespace nslib
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              if ( !parentSiblings.empty( ))
-              {
-                for ( const auto& parentSibling : parentSiblings )
-                  targetEntities.add(
-                    DataManager::entities( ).at( parentSibling.first ));
-              }
-              else if ( grandParent == 0 )
+              if ( grandParent == 0 )
               {
                 for ( const auto& rootEntity
                   : DataManager::rootEntities( ).vector( ))
@@ -425,21 +435,42 @@ namespace nslib
               }
               else
               {
-                targetEntities.add( DataManager::entities( ).at( parent ));
+                targetEntities.addRelatedEntitiesOneToN( relParentOf,
+                  DataManager::entities().at(grandParent),
+                  DataManager::entities( ), 1 );
+                if ( targetEntities.size( ) == 0 )
+                {
+                  targetEntities.add( DataManager::entities( ).at( parent ) );
+                }
               }
             }
             else if ( ( levelDown && levelDown == selectedAction ) ||
               ( levelDownToNewPane && levelDownToNewPane == selectedAction ))
             {
               if ( levelDownToNewPane &&
-                  levelDownToNewPane == selectedAction )
+                levelDownToNewPane == selectedAction )
               {
                 nslib::PaneManager::activePane(
-                    nslib::PaneManager::newPaneFromActivePane( ));
+                  nslib::PaneManager::newPaneFromActivePane( ));
               }
+              targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
+                DataManager::entities( ), 1 );
+            }
+            else if ( ( expandChildren && expandChildren == selectedAction ) ||
+              ( expandChildrenToNewPane
+              && expandChildrenToNewPane == selectedAction ))
+            {
+              targetEntities = PaneManager::activePane( )->entities( );
+              targetEntities.remove( entity );
+              targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
+                DataManager::entities( ), 1 );
 
-              for ( const auto& child : children )
-                targetEntities.add( DataManager::entities( ).at( child.first ));
+              if ( expandChildrenToNewPane
+                && expandChildrenToNewPane == selectedAction )
+              {
+                nslib::PaneManager::activePane(
+                  nslib::PaneManager::newPaneFromActivePane( ));
+              }
             }
             else if ( ( expandGroup && expandGroup == selectedAction ) ||
               ( expandGroupToNewPane &&
@@ -451,9 +482,8 @@ namespace nslib
                 nslib::PaneManager::activePane(
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
-              for ( const auto& groupedEntity : groupedEntities )
-                targetEntities.add(
-                  DataManager::entities( ).at( groupedEntity.first ));
+              targetEntities.addRelatedEntitiesOneToN( relAGroupOf, entity,
+                DataManager::entities( ), 1 );
             }
             else if ( selectedAction && childAction )
             {
@@ -697,7 +727,7 @@ namespace nslib
             else
             {
               Loggers::get( )->log( "item without entity",
-                                    LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
               return;
             }
           }
@@ -753,13 +783,25 @@ namespace nslib
   void InteractionManager::createConnectionRelationship(
     shift::Entity* originEntity_, shift::Entity* destinationEntity_ )
   {
-    if ( _conRelationshipEditWidget )
-      delete _conRelationshipEditWidget;
-
-    _conRelationshipEditWidget =
-      new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
+    if ( shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
+      originEntity_->entityName( ), destinationEntity_->entityName( )))
+    {
+      if ( _conRelationshipEditWidget )
+      {
+        delete _conRelationshipEditWidget;
+      }
+      _conRelationshipEditWidget =
+        new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
         &PaneManager::activePane( )->view( ), true );
-    _conRelationshipEditWidget->show( );
+      _conRelationshipEditWidget->show( );
+    }
+    else
+    {
+      Loggers::get( )->log( "A " + originEntity_->entityName( ) +
+        " cannot be connected to a " + destinationEntity_->entityName( ) + '.',
+        LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+    }
+
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
@@ -885,7 +927,6 @@ namespace nslib
            SelectedState::SELECTED )
         noChildrenSelected = false;
     }
-    return;
   }
 
   void InteractionManager::_queryGroupedSelectedState(

@@ -126,7 +126,6 @@ namespace nslib
     fires::Objects objects;
     shift::Representations preFilterRepresentations;
     shift::Representations relationshipReps;
-
     if ( doFiltering || doSorting )
     {
       for ( const auto& entity : entities.vector( ))
@@ -175,7 +174,9 @@ namespace nslib
 
       // Generate relationship representations
       nslib::RepresentationCreatorManager::generateRelations(
-        filteredAndSortedEntities, relationshipReps, "connectsTo" );
+        filteredAndSortedEntities, relationshipReps, "connectsTo", false );
+      nslib::RepresentationCreatorManager::generateRelations(
+        filteredAndSortedEntities, relationshipReps, "aggregatedConnectsTo", true );
 
     }
     else
@@ -192,8 +193,9 @@ namespace nslib
       // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
       // Generate relationship representations
       nslib::RepresentationCreatorManager::generateRelations( entities,
-                                                            relationshipReps,
-                                                            "connectsTo" );
+        relationshipReps, "connectsTo", false );
+      nslib::RepresentationCreatorManager::generateRelations( entities,
+        relationshipReps, "aggregatedConnectsTo", true );
     }
 
     // shift::Representations relationshipReps;

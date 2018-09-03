@@ -343,12 +343,8 @@ namespace nslib
       const shift::TGidToEntitiesReps& gidsToEntitiesReps,
       shift::TRelatedEntitiesReps& relatedEntitiesReps,
       shift::Representations& relatedEntities,
-      const std::string& relationName )
+      shift::RelationshipOneToN* relatedElements )
     {
-
-      const auto& relatedElements =
-          DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
-
       MapperFloatToFloat nbConnectionsToWidth(
         0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
         1.0f, 3.0f );
@@ -419,6 +415,85 @@ namespace nslib
         }
 
 
+      }
+
+    } // generateRelations
+
+    void RepresentationCreator::generateRelations(
+      const shift::Entities& entities,
+      const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+      shift::TRelatedEntitiesReps& relatedEntitiesReps,
+      shift::Representations& relatedEntities,
+      shift::RelationshipAggregatedOneToN* relatedElements )
+    {
+      MapperFloatToFloat nbConnectionsToWidth(
+        0, _maxConnectionsPerEntity == 0 ? 0.1f : _maxConnectionsPerEntity,
+        1.0f, 3.0f );
+
+      for( auto& entity : entities.vector( ))
+      {
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
+          continue;
+
+        auto entityRelations = relatedElements->mapRelations->find( entity->entityGid( ));
+
+        if( entityRelations == relatedElements->mapRelations->end( ))
+          continue;
+
+        for( auto& other : entities.vector( ))
+        {
+          if( other->entityGid( ) == entity->entityGid( ))
+            continue;
+
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
+            continue;
+
+          auto otherEntityConnection = entityRelations->second->find( other->entityGid( ));
+          if( otherEntityConnection == entityRelations->second->end( ))
+            continue;
+
+          //auto numberOfConnections = 1
+          //  //entityRelations->count( other->entityGid( ));
+
+          //if( numberOfConnections == 0 )
+          //  continue;
+
+          // TODO: Change to equal_range whenever multiple relationships between
+          // the same elements are imported. Then, create a loop to iterate
+          // over the given results and create a new one if not found.
+          auto combinedKey = std::make_pair( entity->entityGid( ),
+                                             other->entityGid( ));
+          auto alreadyConnected =
+            relatedEntitiesReps.find( combinedKey );
+
+          if( alreadyConnected == relatedEntitiesReps.end( ))
+          {
+            ConnectionArrowRep* relationRep =
+              new ConnectionArrowRep( srcEntityRep->second.second,
+                                      otherRep->second.second );
+
+            shift::RelationshipProperties* relationProperties = otherEntityConnection->second.relationshipAggregatedProperties;
+            if ( relationProperties )
+            {
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                  nbConnectionsToWidth.map(
+                    relationProperties->getProperty( "count" ).value< unsigned int >( ))));
+            }
+
+            alreadyConnected = relatedEntitiesReps.insert(
+              std::make_pair( combinedKey,
+                              std::make_tuple( relationRep,
+                                               entity,
+                                               other,
+                                               srcEntityRep->second.second,
+                                               otherRep->second.second )));
+          }
+
+          relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
+        }
       }
 
     } // generateRelations
