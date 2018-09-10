@@ -96,6 +96,8 @@ protected:
   StoredSelections _storedSelections;
   QDockWidget* _layoutsDock;
   QDockWidget* _entityEditDock;
+  QDockWidget* _connectionEditDock;
+  QDockWidget* _connectionListDock;
   QString _lastOpenedFileName;
 
 private:

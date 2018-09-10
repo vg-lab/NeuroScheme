@@ -176,7 +176,8 @@ namespace nslib
       nslib::RepresentationCreatorManager::generateRelations(
         filteredAndSortedEntities, relationshipReps, "connectsTo", false );
       nslib::RepresentationCreatorManager::generateRelations(
-        filteredAndSortedEntities, relationshipReps, "aggregatedConnectsTo", true );
+        filteredAndSortedEntities, relationshipReps,
+        "aggregatedConnectsTo", true );
 
     }
     else

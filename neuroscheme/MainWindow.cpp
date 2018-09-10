@@ -282,18 +282,44 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     nslib::EntityEditWidget::parentDock( _entityEditDock );
     _entityEditDock->setWindowTitle( QString( "Entity Inspector" ));
     _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-                                    QSizePolicy::MinimumExpanding );
+       QSizePolicy::MinimumExpanding );
 
     _entityEditDock->setFeatures( QDockWidget::DockWidgetClosable |
-                                  QDockWidget::DockWidgetMovable |
-                                  QDockWidget::DockWidgetFloatable );
+       QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
 
     this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-                         _entityEditDock,
-                         Qt::Vertical );
+      _entityEditDock, Qt::Vertical );
     _entityEditDock->close( );
   }
 
+  {
+    _connectionEditDock = new QDockWidget;
+    nslib::ConnectionRelationshipEditWidget::parentDock( _connectionEditDock );
+    _connectionEditDock->setWindowTitle( QString( "Connection Inspector" ));
+    _connectionEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
+      QSizePolicy::MinimumExpanding );
+
+    _connectionEditDock->setFeatures( QDockWidget::DockWidgetClosable |
+      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
+
+    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
+      _connectionEditDock, Qt::Vertical );
+    _connectionEditDock->close( );
+  }
+  {
+    _connectionListDock = new QDockWidget;
+    nslib::EntityConnectionListWidget::parentDock( _connectionListDock );
+    _connectionListDock->setWindowTitle( QString( "Entity Connections List" ));
+    _connectionListDock->setSizePolicy( QSizePolicy::MinimumExpanding,
+      QSizePolicy::MinimumExpanding );
+
+    _connectionListDock->setFeatures( QDockWidget::DockWidgetClosable |
+      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
+
+    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
+      _connectionListDock, Qt::Vertical );
+    _connectionListDock->close( );
+  }
 }
 
 void MainWindow::selectDomain( void )

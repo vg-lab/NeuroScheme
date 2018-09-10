@@ -50,7 +50,6 @@ namespace nslib
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false ) override;
 
-
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
@@ -58,13 +57,12 @@ namespace nslib
         shift::Representations& relatedEntities,
         shift::RelationshipAggregatedOneToN* relatedElements ) override ;
 
-
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        shift::RelationshipOneToN* relatedElements ) override ;
+        shift::RelationshipOneToN* relatedElements ) override;
 
       void setMaximums( float maxNeuronSomaVolume_,
                         float maxNeuronSomaArea_,

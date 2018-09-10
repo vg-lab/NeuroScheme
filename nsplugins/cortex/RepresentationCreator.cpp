@@ -436,9 +436,10 @@ namespace nslib
         if( srcEntityRep == gidsToEntitiesReps.end( ))
           continue;
 
-        auto entityRelations = relatedElements->mapRelations->find( entity->entityGid( ));
+        auto entityRelations = relatedElements->mapAggregatedRels( ).
+          find( entity->entityGid( ));
 
-        if( entityRelations == relatedElements->mapRelations->end( ))
+        if( entityRelations == relatedElements->mapAggregatedRels( ).end( ))
           continue;
 
         for( auto& other : entities.vector( ))
@@ -450,7 +451,8 @@ namespace nslib
           if( otherRep == gidsToEntitiesReps.end( ))
             continue;
 
-          auto otherEntityConnection = entityRelations->second->find( other->entityGid( ));
+          auto otherEntityConnection = entityRelations->second->find(
+            other->entityGid( ));
           if( otherEntityConnection == entityRelations->second->end( ))
             continue;
 
@@ -474,24 +476,23 @@ namespace nslib
               new ConnectionArrowRep( srcEntityRep->second.second,
                                       otherRep->second.second );
 
-            shift::RelationshipProperties* relationProperties = otherEntityConnection->second.relationshipAggregatedProperties;
+            shift::RelationshipProperties* relationProperties =
+                otherEntityConnection->second
+                .relationshipAggregatedProperties.get();
             if ( relationProperties )
             {
               relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map(
-                    relationProperties->getProperty( "count" ).value< unsigned int >( ))));
+                    relationProperties->getProperty( "count" ).
+                    value< unsigned int >( ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
-              std::make_pair( combinedKey,
-                              std::make_tuple( relationRep,
-                                               entity,
-                                               other,
-                                               srcEntityRep->second.second,
-                                               otherRep->second.second )));
+              std::make_pair( combinedKey, std::make_tuple( relationRep,
+              entity, other, srcEntityRep->second.second,
+              otherRep->second.second )));
           }
-
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
         }
       }

@@ -13,6 +13,8 @@ set( NSLIB_PUBLIC_HEADERS
   DataManager.h
   Domain.h
   DomainManager.h
+  EntityConnectionListWidget.h
+  EntityEditWidget.h
   error.h
   FilterWidget.h
   InteractionManager.h
@@ -40,7 +42,6 @@ set( NSLIB_PUBLIC_HEADERS
   reps/QGraphicsItemRepresentation.h
   reps/RingItem.h
   reps/SelectableItem.h
-  EntityEditWidget.h
   )
 
 set( NSLIB_SOURCES
@@ -50,6 +51,8 @@ set( NSLIB_SOURCES
   DataManager.cpp
   Domain.cpp
   DomainManager.cpp
+  EntityConnectionListWidget.cpp
+  EntityEditWidget.cpp
   FilterWidget.cpp
   InteractionManager.cpp
   Loggers.cpp
@@ -69,7 +72,6 @@ set( NSLIB_SOURCES
   reps/RingItem.cpp
   reps/SelectableItem.cpp
   qxt/qxtspanslider.cpp
-  EntityEditWidget.cpp
   )
 
 set( NSLIB_LINK_LIBRARIES

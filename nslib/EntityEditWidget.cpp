@@ -47,14 +47,14 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parentWidget_,
-    bool addToScene_, shift::Entity* parentEntity_)
-    : QWidget( parentWidget_ )
-    , _entity( nullptr )
+    shift::Entity* entity_, TEntityEditWidgetAction action_,
+    shift::Entity* parentEntity_, bool addToScene_, QWidget *parentWidget_)
+    : QFrame( parentWidget_ )
+    , _entity( entity_ )
     , _parentEntity( parentEntity_ )
     , _addToScene( addToScene_ )
-    , _action( action )
-    , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
+    , _action( action_ )
+    , _isNew( action_ == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
     , _checkUniquenessCheck( new QCheckBox )
   {
@@ -65,12 +65,12 @@ namespace nslib
 
     unsigned int element = 0;
 
-    if ( entity )
+    if ( _entity )
     {
       TWidgetType widgetType;
       QWidget* widget;
 
-      for ( const auto& propPair : entity->properties( ))
+      for ( const auto& propPair : _entity->properties( ))
       {
         const auto prop = propPair.first;
         auto caster = fires::PropertyManager::getPropertyCaster( prop );
@@ -84,7 +84,7 @@ namespace nslib
 
           const auto& categories = caster->categories( );
 
-          bool isEditable = entity->hasPropertyFlag(
+          bool isEditable = _entity->hasPropertyFlag(
             propName, shift::Entity::TPropertyFlag::EDITABLE );
 
           if ( !categories.empty( ) )
@@ -156,18 +156,17 @@ namespace nslib
       ( _isNew ? tr( "New" ) : tr( "Save" )));
     gridLayout->addWidget( validationButton, element, 1 );
 
-    ++element;
+    ;
     auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
-    gridLayout->addWidget( autoCloseLabel, element, 0 );
+    gridLayout->addWidget( autoCloseLabel, ++element, 0 );
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
     connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
              this, SLOT( toggleAutoClose( )));
     gridLayout->addWidget( _autoCloseCheck.get( ), element, 1 );
 
-    ++element;
     auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
-    gridLayout->addWidget( checkUniquenessLabel, element, 0 );
+    gridLayout->addWidget( checkUniquenessLabel, ++element, 0 );
 
     //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
     _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
@@ -182,7 +181,9 @@ namespace nslib
     setLayout( gridLayout );
     setWindowTitle( tr( "Entity inspector" ));
 
-    _entity = entity;
+    _parentDock->setWidget( this );
+    _parentDock->show( );
+    this->show( );
   }
 
   void EntityEditWidget::validateDialog( void )
@@ -367,7 +368,6 @@ namespace nslib
             [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
           auto& relAggregatedConnectedBy = *( entities.relationships( )
             [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
-
 
           shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
             relAggregatedConnectsTo, relAggregatedConnectedBy,

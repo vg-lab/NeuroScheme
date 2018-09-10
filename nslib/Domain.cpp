@@ -451,7 +451,8 @@ namespace nslib
         ->getRelationshipProperties( "connectsTo" )->create( );
       shift::Relationship::EstablishAndAggregate(
         relAggregatedConnectsTo,relAggregatedConnectedBy,
-        DataManager::entities( ), origEntity, destEntity, propObject );
+        DataManager::entities( ), origEntity, destEntity, propObject,
+        propObject );
       propObject->deserialize( firesData );
     }
   }

@@ -27,6 +27,7 @@
 #include "EntityEditWidget.h"
 #include "reps/SelectableItem.h"
 #include "ConnectionRelationshipEditWidget.h"
+#include "EntityConnectionListWidget.h"
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
@@ -76,6 +77,10 @@ namespace nslib
 
     static void createConnectionRelationship(
       shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
+    static void createOrEditEntity(
+      shift::Entity* entity_, EntityEditWidget::TEntityEditWidgetAction action_,
+      shift::Entity* parentEntity_= nullptr,
+      bool addToScene_ = true, QWidget *parentWidget_ = nullptr );
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
@@ -118,6 +123,7 @@ namespace nslib
     static QMenu* _contextMenu;
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
     static EntityEditWidget* _entityEditWidget;
+    static EntityConnectionListWidget* _entityConnectionListWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;

@@ -39,15 +39,17 @@
 namespace nslib
 {
   QMenu* InteractionManager::_contextMenu = nullptr;
-  ConnectionRelationshipEditWidget*
-    InteractionManager::_conRelationshipEditWidget = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
+  ConnectionRelationshipEditWidget*
+      InteractionManager::_conRelationshipEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
-  Qt::MouseButtons InteractionManager::_buttons = 0;
+  Qt::MouseButtons InteractionManager::_buttons = nullptr;
   std::unique_ptr< TemporalConnectionLine > InteractionManager::_tmpConnectionLine =
     std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
   QAbstractGraphicsShapeItem* InteractionManager::lastShapeItemHoveredOnMouseMove =
     nullptr;
+  EntityConnectionListWidget*
+    InteractionManager::_entityConnectionListWidget = nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -57,11 +59,6 @@ namespace nslib
     auto& relConnectedBy = *( DataManager::entities( ).
       relationships( )[ "connectedBy" ]->asOneToN( ));
 
-//    auto& relAggregatedConnectsTo = *( DataManager::entities( ).
-//      relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-//    auto& relAggregatedConnectedBy = *( DataManager::entities( ).
-//      relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
-
     // Third parameter indicates if the relationship has to be inverted
     enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
     std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
@@ -70,11 +67,6 @@ namespace nslib
       &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
     rels.push_back( std::make_tuple(
       &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
-
-//    rels.push_back( std::make_tuple(
-//      &relAggregatedConnectsTo, scoop::Color( 0, 204, 255 ), false ));
-//    rels.push_back( std::make_tuple(
-//      &relAggregatedConnectedBy, scoop::Color( 255, 204, 0 ), true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -118,10 +110,6 @@ namespace nslib
     }
   }
 
-
-
-
-
   void InteractionManager::hoverEnterEvent(
     QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneHoverEvent* event )
@@ -140,8 +128,6 @@ namespace nslib
 
     if ( event && event->modifiers( ).testFlag( Qt::ControlModifier ))
     {
-      if ( _entityEditWidget )
-        delete _entityEditWidget;
       auto item = dynamic_cast< Item* >( shapeItem );
       if ( item )
       {
@@ -151,13 +137,9 @@ namespace nslib
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          auto entityGid = ( *entities.begin( ))->entityGid( );
-          _entityEditWidget = new EntityEditWidget(
-            DataManager::entities( ).at( entityGid ),
+          //auto entityGid = ( *entities.begin( ))->entityGid( );
+          createOrEditEntity( *entities.begin( ),
             EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
-          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
-          EntityEditWidget::parentDock( )->show( );
-          _entityEditWidget->show( );
         }
       }
     }
@@ -188,11 +170,13 @@ namespace nslib
     QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneContextMenuEvent* event )
   {
-
     if ( !_contextMenu )
       _contextMenu = new QMenu( );
     else
       _contextMenu->clear( );
+
+    auto dataEntities = DataManager::entities( );
+    auto dataRelations = dataEntities.relationships( );
 
     // If clicking outside item, new item menu is showed
     if ( !shapeItem )
@@ -204,8 +188,7 @@ namespace nslib
         const auto& entitiesTypes = domainEntitiesTypes.entitiesTypes( );
 
         //Detect scene parent
-        auto& relChildOf = *( DataManager::entities( ).relationships( )
-          [ "isChildOf" ]->asOneToOne( ));
+        auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
         const auto& sceneEntities =
           PaneManager::activePane( )->entities( ).vector( );
         int commonParent = -1;
@@ -245,7 +228,7 @@ namespace nslib
         }
         else
         {
-          parentEntity = DataManager::entities( ).at( commonParent );
+          parentEntity = dataEntities.at( commonParent );
 
           shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
           childrenTypesNames =
@@ -264,18 +247,10 @@ namespace nslib
         QAction* selectedAction =_contextMenu->exec( event->screenPos( ));
         if ( selectedAction )
         {
-
-          if ( _entityEditWidget )
-            delete _entityEditWidget;
-
-          _entityEditWidget = new EntityEditWidget(
-            domainEntitiesTypes.getEntityObject(childrenTypes->at(
-            actionToIdx[ selectedAction ] )),
+          createOrEditEntity(  domainEntitiesTypes.getEntityObject(
+            childrenTypes->at( actionToIdx[ selectedAction ] )),
             EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
-            nullptr, true, parentEntity );
-          EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
-          EntityEditWidget::parentDock( )->show( );
-          _entityEditWidget->show( );
+            parentEntity );
         }
       } // if ( domain )
     }
@@ -290,33 +265,30 @@ namespace nslib
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          auto entityGid = ( *entities.begin( ))->entityGid( );
+          auto entity = *entities.begin( );
+          auto entityGid = entity->entityGid( );
 
-          auto& relParentOf = *( DataManager::entities( ).
-            relationships( )[ "isParentOf" ]->asOneToN( ));
+          auto& relParentOf = *( dataRelations[ "isParentOf" ]->asOneToN( ));
           const auto& children = relParentOf[ entityGid ];
 
-          auto& relChildOf = *( DataManager::entities( ).relationships( )
-            [ "isChildOf" ]->asOneToOne( ));
+          auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
           const auto& parent = relChildOf[ entityGid ].entity;
 
           const auto& grandParent =
             relChildOf[ relChildOf[ entityGid ].entity ].entity;
 
-          auto& relAGroupOf = *( DataManager::entities( ).relationships( )
-            [ "isAGroupOf" ]->asOneToN( ));
+          auto& relAGroupOf = *( dataRelations[ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
 
           QAction* editEntity = nullptr;
           QAction* dupEntity = nullptr;
           QAction* autoEntity = nullptr;
-          auto entity = DataManager::entities( ).at( entityGid );
           if ( !entity->isSubEntity( ))
           {
             editEntity = _contextMenu->addAction( "Edit" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
-              //TODO connection restricition support
-              if(entity->hasProperty( "Nb of neurons" ))
+              if(shift::RelationshipPropertiesTypes::isConstrained(
+                "ConnectedTo", entity->entityName( ),entity->entityName( )))
               {
                 autoEntity = _contextMenu->addAction( "Add Auto Connection" );
               }
@@ -352,6 +324,48 @@ namespace nslib
               _contextMenu->addSeparator( );
             }
           }
+
+          auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
+          auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
+          auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
+            ->asAggregatedOneToN( )->mapAggregatedRels( );
+          auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
+            ->asAggregatedOneToN( )->mapAggregatedRels( );
+
+         auto connectsToIt = relConnectsTo.find( entityGid );
+         shift::RelationshipOneToNMapDest* connectsToMap =
+           ( connectsToIt == relConnectsTo.end( )
+           || connectsToIt->second.empty( ))
+           ? nullptr : & connectsToIt->second;
+
+          auto connectedByIt = relConnectedBy.find( entityGid );
+          shift::RelationshipOneToNMapDest* connectedByMap =
+            ( connectedByIt == relConnectedBy.end( )
+            || connectedByIt->second.empty( ))
+            ? nullptr : & connectedByIt->second;
+
+          auto aggregatedConnectsToIt =
+            relAggregatedConnectsTo.find( entityGid );
+          shift::AggregatedOneToNAggregatedDests* aggregatedConnectsToMap =
+            ( aggregatedConnectsToIt == relAggregatedConnectsTo.end( )
+            || aggregatedConnectsToIt->second->empty( ))
+            ? nullptr : aggregatedConnectsToIt->second.get( );
+
+          auto aggregatedConnectedByIt =
+            relAggregatedConnectBy.find( entityGid );
+          shift::AggregatedOneToNAggregatedDests* aggregatedConnectedByMap =
+            ( aggregatedConnectedByIt == relAggregatedConnectBy.end( )
+            || aggregatedConnectedByIt->second->empty( ))
+            ? nullptr : aggregatedConnectedByIt->second.get( );
+
+          QAction* showConnections = nullptr;
+          if( connectsToMap || connectedByMap || aggregatedConnectsToMap
+            || aggregatedConnectedByMap )
+          {
+            showConnections = _contextMenu->addAction( "Show connections" );
+            _contextMenu->addSeparator( );
+          }
+
           const bool hasChildren = !children.empty( );
           const bool grouped = !groupedEntities.empty( );
 
@@ -378,44 +392,27 @@ namespace nslib
           const QAction* expandChildrenToNewPane = ( hasChildren )
             ? _contextMenu->addAction( "Expand children [new pane]" ) : nullptr;
 
-          if ( levelUp || levelDown || expandGroup || expandChildren ||
-            levelUpToNewPane || levelDownToNewPane || expandGroupToNewPane ||
-            expandChildrenToNewPane || editEntity )
+          if ( editEntity || dupEntity || autoEntity || levelUp || levelDown
+            || expandGroup || expandChildren ||  levelUpToNewPane
+            || levelDownToNewPane || expandGroupToNewPane
+            || expandChildrenToNewPane || showConnections )
           {
             shift::Representations representations;
             shift::Entities targetEntities;
             QAction* selectedAction = _contextMenu->exec( event->screenPos( ));
             if ( editEntity && editEntity == selectedAction )
             {
-              if ( _entityEditWidget )
-                delete _entityEditWidget;
-
-              _entityEditWidget = new EntityEditWidget(
-                DataManager::entities( ).at( entityGid ),
+              createOrEditEntity( entity,
                 EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
-              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
-              EntityEditWidget::parentDock( )->show( );
-              _entityEditWidget->show( );
             }
             else if ( dupEntity && dupEntity == selectedAction )
             {
-              if ( _entityEditWidget )
-                delete _entityEditWidget;
-
-              _entityEditWidget = new EntityEditWidget(
-                DataManager::entities( ).at( entityGid ),
+              createOrEditEntity( entity,
                 EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
-              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
-              EntityEditWidget::parentDock( )->show( );
-              _entityEditWidget->show( );
-
             }
             else if ( autoEntity && autoEntity == selectedAction )
             {
-              createConnectionRelationship(
-                DataManager::entities( ).at( entityGid ),
-                DataManager::entities( ).at( entityGid ));
-
+              createConnectionRelationship( entity, entity );
             }
             else if ( ( levelUp && levelUp == selectedAction ) ||
               ( levelUpToNewPane && levelUpToNewPane == selectedAction ))
@@ -436,11 +433,11 @@ namespace nslib
               else
               {
                 targetEntities.addRelatedEntitiesOneToN( relParentOf,
-                  DataManager::entities().at(grandParent),
-                  DataManager::entities( ), 1 );
+                  dataEntities.at( grandParent ),
+                  dataEntities, 1 );
                 if ( targetEntities.size( ) == 0 )
                 {
-                  targetEntities.add( DataManager::entities( ).at( parent ) );
+                  targetEntities.add( dataEntities.at( parent ));
                 }
               }
             }
@@ -454,7 +451,7 @@ namespace nslib
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
               targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
-                DataManager::entities( ), 1 );
+                dataEntities, 1 );
             }
             else if ( ( expandChildren && expandChildren == selectedAction ) ||
               ( expandChildrenToNewPane
@@ -463,7 +460,7 @@ namespace nslib
               targetEntities = PaneManager::activePane( )->entities( );
               targetEntities.remove( entity );
               targetEntities.addRelatedEntitiesOneToN( relParentOf, entity,
-                DataManager::entities( ), 1 );
+                dataEntities, 1 );
 
               if ( expandChildrenToNewPane
                 && expandChildrenToNewPane == selectedAction )
@@ -483,25 +480,26 @@ namespace nslib
                   nslib::PaneManager::newPaneFromActivePane( ));
               }
               targetEntities.addRelatedEntitiesOneToN( relAGroupOf, entity,
-                DataManager::entities( ), 1 );
+                dataEntities, 1 );
+            }
+            else if ( showConnections && showConnections == selectedAction )
+            {
+              if( _entityConnectionListWidget )
+              {
+                delete _entityConnectionListWidget;
+              }
+              _entityConnectionListWidget = new EntityConnectionListWidget(
+                entity, connectsToMap, connectedByMap, aggregatedConnectsToMap,
+                aggregatedConnectedByMap );
             }
             else if ( selectedAction && childAction )
             {
-              if ( _entityEditWidget )
-              {
-                delete _entityEditWidget;
-              }
-              _entityEditWidget = new EntityEditWidget(
-                domainEntitiesTypes.getEntityObject(childrenTypes->at(
-                actionToIdx[ selectedAction ] )),
-                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
-                nullptr, false, entity );
-
-              EntityEditWidget::parentDock( )->setWidget( _entityEditWidget );
-              EntityEditWidget::parentDock( )->show( );
-              _entityEditWidget->show( );
+             createOrEditEntity( domainEntitiesTypes.getEntityObject(
+               childrenTypes->at( actionToIdx[ selectedAction ] )),
+               EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
+               entity, false );
             }
-            if ( targetEntities.size( ) > 0 )
+            if ( !targetEntities.empty( ))
             {
               auto canvas = PaneManager::activePane( );
               canvas->displayEntities( targetEntities, false, true );
@@ -569,8 +567,7 @@ namespace nslib
   }
 
   void InteractionManager::mouseMoveEvent( QGraphicsView* graphicsView,
-                                           QAbstractGraphicsShapeItem* shapeItem,
-                                           QMouseEvent* event )
+    QAbstractGraphicsShapeItem* shapeItem, QMouseEvent* event )
   {
     // It _item has value means that a link its being drawn
     if ( _item && _tmpConnectionLine )
@@ -582,7 +579,7 @@ namespace nslib
       if ( shapeItem && dynamic_cast< Item* >( shapeItem ))
       {
         InteractionManager::hoverLeaveEvent( lastShapeItemHoveredOnMouseMove,
-                                             nullptr );
+          nullptr );
         InteractionManager::hoverEnterEvent( shapeItem, nullptr );
         lastShapeItemHoveredOnMouseMove = shapeItem;
       }
@@ -775,9 +772,7 @@ namespace nslib
       _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
 
     _item = nullptr;
-    _buttons = 0;
-
-
+    _buttons = nullptr;
   }
 
   void InteractionManager::createConnectionRelationship(
@@ -790,10 +785,8 @@ namespace nslib
       {
         delete _conRelationshipEditWidget;
       }
-      _conRelationshipEditWidget =
-        new ConnectionRelationshipEditWidget( originEntity_, destinationEntity_,
-        &PaneManager::activePane( )->view( ), true );
-      _conRelationshipEditWidget->show( );
+      _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
+        originEntity_, destinationEntity_);
     }
     else
     {
@@ -876,8 +869,7 @@ namespace nslib
       entities, relSuperEntityOf, relAGroupOf, parentId );
 
     _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
-                                     relSuperEntityOf, relAGroupOf,
-                                     parentId, state );
+       relSuperEntityOf, relAGroupOf, parentId, state );
   }
 
   void InteractionManager::_updateSelectedStateOfSubEntities(
@@ -954,6 +946,19 @@ namespace nslib
            SelectedState::SELECTED )
         noGroupedSelected = false;
     }
+  }
+
+  void InteractionManager::createOrEditEntity( shift::Entity* entity_,
+    EntityEditWidget::TEntityEditWidgetAction action_,
+    shift::Entity* parentEntity_, bool addToScene_,
+    QWidget* parentWidget_ )
+  {
+    if ( _entityEditWidget )
+    {
+      delete _entityEditWidget;
+    }
+    _entityEditWidget = new EntityEditWidget( entity_,
+      action_, parentEntity_, addToScene_, parentWidget_ );
   }
 
 } // namespace nslib

@@ -105,8 +105,8 @@ namespace nslib
           relationships( )[ name ]->asAggregatedOneToN( );
         _repCreators[ repCreatorId ]
           ->generateRelations( entities, _gidsToEntitiesReps[ repCreatorId ],
-                               _relatedEntitiesReps[ repCreatorId ],
-                               representations, relations );
+          _relatedEntitiesReps[ repCreatorId ],
+          representations, relations );
       }
       else
       {
@@ -114,8 +114,8 @@ namespace nslib
           relationships( )[ name ]->asOneToN( );
         _repCreators[ repCreatorId ]
           ->generateRelations( entities, _gidsToEntitiesReps[ repCreatorId ],
-                               _relatedEntitiesReps[ repCreatorId ],
-                               representations, relations );
+          _relatedEntitiesReps[ repCreatorId ],
+          representations, relations );
       }
     }
   }

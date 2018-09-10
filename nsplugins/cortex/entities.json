@@ -556,7 +556,7 @@
                     "element": "std::string"
                 }
            ]
-       },
+        },
         {
             "name": "ConnectedTo",
             "namespace": "nslib::cortex::shiftgen",

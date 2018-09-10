@@ -27,7 +27,6 @@
 #include "RepresentationCreatorManager.h"
 
 #include <QPushButton>
-#include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <assert.h>
@@ -35,154 +34,183 @@
 namespace nslib
 {
 
+  QDockWidget* ConnectionRelationshipEditWidget::_parentDock = nullptr;
+  bool ConnectionRelationshipEditWidget::_autoCloseChecked = false;
+
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
     shift::Entity* originEntity_, shift::Entity* destinationEntity_,
-    QWidget* parent_, bool modal )
-    : QDialog ( parent_ )
+    QWidget* parentWidget_ )
+    : QFrame ( parentWidget_ )
     , _originEntity( originEntity_ )
     , _destinationEntity( destinationEntity_ )
-  {
-    this->setModal( modal );
-    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+    , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
+    , _autoCloseCheck( new QCheckBox( ))
+    , _eraseButton( new QPushButton( QString( tr( "Break" ))))
+    , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
+    , _gridLayout( new QGridLayout( ))
+{
+  unsigned int numProp = 1u;
+  _gridLayout->setAlignment( Qt::AlignTop );
+  _gridLayout->setColumnStretch( 1, 1 );
+  _gridLayout->setColumnMinimumWidth( 1, 150 );
+
+  auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
       ->relationshipPropertiesTypes( );
-    shift::Properties* propObject;
 
-    bool propertyObjExists = true;
-
-    auto& relConnectsTo = *( DataManager::entities( )
+  auto& relConnectsTo = *( DataManager::entities( )
       .relationships( )[ "connectsTo" ]->asOneToN( ));
-    auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
-    if( connectsToIt != relConnectsTo.end( ))
-    {
-      auto connectsToMMIt =
+  auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
+  if( connectsToIt != relConnectsTo.end( ))
+  {
+    auto connectsToMMIt =
         connectsToIt->second.find( _destinationEntity->entityGid( ));
-      if( connectsToMMIt != connectsToIt->second.end( ))
-      {
-        propObject = connectsToMMIt->second;
-      }
-      else
-      {
-        propObject = relationshipPropertiesTypes.getRelationshipProperties(
-          "connectsTo" );
-        propertyObjExists = false;
-      }
+    if( connectsToMMIt != connectsToIt->second.end( ))
+    {
+      _propObject = connectsToMMIt->second;
+      _isNew = false;
     }
     else
     {
-      propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" );
-      propertyObjExists = false;
+      _propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" )->create( );
+      _isNew = true;
     }
-    _propObject = propObject;
+  }
+  else
+  {
+    _propObject = relationshipPropertiesTypes.getRelationshipProperties(
+        "connectsTo" )->create( );
+    _isNew = true;
+  }
+  assert( _propObject );
 
-    assert( propObject );
+  auto labelRel = new QLabel( QString( tr( "Relationship Parameters" )));
+  _gridLayout->addWidget( labelRel, 0, 0, 1, 0 );
 
-    QGridLayout* myLayout = new QGridLayout( );
-    myLayout->setAlignment( Qt::AlignTop );
-
-    auto labelRel = new QLabel( QString( "Relationship Parameters" ));
-    myLayout->addWidget( labelRel, 0, 0, 1, 0 );
-
-    unsigned int numProp = 1;
-
-    for( const auto& propPair: propObject->properties( ))
+  for( const auto& propPair: _propObject->properties( ))
+  {
+    const auto prop = propPair.first;
+    auto caster = fires::PropertyManager::getPropertyCaster( prop );
+    if ( caster )
     {
-      const auto prop = propPair.first;
-      auto caster = fires::PropertyManager::getPropertyCaster( prop );
-      if ( caster )
-      {
-        auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-        auto label = new QLabel( QString::fromStdString( propName ));
-        myLayout->addWidget( label, numProp, 0 );
+      auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
+      auto label = new QLabel( QString::fromStdString( propName ));
+      _gridLayout->addWidget( label, numProp, 0 );
 
-        const auto& categories = caster->categories( );
-        TWidgetType widgetType;
-        QWidget* widget;
-        if ( !categories.empty( ) )
+      const auto& categories = caster->categories( );
+      TWidgetType widgetType;
+      QWidget* widget;
+      if ( !categories.empty( ))
+      {
+        widgetType = TWidgetType::COMBO;
+        auto comboBoxWidget = new QComboBox;
+        widget = comboBoxWidget;
+        auto currentCategory = caster->toString( propPair.second );
+        unsigned int index = 0;
+        for ( const auto& category : categories )
+          comboBoxWidget->addItem( QString::fromStdString( category ));
+        for ( const auto& category : categories )
         {
-          widgetType = TWidgetType::COMBO;
-          auto comboBoxWidget = new QComboBox;
-          widget = comboBoxWidget;
-          auto currentCategory = caster->toString( propPair.second );
-          unsigned int index = 0;
-          for ( const auto& category : categories )
-            comboBoxWidget->addItem( QString::fromStdString( category ));
-          for ( const auto& category : categories )
-          {
-            if ( category != currentCategory )
-              ++index;
-            else
-              break;
-          }
-          comboBoxWidget->setCurrentIndex( index );
-          comboBoxWidget->setEnabled( true );
-          connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-            this, SLOT( refreshSubproperties( )));
+          if ( category != currentCategory )
+            ++index;
+          else
+            break;
+        }
+        comboBoxWidget->setCurrentIndex( index );
+        comboBoxWidget->setEnabled( true );
+        connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
+          this, SLOT( refreshSubproperties( )));
+      }
+      else
+      {
+        widgetType = TWidgetType::LINE_EDIT;
+        auto lineEditwidget = new QLineEdit;
+        widget = lineEditwidget;
+        if( propName == "Name" )
+        {
+          QString connectionName( QString::fromStdString(
+              ( _isNew ? _originEntity->getProperty( "Entity name" )
+              .value< std::string >( ) + "-" + _destinationEntity->
+              getProperty( "Entity name" ).value<std::string>( )
+              : _propObject->getProperty( "Name" ).value< std::string >( ))));
+          lineEditwidget->setText( connectionName );
         }
         else
         {
-          widgetType = TWidgetType::LINE_EDIT;
-          auto lineEditwidget = new QLineEdit;
-          widget = lineEditwidget;
-          if( propName == "Name" )
-          {
-            QString connectionName( QString::fromStdString(
-              ( propertyObjExists ? propObject->getProperty(
-                "Name" ).value<std::string>( ) : originEntity_->getProperty(
-                "Entity name" ).value<std::string>( ) + "-" +
-                destinationEntity_->getProperty(
-                "Entity name" ).value<std::string>( ))));
-            lineEditwidget->setText( connectionName );
-          }
-          else
-          {
-            lineEditwidget->setText( QString::fromStdString(
+          lineEditwidget->setText( QString::fromStdString(
               caster->toString( propPair.second )));
-          }
-          lineEditwidget->setEnabled( true );
         }
-
-        myLayout->addWidget( widget, numProp, 1 );
-
-        if ( !propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-          propName ))
-        {
-          label->hide( );
-          widget->hide( );
-        }
-        numProp++;
-        _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
+        lineEditwidget->setEnabled( true );
       }
+
+      _gridLayout->addWidget( widget, numProp, 1 );
+
+      if ( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
+        propName ))
+      {
+        label->hide( );
+        widget->hide( );
+      }
+      ++numProp;
+      _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
     }
+  }
 
-    QPushButton* cancelButton = new QPushButton( QString( "Cancel" ));
-    myLayout->addWidget( cancelButton, numProp, 0 );
-    QPushButton* validationButton = new QPushButton( QString( "Create" ));
-    myLayout->addWidget( validationButton, numProp, 1 );
 
-    connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
-    connect( validationButton, SIGNAL( clicked( )),
-             this, SLOT( validateDialog( )));
+  _gridLayout->addWidget( _cancelButton.get( ), numProp, 0 );
 
-    setLayout( myLayout );
+  if ( _isNew )
+  {
     setWindowTitle( tr( "Create connection relationship" ));
+    _validationButton.reset( new QPushButton( QString( tr( "Create" ))));
+    _eraseButton->hide();
+  }
+  else
+  {
+    setWindowTitle( tr( "Edit connection relationship" ));
+    _validationButton.reset( new QPushButton( QString( tr( "Save" ))));
+  }
+  _gridLayout->addWidget( _validationButton.get( ), numProp, 1 );
+  _gridLayout->addWidget( _eraseButton.get( ), ++numProp, 0, 1, 2);
+  _gridLayout->addWidget( _autoCloseLabel.get( ), ++numProp, 0 );
+
+  _autoCloseCheck->setChecked( _autoCloseChecked );
+  _gridLayout->addWidget( _autoCloseCheck.get( ), numProp, 1 );
+
+  connect( _eraseButton.get( ), SIGNAL( clicked( )), this,
+    SLOT( breakDialog( )));
+  connect( _validationButton.get( ), SIGNAL( clicked( )),
+           this, SLOT( validateDialog( )));
+  connect( _cancelButton.get( ), SIGNAL( clicked( )), this,
+           SLOT( cancelDialog( )));
+  connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
+      this, SLOT( toggleAutoClose( )));
+
+  setLayout( _gridLayout.get( ) );
+
+  _parentDock->setWidget( this );
+  _parentDock->show( );
+  this->show( );
   }
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-      ->relationshipPropertiesTypes( );
-    shift::RelationshipProperties* propObject = relationshipPropertiesTypes
-      .getRelationshipProperties( "connectsTo" )->create( );
-
-    auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-    auto& relAggregatedConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
-
-    shift::Relationship::EstablishAndAggregate(
-      relAggregatedConnectsTo,relAggregatedConnectedBy,
-      DataManager::entities( ), _originEntity, _destinationEntity, propObject );
+    if( _isNew )
+    {
+      auto& relAggregatedConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+      auto& relAggregatedConnectedBy = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+      shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
+        relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
+        _destinationEntity, _propObject, _propObject );
+      checkClose( );
+    }
+    else if ( _autoCloseCheck->isChecked( ))
+    {
+      this->hide( );
+      _parentDock->close( );
+    }
 
     for ( const auto& propParam: _propParamCont )
     {
@@ -206,7 +234,7 @@ namespace nslib
         assert( false );
 
       auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = propObject->getProperty( label );
+      auto& prop = _propObject->getProperty( label );
       assert ( caster );
 
       caster->fromString( prop, paramString.toStdString( ));
@@ -216,10 +244,10 @@ namespace nslib
     for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
     {
       needToClearCache = needToClearCache ||
-        creatorPair.second->relationshipUpdatedOrCreated( propObject );
+        creatorPair.second->relationshipUpdatedOrCreated( _propObject );
     }
 
-    // TODO improvemente: check if cache needs to be cleared or if just the
+    // TODO improvement: check if cache needs to be cleared or if just the
     // items related to the entity under edition
     // if ( needToClearCache ) {
     RepresentationCreatorManager::clearRelationshipsCache( );
@@ -229,13 +257,52 @@ namespace nslib
     {
       pane->resizeEvent( nullptr );
     }
-
-    this->hide( );
   }
 
   void ConnectionRelationshipEditWidget::cancelDialog(  )
   {
     this->hide( );
+    _parentDock->close( );
+  }
+
+  ConnectionRelationshipEditWidget::~ConnectionRelationshipEditWidget( void )
+  {
+    if ( _isNew )
+    {
+      delete _propObject;
+    }
+  };
+
+  void ConnectionRelationshipEditWidget::parentDock( QDockWidget* parentDock_ )
+  {
+    _parentDock = parentDock_;
+  }
+
+  QDockWidget* ConnectionRelationshipEditWidget::parentDock( void )
+  {
+    return _parentDock;
+  }
+
+  void ConnectionRelationshipEditWidget::toggleAutoClose( void )
+  {
+    _autoCloseChecked = _autoCloseCheck->isChecked( );
+  }
+
+  void ConnectionRelationshipEditWidget::breakDialog(  )
+  {
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+    shift::Relationship::BreakAnAggregatedRelation( relAggregatedConnectsTo,
+      relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
+      _destinationEntity );
+
+    for ( auto pane : PaneManager::panes( ))
+    {
+      pane->resizeEvent( nullptr );
+    }
+    checkClose( );
   }
 
   void ConnectionRelationshipEditWidget::refreshSubproperties( void )
@@ -291,4 +358,30 @@ namespace nslib
     }
   }
 
+  void ConnectionRelationshipEditWidget::checkClose( )
+  {
+    if ( _autoCloseCheck->isChecked( ))
+    {
+      this->hide( );
+      _parentDock->close( );
+    }
+    else if( _isNew )
+    {
+      _isNew = false;
+      _validationButton->setText( tr( "Save" ));
+      setWindowTitle( tr( "Create connection relationship" ));
+      _eraseButton->show();
+    }
+    else
+    {
+      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+          ->relationshipPropertiesTypes( );
+      _propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" )->create( );
+      _isNew = true;
+      _validationButton->setText( tr( "Create" ));
+      setWindowTitle( tr( "Edit connection relationship" ));
+      _eraseButton->hide();
+    }
+  }
 }

@@ -289,13 +289,16 @@ namespace nslib
       _entities.relationships( )[ "connectsTo" ] = relConnectsTo;
       _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
 
-      shift::RelationshipProperties* connectsToObj = _relationshipPropertiesTypes->getRelationshipProperties(
-        "connectsTo" );
+      shift::RelationshipProperties* connectsToObj =
+          _relationshipPropertiesTypes->
+          getRelationshipProperties( "connectsTo" );
 
       _entities.relationships( )[ "aggregatedConnectsTo" ] =
-        new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo", connectsToObj, relChildOf, relConnectsTo );
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo",
+          connectsToObj, relChildOf, relConnectsTo );
       _entities.relationships( )[ "aggregatedConnectedBy" ] =
-        new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy", connectsToObj, relChildOf,relConnectedBy);
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy",
+          connectsToObj, relChildOf,relConnectedBy);
 
     }
 
