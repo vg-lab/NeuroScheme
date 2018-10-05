@@ -411,12 +411,8 @@ namespace nslib
           }
 
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
-
         }
-
-
       }
-
     } // generateRelations
 
     void RepresentationCreator::generateRelations(
@@ -496,7 +492,6 @@ namespace nslib
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
         }
       }
-
     } // generateRelations
 
     void RepresentationCreator::_createColumnOrMiniColumn(

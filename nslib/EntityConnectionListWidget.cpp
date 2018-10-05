@@ -26,8 +26,10 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "InteractionManager.h"
+#include "Loggers.h"
 
 #include <QPushButton>
+#include <QTableView>
 #include <QLabel>
 #include <QLineEdit>
 #include <assert.h>
@@ -36,197 +38,116 @@ namespace nslib
 {
 
   QDockWidget* EntityConnectionListWidget::_parentDock = nullptr;
+  bool EntityConnectionListWidget::_autoCloseChecked = false;
+  bool EntityConnectionListWidget::_allPropsChecked = false;
 
   EntityConnectionListWidget::EntityConnectionListWidget(
-    shift::Entity* entity_,shift::RelationshipOneToNMapDest*  connectsToMap_,
-    shift::RelationshipOneToNMapDest*  connectedByMap_,
-    shift::AggregatedOneToNAggregatedDests* aggregatedConnectsToMap_,
-    shift::AggregatedOneToNAggregatedDests* aggregatedConnectedByMap_,
     QWidget* parentWidget_ )
     : QFrame ( parentWidget_ )
-{
-  QGridLayout* gridLayout = new QGridLayout( );
-  unsigned  int numProp = 0u;
-  QPushButton* cancelButton = new QPushButton( QString( tr( "Cancel" )));
-  gridLayout->setAlignment( Qt::AlignTop );
-  gridLayout->setColumnStretch( 1, 1 );
-  gridLayout->setColumnMinimumWidth( 1, 150 );
-  QString editButtonText = QString( tr( "Edit" ));
-  QString entityName = QString::fromStdString(
-    entity_->getProperty( "Entity name" ).value<std::string>( ));
-
-  auto labelConnectsTo = new QLabel( QString( tr( "Connected to entities:" )));
-  labelConnectsTo->setStyleSheet( "font-weight:bold" );
-  gridLayout->addWidget( labelConnectsTo, 0, 0, 1, 2 );
-
-  if( connectsToMap_ )
+    , _gridLayout( new QGridLayout( ))
+    , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
+    , _autoCloseCheck( new QCheckBox( ))
+    , _allPropertiesLabel( new QLabel( tr( "All-Properties" )))
+    , _allPropertiesCheck( new QCheckBox( ))
+    , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
   {
-    auto iterator = connectsToMap_->begin( );
-    while( iterator != connectsToMap_->end( ))
-    {
-      auto connectedEntity = DataManager::entities( ).at( iterator->first );
-      auto entitiesLabel = new QLabel( entityName + QString( " - " )
-        + QString::fromStdString( connectedEntity->getProperty( "Entity name" )
-        .value<std::string>( )));
-      auto connectionNameLabel = new QLabel( QString::fromStdString(
-        iterator++->second->getProperty( "Name" ).value< std::string >( )));
-      auto editButton = new QPushButton( editButtonText );
+    auto types = DomainManager::getActiveDomain( )->entitiesTypes( );
+    shift::Entity* entityType = std::get< shift::EntitiesTypes::OBJECT >
+      ( *types.entitiesTypes( ).begin( ));
+    auto entityNamePropertyGid = entityType->properties( ).begin( )->first;
+    std::string entityNameString =
+      fires::PropertyGIDsManager::getPropertyLabel( entityNamePropertyGid );
+    QString entityNameLabel = QString::fromStdString( entityNameString );
+    fires::PropertyCaster* entityNameCaster =
+      fires::PropertyManager::getPropertyCaster( entityNamePropertyGid );
+    fires::PropertySorter* entityNameSorter =
+      fires::PropertyManager::getSorter( entityNamePropertyGid );
 
-      gridLayout->addWidget( entitiesLabel, ++numProp, 0 );
-      gridLayout->addWidget( connectionNameLabel, numProp, 1 );
-      gridLayout->addWidget( editButton, numProp, 2 );
+    auto propConnectionType = DomainManager::getActiveDomain( )->
+      relationshipPropertiesTypes( ).getRelationshipProperties( "connectsTo" );
+    _connectsToTable = new ConnectionTableWidget( QString( tr(
+      "Connected to entities:" )), true, false, QString( tr(
+      "Entity not connected to." )), propConnectionType,
+      entityNameCaster, entityNameLabel, entityNameSorter,
+      _gridLayout.get( ), 0, this );
 
-      _connectionsCont.push_back( std::make_tuple(
-        entitiesLabel, connectionNameLabel, editButton ));
-      connect( editButton, &QPushButton::clicked, this,
-        [ this, entity_, connectedEntity ]
-        {
-          connectionDialog( entity_, connectedEntity );
-        });
-    }
+    _connectedByTable = new ConnectionTableWidget( QString( tr(
+      "Connected by entities:" )), false, false, QString( tr(
+      "Entity not connected by." )), propConnectionType,
+      entityNameCaster, entityNameLabel, entityNameSorter,
+      _gridLayout.get( ), 2, this );
+
+    _aggregatedConnectsToTable = new ConnectionTableWidget( QString( tr(
+        "Aggregated connected to entities:" )), true, true, QString( tr(
+        "Entity not aggregated connected to." )), propConnectionType,
+        entityNameCaster, entityNameLabel, entityNameSorter,
+      _gridLayout.get( ), 4, this );
+
+    _aggregatedConnectedByTable = new ConnectionTableWidget( QString( tr(
+        "Aggregated connected by entities:" )), false, true, QString( tr(
+        "Entity not aggregated connected by." )), propConnectionType,
+        entityNameCaster, entityNameLabel, entityNameSorter,
+        _gridLayout.get( ), 6, this );
+
+    _gridLayout->setAlignment( Qt::AlignTop );
+    _gridLayout->setColumnStretch( 1, 1 );
+    _gridLayout->setColumnMinimumWidth( 1, 240 );
+    _gridLayout->setVerticalSpacing( 1 );
+
+    QString editButtonText = QString( tr( "Edit" ));
+
+    _autoCloseCheck->setChecked( _autoCloseChecked );
+    _allPropertiesCheck->setChecked( _allPropsChecked );
+    _gridLayout->addWidget( _cancelButton.get( ), 8, 0 );
+    _gridLayout->addWidget( _allPropertiesCheck.get( ), 9, 1 );
+    _gridLayout->addWidget( _allPropertiesLabel.get( ), 9, 0 );
+    _gridLayout->addWidget( _autoCloseCheck.get( ), 10, 1 );
+    _gridLayout->addWidget( _autoCloseLabel.get( ), 10, 0 );
+
+    auto sizePolicy = QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Maximum );
+    _cancelButton->setSizePolicy( sizePolicy );
+    _allPropertiesCheck->setSizePolicy( sizePolicy );
+    _allPropertiesLabel->setSizePolicy( sizePolicy );
+    _autoCloseCheck->setSizePolicy( sizePolicy );
+    _autoCloseLabel->setSizePolicy( sizePolicy );
+
+    connect( _cancelButton.get( ), &QPushButton::clicked, this,
+      [ this ]
+      {
+        cancelDialog( );
+      });
+    connect( _allPropertiesCheck.get( ), &QPushButton::clicked, this,
+      [ this ]
+      {
+        toggleAllProperties( );
+      });
+    connect( _autoCloseCheck.get( ), &QPushButton::clicked, this,
+      [ this ]
+      {
+        toggleAutoClose( );
+      });
+    setLayout( _gridLayout.get() );
+    _parentDock->setWidget( this );
+    _parentDock->show( );
+    this->show( );
   }
-  else
+
+  void EntityConnectionListWidget::setConnections( shift::Entity*  entity_,
+    shift::RelationshipOneToNMapDest*  connectsToMap_,
+    shift::RelationshipOneToNMapDest*  connectedByMap_,
+    shift::AggregatedOneToNAggregatedDests* aggregatedConnectsToMap_,
+    shift::AggregatedOneToNAggregatedDests* aggregatedConnectedByMap_ )
   {
-    auto labelNotConnectedTo = new QLabel( QString( tr(
-      "Entity not connected to." )));
-    gridLayout->addWidget( labelNotConnectedTo, ++numProp, 0, 1, 2 );
+    _entity = entity_;
+    _aggregatedConnectedByTable->setTableData(
+        aggregatedConnectedByMap_, _entity, _allPropsChecked );
+    _aggregatedConnectsToTable->setTableData(
+        aggregatedConnectsToMap_, _entity, _allPropsChecked );
+    _connectedByTable->setTableData( connectedByMap_, _entity,
+      _allPropsChecked );
+    _connectsToTable->setTableData( connectsToMap_, _entity, _allPropsChecked );
   }
 
-  auto labelConnectBy = new QLabel( QString( tr( "Connected by entities:" )));
-  labelConnectBy->setStyleSheet( "font-weight:bold" );
-  gridLayout->addWidget( labelConnectBy, ++numProp, 0, 1, 2 );
-
-  if( connectedByMap_ )
-  {
-    auto iterator = connectedByMap_->begin( );
-    while( iterator != connectedByMap_->end( ))
-    {
-      auto connectedEntity = DataManager::entities( ).at( iterator->first );
-      auto entitiesLabel = new QLabel( QString::fromStdString(
-        connectedEntity->getProperty( "Entity name" )
-        .value<std::string>( ))  + QString( " - " ) + entityName );
-      auto connectionNameLabel = new QLabel( QString::fromStdString(
-          iterator++->second->getProperty( "Name" ).value< std::string >( )));
-      auto editButton = new QPushButton( editButtonText );
-
-      gridLayout->addWidget( entitiesLabel, ++numProp, 0 );
-      gridLayout->addWidget( connectionNameLabel, numProp, 1 );
-      gridLayout->addWidget( editButton, numProp, 2 );
-
-      _connectionsCont.push_back( std::make_tuple(
-          entitiesLabel, connectionNameLabel, editButton ));
-      connect( editButton, &QPushButton::clicked, this,
-        [ this, entity_, connectedEntity ]
-        {
-          connectionDialog( connectedEntity, entity_ );
-        });
-    }
-  }
-  else
-  {
-    auto labelNotConnectBy = new QLabel( QString( tr(
-      "Entity not connected by." )));
-    gridLayout->addWidget( labelNotConnectBy, ++numProp, 0, 1, 2 );
-  }
-
-  auto labelAggregatedConnectTo =
-      new QLabel( QString( tr( "Aggregated connected to entities:" )));
-  labelAggregatedConnectTo->setStyleSheet( "font-weight:bold" );
-  gridLayout->addWidget( labelAggregatedConnectTo, ++numProp, 0, 1, 2 );
-
-  if( aggregatedConnectsToMap_ )
-  {
-    auto iterator = aggregatedConnectsToMap_->begin( );
-    while( iterator != aggregatedConnectsToMap_->end( ))
-    {
-      auto connectedEntity = DataManager::entities( ).at( iterator->first );
-      auto entitiesLabel = new QLabel( entityName + QString( " - " )
-        + QString::fromStdString( connectedEntity->getProperty( "Entity name" )
-        .value<std::string>( ) ) );
-      auto connectionNameLabel = new QLabel( QString::fromStdString(
-        iterator++->second.relationshipAggregatedProperties
-        ->getProperty( "Name" ).value< std::string >( )));
-      auto editButton = new QPushButton( editButtonText );
-
-      gridLayout->addWidget( entitiesLabel, ++numProp, 0 );
-      gridLayout->addWidget( connectionNameLabel, numProp, 1 );
-      gridLayout->addWidget( editButton, numProp, 2 );
-
-      _connectionsCont.push_back( std::make_tuple(
-          entitiesLabel, connectionNameLabel, editButton ) );
-      /*connect( editButton, &QPushButton::clicked, this,
-          [ this, entity_, connectedEntity ]
-          {
-            connectionDialog( connectedEntity, entity_ );
-          });*/
-    }
-  }
-  else
-  {
-    auto labelNotAggregatedConnectTo = new QLabel( QString( tr(
-      "Entity not aggregated connected to." )));
-    gridLayout->addWidget( labelNotAggregatedConnectTo, ++numProp, 0, 1, 2 );
-  }
-
-  auto labelAggregatedConnectBy =
-    new QLabel( QString( tr( "Aggregated connected by entities:" )));
-  labelAggregatedConnectBy->setStyleSheet( "font-weight:bold" );
-  gridLayout->addWidget( labelAggregatedConnectBy, ++numProp, 0, 1, 2 );
-
-  if( aggregatedConnectedByMap_ )
-  {
-    auto iterator = aggregatedConnectedByMap_->begin( );
-    while( iterator != aggregatedConnectedByMap_->end( ))
-    {
-      auto connectedEntity = DataManager::entities( ).at( iterator->first );
-      auto entitiesLabel = new QLabel( QString::fromStdString(
-        connectedEntity->getProperty( "Entity name" ).value<std::string>( ))
-        + QString( " - " ) + entityName );
-      auto connectionNameLabel = new QLabel( QString::fromStdString(
-          iterator++->second.relationshipAggregatedProperties->
-          getProperty( "Name" ).value< std::string >( )));
-      auto editButton = new QPushButton( editButtonText );
-
-      gridLayout->addWidget( entitiesLabel, ++numProp, 0 );
-      gridLayout->addWidget( connectionNameLabel, numProp, 1 );
-      gridLayout->addWidget( editButton, numProp, 2 );
-
-      _connectionsCont.push_back( std::make_tuple(
-          entitiesLabel, connectionNameLabel, editButton ) );
-      /*connect( editButton, &QPushButton::clicked, this,
-          [ this, entity_, connectedEntity ]
-          {
-            connectionDialog( connectedEntity, entity_ );
-          });*/
-    }
-  }
-  else
-  {
-    auto labelNotAggregatedConnectBy = new QLabel( QString( tr(
-      "Entity not aggregated connected by." )));
-    gridLayout->addWidget( labelNotAggregatedConnectBy, ++numProp, 0, 1, 2 );
-  }
-
-  gridLayout->addWidget( cancelButton, 1+numProp, 0 );
-  connect( cancelButton, &QPushButton::clicked, this,
-    [ this ]
-    {
-      cancelDialog( );
-    });
-
-  setLayout( gridLayout );
-  _parentDock->setWidget( this );
-  _parentDock->show( );
-  this->show( );
-  }
-
-  void EntityConnectionListWidget::connectionDialog(
-      shift::Entity* originEntity_, shift::Entity* destinationEntity_ )
-  {
-    nslib::InteractionManager::createConnectionRelationship(
-      originEntity_, destinationEntity_ );
-    cancelDialog( );
-  }
 
   void EntityConnectionListWidget::cancelDialog(  )
   {
@@ -242,5 +163,82 @@ namespace nslib
   QDockWidget* EntityConnectionListWidget::parentDock( void )
   {
     return _parentDock;
+  }
+
+  void EntityConnectionListWidget::toggleAutoClose( void )
+  {
+    _autoCloseChecked = _autoCloseCheck->isChecked( );
+  }
+
+  void EntityConnectionListWidget::toggleAllProperties( void )
+  {
+    _allPropsChecked = _allPropertiesCheck->isChecked( );
+    _connectsToTable->conectionModel( )->allProperties( _allPropsChecked );
+    _connectedByTable->conectionModel( )->allProperties( _allPropsChecked );
+    _aggregatedConnectedByTable->conectionModel( )
+      ->allProperties( _allPropsChecked );
+    _aggregatedConnectsToTable->conectionModel( )
+      ->allProperties( _allPropsChecked );
+  }
+
+  void
+  EntityConnectionListWidget::updateConnections( shift::EntityGid origEntity_,
+    shift::EntityGid destEntity_, const bool updateAggregatedTo_,
+    const bool updateAggregatedBy_ )
+  {
+    auto entityGid =  _entity->entityGid( );
+    auto dataRelations = DataManager::entities( ).relationships( );
+    auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
+    auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
+    auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
+      ->asAggregatedOneToN( )->mapAggregatedRels( );
+    auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
+      ->asAggregatedOneToN( )->mapAggregatedRels( );
+
+    if( entityGid == origEntity_ )
+    {
+      auto connectsIt = relConnectsTo.find( entityGid );
+      shift::RelationshipOneToNMapDest* connectsMap =
+        ( connectsIt == relConnectsTo.end( )
+        || connectsIt->second.empty( ))
+        ? nullptr : & connectsIt->second;
+      _connectsToTable->setTableData( connectsMap, _entity );
+    }
+    else if( entityGid == destEntity_ )
+    {
+      auto connectsIt = relConnectedBy.find( entityGid );
+      shift::RelationshipOneToNMapDest* connectsMap =
+        ( connectsIt == relConnectedBy.end( )
+        || connectsIt->second.empty( ))
+        ? nullptr : & connectsIt->second;
+      _connectedByTable->setTableData( connectsMap, _entity );
+    }
+    if( updateAggregatedBy_ )
+    {
+      auto connectsIt = relAggregatedConnectBy.find( entityGid );
+      shift::AggregatedOneToNAggregatedDests* connectsMap =
+        ( connectsIt == relAggregatedConnectBy.end( )
+        || connectsIt->second->empty( ))
+        ? nullptr : connectsIt->second.get();
+      _aggregatedConnectedByTable->setTableData( connectsMap, _entity );
+    }
+    if( updateAggregatedTo_ )
+    {
+      auto connectsIt = relAggregatedConnectsTo.find( entityGid );
+      shift::AggregatedOneToNAggregatedDests* connectsMap =
+        ( connectsIt == relAggregatedConnectsTo.end( )
+        || connectsIt->second->empty( ))
+        ? nullptr : connectsIt->second.get();
+      _aggregatedConnectsToTable->setTableData( connectsMap, _entity );
+    }
+  }
+
+  void EntityConnectionListWidget::checkClose( void )
+  {
+    if ( _autoCloseCheck->isChecked( ))
+    {
+      this->hide( );
+      _parentDock->close( );
+    }
   }
 }

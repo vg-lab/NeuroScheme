@@ -25,15 +25,16 @@
 #include "DomainManager.h"
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
+#include "InteractionManager.h"
 
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
 #include <assert.h>
 
+
 namespace nslib
 {
-
   QDockWidget* ConnectionRelationshipEditWidget::_parentDock = nullptr;
   bool ConnectionRelationshipEditWidget::_autoCloseChecked = false;
 
@@ -42,13 +43,15 @@ namespace nslib
     QWidget* parentWidget_ )
     : QFrame ( parentWidget_ )
     , _originEntity( originEntity_ )
-    , _destinationEntity( destinationEntity_ )
+    , _destEntity( destinationEntity_ )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
     , _autoCloseCheck( new QCheckBox( ))
-    , _eraseButton( new QPushButton( QString( tr( "Break" ))))
+    , _eraseButton( new QPushButton( QString( tr( "Delete" ))))
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
     , _gridLayout( new QGridLayout( ))
 {
+  _isAggregated = false;
+  //check here if constrained and if aggregated
   unsigned int numProp = 1u;
   _gridLayout->setAlignment( Qt::AlignTop );
   _gridLayout->setColumnStretch( 1, 1 );
@@ -63,7 +66,7 @@ namespace nslib
   if( connectsToIt != relConnectsTo.end( ))
   {
     auto connectsToMMIt =
-        connectsToIt->second.find( _destinationEntity->entityGid( ));
+        connectsToIt->second.find( _destEntity->entityGid( ));
     if( connectsToMMIt != connectsToIt->second.end( ))
     {
       _propObject = connectsToMMIt->second;
@@ -130,7 +133,7 @@ namespace nslib
         {
           QString connectionName( QString::fromStdString(
               ( _isNew ? _originEntity->getProperty( "Entity name" )
-              .value< std::string >( ) + "-" + _destinationEntity->
+              .value< std::string >( ) + "-" + _destEntity->
               getProperty( "Entity name" ).value<std::string>( )
               : _propObject->getProperty( "Name" ).value< std::string >( ))));
           lineEditwidget->setText( connectionName );
@@ -195,23 +198,6 @@ namespace nslib
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    if( _isNew )
-    {
-      auto& relAggregatedConnectsTo = *( DataManager::entities( )
-        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-      auto& relAggregatedConnectedBy = *( DataManager::entities( )
-        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
-      shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
-        relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
-        _destinationEntity, _propObject, _propObject );
-      checkClose( );
-    }
-    else if ( _autoCloseCheck->isChecked( ))
-    {
-      this->hide( );
-      _parentDock->close( );
-    }
-
     for ( const auto& propParam: _propParamCont )
     {
       const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
@@ -245,6 +231,25 @@ namespace nslib
     {
       needToClearCache = needToClearCache ||
         creatorPair.second->relationshipUpdatedOrCreated( _propObject );
+    }
+
+    if( _isNew )
+    {
+      auto& relAggregatedConnectsTo = *( DataManager::entities( )
+          .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+      auto& relAggregatedConnectedBy = *( DataManager::entities( )
+          .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+      shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
+        relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
+        _destEntity, _propObject, _propObject );
+      InteractionManager::updateEntityConnectionList(_originEntity->entityGid( ),
+        _destEntity->entityGid( ));
+      checkClose( );
+    }
+    else if ( _autoCloseCheck->isChecked( ))
+    {
+      this->hide( );
+      _parentDock->close( );
     }
 
     // TODO improvement: check if cache needs to be cleared or if just the
@@ -296,12 +301,14 @@ namespace nslib
         .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
     shift::Relationship::BreakAnAggregatedRelation( relAggregatedConnectsTo,
       relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
-      _destinationEntity );
+      _destEntity );
 
     for ( auto pane : PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
     }
+    InteractionManager::updateEntityConnectionList(_originEntity->entityGid( ),
+      _destEntity->entityGid( ));
     checkClose( );
   }
 
@@ -381,7 +388,25 @@ namespace nslib
       _isNew = true;
       _validationButton->setText( tr( "Create" ));
       setWindowTitle( tr( "Edit connection relationship" ));
-      _eraseButton->hide();
+      _eraseButton->hide( );
     }
   }
+
+  shift::Entity* ConnectionRelationshipEditWidget::originEntity( ) const
+  {
+    return _originEntity;
+  }
+
+  shift::Entity*
+  ConnectionRelationshipEditWidget::destEntity( ) const
+  {
+    return _destEntity;
+  }
+
+  bool ConnectionRelationshipEditWidget::isAggregated( ) const
+  {
+    return _isAggregated;
+  }
+
+
 }

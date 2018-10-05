@@ -41,15 +41,16 @@ namespace nslib
   QMenu* InteractionManager::_contextMenu = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   ConnectionRelationshipEditWidget*
-      InteractionManager::_conRelationshipEditWidget = nullptr;
+    InteractionManager::_conRelationshipEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
   Qt::MouseButtons InteractionManager::_buttons = nullptr;
-  std::unique_ptr< TemporalConnectionLine > InteractionManager::_tmpConnectionLine =
+  std::unique_ptr< TemporalConnectionLine >
+    InteractionManager::_tmpConnectionLine =
     std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
-  QAbstractGraphicsShapeItem* InteractionManager::lastShapeItemHoveredOnMouseMove =
-    nullptr;
-  EntityConnectionListWidget*
-    InteractionManager::_entityConnectionListWidget = nullptr;
+  QAbstractGraphicsShapeItem*
+    InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
+  EntityConnectionListWidget* InteractionManager::_entityConnectionListWidget =
+      nullptr;
 
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
@@ -484,12 +485,12 @@ namespace nslib
             }
             else if ( showConnections && showConnections == selectedAction )
             {
-              if( _entityConnectionListWidget )
+              if( !_entityConnectionListWidget )
               {
-                delete _entityConnectionListWidget;
+                _entityConnectionListWidget = new EntityConnectionListWidget( );
               }
-              _entityConnectionListWidget = new EntityConnectionListWidget(
-                entity, connectsToMap, connectedByMap, aggregatedConnectsToMap,
+              _entityConnectionListWidget->setConnections( entity,
+                connectsToMap, connectedByMap, aggregatedConnectsToMap,
                 aggregatedConnectedByMap );
             }
             else if ( selectedAction && childAction )
@@ -961,4 +962,31 @@ namespace nslib
       action_, parentEntity_, addToScene_, parentWidget_ );
   }
 
+  void InteractionManager::updateEntityConnectionList( shift::EntityGid origEntity_,
+    shift::EntityGid destEntity, const bool updateAggregatedTo_,
+    const bool updateAggregatedBy_ )
+  {
+    if( _entityConnectionListWidget && _entityConnectionListWidget->isVisible( ))
+    {
+      _entityConnectionListWidget->updateConnections( origEntity_, destEntity,
+        updateAggregatedTo_, updateAggregatedBy_ );
+    }
+  }
+
+  void InteractionManager::updateConnectionRelationship(
+      shift::Entity* originEntity_, shift::Entity* destEntity_ )
+  {
+    if( _conRelationshipEditWidget && _conRelationshipEditWidget->isVisible( ))
+    {
+      auto destEntity = _conRelationshipEditWidget->destEntity( );
+      auto origEntity = _conRelationshipEditWidget->originEntity( );
+      if( ( destEntity == destEntity_ && origEntity == originEntity_ )
+        || _conRelationshipEditWidget->isAggregated( ))
+      {
+        delete _conRelationshipEditWidget;
+        _conRelationshipEditWidget =
+          new ConnectionRelationshipEditWidget( origEntity, destEntity );
+      }
+    }
+  }
 } // namespace nslib

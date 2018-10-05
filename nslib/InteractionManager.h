@@ -75,6 +75,13 @@ namespace nslib
                                 QAbstractGraphicsShapeItem* shapeItem,
                                 QMouseEvent* event );
 
+    static void updateEntityConnectionList( shift::EntityGid origEntity_,
+      shift::EntityGid destEntity, bool updateAggregatedTo_ = true,
+      bool updateAggregatedBy_ = true );
+
+    static void updateConnectionRelationship(
+        shift::Entity* originEntity_, shift::Entity* destEntity_ );
+
     static void createConnectionRelationship(
       shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
     static void createOrEditEntity(

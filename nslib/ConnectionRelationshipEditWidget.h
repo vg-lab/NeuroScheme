@@ -24,6 +24,8 @@
 #ifndef __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 #define __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 
+#include <nslib/api.h>
+
 #include <QDialog>
 #include <QComboBox>
 #include <QCheckBox>
@@ -35,7 +37,7 @@
 
 namespace nslib
 {
-  class ConnectionRelationshipEditWidget:
+  class NSLIB_API ConnectionRelationshipEditWidget:
     public QFrame
   {
     Q_OBJECT
@@ -47,7 +49,11 @@ namespace nslib
     static void parentDock( QDockWidget* parentDock_ );
     static QDockWidget* parentDock( void );
 
-  public slots:
+    shift::Entity* originEntity( ) const;
+    shift::Entity* destEntity( ) const;
+    bool isAggregated( ) const;
+
+    public slots:
     void validateDialog( void );
     void cancelDialog( void );
     void breakDialog( void );
@@ -59,7 +65,8 @@ namespace nslib
     typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
 
     shift::Entity* _originEntity;
-    shift::Entity* _destinationEntity;
+    shift::Entity* _destEntity;
+    bool _isAggregated; //todo aggregated properties
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
     bool _isNew;

@@ -9,6 +9,7 @@ set( NSLIB_PUBLIC_HEADERS
   Color.h
   Config.h
   ConnectionRelationshipEditWidget.h
+  ConnectionTableWidget.h
   DataLoader.h
   DataManager.h
   Domain.h
@@ -48,6 +49,7 @@ set( NSLIB_SOURCES
   Canvas.cpp
   Config.cpp
   ConnectionRelationshipEditWidget.cpp
+  ConnectionTableWidget.cpp
   DataManager.cpp
   Domain.cpp
   DomainManager.cpp
