@@ -96,7 +96,21 @@ namespace nslib
       bool& allChildrenSelected,
       bool& noChildrenSelected );
 
+    static void deleteEntity( shift::EntityGid entityGid_ );
+
   protected:
+
+    static void basicDeleteEntity( shift::Entity* entity_,
+      shift::Entities& dataEntities_, shift::RelationshipOneToN& relConnectsTo_,
+      shift::RelationshipOneToN& relConnectedBy_,
+      shift::RelationshipOneToN& relParentOf_,
+      shift::RelationshipOneToOne& relChildOf_,
+      shift::RelationshipAggregatedOneToN& relAggregatedConnectsTo_,
+      shift::RelationshipAggregatedOneToN& relAggregatedConnectBy_,
+      shift::RelationshipOneToOne& relSubEntityOf_,
+      shift::RelationshipOneToN& relSuperEntityOf_,
+      shift::RelationshipOneToN& relAGroupOf_,
+      shift::RelationshipOneToN& relAPartOf_);
 
     static void _propagateSelectedStateToChilds(
       const shift::Entities& entities,

@@ -276,17 +276,19 @@ namespace nslib
           const auto& parent = relChildOf[ entityGid ].entity;
 
           const auto& grandParent =
-            relChildOf[ relChildOf[ entityGid ].entity ].entity;
+            relChildOf[ parent ].entity;
 
           auto& relAGroupOf = *( dataRelations[ "isAGroupOf" ]->asOneToN( ));
           const auto& groupedEntities = relAGroupOf[ entityGid ];
 
           QAction* editEntity = nullptr;
+          QAction* deleteEntity = nullptr;
           QAction* dupEntity = nullptr;
           QAction* autoEntity = nullptr;
           if ( !entity->isSubEntity( ))
           {
             editEntity = _contextMenu->addAction( "Edit" );
+            deleteEntity = _contextMenu->addAction( "Delete" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
               if(shift::RelationshipPropertiesTypes::isConstrained(
                 "ConnectedTo", entity->entityName( ),entity->entityName( )))
@@ -294,7 +296,7 @@ namespace nslib
                 autoEntity = _contextMenu->addAction( "Add Auto Connection" );
               }
             }
-          if ( editEntity || dupEntity || autoEntity )
+          if ( editEntity || dupEntity || autoEntity || deleteEntity )
             _contextMenu->addSeparator( );
 
           QAction* childAction = nullptr;
@@ -393,8 +395,8 @@ namespace nslib
           const QAction* expandChildrenToNewPane = ( hasChildren )
             ? _contextMenu->addAction( "Expand children [new pane]" ) : nullptr;
 
-          if ( editEntity || dupEntity || autoEntity || levelUp || levelDown
-            || expandGroup || expandChildren ||  levelUpToNewPane
+          if ( editEntity || deleteEntity || dupEntity || autoEntity || levelUp
+            || levelDown|| expandGroup || expandChildren ||  levelUpToNewPane
             || levelDownToNewPane || expandGroupToNewPane
             || expandChildrenToNewPane || showConnections )
           {
@@ -409,7 +411,11 @@ namespace nslib
             else if ( dupEntity && dupEntity == selectedAction )
             {
               createOrEditEntity( entity,
-                EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
+                                  EntityEditWidget::TEntityEditWidgetAction::DUPLICATE_ENTITY );
+            }
+            else if ( deleteEntity && deleteEntity == selectedAction )
+            {
+              InteractionManager::deleteEntity( entityGid );
             }
             else if ( autoEntity && autoEntity == selectedAction )
             {
@@ -966,7 +972,7 @@ namespace nslib
     shift::EntityGid destEntity, const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    if( _entityConnectionListWidget && _entityConnectionListWidget->isVisible( ))
+    if( _entityConnectionListWidget && !_entityConnectionListWidget->isHidden( ))
     {
       _entityConnectionListWidget->updateConnections( origEntity_, destEntity,
         updateAggregatedTo_, updateAggregatedBy_ );
@@ -976,7 +982,7 @@ namespace nslib
   void InteractionManager::updateConnectionRelationship(
       shift::Entity* originEntity_, shift::Entity* destEntity_ )
   {
-    if( _conRelationshipEditWidget && _conRelationshipEditWidget->isVisible( ))
+    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( ))
     {
       auto destEntity = _conRelationshipEditWidget->destEntity( );
       auto origEntity = _conRelationshipEditWidget->originEntity( );
@@ -989,4 +995,170 @@ namespace nslib
       }
     }
   }
+
+  void InteractionManager::deleteEntity( shift::EntityGid entityGid_ )
+  {
+    auto& dataEntities = DataManager::entities( );
+    auto relations = dataEntities.relationships( );
+    auto entity = dataEntities.at( entityGid_ );
+    if( entity->isSubEntity( ))
+    {
+      Loggers::get( )->log( "Deleting a subEntity",
+        LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+    }
+    else
+    {
+      auto& relParentOf = *( relations[ "isParentOf" ]->asOneToN( ));
+      //const auto& children = relParentOf[ entityGid_ ];
+
+      auto& relChildOf = *( relations[ "isChildOf" ]->asOneToOne( ));
+      const auto& parent = relChildOf[ entityGid_ ].entity;
+      shift::Entity* parentEntity = nullptr;
+      if( parent > 0 )
+      {
+        parentEntity = dataEntities.at(parent);
+        shift::Relationship::relationBreak( relParentOf, relChildOf,
+          parentEntity, entity );
+        //All dependent aggregateds will be break so they wont be reclaculated.
+      }
+      else
+      {
+        DataManager::rootEntities( ).remove( entity );
+      }
+      auto& relConnectsTo = *( relations[ "connectsTo" ]->asOneToN( ));
+      auto& relConnectedBy = *( relations[ "connectedBy" ]->asOneToN( ));
+      auto& relAggregatedConnectsTo = *( relations[ "aggregatedConnectsTo" ]
+        ->asAggregatedOneToN( ));
+      auto& relAggregatedConnectBy = *( relations[ "aggregatedConnectedBy" ]
+        ->asAggregatedOneToN( ));
+
+      auto& relSubEntityOf = *( relations.at( "isSubEntityOf" )->asOneToOne( ));
+      auto& relSuperEntityOf =
+        *( relations.at( "isSuperEntityOf" )->asOneToN( ));
+      auto& relAGroupOf = *( relations[ "isAGroupOf" ]->asOneToN( ));
+      auto& relAPartOf = *( relations[ "isPartOf" ]->asOneToN( ));
+
+      basicDeleteEntity( entity, dataEntities, relConnectsTo, relConnectedBy,
+        relParentOf, relChildOf, relAggregatedConnectsTo,
+        relAggregatedConnectBy, relSubEntityOf, relSuperEntityOf,
+        relAGroupOf, relAPartOf );
+
+      if( parentEntity )
+      {
+        parentEntity->autoUpdateProperties( );
+      }
+      if( _entityConnectionListWidget
+        && !_entityConnectionListWidget->isHidden( ))
+      {
+        _entityConnectionListWidget->updateConnections( );
+      }
+      //todo update _conRelationshipEditWidget if its aggregated
+      for ( auto pane : PaneManager::panes( ))
+      {
+        pane->resizeEvent( nullptr );
+      }
+    }
+  }
+  void InteractionManager::basicDeleteEntity( shift::Entity* entity_,
+    shift::Entities& dataEntities_, shift::RelationshipOneToN& relConnectsTo_,
+    shift::RelationshipOneToN& relConnectedBy_,
+    shift::RelationshipOneToN& relParentOf_,
+    shift::RelationshipOneToOne& relChildOf_,
+    shift::RelationshipAggregatedOneToN& relAggregatedConnectsTo_,
+    shift::RelationshipAggregatedOneToN& relAggregatedConnectBy_,
+    shift::RelationshipOneToOne& relSubEntityOf_,
+    shift::RelationshipOneToN& relSuperEntityOf_,
+    shift::RelationshipOneToN& relAGroupOf_,
+    shift::RelationshipOneToN& relAPartOf_)
+  {
+    if( !entity_->isSubEntity( ) )
+    {
+      shift::Entities connectedEntites;
+      connectedEntites.addRelatedEntitiesOneToN( relParentOf_, entity_,
+                                                 dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ) )
+      {
+        shift::Relationship::relationBreak( relParentOf_, relChildOf_, entity_,
+          connectEntity );
+        basicDeleteEntity( connectEntity, dataEntities_, relConnectsTo_,
+          relConnectedBy_, relParentOf_, relChildOf_, relAggregatedConnectsTo_,
+          relAggregatedConnectBy_, relSubEntityOf_, relSuperEntityOf_,
+          relAGroupOf_, relAPartOf_ );
+      }
+      connectedEntites.clear( );
+      connectedEntites.addRelatedEntitiesOneToN( relConnectsTo_, entity_,
+        dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ))
+      {
+        shift::Relationship::BreakAnAggregatedRelation(
+            relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
+            entity_, connectEntity );
+      }
+      connectedEntites.clear( );
+      connectedEntites.addRelatedEntitiesOneToN( relConnectedBy_, entity_,
+        dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ))
+      {
+        shift::Relationship::BreakAnAggregatedRelation(
+          relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
+          connectEntity, entity_ );
+      }
+      connectedEntites.clear( );
+      connectedEntites.addRelatedEntitiesOneToN( relAGroupOf_, entity_,
+        dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ))
+      {
+        shift::Relationship::relationBreak( relAGroupOf_,
+          relAPartOf_, connectEntity, entity_ );
+      }
+      connectedEntites.clear( );
+      connectedEntites.addRelatedEntitiesOneToN( relAPartOf_, entity_,
+        dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ))
+      {
+        shift::Relationship::relationBreak( relAGroupOf_,  relAPartOf_, entity_,
+          connectEntity );
+      }
+      connectedEntites.clear( );
+      connectedEntites.addRelatedEntitiesOneToN( relSuperEntityOf_, entity_,
+        dataEntities_, 1 );
+      for( auto connectEntity : connectedEntites.vector( ))
+      {
+        shift::Relationship::relationBreak( relSuperEntityOf_,
+          relSubEntityOf_, entity_, connectEntity );
+        basicDeleteEntity( connectEntity, dataEntities_, relConnectsTo_,
+          relConnectedBy_, relParentOf_, relChildOf_,
+          relAggregatedConnectsTo_, relAggregatedConnectBy_, relSubEntityOf_,
+          relSuperEntityOf_, relAGroupOf_, relAPartOf_ );
+      }
+    }
+
+    dataEntities_.remove( entity_ );
+    if( _entityEditWidget && !_entityEditWidget->isHidden( )
+        && _entityEditWidget->entity( ) == entity_ )
+    {
+      EntityEditWidget::parentDock( )->hide( );
+      _entityEditWidget->hide( );
+    }
+    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( )
+        && ( _conRelationshipEditWidget->originEntity( ) == entity_
+        || _conRelationshipEditWidget->destEntity( ) == entity_ ))
+    {
+      ConnectionRelationshipEditWidget::parentDock( )->hide( );
+      _conRelationshipEditWidget->hide( );
+    }
+    if( _entityConnectionListWidget && !_entityConnectionListWidget->isHidden( )
+        && _entityConnectionListWidget->entity( ) == entity_ )
+    {
+      EntityConnectionListWidget::parentDock( )->hide( );
+      _entityConnectionListWidget->hide( );
+    }
+    for( auto pane : PaneManager::panes( ))
+    {
+      pane->entities( ).removeIfContains( entity_ );
+    }
+    delete entity_;
+  }
+
+
 } // namespace nslib

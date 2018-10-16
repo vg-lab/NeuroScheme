@@ -438,4 +438,9 @@ namespace nslib
   {
   }
 
+  shift::Entity* EntityEditWidget::entity( )
+  {
+    return _entity;
+  }
+
 } // namespace

@@ -110,10 +110,7 @@ namespace nslib
     nslib::Loggers::get( )->log(
       "display " + std::to_string( entities.size( )),
       nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-
-
     representations.clear( );
-
 
     bool doFiltering =
       _filterWidget &&

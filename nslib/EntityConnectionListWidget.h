@@ -60,8 +60,10 @@ namespace nslib
     static void parentDock( QDockWidget* parentDock_ );
     static QDockWidget* parentDock( void );
     void checkClose( void );
+    void updateConnections( void );
+    shift::Entity* entity( void );
 
-  public slots:
+    public slots:
     void cancelDialog( void );
     void toggleAutoClose( void );
     void toggleAllProperties( void );
