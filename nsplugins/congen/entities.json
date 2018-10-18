@@ -89,79 +89,95 @@
             "properties": [
                 {
                     "name": "Name",
-                    "type": "std::string"
+                    "type": "std::string",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Connectivity Model",
-                    "type": "TConnectivityModel"
+                    "type": "TConnectivityModel",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Random probability",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model",
                                         "parentValue": "Random" } ]
                 },
                 {
                     "name": "FanOut Outdegree",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanOut" } ]
                 },
                 {
                     "name": "FanIn Indegree",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "FanIn" } ]
                 },
                 {
                     "name": "Spatial Gaussian Probability",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
                 },
                 {
                     "name": "Spatial Gaussian Sigma",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Spatial Gaussian" } ]
                 },
                 {
                     "name": "Weight Type",
-                    "type": "TFixedOrDistribution"
+                    "type": "TFixedOrDistribution",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Weight",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Fixed" } ]
                 },
                 {
                     "name": "Weight Gaussian Mean",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Weight Gaussian Sigma",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Weight Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Delay Type",
+                    "flags": [ "EDITABLE" ],
                     "type": "TFixedOrDistribution"
                 },
                 {
                     "name": "Delay",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Fixed" } ]
                 },
                 {
                     "name": "Delay Gaussian Mean",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Delay Gaussian Sigma",
                     "type": "float",
+                    "flags": [ "EDITABLE" ],
                     "constraints" : [ { "type": "subproperty", "parentProperty": "Delay Type", "parentValue": "Gaussian" } ]
                 },
                 {
                     "name": "Threshold",
-                    "type": "float"
+                    "type": "float",
+                    "flags": [ "EDITABLE" ]
                 }
 
             ],
@@ -188,6 +204,177 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "AggregatedConnectsWith",
+            "relationship": "aggregatedConnectsTo",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Name",
+                    "type": "std::string",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Nb of base connections",
+                    "type": "uint",
+                    "flags": [],
+                    "auto": {
+                        "op": "COUNT",
+                        "source": {
+                            "property": "Name",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Random probability mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Random probability",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "FanOut Outdegree mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "FanOut Outdegree",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "FanIn Indegree mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "FanIn Indegree",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Spatial Gaussian Probability mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Random probability",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Spatial Gaussian Sigma mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Spatial Gaussian Sigma",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Weight mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Weight",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Weight Gaussian Mean mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Weight Gaussian Mean",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Weight Gaussian Sigma mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Weight Gaussian Sigma",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delay mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Delay",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delay Gaussian Mean mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Delay Gaussian Mean",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delay Gaussian Sigma mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Delay Gaussian Sigma",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "Threshold mean",
+                    "type": "float",
+                    "flags": [],
+                    "auto": {
+                        "op": "MEAN",
+                        "source": {
+                            "property": "Threshold",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                }
+            ],
+            "types":
+            [ ]
         },
         {
             "name": "ConnectedTo",

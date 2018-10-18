@@ -22,6 +22,7 @@
 
 #include "Domain.h"
 #include "Neuron.h"
+#include <shift/RelationshipProperties.h>
 #include <nslib/RepresentationCreatorManager.h>
 #include <nslib/DataManager.h>
 #include <nslib/PaneManager.h>
@@ -257,7 +258,10 @@ namespace nslib
         new Eigen4VectorCaster( ));
 
       this->_exportRelations =
-        { "isParentOf", "isAGroupOf", "isSuperEntityOf", "connectsTo", };
+        { "isParentOf", "isAGroupOf", "isSuperEntityOf", "connectsTo",
+          "aggregatedConnectsTo","aggregatedConnectedBy" };
+      this->_exportAggregatedRelations = { false, false, false, false, true,
+        true };
       this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
@@ -290,7 +294,7 @@ namespace nslib
       _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
 
       shift::RelationshipProperties* connectsToObj =
-        _relationshipPropertiesTypes->getRelationshipProperties( "connectsTo" );
+        _relationshipPropertiesTypes->getRelationshipProperties( "aggregatedConnectsTo" );
 
       _entities.relationships( )[ "aggregatedConnectsTo" ] =
         new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo",
@@ -341,17 +345,25 @@ namespace nslib
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
 
-      addIsParentOfRelationshipsToJSON( getRelationsOfType(
-        "isParentOf", relationships), oldGUIToEntity );
+      addIsParentOfRelationshipsFromJSON( getRelationsOfType(
+        "isParentOf", relationships ), oldGUIToEntity );
 
-      addConnectsToRelationsToJSON( getRelationsOfType(
-        "connectsTo", relationships), oldGUIToEntity );
+      addConnectsToRelationsFromJSON( getRelationsOfType(
+        "connectsTo", relationships ), oldGUIToEntity );
 
       addIsAGroupOfRelationshipsToJSON( getRelationsOfType(
-        "connectsTo", relationships), oldGUIToEntity );
+        "isAGroupOf", relationships ), oldGUIToEntity );
 
       addIsSuperEntityOfRelationshipsToJSON( getRelationsOfType(
-        "connectsTo", relationships), oldGUIToEntity );
+        "isSuperEntityOf", relationships ), oldGUIToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectedBy", relationships ), "aggregatedConnectedBy",
+        oldGUIToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
+        oldGUIToEntity );
     }
 
     void Domain::addIsAGroupOfRelationshipsToJSON(
@@ -369,7 +381,7 @@ namespace nslib
         shift::Entity* destEntity;
 
         importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "GroupOf" );
+          destEntity, "GroupOf", true );
 
         shift::Relationship::Establish( relGroupOf, relGroupBy,
           origEntity, destEntity );
@@ -393,7 +405,7 @@ namespace nslib
         shift::Entity* destEntity;
 
         importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "SuperEntityOf" );
+          destEntity, "SuperEntityOf", true );
 
         shift::Relationship::Establish( relSuperEntity, relSubEntity,
           origEntity, destEntity );

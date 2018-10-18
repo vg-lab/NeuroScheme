@@ -74,14 +74,15 @@ namespace nslib
     }
 
   protected:
-    std::vector <std::string> _exportRelations;
+    std::vector< std::string > _exportRelations;
+    std::vector< bool > _exportAggregatedRelations;
     DataLoader* _dataLoader;
     shift::EntitiesTypes* _entitiesTypes;
     shift::RelationshipPropertiesTypes* _relationshipPropertiesTypes;
     std::string _domainName;
 
     virtual void exportRelationTypeToJSON( const std::string& relationName,
-      std::ostream& outputStream, bool minimizeStream ) const;
+      std::ostream& outputStream, bool minimizeStream, bool aggregated ) const;
 
     virtual void importEntityJSON( const boost::property_tree::ptree& entityJSON,
       shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID );
@@ -95,18 +96,22 @@ namespace nslib
       const  boost::property_tree::ptree& relationships );
 
     virtual void importJSONRelationGIDS(
-      const  boost::property_tree::ptree& relation,
+      const boost::property_tree::ptree& relation,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
       shift::Entity*& origEntity, shift::Entity*& destEntity,
-      const std::string& relationName );
+      const std::string& relationName, bool checkConstrained );
 
-    virtual void addConnectsToRelationsToJSON(
+    virtual void addConnectsToRelationsFromJSON(
       const boost::property_tree::ptree& relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
 
-    virtual void addIsParentOfRelationshipsToJSON(
+    virtual void addAggregatedConnectionFromJSON(
+      const boost::property_tree::ptree& relations, const std::string& name,
+      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
+
+    virtual void addIsParentOfRelationshipsFromJSON(
       const boost::property_tree::ptree& relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
 
     virtual void importEntititiesJSON(
       const boost::property_tree::ptree& entities,

@@ -516,6 +516,46 @@
             [ ]
         },
         {
+            "name": "AggregatedConnectsWith",
+            "relationship": "aggregatedConnectsTo",
+            "namespace": "nslib::cortex::shiftgen",
+            "includes" : [ ],
+            "properties": [
+                {
+                    "name": "Name",
+                    "type": "std::string",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Nb of base connections",
+                    "type": "uint",
+                    "flags": [],
+                    "auto": {
+                        "op": "COUNT",
+                        "source": {
+                            "property": "Name",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                },
+                {
+                    "name": "count sum",
+                    "type": "uint",
+                    "flags": [],
+                    "auto": {
+                        "op": "SUM",
+                        "source": {
+                            "property": "count",
+                            "entities": [ "ConnectsWith", "AggregatedConnectsWith" ]
+                        }
+                    }
+                }
+            ],
+            "types":
+            [
+            ]
+        },
+        {
            "name": "ParentOf",
            "namespace": "nslib::cortex::shiftgen",
            "includes" : [ ],

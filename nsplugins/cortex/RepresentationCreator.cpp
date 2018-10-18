@@ -480,7 +480,7 @@ namespace nslib
               relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map(
-                    relationProperties->getProperty( "count" ).
+                    relationProperties->getProperty( "count sum" ).
                     value< unsigned int >( ))));
             }
 

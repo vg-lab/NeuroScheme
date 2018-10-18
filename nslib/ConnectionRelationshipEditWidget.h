@@ -43,8 +43,11 @@ namespace nslib
     Q_OBJECT
 
   public:
+    typedef enum { AUTO, SIMPLE, AGGREGATED  } TConnectionType;
     ConnectionRelationshipEditWidget( shift::Entity*  originEntity_,
-      shift::Entity* destinationEntity_, QWidget* parentWidget_ = nullptr );
+      shift::Entity* destinationEntity_,
+      TConnectionType connectionType_ = TConnectionType::AUTO,
+      QWidget* parentWidget_ = nullptr );
     ~ConnectionRelationshipEditWidget( void );
     static void parentDock( QDockWidget* parentDock_ );
     static QDockWidget* parentDock( void );
@@ -66,7 +69,7 @@ namespace nslib
 
     shift::Entity* _originEntity;
     shift::Entity* _destEntity;
-    bool _isAggregated; //todo aggregated properties
+    bool _isAggregated;
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
     bool _isNew;

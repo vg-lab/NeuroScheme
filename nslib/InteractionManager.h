@@ -79,11 +79,16 @@ namespace nslib
       shift::EntityGid destEntity, bool updateAggregatedTo_ = true,
       bool updateAggregatedBy_ = true );
 
+    static void refreshEntityConnectionList( void );
+
     static void updateConnectionRelationship(
-        shift::Entity* originEntity_, shift::Entity* destEntity_ );
+      shift::Entity* originEntity_, shift::Entity* destEntity_ );
 
     static void createConnectionRelationship(
-      shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
+      shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+      ConnectionRelationshipEditWidget::TConnectionType connectionType_ =
+      ConnectionRelationshipEditWidget::TConnectionType::AUTO );
+
     static void createOrEditEntity(
       shift::Entity* entity_, EntityEditWidget::TEntityEditWidgetAction action_,
       shift::Entity* parentEntity_= nullptr,
@@ -144,7 +149,7 @@ namespace nslib
     static QMenu* _contextMenu;
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
     static EntityEditWidget* _entityEditWidget;
-    static EntityConnectionListWidget* _entityConnectionListWidget;
+    static EntityConnectionListWidget* _entityConnectListWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;

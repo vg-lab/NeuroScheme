@@ -45,12 +45,15 @@ namespace nslib
     QWidget* parentWidget_ )
     : QFrame ( parentWidget_ )
     , _gridLayout( new QGridLayout( ))
+    , _entityNameLabel( new QLabel )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
     , _autoCloseCheck( new QCheckBox( ))
     , _allPropertiesLabel( new QLabel( tr( "All-Properties" )))
     , _allPropertiesCheck( new QCheckBox( ))
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
   {
+    _gridLayout->addWidget( _entityNameLabel.get( ), 0, 0 );
+    _entityNameLabel->setStyleSheet( "font-weight:bold" );
     auto types = DomainManager::getActiveDomain( )->entitiesTypes( );
     shift::Entity* entityType = std::get< shift::EntitiesTypes::OBJECT >
       ( *types.entitiesTypes( ).begin( ));
@@ -63,48 +66,50 @@ namespace nslib
     fires::PropertySorter* entityNameSorter =
       fires::PropertyManager::getSorter( entityNamePropertyGid );
 
-    auto propConnectionType = DomainManager::getActiveDomain( )->
-      relationshipPropertiesTypes( ).getRelationshipProperties( "connectsTo" );
+    auto relationshipPropertiesTypes =
+      DomainManager::getActiveDomain( )-> relationshipPropertiesTypes( );
+    auto propConnectionType = relationshipPropertiesTypes
+      .getRelationshipProperties( "connectsTo" );
     _connectsToTable = new ConnectionTableWidget( QString( tr(
       "Connected to entities:" )), true, false, QString( tr(
       "Entity not connected to." )), propConnectionType,
       entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 0, this );
+      _gridLayout.get( ), 1, this );
 
     _connectedByTable = new ConnectionTableWidget( QString( tr(
       "Connected by entities:" )), false, false, QString( tr(
       "Entity not connected by." )), propConnectionType,
       entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 2, this );
+      _gridLayout.get( ), 3, this );
 
+    propConnectionType = relationshipPropertiesTypes
+        .getRelationshipProperties( "aggregatedConnectsTo" );
     _aggregatedConnectsToTable = new ConnectionTableWidget( QString( tr(
         "Aggregated connected to entities:" )), true, true, QString( tr(
         "Entity not aggregated connected to." )), propConnectionType,
         entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 4, this );
+      _gridLayout.get( ), 5, this );
 
     _aggregatedConnectedByTable = new ConnectionTableWidget( QString( tr(
         "Aggregated connected by entities:" )), false, true, QString( tr(
         "Entity not aggregated connected by." )), propConnectionType,
         entityNameCaster, entityNameLabel, entityNameSorter,
-        _gridLayout.get( ), 6, this );
+        _gridLayout.get( ), 7, this );
 
     _gridLayout->setAlignment( Qt::AlignTop );
     _gridLayout->setColumnStretch( 1, 1 );
-    _gridLayout->setColumnMinimumWidth( 1, 240 );
     _gridLayout->setVerticalSpacing( 1 );
-
-    QString editButtonText = QString( tr( "Edit" ));
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
     _allPropertiesCheck->setChecked( _allPropsChecked );
-    _gridLayout->addWidget( _cancelButton.get( ), 8, 0 );
-    _gridLayout->addWidget( _allPropertiesCheck.get( ), 9, 1 );
-    _gridLayout->addWidget( _allPropertiesLabel.get( ), 9, 0 );
-    _gridLayout->addWidget( _autoCloseCheck.get( ), 10, 1 );
-    _gridLayout->addWidget( _autoCloseLabel.get( ), 10, 0 );
+    _gridLayout->addWidget( _cancelButton.get( ), 9, 0 );
+    _gridLayout->addWidget( _allPropertiesCheck.get( ), 10, 1 );
+    _gridLayout->addWidget( _allPropertiesLabel.get( ), 10, 0 );
+    _gridLayout->addWidget( _autoCloseCheck.get( ), 11, 1 );
+    _gridLayout->addWidget( _autoCloseLabel.get( ), 11, 0 );
 
     auto sizePolicy = QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Maximum );
+    _entityNameLabel->setSizePolicy( sizePolicy );
     _cancelButton->setSizePolicy( sizePolicy );
     _allPropertiesCheck->setSizePolicy( sizePolicy );
     _allPropertiesLabel->setSizePolicy( sizePolicy );
@@ -139,6 +144,8 @@ namespace nslib
     shift::AggregatedOneToNAggregatedDests* aggregatedConnectedByMap_ )
   {
     _entity = entity_;
+    _entityNameLabel->setText(QString::fromStdString( "Connections of entity: "
+      + _entity->getProperty( "Entity name" ).value< std::string >( )));
     _aggregatedConnectedByTable->setTableData(
         aggregatedConnectedByMap_, _entity, _allPropsChecked );
     _aggregatedConnectsToTable->setTableData(
@@ -146,6 +153,8 @@ namespace nslib
     _connectedByTable->setTableData( connectedByMap_, _entity,
       _allPropsChecked );
     _connectsToTable->setTableData( connectsToMap_, _entity, _allPropsChecked );
+    _parentDock->show( );
+    this->show( );
   }
 
 

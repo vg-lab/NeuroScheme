@@ -49,7 +49,7 @@ namespace nslib
     std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
   QAbstractGraphicsShapeItem*
     InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
-  EntityConnectionListWidget* InteractionManager::_entityConnectionListWidget =
+  EntityConnectionListWidget* InteractionManager::_entityConnectListWidget =
       nullptr;
 
   void InteractionManager::highlightConnectivity(
@@ -491,11 +491,11 @@ namespace nslib
             }
             else if ( showConnections && showConnections == selectedAction )
             {
-              if( !_entityConnectionListWidget )
+              if( !_entityConnectListWidget )
               {
-                _entityConnectionListWidget = new EntityConnectionListWidget( );
+                _entityConnectListWidget = new EntityConnectionListWidget( );
               }
-              _entityConnectionListWidget->setConnections( entity,
+              _entityConnectListWidget->setConnections( entity,
                 connectsToMap, connectedByMap, aggregatedConnectsToMap,
                 aggregatedConnectedByMap );
             }
@@ -783,25 +783,15 @@ namespace nslib
   }
 
   void InteractionManager::createConnectionRelationship(
-    shift::Entity* originEntity_, shift::Entity* destinationEntity_ )
+    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+    ConnectionRelationshipEditWidget::TConnectionType connectionType_ )
   {
-    if ( shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
-      originEntity_->entityName( ), destinationEntity_->entityName( )))
+    if ( _conRelationshipEditWidget )
     {
-      if ( _conRelationshipEditWidget )
-      {
-        delete _conRelationshipEditWidget;
-      }
-      _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
-        originEntity_, destinationEntity_);
+      delete _conRelationshipEditWidget;
     }
-    else
-    {
-      Loggers::get( )->log( "A " + originEntity_->entityName( ) +
-        " cannot be connected to a " + destinationEntity_->entityName( ) + '.',
-        LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
-    }
-
+    _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
+      originEntity_, destinationEntity_, connectionType_);
   }
 
   void InteractionManager::_propagateSelectedStateToChilds(
@@ -968,30 +958,44 @@ namespace nslib
       action_, parentEntity_, addToScene_, parentWidget_ );
   }
 
-  void InteractionManager::updateEntityConnectionList( shift::EntityGid origEntity_,
-    shift::EntityGid destEntity, const bool updateAggregatedTo_,
+  void InteractionManager::updateEntityConnectionList(
+    shift::EntityGid origEntity_, shift::EntityGid destEntity,
+    const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    if( _entityConnectionListWidget && !_entityConnectionListWidget->isHidden( ))
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
     {
-      _entityConnectionListWidget->updateConnections( origEntity_, destEntity,
+      _entityConnectListWidget->updateConnections( origEntity_, destEntity,
         updateAggregatedTo_, updateAggregatedBy_ );
     }
   }
 
+  void InteractionManager::refreshEntityConnectionList( void )
+  {
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
+    {
+      _entityConnectListWidget->hide( );
+      _entityConnectListWidget->show( );
+    }
+  }
+
   void InteractionManager::updateConnectionRelationship(
-      shift::Entity* originEntity_, shift::Entity* destEntity_ )
+    shift::Entity* originEntity_, shift::Entity* destEntity_ )
   {
     if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( ))
     {
       auto destEntity = _conRelationshipEditWidget->destEntity( );
       auto origEntity = _conRelationshipEditWidget->originEntity( );
-      if( ( destEntity == destEntity_ && origEntity == originEntity_ )
-        || _conRelationshipEditWidget->isAggregated( ))
+      const bool isAggregated = _conRelationshipEditWidget->isAggregated( );
+      if( isAggregated ||
+        ( destEntity == destEntity_ && origEntity == originEntity_ ))
       {
+        auto type = isAggregated
+          ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED
+          : ConnectionRelationshipEditWidget::TConnectionType::SIMPLE;
         delete _conRelationshipEditWidget;
-        _conRelationshipEditWidget =
-          new ConnectionRelationshipEditWidget( origEntity, destEntity );
+        _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
+          origEntity, destEntity, type );
       }
     }
   }
@@ -1047,12 +1051,13 @@ namespace nslib
       {
         parentEntity->autoUpdateProperties( );
       }
-      if( _entityConnectionListWidget
-        && !_entityConnectionListWidget->isHidden( ))
+      if( _entityConnectListWidget
+        && !_entityConnectListWidget->isHidden( ))
       {
-        _entityConnectionListWidget->updateConnections( );
+        _entityConnectListWidget->updateConnections( );
       }
-      //todo update _conRelationshipEditWidget if its aggregated
+      //Updated if it's an aggregated
+      updateConnectionRelationship( nullptr, nullptr );
       for ( auto pane : PaneManager::panes( ))
       {
         pane->resizeEvent( nullptr );
@@ -1071,7 +1076,7 @@ namespace nslib
     shift::RelationshipOneToN& relAGroupOf_,
     shift::RelationshipOneToN& relAPartOf_)
   {
-    if( !entity_->isSubEntity( ) )
+    if( !entity_->isSubEntity( ))
     {
       shift::Entities connectedEntites;
       connectedEntites.addRelatedEntitiesOneToN( relParentOf_, entity_,
@@ -1147,11 +1152,11 @@ namespace nslib
       ConnectionRelationshipEditWidget::parentDock( )->hide( );
       _conRelationshipEditWidget->hide( );
     }
-    if( _entityConnectionListWidget && !_entityConnectionListWidget->isHidden( )
-        && _entityConnectionListWidget->entity( ) == entity_ )
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( )
+        && _entityConnectListWidget->entity( ) == entity_ )
     {
       EntityConnectionListWidget::parentDock( )->hide( );
-      _entityConnectionListWidget->hide( );
+      _entityConnectListWidget->hide( );
     }
     for( auto pane : PaneManager::panes( ))
     {

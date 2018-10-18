@@ -26,6 +26,7 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "InteractionManager.h"
+#include "Loggers.h"
 
 #include <QPushButton>
 #include <QLabel>
@@ -40,55 +41,101 @@ namespace nslib
 
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
     shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+    TConnectionType connectionType_,
     QWidget* parentWidget_ )
     : QFrame ( parentWidget_ )
     , _originEntity( originEntity_ )
     , _destEntity( destinationEntity_ )
+    , _isAggregated( true )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
     , _autoCloseCheck( new QCheckBox( ))
     , _eraseButton( new QPushButton( QString( tr( "Delete" ))))
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
     , _gridLayout( new QGridLayout( ))
 {
-  _isAggregated = false;
-  //check here if constrained and if aggregated
-  unsigned int numProp = 1u;
-  _gridLayout->setAlignment( Qt::AlignTop );
-  _gridLayout->setColumnStretch( 1, 1 );
-  _gridLayout->setColumnMinimumWidth( 1, 150 );
-
-  auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-      ->relationshipPropertiesTypes( );
-
-  auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-  auto connectsToIt = relConnectsTo.find( _originEntity->entityGid( ));
-  if( connectsToIt != relConnectsTo.end( ))
+  if( connectionType_ != TConnectionType::AGGREGATED )
   {
-    auto connectsToMMIt =
-        connectsToIt->second.find( _destEntity->entityGid( ));
-    if( connectsToMMIt != connectsToIt->second.end( ))
+    if( !shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
+      originEntity_->entityName( ), destinationEntity_->entityName( )))
     {
-      _propObject = connectsToMMIt->second;
+      if ( connectionType_ == TConnectionType::SIMPLE )
+      {
+        Loggers::get( )->log( "A " + originEntity_->entityName( ) +
+          " cannot be connected to a " + destinationEntity_->entityName( ) +
+          '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+        this->hide( );
+        _parentDock->hide( );
+        return;
+      }
+      else
+      {
+        Loggers::get( )->log( "A " + originEntity_->entityName( ) +
+          " cannot be connected to a " + destinationEntity_->entityName( ) +
+          ". Searching aggregated connections.", LOG_LEVEL_VERBOSE,
+          NEUROSCHEME_FILE_LINE );
+      }
+    }
+    else
+    {
+      _isAggregated = false;
+    }
+  }
+  auto originName = _originEntity->getProperty( "Entity name" )
+    .value<std::string>( );
+  auto destName = _originEntity->getProperty( "Entity name" )
+    .value<std::string>( );
+  QString relationName;
+  if( _isAggregated )
+  {
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    _propObject = relAggregatedConnectsTo.getRelationProperties(
+      _originEntity->entityGid( ), _destEntity->entityGid( ));
+    if( !_propObject )
+    {
+      Loggers::get( )->log( "Entity " + originName +
+        " cannot be aggregated connected to entity " +
+        destName + '.', LOG_LEVEL_WARNING,
+        NEUROSCHEME_FILE_LINE );
+      this->hide( );
+      _parentDock->hide( );
+      return;
+    }
+    relationName = tr( " Editing Aggregated Relationship Parameters: " );
+    _isNew = false;
+  }
+  else
+  {
+    auto& relConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "connectsTo" ]->asOneToN( ));
+    _propObject = relConnectsTo.getRelationProperties(
+      _originEntity->entityGid( ), _destEntity->entityGid( ));
+    if( _propObject )
+    {
       _isNew = false;
     }
     else
     {
+      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+        ->relationshipPropertiesTypes( );
       _propObject = relationshipPropertiesTypes.getRelationshipProperties(
-          "connectsTo" )->create( );
+        "connectsTo" )->create( );
+      _propObject->setProperty("Name","R:" + originName + "-" + destName );
       _isNew = true;
     }
+    relationName = tr( " Editing Relationship Parameters: " );
   }
-  else
-  {
-    _propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" )->create( );
-    _isNew = true;
-  }
+  unsigned int numProp = 0u;
+  _gridLayout->setAlignment( Qt::AlignTop );
+  _gridLayout->setColumnStretch( 1, 1 );
+  _gridLayout->setColumnMinimumWidth( 1, 150 );
+
+
   assert( _propObject );
 
-  auto labelRel = new QLabel( QString( tr( "Relationship Parameters" )));
-  _gridLayout->addWidget( labelRel, 0, 0, 1, 0 );
+  auto labelRel = new QLabel( relationName
+    + QString::fromStdString( originName + " - " + destName ));
+  _gridLayout->addWidget( labelRel, numProp++, 0, 1, 0 );
 
   for( const auto& propPair: _propObject->properties( ))
   {
@@ -103,6 +150,8 @@ namespace nslib
       const auto& categories = caster->categories( );
       TWidgetType widgetType;
       QWidget* widget;
+      bool isEditable = _propObject->hasPropertyFlag(
+        propName, shift::RelationshipProperties::TPropertyFlag::EDITABLE );
       if ( !categories.empty( ))
       {
         widgetType = TWidgetType::COMBO;
@@ -120,7 +169,7 @@ namespace nslib
             break;
         }
         comboBoxWidget->setCurrentIndex( index );
-        comboBoxWidget->setEnabled( true );
+        comboBoxWidget->setEnabled( isEditable );
         connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
           this, SLOT( refreshSubproperties( )));
       }
@@ -129,21 +178,10 @@ namespace nslib
         widgetType = TWidgetType::LINE_EDIT;
         auto lineEditwidget = new QLineEdit;
         widget = lineEditwidget;
-        if( propName == "Name" )
-        {
-          QString connectionName( QString::fromStdString(
-              ( _isNew ? _originEntity->getProperty( "Entity name" )
-              .value< std::string >( ) + "-" + _destEntity->
-              getProperty( "Entity name" ).value<std::string>( )
-              : _propObject->getProperty( "Name" ).value< std::string >( ))));
-          lineEditwidget->setText( connectionName );
-        }
-        else
-        {
-          lineEditwidget->setText( QString::fromStdString(
-              caster->toString( propPair.second )));
-        }
-        lineEditwidget->setEnabled( true );
+        lineEditwidget->setText( QString::fromStdString(
+          caster->toString( propPair.second )));
+
+        lineEditwidget->setEnabled( isEditable );
       }
 
       _gridLayout->addWidget( widget, numProp, 1 );
@@ -166,10 +204,14 @@ namespace nslib
   {
     setWindowTitle( tr( "Create connection relationship" ));
     _validationButton.reset( new QPushButton( QString( tr( "Create" ))));
-    _eraseButton->hide();
+    _eraseButton->hide( );
   }
   else
   {
+    if( _isAggregated )
+    {
+      _eraseButton->hide( );
+    }
     setWindowTitle( tr( "Edit connection relationship" ));
     _validationButton.reset( new QPushButton( QString( tr( "Save" ))));
   }
@@ -183,11 +225,11 @@ namespace nslib
   connect( _eraseButton.get( ), SIGNAL( clicked( )), this,
     SLOT( breakDialog( )));
   connect( _validationButton.get( ), SIGNAL( clicked( )),
-           this, SLOT( validateDialog( )));
+    this, SLOT( validateDialog( )));
   connect( _cancelButton.get( ), SIGNAL( clicked( )), this,
-           SLOT( cancelDialog( )));
+    SLOT( cancelDialog( )));
   connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
-      this, SLOT( toggleAutoClose( )));
+    this, SLOT( toggleAutoClose( )));
 
   setLayout( _gridLayout.get( ) );
 
@@ -232,13 +274,12 @@ namespace nslib
       needToClearCache = needToClearCache ||
         creatorPair.second->relationshipUpdatedOrCreated( _propObject );
     }
-
+    auto& relAggregatedConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+    auto& relAggregatedConnectedBy = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
     if( _isNew )
     {
-      auto& relAggregatedConnectsTo = *( DataManager::entities( )
-          .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-      auto& relAggregatedConnectedBy = *( DataManager::entities( )
-          .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
       shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
         relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
         _destEntity, _propObject, _propObject );
@@ -246,10 +287,18 @@ namespace nslib
         _destEntity->entityGid( ));
       checkClose( );
     }
-    else if ( _autoCloseCheck->isChecked( ))
+    else
     {
-      this->hide( );
-      _parentDock->close( );
+      InteractionManager::refreshEntityConnectionList( );
+      auto originGid = _originEntity->entityGid( );
+      auto destGid = _destEntity->entityGid( );
+      relAggregatedConnectsTo.updateDependentRelations( originGid, destGid );
+      relAggregatedConnectedBy.updateDependentRelations( destGid, originGid );
+      if( _autoCloseCheck->isChecked( ) )
+      {
+        this->hide( );
+        _parentDock->close( );
+      }
     }
 
     // TODO improvement: check if cache needs to be cleared or if just the

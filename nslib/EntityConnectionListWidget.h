@@ -79,6 +79,7 @@ namespace nslib
     ConnectionTableWidget* _aggregatedConnectsToTable;
     ConnectionTableWidget* _aggregatedConnectedByTable;
     std::unique_ptr< QGridLayout > _gridLayout;
+    std::unique_ptr< QLabel > _entityNameLabel;
     std::unique_ptr< QLabel > _autoCloseLabel;
     std::unique_ptr< QCheckBox > _autoCloseCheck;
     std::unique_ptr< QLabel > _allPropertiesLabel;

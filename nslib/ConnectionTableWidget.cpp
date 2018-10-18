@@ -113,7 +113,7 @@ namespace nslib
       {
         auto connectedEntity = DataManager::entities( ).at( iterator->first );
         fires::Property& entityName = connectedEntity->getProperty(
-            "Entity name" );
+          "Entity name" );
         auto connectionProperties = iterator++
           ->second.relationshipAggregatedProperties;
         _tableData.push_back( &entityName );
@@ -421,16 +421,16 @@ namespace nslib
       else
       {
         int buttonWidth = static_cast<int>( 0.5f * rect.width( ));
-        editButtonStyle.rect = QRect( rect.left( ) + buttonWidth, rect.top( ),
-          buttonWidth, rect.height( ));
+        editButtonStyle.rect =QRect( rect.left( ), rect.top( ), buttonWidth,
+          rect.height( ));
 
-        QStyleOptionButton breakButtonStyle;
-        breakButtonStyle.rect = QRect( rect.left( ), rect.top( ), buttonWidth,
-          rect.height( ) );
-        breakButtonStyle.text = "Delete";
-        breakButtonStyle.state = QStyle::State_Enabled;
+        QStyleOptionButton deleteButtonStyle;
+        deleteButtonStyle.rect = QRect( rect.left( ) + buttonWidth, rect.top( ),
+          buttonWidth, rect.height( ));
+        deleteButtonStyle.text = "Delete";
+        deleteButtonStyle.state = QStyle::State_Enabled;
         QApplication::style( )->drawControl( QStyle::CE_PushButton,
-          &breakButtonStyle, painter_ );
+          &deleteButtonStyle, painter_ );
       }
       QApplication::style( )->drawControl( QStyle::CE_PushButton,
         &editButtonStyle, painter_ );
@@ -456,20 +456,36 @@ namespace nslib
         if( clickY > cellY && clickY < cellY + rect.height( )
           && clickX > cellX && clickX < cellX + cellWidth )
         {
-          if(_model->isAggregated( ))
-          {
-            std::cout << "Edit aggregated properties not implemented." << std::endl;
-            return true;
-          }
           int rowIndex = index_.row( );
           auto entity = _model->entity( );
           auto connectedEntity = _model->connectedEntityAt( rowIndex );
-          if( clickX < cellX + static_cast< int >( cellWidth * 0.5f ) )
+          const bool isAggregated = _model->isAggregated( );
+          if( isAggregated || clickX < cellX +
+            static_cast< int >( cellWidth * 0.5f ) )
+          {
+            auto type = isAggregated
+              ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED
+              : ConnectionRelationshipEditWidget::TConnectionType::SIMPLE;
+            if( _model->entityIsOrigin( ))
+            {
+              InteractionManager::createConnectionRelationship( entity,
+                connectedEntity, type );
+            }
+            else
+            {
+              InteractionManager::createConnectionRelationship( connectedEntity,
+                entity, type );
+            }
+            return true;
+          }
+          else
           {
             auto& relAggregatedConnectsTo = *( DataManager::entities( )
-              .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+              .relationships( )[ "aggregatedConnectsTo" ]
+              ->asAggregatedOneToN( ));
             auto& relAggregatedConnectedBy = *( DataManager::entities( )
-              .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+              .relationships( )[ "aggregatedConnectedBy" ]
+              ->asAggregatedOneToN( ));
             if( _model->rowCount( ) == 1 )
             {
              _model->updateData( ( shift::AggregatedOneToNAggregatedDests* )
@@ -480,7 +496,7 @@ namespace nslib
               _model->removeRow( rowIndex );
             }
 
-            if( _model->entityIsOrigin( ) )
+            if( _model->entityIsOrigin( ))
             {
               shift::Relationship::BreakAnAggregatedRelation(
                 relAggregatedConnectsTo, relAggregatedConnectedBy,
@@ -496,20 +512,12 @@ namespace nslib
               InteractionManager::updateConnectionRelationship( connectedEntity,
                 entity );
             }
+            //Recalcs aggregated relations
+            InteractionManager::updateEntityConnectionList( 0, 0, true, true );
             for( auto pane : PaneManager::panes( ))
             {
               pane->resizeEvent( nullptr );
             }
-          }
-          else if( _model->entityIsOrigin( ))
-          {
-            InteractionManager::createConnectionRelationship( entity,
-              connectedEntity );
-          }
-          else
-          {
-            InteractionManager::createConnectionRelationship( connectedEntity,
-              entity );
           }
           _listWidget->checkClose( );
         }

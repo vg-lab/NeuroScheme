@@ -312,17 +312,9 @@ namespace nslib
             {
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle
-              if (( relationProperties->getProperty( "Weight Type" ).
-                value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                    shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
-                relationProperties->getProperty( "Weight" ).value< float >( )
-                    < 0.0f ) ||
-                  ( relationProperties->getProperty( "Weight Type" ).
-                    value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                    shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
-                    relationProperties->getProperty( "Weight Gaussian Mean" ).
-                      value< float >( )
-                    < 0.0f ))
+              if ( relationProperties->getProperty( "Weight mean" ).value< float >( )
+                < 0.0f || relationProperties->getProperty(
+                "Weight Gaussian Mean mean" ).value< float >( ) < 0.0f )
               {
                 relationRep->setProperty(
                   "head", shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
@@ -337,7 +329,7 @@ namespace nslib
                 "width", ( unsigned int ) roundf(
                   nbConnectionsToWidth.map( fabsf(
                     relationProperties->getProperty(
-                      "Weight" ).value< float >( )))));
+                      "Weight mean" ).value< float >( )))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(

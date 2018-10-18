@@ -107,7 +107,9 @@ namespace nslib
 
     Domain::Domain( void )
     {
-      this->_exportRelations = { "isParentOf", "connectsTo" };
+      this->_exportRelations = { "isParentOf", "connectsTo",
+        "aggregatedConnectsTo", "aggregatedConnectedBy" };
+      this->_exportAggregatedRelations = { false, false, true, true };
       this->_domainName = "congen";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
@@ -140,7 +142,8 @@ namespace nslib
       _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
 
       shift::RelationshipProperties* connectsToObj =
-        _relationshipPropertiesTypes->getRelationshipProperties( "connectsTo" );
+        _relationshipPropertiesTypes->
+        getRelationshipProperties( "aggregatedConnectsTo" );
 
       _entities.relationships( )[ "aggregatedConnectsTo" ] =
         new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo",
@@ -173,11 +176,19 @@ namespace nslib
       const boost::property_tree::ptree& relationships,
       std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
     {
-      addIsParentOfRelationshipsToJSON( getRelationsOfType(
-        "isParentOf", relationships), oldGUIToEntity );
+      addIsParentOfRelationshipsFromJSON( getRelationsOfType(
+        "isParentOf", relationships ), oldGUIToEntity );
 
-      addConnectsToRelationsToJSON( getRelationsOfType(
-        "connectsTo", relationships), oldGUIToEntity );
+      addConnectsToRelationsFromJSON( getRelationsOfType(
+        "connectsTo", relationships ), oldGUIToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectedBy", relationships ), "aggregatedConnectedBy",
+        oldGUIToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
+        oldGUIToEntity );
 
     }
 
