@@ -133,6 +133,9 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
            this, SLOT( toggleShowConnectivity( )));
 
+  connect( _ui->actionShowNoHierarchyEntities, SIGNAL( triggered( )),
+           this, SLOT( toggleShowNoHierarchyEntities( )));
+
   connect( _ui->actionSplitHorizontally, SIGNAL( triggered( )),
            this, SLOT( duplicateActivePane( )));
 
@@ -589,8 +592,8 @@ void MainWindow::duplicateActivePane( void )
 
 void MainWindow::home( void )
 {
-    nslib::PaneManager::activePane( )->displayEntities(
-      nslib::DataManager::rootEntities( ), false, true );
+  nslib::PaneManager::activePane( )->displayEntities(
+    nslib::DataManager::rootEntities( ), false, true );
 }
 
 void MainWindow::aboutDialog( void )
@@ -657,6 +660,18 @@ void MainWindow::toggleShowConnectivity( void )
   for ( auto canvas : nslib::PaneManager::panes( ))
   {
     canvas->resizeEvent( nullptr );
+    // canvas->layouts( ).getLayout(
+    //   canvas->activeLayoutIndex( ))->refresh( false );
+  }
+}
+
+void MainWindow::toggleShowNoHierarchyEntities( void )
+{
+  nslib::Config::_showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
+
+  for ( auto canvas : nslib::PaneManager::panes( ))
+  {
+    canvas->displayEntities( canvas->sceneEntities( ), false, false );
     // canvas->layouts( ).getLayout(
     //   canvas->activeLayoutIndex( ))->refresh( false );
   }

@@ -201,8 +201,11 @@ namespace nslib
       } else throw "Unknown Connectivity Model";
     }
 
-    void  XMLExporter::addInput( const QString& name, const QString& frecuency,
-        const QString& population, const QString& site_patterns )
+    void  XMLExporter::addInput( const QString& name,
+      const bool isRandomStim, const QString& delay,
+      const QString& duration, const QString& amplitude,
+      const QString& frecuency, const QString& synaptic_mechanism,
+      const QString& population, const QString& site_patterns )
     {
       if ( nodeImpulses == nullptr )
       {
@@ -212,8 +215,19 @@ namespace nslib
       QDomElement input = addElement( domDoc, *nodeImpulses, "input" );
       input.setAttribute( "name", name );
 
-      QDomElement random_stim = addElement( domDoc, input, "random_stim" );
-      random_stim.setAttribute( "frecuency", frecuency );
+      if( isRandomStim )
+      {
+        QDomElement random_stim = addElement( domDoc, input, "random_stim" );
+        random_stim.setAttribute( "frecuency", frecuency );
+        random_stim.setAttribute( "synaptic_mechanism", synaptic_mechanism );
+      }
+      else
+      {
+        QDomElement pulse_input = addElement( domDoc, input, "pulse_input" );
+        pulse_input.setAttribute( "delay", delay );
+        pulse_input.setAttribute( "duration", duration );
+        pulse_input.setAttribute( "amplitude", amplitude );
+      }
 
       QDomElement target = addElement( domDoc, input, "target" );
       target.setAttribute( "population", population );

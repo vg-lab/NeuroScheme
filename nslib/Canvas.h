@@ -89,14 +89,17 @@ namespace nslib
     std::string name;
 
     void displayEntities( shift::Entities& entities_, bool animate,
-                          bool refreshProperties );
+      bool refreshProperties );
+    void displayEntities( bool animate, bool refreshProperties );
+    void setEntities( shift::Entities& entities_ );
 //    void displayReps( shift::Representations&, bool animate );
     Canvas* clone( void ) const;
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );
-    shift::Entities& entities( void ) { return _entities; }
+    shift::Entities& allEntities( void ) { return _entities; }
+    shift::Entities& sceneEntities( void ) { return _sceneEntities; }
     const TProperties& properties( void ) { return _properties; }
-    void refreshProperties( const shift::Entities& entities_ );
+    void refreshProperties( void );
 
 
 protected:
@@ -107,6 +110,7 @@ protected:
 
     shift::Representations _reps;
     shift::Entities _entities;
+    shift::Entities _sceneEntities;
     TProperties _properties;
 
   public slots:

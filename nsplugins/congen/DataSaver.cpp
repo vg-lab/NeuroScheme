@@ -28,6 +28,7 @@
 #include "NeuronPopItem.h"
 #include "DataSaver.h"
 #include <shift_NeuronPop.h>
+#include <shift_Stimulator.h>
 
 namespace nslib
 {
@@ -56,8 +57,8 @@ namespace nslib
                "Entity name" ).value<std::string>( )),
                QString::fromStdString( caster->toString(
                entity->getProperty( "Neuron model" ))),
-               QString::fromStdString( std::to_string( entity->getProperty(
-               "Nb of neurons" ).value<unsigned int>( ))),
+               QString::number( entity->getProperty(
+               "Nb of neurons" ).value<unsigned int>( )),
                "0", "0", "0", "0", "0", "0" );
            }
         }
@@ -65,7 +66,29 @@ namespace nslib
           relationships( )[ "connectsTo" ]->asOneToN( ));
         saveXmlConnections( relConnectsTo, exporter_ );
 
-        //Add inputs here!
+        caster = fires::PropertyManager
+          ::getPropertyCaster( "Random stim synaptic mechanism" );
+
+        for ( const auto& entity : DataManager::noHierarchyEntities( ).vector( ))
+        {
+          if ( dynamic_cast< shiftgen::Stimulator* >( entity ))
+          {
+            entitiesGids.push_back( entity->entityGid( ));
+            exporter_->addInput( QString::fromStdString( entity->getProperty(
+              "Entity name" ).value<std::string>( )),
+              entity->getProperty( "Stimulator type" )
+              .value< shiftgen::Stimulator::TStimulatorType >( ) ==
+              shiftgen::Stimulator::TStimulatorType::Random_stim,
+              QString::number( entity->getProperty( "Pulse input Delay" ).
+              value<float>( )),QString::number( entity->getProperty(
+              "Pulse input Duration" ). value<float>( )), QString::number(
+              entity->getProperty( "Pulse input Amplitude" ).value<float>( )),
+              QString::number( entity->getProperty( "Random stim Frequency" )
+                .value< unsigned int >( )),QString::fromStdString( caster->toString(
+                entity->getProperty( "Random stim synaptic mechanism" ))),
+              "undefined", "undefined" );
+          }
+        }
 
         entitiesGids.clear( );
         exporter_->exportConGenXML( fileName.toStdString( ));

@@ -35,6 +35,7 @@ namespace nslib
   TYPE Config::_##NAME = VALUE
 
   NSLIB_CONFIG_INIT( bool, showConnectivity, false );
+  NSLIB_CONFIG_INIT( bool, _showNoHierarchyEntities, false );
   NSLIB_CONFIG_INIT( bool, autoPublishSelection, true );
   NSLIB_CONFIG_INIT( bool, autoPublishFocusOnSelection, false );
   NSLIB_CONFIG_INIT( bool, autoPublishFocusOnDisplayed, false );

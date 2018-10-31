@@ -38,8 +38,6 @@
 #include <memory>
 #include <shift/Relationship.h>
 
-//TODO: Add realtion of parent of to entities
-
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
@@ -120,6 +118,12 @@ namespace nslib
 
           _entityParamCont.push_back(
             std::make_tuple( widgetType, label, widget ));
+          if ( !_entity->evalConstraint( shift::Properties::SUBPROPERTY,
+            propName ))
+          {
+            label->hide( );
+            widget->hide( );
+          }
         }
       }
 
@@ -327,11 +331,6 @@ namespace nslib
       if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         nslib::DataManager::entities( ).add( _entity );
-        if ( _addToScene )
-        {
-          nslib::PaneManager::activePane( )->entities( ).add( _entity );
-        }
-
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
 
@@ -347,37 +346,48 @@ namespace nslib
           shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
           nslib::DataManager::entities( ).add( subentity );
-          nslib::PaneManager::activePane( )->entities( ).add( subentity );
+          nslib::PaneManager::activePane( )->allEntities( ).add( subentity );
+          nslib::PaneManager::activePane( )->sceneEntities( ).add( subentity );
         }
 
-        // nslib::PaneManager::activePane( )->refreshProperties(
-        // nslib::PaneManager::activePane( )->entities( ));
-        // nslib::PaneManager::activePane( )->resizeEvent( nullptr );
-        nslib::PaneManager::activePane( )->displayEntities(
-          nslib::PaneManager::activePane( )->entities( ), false, true );
-
-        if ( _parentEntity )
+        if( _entity->isNotHierarchy( ))
         {
-
-          auto& entities = nslib::DataManager::entities( );
-          auto& relParentOf =
-            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-          auto& relChildOf =
-            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
-          auto& relAggregatedConnectsTo = *( entities.relationships( )
-            [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-          auto& relAggregatedConnectedBy = *( entities.relationships( )
-            [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
-
-          shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
-            relAggregatedConnectsTo, relAggregatedConnectedBy,
-            _parentEntity, _entity );
-          nslib::PaneManager::activePane( )->refreshProperties (
-            nslib::PaneManager::activePane( )->entities( ));
+          nslib::DataManager::noHierarchyEntities( ).add( _entity );
+          if( nslib::Config::_showNoHierarchyEntities( ))
+          {
+            for ( auto pane : nslib::PaneManager::panes( ))
+            {
+              pane->allEntities( ).add( _entity );
+            }
+          }
         }
         else
         {
-          nslib::DataManager::rootEntities( ).add( _entity );
+          if ( _addToScene )
+          {
+            nslib::PaneManager::activePane( )->allEntities( ).add( _entity );
+            nslib::PaneManager::activePane( )->sceneEntities( ).add( _entity );
+          }
+          if( _parentEntity )
+          {
+            auto& entities = nslib::DataManager::entities( );
+            auto& relParentOf =
+              *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
+            auto& relChildOf =
+              *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+            auto& relAggregatedConnectsTo = *( entities.relationships( )
+              [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+            auto& relAggregatedConnectedBy = *( entities.relationships( )
+              [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+
+            shift::Relationship::EstablishWithHierarchy( relParentOf,
+              relChildOf, relAggregatedConnectsTo, relAggregatedConnectedBy,
+              _parentEntity, _entity );
+          }
+          else
+          {
+            nslib::DataManager::rootEntities( ).add( _entity );
+          }
         }
       }
       if ( _action == EDIT_ENTITY )
@@ -396,14 +406,12 @@ namespace nslib
           shift::Representation* rep = repPair.first;
           delete rep;
         }
-        for ( auto pane : nslib::PaneManager::panes( ))
-        {
-          pane->reps( ).clear( );
-          // pane->resizeEvent( nullptr );
-          pane->displayEntities(
-            nslib::PaneManager::activePane( )->entities( ), false, true );
-        }
       }
+    }
+    for ( auto pane : nslib::PaneManager::panes( ))
+    {
+      pane->reps( ).clear( );
+      pane->displayEntities( false, true );
     }
   }
 

@@ -2,7 +2,7 @@ include( shift_generate_cxx )
 
 # Generate objects
 set( SHIFT_GENERATED_OBJECTS
-  NeuronPop NeuronSuperPop )
+  NeuronPop NeuronSuperPop Stimulator )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 shift_generate_cxx(

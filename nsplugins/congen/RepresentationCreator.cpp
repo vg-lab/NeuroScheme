@@ -25,7 +25,6 @@
 #include <nslib/DataManager.h>
 #include <nslib/Loggers.h>
 #include "RepresentationCreator.h"
-#include <shift_NeuronPop.h>
 #include <shift_NeuronSuperPop.h>
 #include <shift_ConnectsWith.h>
 #include "NeuronPopRep.h"
@@ -41,7 +40,39 @@ namespace nslib
     RepresentationCreator::RepresentationCreator( void )
       : _maxNeuronsPerPopulation( 1 )
       , _maxAbsoluteWeight( 0.0f )
+      , _superPopColor( "#a8f7ac" )
     {
+      _neuronModelColorMap.setColor(
+        shiftgen::NeuronPop::TNeuronModel::iaf_psc_alpha,
+        scoop::Color( "#5c8daa" ));
+      _neuronModelColorMap.setColor(
+        shiftgen::NeuronPop::TNeuronModel::undefined,
+        scoop::Color( "#e7ba83" ));
+
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::AC_generator,
+        scoop::Color( "#721346" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::DC_generator,
+        scoop::Color( "#af2f3c" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::MIP_generator,
+        scoop::Color( "#af4a1f" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::Noise_generator,
+        scoop::Color( "#b23431" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::Poisson_generator,
+        scoop::Color( "#a12320" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::Spike_generator,
+        scoop::Color( "#a33250" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::Step_current_generator,
+        scoop::Color( "#8e3766" ));
+      _neuronStimulatorModelColorMap.setColor(
+        shiftgen::Stimulator::TStimulatorModel::undefined_generator,
+        scoop::Color( "#a88459" ));
     }
 
     void RepresentationCreator::create(
@@ -57,14 +88,6 @@ namespace nslib
       nslib::Loggers::get( )->log( "create",
         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-      scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
-        neuronModelColorMap;
-      neuronModelColorMap.setColor(
-        shiftgen::NeuronPop::TNeuronModel::iaf_psc_alpha,
-        scoop::Color( "#5c8daa" ));
-      neuronModelColorMap.setColor(
-        shiftgen::NeuronPop::TNeuronModel::undefined,
-        scoop::Color( "#e7ba83" ));
       MapperFloatToFloat
         neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
 
@@ -83,7 +106,6 @@ namespace nslib
         }
         shiftgen::NeuronPop* neuronPopEntity =
           dynamic_cast< shiftgen::NeuronPop* >( entity );
-        shiftgen::NeuronSuperPop* neuronSuperPopEntity;
         NeuronPopRep* neuronRep = nullptr;
 
         if ( neuronPopEntity )
@@ -92,13 +114,13 @@ namespace nslib
           if ( neuronPopEntity->hasProperty( "Neuron model" ))
           {
             neuronRep->setProperty(
-              "color", neuronModelColorMap.getColor(
+              "color", _neuronModelColorMap.getColor(
               neuronPopEntity->getProperty( "Neuron model" ).
               value< shiftgen::NeuronPop::TNeuronModel >( )));
           }
           else
           {
-            neuronRep->setProperty( "color", neuronModelColorMap.getColor(
+            neuronRep->setProperty( "color", _neuronModelColorMap.getColor(
               shiftgen::NeuronPop::TNeuronModel::undefined ) );
           }
           neuronRep->setProperty( "line perc", neuronsToPercentage.map(
@@ -106,28 +128,45 @@ namespace nslib
         }
         else
         {
-          neuronSuperPopEntity =
+          shiftgen::NeuronSuperPop* neuronSuperPopEntity =
             dynamic_cast< shiftgen::NeuronSuperPop* >( entity );
-          if ( neuronSuperPopEntity ){
+          if( neuronSuperPopEntity )
+          {
             neuronRep = new NeuronPopRep( );
-            if ( neuronSuperPopEntity->hasProperty( "Neuron model" ))
-            {
-              neuronRep->setProperty(
-                "color", neuronModelColorMap.getColor(
-                  neuronSuperPopEntity->getProperty( "Neuron model" ).
-                    value< shiftgen::NeuronPop::TNeuronModel >( )));
-            }
-            else
-            {
-              //TODO: neuron superPop color
-              neuronRep->setProperty( "color", neuronModelColorMap.getColor(
-                shiftgen::NeuronPop::TNeuronModel::undefined ) );
-            }
+
+            neuronRep->setProperty( "color", _superPopColor );
+
             neuronRep->setProperty( "line perc", neuronsToPercentage.map(
-              neuronSuperPopEntity->getProperty( "Nb of neurons Mean" ).value< uint >( )));
+              neuronSuperPopEntity->getProperty( "Nb of neurons Mean" )
+              .value<uint>( ) ) );
+          }
+          else
+          {
+            shiftgen::Stimulator* neuronPopInput =
+              dynamic_cast< shiftgen::Stimulator* >( entity );
+            if( neuronPopInput )
+            {
+              neuronRep = new NeuronPopRep( );
+              if( neuronPopInput->hasProperty( "Stimulator model" ))
+              {
+                neuronRep->setProperty(
+                  "color", _neuronStimulatorModelColorMap.getColor(
+                  neuronPopInput->getProperty( "Stimulator model" ).
+                  value<shiftgen::Stimulator::TStimulatorModel >( )));
+              }
+              else
+              {
+                neuronRep->setProperty( "color",
+                  _neuronStimulatorModelColorMap.getColor(
+                  shiftgen::Stimulator::TStimulatorModel::undefined_generator ));
+              }
+              neuronRep->setProperty( "line perc", neuronsToPercentage.map(
+                neuronPopInput->getProperty( "Nb of neurons" )
+                .value<uint>( ) ) );
+            }
           }
         }
-        if ( neuronPopEntity || neuronSuperPopEntity )
+        if ( neuronRep )
         {
           representations.push_back( neuronRep );
           // Link entity and rep
@@ -347,47 +386,62 @@ namespace nslib
 
     bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
     {
-      bool needToClear = false;
-
-      if ( dynamic_cast< shiftgen::NeuronPop* >( entity ))
+      unsigned int newNeuronsPerPopulation = 0;
+      if ( dynamic_cast< shiftgen::NeuronPop* >( entity ) || dynamic_cast< shiftgen::Stimulator* >( entity ))
       {
-        auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
-        auto newNeuronsPerPopulation =
-          entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
-        _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
-          _maxNeuronsPerPopulation );
 
-        needToClear = ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation );
+        newNeuronsPerPopulation =
+          entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
 
       }
-      if ( needToClear )
-        this->clear( );
+      else if ( dynamic_cast< shiftgen::NeuronSuperPop* >( entity ))
+      {
 
-      return needToClear;
+        newNeuronsPerPopulation =
+            entity->getProperty( "Nb of neurons Mean" ).value< unsigned int >( );
+
+      }
+      if ( newNeuronsPerPopulation > _maxNeuronsPerPopulation )
+      {
+        this->clear( );
+        _maxNeuronsPerPopulation = newNeuronsPerPopulation;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
     }
 
     bool RepresentationCreator::relationshipUpdatedOrCreated(
       shift::RelationshipProperties* relProperties )
     {
-      bool needToClear = false;
-
+      float newAbsoluteWeight = 0.0f;
       if ( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
       {
-        auto oldMaxAbsoluteWeight = _maxAbsoluteWeight;
-        auto newAbsoluteWeight = fabsf(
+        newAbsoluteWeight = fabsf(
           ( relProperties->getProperty( "Weight Type" ).
             value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
               shiftgen::ConnectsWith::TFixedOrDistribution::Fixed  ?
             relProperties->getProperty( "Weight" ).value< float >( ) :
             relProperties->getProperty( "Weight Gaussian Mean" ).value< float >( )));
-
-        _maxAbsoluteWeight= std::max( newAbsoluteWeight,
-          _maxAbsoluteWeight );
-
-        needToClear = ( _maxAbsoluteWeight != oldMaxAbsoluteWeight );
       }
-
-      return needToClear;
+      else if ( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
+      {
+        newAbsoluteWeight = std::max( fabsf(
+          relProperties->getProperty( "Weight mean" ).value< float >( )),
+          fabsf( relProperties->getProperty( "Weight Gaussian Mean mean" )
+          .value< float >( )));
+      }
+      if ( newAbsoluteWeight > _maxAbsoluteWeight )
+      {
+        _maxAbsoluteWeight = newAbsoluteWeight;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
     }
 
     void RepresentationCreator::maxAbsoluteWeight(

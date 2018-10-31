@@ -12,13 +12,11 @@
                     "name": "Entity name",
                     "type": "std::string",
                     "flags": [ "UNIQUE", "EDITABLE" ]
-
                 },
                 {
                     "name": "Nb of neurons",
                     "type": "uint",
                     "flags": [ "EDITABLE" ]
-
                 },
                 {
                     "name": "Neuron model",
@@ -82,6 +80,95 @@
             "types": []
         },
         {
+            "name": "Stimulator",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [],
+            "flags" : [ "noHierarchy" ],
+            "properties": [
+                {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
+                {
+                    "name": "Nb of neurons",
+                    "type": "uint",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Stimulator model",
+                    "type": "TStimulatorModel",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                  "name": "Stimulator type",
+                  "type": "TStimulatorType",
+                  "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Pulse input Delay",
+                    "type": "float",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                },
+                {
+                    "name": "Pulse input Duration",
+                    "type": "float",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                },
+                {
+                    "name": "Pulse input Amplitude",
+                    "type": "float",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                },
+                {
+                    "name": "Random stim Frequency",
+                    "type": "uint",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Random stim" } ]
+                },
+                {
+                    "name": "Random stim synaptic mechanism",
+                    "type": "TSynapticMechanism",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Random stim" } ]
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TStimulatorModel",
+                    "values": [
+                        "AC generator",
+                        "DC generator",
+                        "MIP generator",
+                        "Noise generator",
+                        "Poisson generator",
+                        "Spike generator",
+                        "Step current generator",
+                        "undefined generator"
+                    ]
+                },
+              {
+                "class": "enum",
+                "name": "TStimulatorType",
+                "values": [
+                  "Pulse input",
+                  "Random stim"
+                ]
+              },
+              {
+                  "class": "enum",
+                  "name": "TSynapticMechanism",
+                  "values": [
+                    "undefined"
+                  ]
+              }
+            ]
+        },
+        {
             "name": "ConnectsWith",
             "relationship": "connectsTo",
             "namespace": "nslib::congen::shiftgen",
@@ -101,8 +188,7 @@
                     "name": "Random probability",
                     "type": "float",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model",
-                                        "parentValue": "Random" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Connectivity Model", "parentValue": "Random" } ]
                 },
                 {
                     "name": "FanOut Outdegree",
@@ -382,7 +468,8 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "Stimulator" }
             ],
             "flags": [ ],
             "properties": [ ],

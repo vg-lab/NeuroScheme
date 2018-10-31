@@ -298,6 +298,7 @@ namespace nslib
     {
       auto& entities = nslib::DataManager::entities( );
       auto& rootEntities = nslib::DataManager::rootEntities( );
+      nslib::DataManager::noHierarchyEntities( ).clear( );
       fires::PropertyManager::clear( );
       entities.clear( );
       rootEntities.clear( );
