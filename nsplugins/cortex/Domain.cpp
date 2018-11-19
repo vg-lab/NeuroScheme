@@ -87,40 +87,40 @@ namespace nslib
       {
         this->setWindowTitle( "BlueConfig loading options:" );
 
-        _layout.reset( new QGridLayout );
+        _layout = new QGridLayout;
         int row = 0;
 
-        _labelLoadMorpho.reset(
-          new QLabel( tr( "Load morphologies:" )));
-        _checkLoadMorpho.reset( new QCheckBox( ));
+        _labelLoadMorpho =
+          new QLabel( tr( "Load morphologies:" ));
+        _checkLoadMorpho = new QCheckBox( );
         _checkLoadMorpho->setChecked( true );
-        _labelLoadMorpho->setBuddy( _checkLoadMorpho.get( ));
-        _layout->addWidget( _labelLoadMorpho.get( ), row, 0);
-        _layout->addWidget( _checkLoadMorpho.get( ), row, 1);
+        _labelLoadMorpho->setBuddy( _checkLoadMorpho );
+        _layout->addWidget( _labelLoadMorpho, row, 0 );
+        _layout->addWidget( _checkLoadMorpho, row, 1 );
         row++;
 
-        _labelLoadConnectivity.reset(
-          new QLabel( tr( "Load connectivity:" )));
-        _checkLoadConnectivity.reset( new QCheckBox( ));
+        _labelLoadConnectivity =
+          new QLabel( tr( "Load connectivity:" ));
+        _checkLoadConnectivity = new QCheckBox( );
         _checkLoadConnectivity->setChecked( false );
-        _labelLoadConnectivity->setBuddy( _checkLoadConnectivity.get( ));
-        _layout->addWidget( _labelLoadConnectivity.get( ), row, 0);
-        _layout->addWidget( _checkLoadConnectivity.get( ), row, 1);
+        _labelLoadConnectivity->setBuddy( _checkLoadConnectivity );
+        _layout->addWidget( _labelLoadConnectivity, row, 0 );
+        _layout->addWidget( _checkLoadConnectivity, row, 1 );
         row++;
 
-        _labelLoadCSVStats.reset(
-          new QLabel( tr( "Load csv stats file:" )));
-        _checkLoadCSVStats.reset( new QCheckBox( ));
+        _labelLoadCSVStats =
+          new QLabel( tr( "Load csv stats file:" ));
+        _checkLoadCSVStats = new QCheckBox( );
         _checkLoadCSVStats->setChecked( false );
-        _labelLoadCSVStats->setBuddy( _checkLoadCSVStats.get( ));
-        _layout->addWidget( _labelLoadCSVStats.get( ), row, 0);
-        _layout->addWidget( _checkLoadCSVStats.get( ), row, 1);
+        _labelLoadCSVStats->setBuddy( _checkLoadCSVStats );
+        _layout->addWidget( _labelLoadCSVStats, row, 0 );
+        _layout->addWidget( _checkLoadCSVStats, row, 1 );
         row++;
 
-        _okButton.reset( new QPushButton( "Ok" ));
-        _layout->addWidget( _okButton.get( ), row, 1);
-        connect( _okButton.get( ), SIGNAL( clicked( )), this, SLOT( close( )));
-        setLayout( _layout.get( ));
+        _okButton = new QPushButton( "Ok" );
+        _layout->addWidget( _okButton, row, 1);
+        connect( _okButton, SIGNAL( clicked( )), this, SLOT( close( )));
+        setLayout( _layout);
       }
 
       bool loadMorphology( void ) { return _checkLoadMorpho->isChecked( ); }
@@ -131,14 +131,14 @@ namespace nslib
     //   void ok( void ) { this->close( ); }
 
     protected:
-      std::unique_ptr< QLabel > _labelLoadMorpho;
-      std::unique_ptr< QCheckBox > _checkLoadMorpho;
-      std::unique_ptr< QLabel > _labelLoadConnectivity;
-      std::unique_ptr< QCheckBox > _checkLoadConnectivity;
-      std::unique_ptr< QLabel > _labelLoadCSVStats;
-      std::unique_ptr< QCheckBox > _checkLoadCSVStats;
-      std::unique_ptr< QGridLayout > _layout;
-      std::unique_ptr< QPushButton > _okButton;
+      QLabel* _labelLoadMorpho;
+      QCheckBox* _checkLoadMorpho;
+      QLabel* _labelLoadConnectivity;
+      QCheckBox* _checkLoadConnectivity;
+      QLabel* _labelLoadCSVStats;
+      QCheckBox* _checkLoadCSVStats;
+      QGridLayout* _layout;
+      QPushButton* _okButton;
     };
 
     void DomainGUI::loadBlueConfig( void )

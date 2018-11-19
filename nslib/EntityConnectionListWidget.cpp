@@ -43,7 +43,7 @@ namespace nslib
 
   EntityConnectionListWidget::EntityConnectionListWidget(
     QWidget* parentWidget_ )
-    : QFrame ( parentWidget_ )
+    : QWidget ( parentWidget_ )
     , _gridLayout( new QGridLayout( ))
     , _entityNameLabel( new QLabel )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
@@ -52,7 +52,7 @@ namespace nslib
     , _allPropertiesCheck( new QCheckBox( ))
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
   {
-    _gridLayout->addWidget( _entityNameLabel.get( ), 0, 0 );
+    _gridLayout->addWidget( _entityNameLabel, 0, 0 );
     _entityNameLabel->setStyleSheet( "font-weight:bold" );
     auto types = DomainManager::getActiveDomain( )->entitiesTypes( );
     shift::Entity* entityType = std::get< shift::EntitiesTypes::OBJECT >
@@ -74,13 +74,13 @@ namespace nslib
       "Connected to entities:" )), true, false, QString( tr(
       "Entity not connected to." )), propConnectionType,
       entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 1, this );
+      _gridLayout, 1, this );
 
     _connectedByTable = new ConnectionTableWidget( QString( tr(
       "Connected by entities:" )), false, false, QString( tr(
       "Entity not connected by." )), propConnectionType,
       entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 3, this );
+      _gridLayout, 3, this );
 
     propConnectionType = relationshipPropertiesTypes
         .getRelationshipProperties( "aggregatedConnectsTo" );
@@ -88,13 +88,13 @@ namespace nslib
         "Aggregated connected to entities:" )), true, true, QString( tr(
         "Entity not aggregated connected to." )), propConnectionType,
         entityNameCaster, entityNameLabel, entityNameSorter,
-      _gridLayout.get( ), 5, this );
+      _gridLayout, 5, this );
 
     _aggregatedConnectedByTable = new ConnectionTableWidget( QString( tr(
         "Aggregated connected by entities:" )), false, true, QString( tr(
         "Entity not aggregated connected by." )), propConnectionType,
         entityNameCaster, entityNameLabel, entityNameSorter,
-        _gridLayout.get( ), 7, this );
+        _gridLayout, 7, this );
 
     _gridLayout->setAlignment( Qt::AlignTop );
     _gridLayout->setColumnStretch( 1, 1 );
@@ -102,11 +102,11 @@ namespace nslib
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
     _allPropertiesCheck->setChecked( _allPropsChecked );
-    _gridLayout->addWidget( _cancelButton.get( ), 9, 0 );
-    _gridLayout->addWidget( _allPropertiesCheck.get( ), 10, 1 );
-    _gridLayout->addWidget( _allPropertiesLabel.get( ), 10, 0 );
-    _gridLayout->addWidget( _autoCloseCheck.get( ), 11, 1 );
-    _gridLayout->addWidget( _autoCloseLabel.get( ), 11, 0 );
+    _gridLayout->addWidget( _cancelButton, 9, 0 );
+    _gridLayout->addWidget( _allPropertiesCheck, 10, 1 );
+    _gridLayout->addWidget( _allPropertiesLabel, 10, 0 );
+    _gridLayout->addWidget( _autoCloseCheck, 11, 1 );
+    _gridLayout->addWidget( _autoCloseLabel, 11, 0 );
 
     auto sizePolicy = QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Maximum );
     _entityNameLabel->setSizePolicy( sizePolicy );
@@ -116,22 +116,22 @@ namespace nslib
     _autoCloseCheck->setSizePolicy( sizePolicy );
     _autoCloseLabel->setSizePolicy( sizePolicy );
 
-    connect( _cancelButton.get( ), &QPushButton::clicked, this,
+    connect( _cancelButton, &QPushButton::clicked, this,
       [ this ]
       {
         cancelDialog( );
       });
-    connect( _allPropertiesCheck.get( ), &QPushButton::clicked, this,
+    connect( _allPropertiesCheck, &QPushButton::clicked, this,
       [ this ]
       {
         toggleAllProperties( );
       });
-    connect( _autoCloseCheck.get( ), &QPushButton::clicked, this,
+    connect( _autoCloseCheck, &QPushButton::clicked, this,
       [ this ]
       {
         toggleAutoClose( );
       });
-    setLayout( _gridLayout.get() );
+    setLayout( _gridLayout );
     _parentDock->setWidget( this );
     _parentDock->show( );
     this->show( );

@@ -49,7 +49,7 @@ namespace nslib
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity_, TEntityEditWidgetAction action_,
     shift::Entity* parentEntity_, bool addToScene_, QWidget *parentWidget_)
-    : QFrame( parentWidget_ )
+    : QWidget( parentWidget_ )
     , _entity( entity_ )
     , _parentEntity( parentEntity_ )
     , _addToScene( addToScene_ )
@@ -130,8 +130,8 @@ namespace nslib
         sep3->setFrameShape( QFrame::HLine );
         sep4->setFrameShape( QFrame::HLine );
 
-        gridLayout->addWidget( sep3,element,0 );
-        gridLayout->addWidget( sep4,element,1 );
+        gridLayout->addWidget( sep3,element, 0 );
+        gridLayout->addWidget( sep4,element, 1 );
         ++element;
 
         widgetType = TWidgetType::LINE_EDIT;
@@ -139,8 +139,7 @@ namespace nslib
           QString::fromStdString( "Number of entities" ));
         gridLayout->addWidget( label, element, 0 );
 
-        _numNewEntities.reset( new QLineEdit );
-        widget = _numNewEntities.get( );
+        widget = _numNewEntities = new QLineEdit;
         _numNewEntities->setText( "1" );
 
         _numNewEntities->setEnabled( true );
@@ -161,18 +160,18 @@ namespace nslib
     gridLayout->addWidget( autoCloseLabel, ++element, 0 );
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
-    connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
+    connect( _autoCloseCheck, SIGNAL( clicked( )),
              this, SLOT( toggleAutoClose( )));
-    gridLayout->addWidget( _autoCloseCheck.get( ), element, 1 );
+    gridLayout->addWidget( _autoCloseCheck, element, 1 );
 
     auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
     gridLayout->addWidget( checkUniquenessLabel, ++element, 0 );
 
     //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
     _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
-    connect( _checkUniquenessCheck.get( ), SIGNAL( clicked( )),
+    connect( _checkUniquenessCheck, SIGNAL( clicked( )),
              this, SLOT( toggleCheckUniqueness( )));
-    gridLayout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
+    gridLayout->addWidget( _checkUniquenessCheck, element, 1 );
 
     connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( validationButton, SIGNAL( clicked( )),
@@ -193,7 +192,7 @@ namespace nslib
 
     if ( _action == DUPLICATE_ENTITY || _isNew )
     {
-      numEles = _numNewEntities->text( ).toInt( );
+      numEles = _numNewEntities->text( ).toUInt( );
     }
 
     for ( unsigned int i = 0; i < numEles; ++i )

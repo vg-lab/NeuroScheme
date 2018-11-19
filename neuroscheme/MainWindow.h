@@ -94,10 +94,10 @@ protected:
 
   QString _tableColumnToString( TTableColumns column );
   StoredSelections _storedSelections;
-  QDockWidget* _layoutsDock;
-  QDockWidget* _entityEditDock;
-  QDockWidget* _connectionEditDock;
-  QDockWidget* _connectionListDock;
+  QDockWidget* _layoutsDock = nullptr;
+  QDockWidget* _entityEditDock = nullptr;
+  QDockWidget* _connectionEditDock = nullptr;
+  QDockWidget* _connectionListDock = nullptr;
   QString _lastOpenedFileName;
 
 private:

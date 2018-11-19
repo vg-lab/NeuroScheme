@@ -128,9 +128,9 @@ namespace nslib
     const QString _emptyString;
     std::vector< fires::Property* > _tableData;
     std::vector< shift::Entity* > _entitiesData;
-    std::vector <QString> _headerData;
-    std::vector<fires::PropertyCaster*> _propertiesCaster;
-    std::vector<fires::PropertySorter*> _propertiesSorter;
+    std::vector < QString > _headerData;
+    std::vector< fires::PropertyCaster* > _propertiesCaster;
+    std::vector< fires::PropertySorter* > _propertiesSorter;
   };
 
   class ConnectionsTableDelegate : public QItemDelegate

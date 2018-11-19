@@ -35,7 +35,7 @@
 
 namespace nslib
 {
-  class NSLIB_API EntityEditWidget : public QFrame
+  class NSLIB_API EntityEditWidget : public QWidget
   {
     Q_OBJECT
 
@@ -46,7 +46,7 @@ namespace nslib
 
     EntityEditWidget( shift::Entity* entity_, TEntityEditWidgetAction action_,
       shift::Entity* parentEntity_= nullptr,
-      bool addToScene_ = true, QWidget *parentWidget_ = nullptr );
+      bool addToScene_ = true, QWidget* parentWidget_ = nullptr );
     shift::Entity* entity( );
 
     ~EntityEditWidget( void );
@@ -70,12 +70,12 @@ namespace nslib
     bool _addToScene;
     TEntityEditWidgetAction _action;
 
-    std::unique_ptr< QLineEdit > _numNewEntities;
+    QLineEdit* _numNewEntities;
 
     bool _isNew;
 
-    std::unique_ptr< QCheckBox > _autoCloseCheck;
-    std::unique_ptr< QCheckBox > _checkUniquenessCheck;
+    QCheckBox* _autoCloseCheck;
+    QCheckBox* _checkUniquenessCheck;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

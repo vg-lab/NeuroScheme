@@ -953,6 +953,7 @@ namespace nslib
     if ( _entityEditWidget )
     {
       delete _entityEditWidget;
+      _entityEditWidget = nullptr;
     }
     _entityEditWidget = new EntityEditWidget( entity_,
       action_, parentEntity_, addToScene_, parentWidget_ );

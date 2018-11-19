@@ -43,7 +43,7 @@ namespace nslib
     shift::Entity* originEntity_, shift::Entity* destinationEntity_,
     TConnectionType connectionType_,
     QWidget* parentWidget_ )
-    : QFrame ( parentWidget_ )
+    : QWidget ( parentWidget_ )
     , _originEntity( originEntity_ )
     , _destEntity( destinationEntity_ )
     , _isAggregated( true )
@@ -82,7 +82,7 @@ namespace nslib
   }
   auto originName = _originEntity->getProperty( "Entity name" )
     .value<std::string>( );
-  auto destName = _originEntity->getProperty( "Entity name" )
+  auto destName = _destEntity->getProperty( "Entity name" )
     .value<std::string>( );
   QString relationName;
   if( _isAggregated )
@@ -198,12 +198,12 @@ namespace nslib
   }
 
 
-  _gridLayout->addWidget( _cancelButton.get( ), numProp, 0 );
+  _gridLayout->addWidget( _cancelButton, numProp, 0 );
 
   if ( _isNew )
   {
     setWindowTitle( tr( "Create connection relationship" ));
-    _validationButton.reset( new QPushButton( QString( tr( "Create" ))));
+    _validationButton = new QPushButton( QString( tr( "Create" )));
     _eraseButton->hide( );
   }
   else
@@ -213,25 +213,25 @@ namespace nslib
       _eraseButton->hide( );
     }
     setWindowTitle( tr( "Edit connection relationship" ));
-    _validationButton.reset( new QPushButton( QString( tr( "Save" ))));
+    _validationButton = new QPushButton( QString( tr( "Save" )));
   }
-  _gridLayout->addWidget( _validationButton.get( ), numProp, 1 );
-  _gridLayout->addWidget( _eraseButton.get( ), ++numProp, 0, 1, 2);
-  _gridLayout->addWidget( _autoCloseLabel.get( ), ++numProp, 0 );
+  _gridLayout->addWidget( _validationButton, numProp, 1 );
+  _gridLayout->addWidget( _eraseButton, ++numProp, 0, 1, 2);
+  _gridLayout->addWidget( _autoCloseLabel, ++numProp, 0 );
 
   _autoCloseCheck->setChecked( _autoCloseChecked );
-  _gridLayout->addWidget( _autoCloseCheck.get( ), numProp, 1 );
+  _gridLayout->addWidget( _autoCloseCheck, numProp, 1 );
 
-  connect( _eraseButton.get( ), SIGNAL( clicked( )), this,
+  connect( _eraseButton, SIGNAL( clicked( )), this,
     SLOT( breakDialog( )));
-  connect( _validationButton.get( ), SIGNAL( clicked( )),
+  connect( _validationButton, SIGNAL( clicked( )),
     this, SLOT( validateDialog( )));
-  connect( _cancelButton.get( ), SIGNAL( clicked( )), this,
+  connect( _cancelButton, SIGNAL( clicked( )), this,
     SLOT( cancelDialog( )));
-  connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
+  connect( _autoCloseCheck, SIGNAL( clicked( )),
     this, SLOT( toggleAutoClose( )));
 
-  setLayout( _gridLayout.get( ) );
+  setLayout( _gridLayout );
 
   _parentDock->setWidget( this );
   _parentDock->show( );

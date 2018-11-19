@@ -2,7 +2,7 @@
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
  * Authors: Juan Jose Garcia Cantero <juanjose.garcia@urjc.es>
-*           Iago Calvo Lista <i.calvol@alumnos.urjc.es>
+ *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -38,7 +38,7 @@
 namespace nslib
 {
   class NSLIB_API ConnectionRelationshipEditWidget:
-    public QFrame
+    public QWidget
   {
     Q_OBJECT
 
@@ -73,12 +73,12 @@ namespace nslib
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
     bool _isNew;
-    std::unique_ptr< QLabel > _autoCloseLabel;
-    std::unique_ptr< QCheckBox > _autoCloseCheck;
-    std::unique_ptr< QPushButton > _validationButton;
-    std::unique_ptr< QPushButton > _eraseButton;
-    std::unique_ptr< QPushButton > _cancelButton;
-    std::unique_ptr< QGridLayout > _gridLayout;
+    QLabel* _autoCloseLabel;
+    QCheckBox* _autoCloseCheck;
+    QPushButton* _validationButton;
+    QPushButton* _eraseButton;
+    QPushButton* _cancelButton;
+    QGridLayout* _gridLayout;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
