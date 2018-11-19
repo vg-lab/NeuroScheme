@@ -97,12 +97,18 @@ namespace nslib
             for ( const auto& category : categories )
             {
               if ( category != currentCategory )
+              {
                 ++index;
+              }
               else
+              {
                 break;
+              }
             }
             comboBoxWidget->setCurrentIndex( index );
             comboBoxWidget->setEnabled( isEditable );
+            connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
+              this, SLOT( refreshSubproperties( )));
           }
           else
           {
@@ -216,7 +222,7 @@ namespace nslib
         const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
         const auto& label = labelWidget->text( ).toStdString( );
 
-        bool isEditable = origEntity->hasPropertyFlag(
+        const bool isEditable = origEntity->hasPropertyFlag(
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
         if ( ( _action == EDIT_ENTITY ) && !isEditable )
@@ -229,12 +235,12 @@ namespace nslib
         QString paramString;
         if ( editType == TWidgetType::COMBO )
         {
-          auto comboWidget = dynamic_cast< QComboBox* >( widget );
+          const auto comboWidget = dynamic_cast< QComboBox* >( widget );
           paramString = comboWidget->currentText( );
         }
         else if ( editType == TWidgetType::LINE_EDIT )
         {
-          auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
+          const auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
           paramString = lineEditwidget->text( );
           //change name if multiple are created silmultaneus
           if ( numEles > 1 && label == "Entity name" )
@@ -243,9 +249,11 @@ namespace nslib
           }
         }
         else
+        {
           assert( false );
+        }
 
-        auto caster = fires::PropertyManager::getPropertyCaster( label );
+        const auto caster = fires::PropertyManager::getPropertyCaster( label );
         if ( !_entity->hasProperty( label ))
         {
           // WAR: This is to force create/copy properties not defined in the
@@ -260,7 +268,7 @@ namespace nslib
 
         if ( _checkUniquenessCheck->isChecked( ))
         {
-          bool isUnique = _entity->hasPropertyFlag(
+          const bool isUnique = _entity->hasPropertyFlag(
             label, shift::Entity::TPropertyFlag::UNIQUE );
           if ( isUnique )
           {
@@ -415,6 +423,60 @@ namespace nslib
     }
   }
 
+  void EntityEditWidget::refreshSubproperties( void )
+  {
+    //todo: same code as in connectionRelationshipEditWidget
+    // First set all values via caster
+    for ( const auto& propParam: _entityParamCont )
+    {
+      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
+      const auto& label = labelWidget->text( ).toStdString( );
+
+      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
+      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
+      QString paramString;
+      if ( editType ==  TWidgetType::COMBO )
+      {
+        const auto comboWidget = dynamic_cast< QComboBox* >( widget );
+        paramString = comboWidget->currentText( );
+      }
+      else if ( editType == TWidgetType::LINE_EDIT )
+      {
+        const auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
+        paramString = lineEditwidget->text( );
+      }
+      else
+      {
+        assert( false );
+      }
+
+      const auto caster = fires::PropertyManager::getPropertyCaster( label );
+      auto& prop = _entity->getProperty( label );
+      assert ( caster );
+
+      caster->fromString( prop, paramString.toStdString( ));
+    }
+
+    // Now hide/show widgets depending on the values set before
+    for ( const auto& propParam: _entityParamCont )
+    {
+      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
+      const auto& label = labelWidget->text( ).toStdString( );
+      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
+
+      if( !_entity->evalConstraint(
+          shift::Properties::SUBPROPERTY, label ))
+      {
+        labelWidget->hide( );
+        widget->hide( );
+      }
+      else
+      {
+        labelWidget->show( );
+        widget->show( );
+      }
+    }
+  }
 
   void EntityEditWidget::cancelDialog( void )
   {

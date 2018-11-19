@@ -86,7 +86,7 @@ namespace nslib
               QString::number( entity->getProperty( "Random stim Frequency" )
                 .value< unsigned int >( )),QString::fromStdString( caster->toString(
                 entity->getProperty( "Random stim synaptic mechanism" ))),
-              "undefined", "undefined" );
+              "undefined", "percentage_cells percentage=\"50\"" );
           }
         }
 

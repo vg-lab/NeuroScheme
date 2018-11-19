@@ -60,6 +60,10 @@ namespace nslib
         const std::unordered_map< std::string, unsigned int >& popNameToGid,
         float& maxAbsoluteWeight );
 
+      static void _loadInput(
+          QXmlStreamReader& xml,
+          std::unordered_map< std::string, unsigned int >& popNameToGid );
+
     };
   }
 }

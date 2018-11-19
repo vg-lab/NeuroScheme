@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *          Iago Calvo <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -19,34 +20,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__NEURON_REP__
-#define __NSLIB__NEURON_REP__
+#include "NeuronSuperPopRep.h"
+#include "NeuronSuperPopItem.h"
+#include <nslib/Color.h>
+#include <stdint.h>
 
-#include <nslib/reps/QGraphicsItemRepresentation.h>
-#include <shift/shift.h>
-#include <shift_NeuronPopRep.h>
 
 namespace nslib
 {
   namespace congen
   {
-    class NeuronPopRep
-      : public shiftgen::NeuronPopRep
-      , public QGraphicsItemRepresentation
+
+    NeuronSuperPopRep::NeuronSuperPopRep( void )
+      : shiftgen::NeuronSuperPopRep( )
     {
-    public:
+    }
 
-      NeuronPopRep( void );
-      NeuronPopRep( const NeuronPopRep& );
-      NeuronPopRep( const shiftgen::NeuronPopRep& );
-      virtual ~NeuronPopRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-        bool create = true );
+    NeuronSuperPopRep::NeuronSuperPopRep( const NeuronSuperPopRep& other )
+      : shiftgen::NeuronSuperPopRep( other )
+    {
+    }
 
-    };
+    NeuronSuperPopRep::NeuronSuperPopRep(
+      const shiftgen::NeuronSuperPopRep& other )
+      : shiftgen::NeuronSuperPopRep( other )
+    {
+    }
 
+
+    QGraphicsItem* NeuronSuperPopRep::item( QGraphicsScene* scene, bool create )
+    {
+      if ( create && ( _items.find( scene ) == _items.end( )) &&
+           !_items[ scene ] )
+      {
+        _items[ scene ] = new NeuronSuperPopItem( *this );
+      }
+      return _items.at( scene );
+    }
 
   } // namespace congen
 } // namespace nslib
-
-#endif

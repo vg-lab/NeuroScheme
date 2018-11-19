@@ -143,21 +143,22 @@ namespace nslib
     auto caster = fires::PropertyManager::getPropertyCaster( prop );
     if ( caster )
     {
-      auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-      auto label = new QLabel( QString::fromStdString( propName ));
+      const auto propName =
+        fires::PropertyGIDsManager::getPropertyLabel( prop );
+      const auto label = new QLabel( QString::fromStdString( propName ));
       _gridLayout->addWidget( label, numProp, 0 );
 
       const auto& categories = caster->categories( );
       TWidgetType widgetType;
       QWidget* widget;
-      bool isEditable = _propObject->hasPropertyFlag(
+      const bool isEditable = _propObject->hasPropertyFlag(
         propName, shift::RelationshipProperties::TPropertyFlag::EDITABLE );
       if ( !categories.empty( ))
       {
         widgetType = TWidgetType::COMBO;
         auto comboBoxWidget = new QComboBox;
         widget = comboBoxWidget;
-        auto currentCategory = caster->toString( propPair.second );
+        const auto currentCategory = caster->toString( propPair.second );
         unsigned int index = 0;
         for ( const auto& category : categories )
           comboBoxWidget->addItem( QString::fromStdString( category ));
@@ -240,33 +241,7 @@ namespace nslib
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = _propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
+    refreshValues( );
 
     bool needToClearCache = false;
     for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
@@ -290,8 +265,8 @@ namespace nslib
     else
     {
       InteractionManager::refreshEntityConnectionList( );
-      auto originGid = _originEntity->entityGid( );
-      auto destGid = _destEntity->entityGid( );
+      const auto originGid = _originEntity->entityGid( );
+      const auto destGid = _destEntity->entityGid( );
       relAggregatedConnectsTo.updateDependentRelations( originGid, destGid );
       relAggregatedConnectedBy.updateDependentRelations( destGid, originGid );
       if( _autoCloseCheck->isChecked( ) )
@@ -310,6 +285,39 @@ namespace nslib
     for ( auto pane : PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
+    }
+  }
+
+  void ConnectionRelationshipEditWidget::refreshValues( )
+  {
+    for ( const auto& propParam: _propParamCont )
+    {
+      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
+      const auto& label = labelWidget->text( ).toStdString( );
+
+      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
+      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
+      QString paramString;
+      if ( editType ==  TWidgetType::COMBO )
+      {
+        const auto comboWidget = dynamic_cast< QComboBox* >( widget );
+        paramString = comboWidget->currentText( );
+      }
+      else if ( editType == TWidgetType::LINE_EDIT )
+      {
+        const auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
+        paramString = lineEditwidget->text( );
+      }
+      else
+      {
+        assert( false );
+      }
+
+      const auto caster = fires::PropertyManager::getPropertyCaster( label );
+      auto& prop = _propObject->getProperty( label );
+      assert ( caster );
+
+      caster->fromString( prop, paramString.toStdString( ));
     }
   }
 
@@ -364,34 +372,7 @@ namespace nslib
   void ConnectionRelationshipEditWidget::refreshSubproperties( void )
   {
     // First set all values via caster
-    // TODO this code is the same as in validate
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = _propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
+    refreshValues( );
 
     // Now hide/show widgets depending on the values set before
     for ( const auto& propParam: _propParamCont )
@@ -400,7 +381,7 @@ namespace nslib
       const auto& label = labelWidget->text( ).toStdString( );
       const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
 
-      if ( !_propObject->evalConstraint(
+      if( !_propObject->evalConstraint(
         shift::Properties::SUBPROPERTY, label ))
       {
         labelWidget->hide( );

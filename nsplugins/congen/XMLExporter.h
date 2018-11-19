@@ -63,7 +63,7 @@ namespace nslib
           void addInput( const QString& name,
             const bool isRandomStim,
             const QString& delay,const QString& duration,
-            const QString& amplitude, const QString& frecuency,
+            const QString& amplitude, const QString& frequency,
             const QString& synaptic_mechanism, const QString& population,
             const QString& site_patternss );
 

@@ -163,6 +163,7 @@
                   "class": "enum",
                   "name": "TSynapticMechanism",
                   "values": [
+                    "DoubExpSynA",
                     "undefined"
                   ]
               }
@@ -469,7 +470,7 @@
             "constraints":
             [
                 { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
-                { "srcEntity": "NeuronPop", "dstEntity": "Stimulator" }
+                { "srcEntity": "Stimulator", "dstEntity": "NeuronPop" }
             ],
             "flags": [ ],
             "properties": [ ],
@@ -489,7 +490,8 @@
             "includes" : [ ],
             "constraints":
             [
-                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" }
+                { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "Stimulator" }
             ],
             "flags": [ ],
             "properties": [ ],

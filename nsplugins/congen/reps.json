@@ -20,6 +20,40 @@
             "types": [ ]
         },
         {
+            "name": "NeuronSuperPopRep",
+            "includes" : [ "<nslib/Color.h>" ],
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "color",
+                    "type": "Color"
+                },
+                {
+                    "name": "line perc",
+                    "type": "float"
+                }
+
+            ],
+            "types": [ ]
+        },
+        {
+            "name": "StimulatorRep",
+            "includes" : [ "<nslib/Color.h>" ],
+            "namespace": "nslib::congen::shiftgen",
+            "properties": [
+                {
+                    "name": "color",
+                    "type": "Color"
+                },
+                {
+                    "name": "line perc",
+                    "type": "float"
+                }
+
+            ],
+            "types": [ ]
+        },
+        {
             "name": "ConnectionArrowRep",
             "namespace": "nslib::congen::shiftgen",
             "properties": [

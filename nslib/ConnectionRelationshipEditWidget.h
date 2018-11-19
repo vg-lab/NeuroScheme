@@ -84,6 +84,7 @@ namespace nslib
     static bool _autoCloseChecked;
 
     void checkClose( );
+    void refreshValues( );
   };
 }
 #endif

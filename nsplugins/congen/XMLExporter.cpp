@@ -204,13 +204,14 @@ namespace nslib
     void  XMLExporter::addInput( const QString& name,
       const bool isRandomStim, const QString& delay,
       const QString& duration, const QString& amplitude,
-      const QString& frecuency, const QString& synaptic_mechanism,
-      const QString& population, const QString& site_patterns )
+      const QString& frequency, const QString& synaptic_mechanism,
+      const QString& population, const QString& /*site_patterns*/ )
     {
       if ( nodeImpulses == nullptr )
       {
         nodeImpulses = new QDomElement( );
         *nodeImpulses = addElement( domDoc, nodeRoot , "inputs" );
+        nodeImpulses->setAttribute( "units", "SI Units" );
       }
       QDomElement input = addElement( domDoc, *nodeImpulses, "input" );
       input.setAttribute( "name", name );
@@ -218,7 +219,7 @@ namespace nslib
       if( isRandomStim )
       {
         QDomElement random_stim = addElement( domDoc, input, "random_stim" );
-        random_stim.setAttribute( "frecuency", frecuency );
+        random_stim.setAttribute( "frequency", frequency );
         random_stim.setAttribute( "synaptic_mechanism", synaptic_mechanism );
       }
       else
@@ -232,8 +233,10 @@ namespace nslib
       QDomElement target = addElement( domDoc, input, "target" );
       target.setAttribute( "population", population );
 
-      QDomElement site_pattern_ = addElement( domDoc, target, "site_pattern" );
-      QDomElement site_pattern_type = addElement( domDoc, site_pattern_, site_patterns);
+      QDomElement sites = addElement( domDoc, target, "sites" );
+      sites.setAttribute( "size", "1" );
+      QDomElement site = addElement( domDoc, sites, "site");
+      site.setAttribute( "cell_id", "0" );
     }
 
     void XMLExporter::loadConGenXML( const QString& pFilePath )

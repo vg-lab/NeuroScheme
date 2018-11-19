@@ -91,11 +91,10 @@ namespace nslib
               maxNeuronsPerPopulation = popSize;
             }
           }
-
+          xml.skipCurrentElement( ); // random_arrangement
         }
         xml.skipCurrentElement( ); // pop_location
       }
-      xml.skipCurrentElement( ); // random_arrangement
       xml.skipCurrentElement( ); // population
 
       NeuronPop::TNeuronModel neuronModel =
@@ -294,6 +293,80 @@ namespace nslib
 
     }
 
+    void DataLoader::_loadInput(
+        QXmlStreamReader& xml,
+        std::unordered_map< std::string, unsigned int >& popNameToGid )
+    {
+      auto attributes = xml.attributes( );
+      std::string popName;
+      unsigned int popSize = 0u;
+      shiftgen::Stimulator::TStimulatorModel model =
+        shiftgen::Stimulator::TStimulatorModel::undefined_generator;
+      shiftgen::Stimulator::TStimulatorType type =
+        shiftgen::Stimulator::TStimulatorType::Pulse_input;
+      float delay = 0.0f;
+      float duration = 0.0f;
+      float amplitude = 0.0f;
+      unsigned int frequency = 0u;
+      shiftgen::Stimulator::TSynapticMechanism synaptic_mechanism =
+        shiftgen::Stimulator::TSynapticMechanism::undefined;
+
+      if( attributes.hasAttribute( "name" ))
+      {
+        popName = attributes.value( "name" ).toString( ).toStdString( );
+      }
+
+      xml.readNextStartElement( );
+      if ( xml.name( ) == "pulse_input" )
+      {
+        attributes = xml.attributes( );
+        if( attributes.hasAttribute( "delay" ))
+        {
+          delay = attributes.value( "delay" ).toFloat( );
+        }
+        if( attributes.hasAttribute( "duration" ))
+        {
+          duration = attributes.value( "duration" ).toFloat( );
+        }
+        if( attributes.hasAttribute( "amplitude" ))
+        {
+          amplitude = attributes.value( "amplitude" ).toFloat( );
+        }
+        xml.skipCurrentElement( ); //pulse_input
+      }
+      else if ( xml.name( ) == "random_stim" )
+      {
+        type =
+            shiftgen::Stimulator::TStimulatorType::Random_stim;
+        attributes = xml.attributes( );
+        if( attributes.hasAttribute( "frequency" ))
+        {
+          frequency = attributes.value( "frequency" ).toUInt( );
+        }
+        if( attributes.hasAttribute( "synaptic_mechanism" ))
+        {
+          std::string synapticMechanism = attributes
+              .value( "synaptic_mechanism" ).toString( ).toStdString( );
+          if( synapticMechanism == "DoubExpSynA" ){
+            synaptic_mechanism =
+              shiftgen::Stimulator::TSynapticMechanism::DoubExpSynA;
+          }
+        }
+        xml.skipCurrentElement( ); // random_stim
+      }
+      xml.skipCurrentElement( ); // input
+
+      shift::Entity* stimulator =
+        new shiftgen::Stimulator( popName, popSize, model, type, delay,
+        duration, amplitude, frequency, synaptic_mechanism );
+      popNameToGid[ popName ] = stimulator->entityGid( );
+
+      auto& entities = nslib::DataManager::entities( );
+      auto& noHierarchyEntities = nslib::DataManager::noHierarchyEntities( );
+      entities.add( stimulator );
+      noHierarchyEntities.add( stimulator );
+    }
+
     bool DataLoader::loadNeuroML( const std::string& fileName )
     {
       auto& entities = nslib::DataManager::entities( );
@@ -342,9 +415,17 @@ namespace nslib
           continue;
 
         if ( xml.name( ) == "population" )
+        {
           _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
+        }
         else if ( xml.name( ) == "projection" )
+        {
           _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
+        }
+        else if ( xml.name( ) == "input" )
+        {
+          _loadInput( xml, popNameToGid );
+        }
       }
 
       // Sets new maximum and minimum in the RepresentationCreator

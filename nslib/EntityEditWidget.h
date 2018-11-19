@@ -60,6 +60,7 @@ namespace nslib
     void cancelDialog( void );
     void toggleAutoClose( void );
     void toggleCheckUniqueness( void );
+    void refreshSubproperties( void );
 
   private:
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
