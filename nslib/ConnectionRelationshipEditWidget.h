@@ -38,7 +38,7 @@
 namespace nslib
 {
   class NSLIB_API ConnectionRelationshipEditWidget:
-    public QFrame
+    public QWidget
   {
     Q_OBJECT
 

@@ -377,7 +377,7 @@ void MainWindow::selectDomain( void )
   {
     domain->createGUI( this, _ui->menubar );
 
-    auto fileJSON = nslib::Config::isArgumentDefined( { "--JSONFile" } );
+    auto fileJSON = nslib::Config::isArgumentDefined( { "--json" } );
     if ( !fileJSON.empty( ))
     {
     auto filePath = nslib::Config::inputArgs( )[ fileJSON ][0] ;

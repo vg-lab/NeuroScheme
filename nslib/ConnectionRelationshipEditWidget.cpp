@@ -43,7 +43,7 @@ namespace nslib
     shift::Entity* originEntity_, shift::Entity* destinationEntity_,
     TConnectionType connectionType_,
     QWidget* parentWidget_ )
-    : QFrame ( parentWidget_ )
+    : QWidget ( parentWidget_ )
     , _originEntity( originEntity_ )
     , _destEntity( destinationEntity_ )
     , _isAggregated( true )
@@ -82,7 +82,7 @@ namespace nslib
   }
   auto originName = _originEntity->getProperty( "Entity name" )
     .value<std::string>( );
-  auto destName = _originEntity->getProperty( "Entity name" )
+  auto destName = _destEntity->getProperty( "Entity name" )
     .value<std::string>( );
   QString relationName;
   if( _isAggregated )

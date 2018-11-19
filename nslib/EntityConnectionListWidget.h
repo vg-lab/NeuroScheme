@@ -43,7 +43,7 @@ namespace nslib
   class ConnectionTableWidget;
 
   class NSLIB_API EntityConnectionListWidget:
-    public QFrame
+    public QWidget
   {
     Q_OBJECT
 

@@ -49,7 +49,7 @@ namespace nslib
   EntityEditWidget::EntityEditWidget(
     shift::Entity* entity_, TEntityEditWidgetAction action_,
     shift::Entity* parentEntity_, bool addToScene_, QWidget *parentWidget_)
-    : QFrame( parentWidget_ )
+    : QWidget( parentWidget_ )
     , _entity( entity_ )
     , _parentEntity( parentEntity_ )
     , _addToScene( addToScene_ )

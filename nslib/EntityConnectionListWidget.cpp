@@ -43,7 +43,7 @@ namespace nslib
 
   EntityConnectionListWidget::EntityConnectionListWidget(
     QWidget* parentWidget_ )
-    : QFrame ( parentWidget_ )
+    : QWidget ( parentWidget_ )
     , _gridLayout( new QGridLayout( ))
     , _entityNameLabel( new QLabel )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))

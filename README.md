@@ -77,12 +77,16 @@ try to visualize a very simple scene by running:
 
 Congen domain allows importing and exporting data to NeuroML.
 
+```bash
+./bin/NeuroScheme -d congen -x /path/to/neuroML.xml
+```
+
 #### All domains
 
 All domains have an importer and exporter to our custom JSON format.
 
 ```bash
-./bin/NeuroScheme -d domain --JSONFile /path/to/file.json
+./bin/NeuroScheme -d domain --json /path/to/file.json
 ```
 
 ### Interacting with data

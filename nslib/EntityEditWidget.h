@@ -35,7 +35,7 @@
 
 namespace nslib
 {
-  class NSLIB_API EntityEditWidget : public QFrame
+  class NSLIB_API EntityEditWidget : public QWidget
   {
     Q_OBJECT
 
