@@ -205,7 +205,7 @@ namespace nslib
       const bool isRandomStim, const QString& delay,
       const QString& duration, const QString& amplitude,
       const QString& frequency, const QString& synaptic_mechanism,
-      const QString& population, const QString& /*site_patterns*/ )
+      const shift::Entities& connectedEntities )
     {
       if ( nodeImpulses == nullptr )
       {
@@ -229,14 +229,29 @@ namespace nslib
         pulse_input.setAttribute( "duration", duration );
         pulse_input.setAttribute( "amplitude", amplitude );
       }
+      if( connectedEntities.empty( ))
+      {
+        QDomElement target = addElement( domDoc, input, "target" );
+        target.setAttribute( "population", "UNDEFINED" );
 
-      QDomElement target = addElement( domDoc, input, "target" );
-      target.setAttribute( "population", population );
-
-      QDomElement sites = addElement( domDoc, target, "sites" );
-      sites.setAttribute( "size", "1" );
-      QDomElement site = addElement( domDoc, sites, "site");
-      site.setAttribute( "cell_id", "0" );
+        QDomElement sites = addElement( domDoc, target, "sites" );
+        sites.setAttribute( "size", "1" );
+        QDomElement site = addElement( domDoc, sites, "site");
+        site.setAttribute( "cell_id", "0" );
+      }
+      else
+      {
+        for( const auto& entity : connectedEntities.vector( ))
+        {
+          QDomElement target = addElement( domDoc, input, "target" );
+          target.setAttribute( "population", QString::fromStdString(
+            entity->getProperty( "Entity name" ).value< std::string >( )));
+          QDomElement sites = addElement( domDoc, target, "sites" );
+          sites.setAttribute( "size", "1" );
+          QDomElement site = addElement( domDoc, sites, "site");
+          site.setAttribute( "cell_id", "0" );
+        }
+      }
     }
 
     void XMLExporter::loadConGenXML( const QString& pFilePath )

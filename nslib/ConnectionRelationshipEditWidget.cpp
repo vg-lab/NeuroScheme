@@ -116,8 +116,8 @@ namespace nslib
     }
     else
     {
-      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-        ->relationshipPropertiesTypes( );
+      const auto& relationshipPropertiesTypes =
+        DomainManager::getActiveDomain( )->relationshipPropertiesTypes( );
       _propObject = relationshipPropertiesTypes.getRelationshipProperties(
         "connectsTo" )->create( );
       _propObject->setProperty("Name","R:" + originName + "-" + destName );

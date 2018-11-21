@@ -73,6 +73,9 @@ namespace nslib
         {
           if ( dynamic_cast< shiftgen::Stimulator* >( entity ))
           {
+            shift::Entities connectedEntities;
+            connectedEntities.addRelatedEntitiesOneToN( relConnectsTo, entity,
+              DataManager::entities( ), 1 );
             entitiesGids.push_back( entity->entityGid( ));
             exporter_->addInput( QString::fromStdString( entity->getProperty(
               "Entity name" ).value<std::string>( )),
@@ -86,7 +89,7 @@ namespace nslib
               QString::number( entity->getProperty( "Random stim Frequency" )
                 .value< unsigned int >( )),QString::fromStdString( caster->toString(
                 entity->getProperty( "Random stim synaptic mechanism" ))),
-              "undefined", "percentage_cells percentage=\"50\"" );
+                connectedEntities);
           }
         }
 

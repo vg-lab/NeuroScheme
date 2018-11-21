@@ -30,6 +30,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <shift/Entities.h>
+
 namespace nslib
 {
   namespace congen
@@ -64,8 +66,8 @@ namespace nslib
             const bool isRandomStim,
             const QString& delay,const QString& duration,
             const QString& amplitude, const QString& frequency,
-            const QString& synaptic_mechanism, const QString& population,
-            const QString& site_patternss );
+            const QString& synaptic_mechanism,
+            const shift::Entities& connectedEntities );
 
       private:
           QDomElement addElement(	QDomDocument& doc,
