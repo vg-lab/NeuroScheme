@@ -1145,8 +1145,7 @@ namespace nslib
     }
     for( auto pane : PaneManager::panes( ))
     {
-      pane->sceneEntities( ).removeIfContains( entity_ );
-      pane->allEntities( ).removeIfContains( entity_ );
+      pane->removeEntity( entity_ );
     }
     delete entity_;
   }

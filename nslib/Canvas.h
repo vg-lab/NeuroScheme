@@ -82,6 +82,9 @@ namespace nslib
     const Layouts& layouts( void ) const;
     Layouts& layouts( void );
     void addLayout( Layout* );
+    void addEntity( shift::Entity* entity_, const bool isInput = false );
+    void removeEntity( const shift::Entity* entity_,
+      const bool isInput = false );
 
     int activeLayoutIndex( void );
     void activeLayoutIndex( int );

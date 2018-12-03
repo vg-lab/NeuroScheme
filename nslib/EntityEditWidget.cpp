@@ -354,8 +354,7 @@ namespace nslib
           shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
           nslib::DataManager::entities( ).add( subentity );
-          nslib::PaneManager::activePane( )->allEntities( ).add( subentity );
-          nslib::PaneManager::activePane( )->sceneEntities( ).add( subentity );
+          nslib::PaneManager::activePane( )->addEntity( subentity );
         }
 
         if( _entity->isNotHierarchy( ))
@@ -365,7 +364,7 @@ namespace nslib
           {
             for ( auto pane : nslib::PaneManager::panes( ))
             {
-              pane->allEntities( ).add( _entity );
+              pane->addEntity( _entity, true );
             }
           }
         }
@@ -373,8 +372,7 @@ namespace nslib
         {
           if ( _addToScene )
           {
-            nslib::PaneManager::activePane( )->allEntities( ).add( _entity );
-            nslib::PaneManager::activePane( )->sceneEntities( ).add( _entity );
+            nslib::PaneManager::activePane( )->addEntity( _entity );
           }
           if( _parentEntity )
           {

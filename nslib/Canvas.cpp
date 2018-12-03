@@ -462,5 +462,23 @@ namespace nslib
 
   }
 
+  void Canvas::addEntity( shift::Entity* entity_, const bool isInput_  )
+  {
+    if( !isInput_)
+    {
+      _sceneEntities.add( entity_ );
+    }
+    _entities.add( entity_ );
+  }
+
+  void Canvas::removeEntity( const shift::Entity* entity_,
+    const bool isInput_  )
+  {
+    if( !isInput_)
+    {
+      _sceneEntities.removeIfContains( entity_ );
+    }
+    _entities.removeIfContains( entity_ );
+  }
 
 } // namespace nslib
