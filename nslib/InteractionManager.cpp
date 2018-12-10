@@ -950,13 +950,11 @@ namespace nslib
     shift::Entity* parentEntity_, bool addToScene_,
     QWidget* parentWidget_ )
   {
-    if ( _entityEditWidget )
+    if ( !_entityEditWidget )
     {
-      delete _entityEditWidget;
-      _entityEditWidget = nullptr;
+      _entityEditWidget = new EntityEditWidget( parentWidget_ );
     }
-    _entityEditWidget = new EntityEditWidget( entity_,
-      action_, parentEntity_, addToScene_, parentWidget_ );
+   _entityEditWidget->updateEntity( entity_, action_, parentEntity_, addToScene_ );
   }
 
   void InteractionManager::updateEntityConnectionList(

@@ -30,6 +30,8 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QDockWidget>
+#include <QGridLayout>
+#include <QPushButton>
 
 #include <shift/shift.h>
 
@@ -44,10 +46,12 @@ namespace nslib
     typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
     TEntityEditWidgetAction;
 
-    EntityEditWidget( shift::Entity* entity_, TEntityEditWidgetAction action_,
-      shift::Entity* parentEntity_= nullptr,
-      bool addToScene_ = true, QWidget* parentWidget_ = nullptr );
+    EntityEditWidget( QWidget* parentWidget_ = nullptr );
     shift::Entity* entity( );
+
+    void updateEntity( shift::Entity* entity_, TEntityEditWidgetAction action_,
+      shift::Entity* parentEntity_= nullptr,
+      bool addToScene_ = true );
 
     ~EntityEditWidget( void );
 
@@ -64,18 +68,27 @@ namespace nslib
   private:
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
     typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
-    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
-    shift::Entity* _entity;
-    shift::Entity* _parentEntity;
-    bool _addToScene;
-    TEntityEditWidgetAction _action;
 
+    QGridLayout* _gridLayout;
+    QGridLayout*_gridLayoutProps;
     QLineEdit* _numNewEntities;
-
-    bool _isNew;
-
     QCheckBox* _autoCloseCheck;
     QCheckBox* _checkUniquenessCheck;
+    QPushButton* _eraseButton;
+    QPushButton* _cancelButton;
+    QPushButton* _validationButton;
+    QLabel* _titleLabel;
+    QLabel* _numEntitiesLabel;
+    QFrame* _separation;
+    std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
+
+    shift::Entity* _entity;
+    shift::Entity* _parentEntity;
+
+    TEntityEditWidgetAction _action;
+
+    bool _isNew;
+    bool _addToScene;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
