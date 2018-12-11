@@ -55,6 +55,7 @@ namespace nslib
   {
     _entityEditWidget = new EntityEditWidget( );
     _entityConnectListWidget = new EntityConnectionListWidget( );
+    _conRelationshipEditWidget = new ConnectionRelationshipEditWidget( );
     _contextMenu = new QMenu( );
   }
   void InteractionManager::highlightConnectivity(
@@ -784,11 +785,7 @@ namespace nslib
     shift::Entity* originEntity_, shift::Entity* destinationEntity_,
     ConnectionRelationshipEditWidget::TConnectionType connectionType_ )
   {
-    if ( _conRelationshipEditWidget )
-    {
-      delete _conRelationshipEditWidget;
-    }
-    _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
+    _conRelationshipEditWidget->updateWidget(
       originEntity_, destinationEntity_, connectionType_);
   }
 
@@ -814,7 +811,7 @@ namespace nslib
       SelectionManager::setSelectedState(
         entities.at( childId.first ), state );
       _propagateSelectedStateToChilds( entities, relParentOf, relSuperEntityOf,
-                                       childId.first, state );
+        childId.first, state );
     }
 
   }
@@ -974,7 +971,7 @@ namespace nslib
   void InteractionManager::updateConnectionRelationship(
     shift::Entity* originEntity_, shift::Entity* destEntity_ )
   {
-    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( ))
+    if( !_conRelationshipEditWidget->isHidden( ))
     {
       auto destEntity = _conRelationshipEditWidget->destEntity( );
       auto origEntity = _conRelationshipEditWidget->originEntity( );
@@ -986,7 +983,7 @@ namespace nslib
           ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED
           : ConnectionRelationshipEditWidget::TConnectionType::SIMPLE;
         delete _conRelationshipEditWidget;
-        _conRelationshipEditWidget = new ConnectionRelationshipEditWidget(
+        _conRelationshipEditWidget->updateWidget(
           origEntity, destEntity, type );
       }
     }
@@ -1136,7 +1133,7 @@ namespace nslib
       EntityEditWidget::parentDock( )->hide( );
       _entityEditWidget->hide( );
     }
-    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( )
+    if( !_conRelationshipEditWidget->isHidden( )
         && ( _conRelationshipEditWidget->originEntity( ) == entity_
         || _conRelationshipEditWidget->destEntity( ) == entity_ ))
     {

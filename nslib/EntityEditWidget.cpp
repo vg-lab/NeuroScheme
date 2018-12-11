@@ -110,11 +110,12 @@ namespace nslib
     connect( _validationButton, SIGNAL( clicked( )),
       this, SLOT( validateDialog( )));
     connect( _eraseButton, SIGNAL( clicked( )),
-             this, SLOT( eraseEntity( )));
+      this, SLOT( eraseEntity( )));
 
     setLayout( _gridLayout );
     _parentDock->setWidget( this );
-    connect( _entityUpdateTimer, SIGNAL(timeout( )), this, SLOT( refreshEntity( )));
+    connect( _entityUpdateTimer, SIGNAL(timeout( )), this,
+      SLOT( refreshEntity( )));
     _entityUpdateTimer->start(/*timeout*/ );
     //timeout of 0 will time out as soon as all events in the event queue
     // have been processed
@@ -169,14 +170,14 @@ namespace nslib
           if( _isNew )
           {
             _eraseButton->setVisible( false );
-            _validationButton->setText( tr( "New" ) );
+            _validationButton->setText( tr( "New" ));
             _titleLabel->setText( tr( "Creating new: " )
               + QString::fromStdString( _entity->entityName( )));
           }
           else
           {
             _eraseButton->setVisible( false );
-            _validationButton->setText( tr( "Duplicate" ) );
+            _validationButton->setText( tr( "Duplicate" ));
             _titleLabel->setText( tr( "Duplicate: " )
               + QString::fromStdString( _entity->entityName( )));
           }
@@ -187,7 +188,7 @@ namespace nslib
           _separation->setVisible( false );
           _numEntitiesLabel->setVisible( false );
           _numNewEntities->setVisible( false );
-          _validationButton->setText( tr( "Save" ) );
+          _validationButton->setText( tr( "Save" ));
           _titleLabel->setText( tr( "Editing: " )
             + QString::fromStdString( _entity->entityName( )));
         }
@@ -219,7 +220,7 @@ namespace nslib
               auto currentCategory = caster->toString( propPair.second );
               unsigned int index = 0;
               for( const auto& category : categories )
-                comboBoxWidget->addItem( QString::fromStdString( category ) );
+                comboBoxWidget->addItem( QString::fromStdString( category ));
               for( const auto& category : categories )
               {
                 if( category != currentCategory )
@@ -240,14 +241,14 @@ namespace nslib
               auto lineEditwidget = new QLineEdit;
               widget = lineEditwidget;
               lineEditwidget->setText( QString::fromStdString(
-                caster->toString( propPair.second ) ) );
+                caster->toString( propPair.second )));
               lineEditwidget->setEnabled( isEditable );
             }
             _gridLayoutProps->addWidget( widget, element, 1 );
             ++element;
 
             _entityParamCont.push_back( std::make_tuple(
-              widgetType, label, widget ) );
+              widgetType, label, widget ));
           }
         }
       }
