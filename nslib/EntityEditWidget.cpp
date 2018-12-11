@@ -24,6 +24,7 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "DomainManager.h"
+#include "InteractionManager.h"
 
 #include <QtGui>
 #include <QInputDialog>
@@ -57,6 +58,9 @@ namespace nslib
     , _titleLabel( new QLabel )
     , _numEntitiesLabel( new QLabel( tr( "Number of entities" )))
     , _separation( new QFrame( ))
+    , _entity( nullptr )
+    , _updateEntity( nullptr )
+    , _entityUpdateTimer( new QTimer( this ))
   {
     _gridLayout->setAlignment( Qt::AlignTop );
     _gridLayout->setColumnStretch( 1, 1 );
@@ -91,7 +95,7 @@ namespace nslib
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
     connect( _autoCloseCheck, SIGNAL( clicked( )),
-             this, SLOT( toggleAutoClose( )));
+      this, SLOT( toggleAutoClose( )));
     _gridLayout->addWidget( _autoCloseCheck, rowNum, 1 );
 
     QLabel* checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
@@ -105,128 +109,151 @@ namespace nslib
     connect( _cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( _validationButton, SIGNAL( clicked( )),
       this, SLOT( validateDialog( )));
+    connect( _eraseButton, SIGNAL( clicked( )),
+             this, SLOT( eraseEntity( )));
 
     setLayout( _gridLayout );
-
     _parentDock->setWidget( this );
+    connect( _entityUpdateTimer, SIGNAL(timeout( )), this, SLOT( refreshEntity( )));
+    _entityUpdateTimer->start(/*timeout*/ );
+    //timeout of 0 will time out as soon as all events in the event queue
+    // have been processed
+  }
+
+  void EntityEditWidget::eraseEntity( )
+  {
+    InteractionManager::deleteEntity( _entity->entityGid( ));
+    cancelDialog( );
   }
 
   void EntityEditWidget::updateEntity( shift::Entity* entity_,
     TEntityEditWidgetAction action_,
     shift::Entity* parentEntity_, bool addToScene_)
   {
-    _entity = entity_;
-    _parentEntity = parentEntity_;
-    _action = action_;
-    _isNew = action_ == TEntityEditWidgetAction::NEW_ENTITY;
-    _addToScene = addToScene_;
+    _updateParentEntity = parentEntity_;
+    _updateAction = action_;
+    _updateAddToScene = addToScene_;
+    _updateEntity = entity_;
+  }
 
-    unsigned int element = 0;
-    QLayoutItem* item;
-    while (( item = _gridLayoutProps->takeAt( 0 )) != nullptr )
+  void EntityEditWidget::refreshEntity( )
+  {
+    if( _updateEntity )
     {
-      delete item->widget();
-      delete item;
-    }
-    _entityParamCont.clear( );
+      _parentEntity = _updateParentEntity;
+      _action = _updateAction;
+      _addToScene = _updateAddToScene;
+      _entity = _updateEntity;
+      _updateEntity = nullptr;
 
-    if ( _entity )
-    {
-      if ( _action == DUPLICATE_ENTITY || _isNew )
+      _isNew = _action == TEntityEditWidgetAction::NEW_ENTITY;
+
+      unsigned int element = 0;
+      QLayoutItem* item;
+      while( ( item = _gridLayoutProps->takeAt( 0 )) != nullptr )
       {
-        _separation->setVisible( true );
-        _numEntitiesLabel->setVisible( true );
-        _numNewEntities->setText( "1" );
-        _numNewEntities->setVisible( true );
-
-        if( _isNew )
-        {
-          _eraseButton->setVisible( false );
-          _validationButton->setText( tr( "New" ));
-          _titleLabel->setText( tr( "Creating new: " )
-             + QString::fromStdString( _entity->entityName( )));
-        }
-        else
-        {
-          _eraseButton->setVisible( false );
-          _validationButton->setText( tr( "Duplicate" ));
-          _titleLabel->setText( tr( "Duplicate: " )
-            + QString::fromStdString( _entity->entityName( )));
-        }
+        delete item->widget( );
+        delete item;
       }
-      else
-      {
-        _eraseButton->setVisible( true );
-        _separation->setVisible( false );
-        _numEntitiesLabel->setVisible( false );
-        _numNewEntities->setVisible( false );
-        _validationButton->setText( tr( "Save" ));
-        _titleLabel->setText( tr("Editing: ")
-          + QString::fromStdString( _entity->entityName( )));
-      }
+      _entityParamCont.clear( );
 
-      TWidgetType widgetType;
-      QWidget* widget;
-
-      for ( const auto& propPair : _entity->properties( ))
+      if( _entity )
       {
-        const auto prop = propPair.first;
-        auto caster = fires::PropertyManager::getPropertyCaster( prop );
-        if ( caster )
+        if( _action == DUPLICATE_ENTITY || _isNew )
         {
-          auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-          auto label = new QLabel(
-            QString::fromStdString( propName ));
+          _separation->setVisible( true );
+          _numEntitiesLabel->setVisible( true );
+          _numNewEntities->setText( "1" );
+          _numNewEntities->setVisible( true );
 
-          _gridLayoutProps->addWidget( label, element, 0 );
-
-          const auto& categories = caster->categories( );
-
-          bool isEditable = _entity->hasPropertyFlag( propName,
-            shift::Entity::TPropertyFlag::EDITABLE );
-
-          if ( !categories.empty( ))
+          if( _isNew )
           {
-            widgetType = TWidgetType::COMBO;
-            auto comboBoxWidget = new QComboBox;
-            widget = comboBoxWidget;
-            auto currentCategory = caster->toString( propPair.second );
-            unsigned int index = 0;
-            for ( const auto& category : categories )
-              comboBoxWidget->addItem( QString::fromStdString( category ));
-            for ( const auto& category : categories )
-            {
-              if ( category != currentCategory )
-              {
-                ++index;
-              }
-              else
-              {
-                break;
-              }
-            }
-            comboBoxWidget->setCurrentIndex( index );
-            comboBoxWidget->setEnabled( isEditable );
+            _eraseButton->setVisible( false );
+            _validationButton->setText( tr( "New" ) );
+            _titleLabel->setText( tr( "Creating new: " )
+              + QString::fromStdString( _entity->entityName( )));
           }
           else
           {
-            widgetType = TWidgetType::LINE_EDIT;
-            auto lineEditwidget = new QLineEdit;
-            widget = lineEditwidget;
-            lineEditwidget->setText( QString::fromStdString(
-                caster->toString( propPair.second )));
-            lineEditwidget->setEnabled( isEditable );
+            _eraseButton->setVisible( false );
+            _validationButton->setText( tr( "Duplicate" ) );
+            _titleLabel->setText( tr( "Duplicate: " )
+              + QString::fromStdString( _entity->entityName( )));
           }
-          _gridLayoutProps->addWidget( widget, element, 1 );
-          ++element;
+        }
+        else
+        {
+          _eraseButton->setVisible( true );
+          _separation->setVisible( false );
+          _numEntitiesLabel->setVisible( false );
+          _numNewEntities->setVisible( false );
+          _validationButton->setText( tr( "Save" ) );
+          _titleLabel->setText( tr( "Editing: " )
+            + QString::fromStdString( _entity->entityName( )));
+        }
 
-          _entityParamCont.push_back( std::make_tuple(
-            widgetType, label, widget ));
+        TWidgetType widgetType;
+        QWidget* widget;
+
+        for( const auto& propPair : _entity->properties( ))
+        {
+          const auto prop = propPair.first;
+          auto caster = fires::PropertyManager::getPropertyCaster( prop );
+          if( caster )
+          {
+            auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
+            auto label = new QLabel( QString::fromStdString( propName ));
+
+            _gridLayoutProps->addWidget( label, element, 0 );
+
+            const auto& categories = caster->categories( );
+
+            const bool isEditable = _entity->hasPropertyFlag( propName,
+              shift::Entity::TPropertyFlag::EDITABLE );
+
+            if( !categories.empty( ))
+            {
+              widgetType = TWidgetType::COMBO;
+              auto comboBoxWidget = new QComboBox;
+              widget = comboBoxWidget;
+              auto currentCategory = caster->toString( propPair.second );
+              unsigned int index = 0;
+              for( const auto& category : categories )
+                comboBoxWidget->addItem( QString::fromStdString( category ) );
+              for( const auto& category : categories )
+              {
+                if( category != currentCategory )
+                {
+                  ++index;
+                }
+                else
+                {
+                  break;
+                }
+              }
+              comboBoxWidget->setCurrentIndex( index );
+              comboBoxWidget->setEnabled( isEditable );
+            }
+            else
+            {
+              widgetType = TWidgetType::LINE_EDIT;
+              auto lineEditwidget = new QLineEdit;
+              widget = lineEditwidget;
+              lineEditwidget->setText( QString::fromStdString(
+                caster->toString( propPair.second ) ) );
+              lineEditwidget->setEnabled( isEditable );
+            }
+            _gridLayoutProps->addWidget( widget, element, 1 );
+            ++element;
+
+            _entityParamCont.push_back( std::make_tuple(
+              widgetType, label, widget ) );
+          }
         }
       }
+      _parentDock->show( );
+      this->show( );
     }
-    _parentDock->show( );
-    this->show( );
   }
 
   void EntityEditWidget::validateDialog( void )
@@ -348,8 +375,7 @@ namespace nslib
       {
         if ( _autoCloseCheck->isChecked( ))
         {
-          this->hide( );
-          _parentDock->close( );
+          cancelDialog( );
         }
       }
 

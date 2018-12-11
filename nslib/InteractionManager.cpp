@@ -51,7 +51,12 @@ namespace nslib
     InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
   EntityConnectionListWidget* InteractionManager::_entityConnectListWidget =
       nullptr;
-
+  void InteractionManager::start( )
+  {
+    _entityEditWidget = new EntityEditWidget( );
+    _entityConnectListWidget = new EntityConnectionListWidget( );
+    _contextMenu = new QMenu( );
+  }
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
   {
@@ -171,10 +176,7 @@ namespace nslib
     QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneContextMenuEvent* event )
   {
-    if ( !_contextMenu )
-      _contextMenu = new QMenu( );
-    else
-      _contextMenu->clear( );
+    _contextMenu->clear( );
 
     auto dataEntities = DataManager::entities( );
     auto dataRelations = dataEntities.relationships( );
@@ -491,10 +493,6 @@ namespace nslib
             }
             else if ( showConnections && showConnections == selectedAction )
             {
-              if( !_entityConnectListWidget )
-              {
-                _entityConnectListWidget = new EntityConnectionListWidget( );
-              }
               _entityConnectListWidget->setConnections( entity,
                 connectsToMap, connectedByMap, aggregatedConnectsToMap,
                 aggregatedConnectedByMap );
@@ -569,7 +567,7 @@ namespace nslib
     else
     {
       _item = nullptr;
-      _buttons = 0;
+      _buttons = nullptr;
     }
   }
 
@@ -947,13 +945,8 @@ namespace nslib
 
   void InteractionManager::createOrEditEntity( shift::Entity* entity_,
     EntityEditWidget::TEntityEditWidgetAction action_,
-    shift::Entity* parentEntity_, bool addToScene_,
-    QWidget* parentWidget_ )
+    shift::Entity* parentEntity_, bool addToScene_ )
   {
-    if ( !_entityEditWidget )
-    {
-      _entityEditWidget = new EntityEditWidget( parentWidget_ );
-    }
    _entityEditWidget->updateEntity( entity_, action_, parentEntity_, addToScene_ );
   }
 
@@ -962,7 +955,7 @@ namespace nslib
     const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
+    if( !_entityConnectListWidget->isHidden( ))
     {
       _entityConnectListWidget->updateConnections( origEntity_, destEntity,
         updateAggregatedTo_, updateAggregatedBy_ );
@@ -971,7 +964,7 @@ namespace nslib
 
   void InteractionManager::refreshEntityConnectionList( void )
   {
-    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
+    if( !_entityConnectListWidget->isHidden( ))
     {
       _entityConnectListWidget->hide( );
       _entityConnectListWidget->show( );
@@ -1050,8 +1043,7 @@ namespace nslib
       {
         parentEntity->autoUpdateProperties( );
       }
-      if( _entityConnectListWidget
-        && !_entityConnectListWidget->isHidden( ))
+      if( !_entityConnectListWidget->isHidden( ))
       {
         _entityConnectListWidget->updateConnections( );
       }
@@ -1138,7 +1130,7 @@ namespace nslib
     }
 
     dataEntities_.remove( entity_ );
-    if( _entityEditWidget && !_entityEditWidget->isHidden( )
+    if( !_entityEditWidget->isHidden( )
         && _entityEditWidget->entity( ) == entity_ )
     {
       EntityEditWidget::parentDock( )->hide( );
@@ -1151,7 +1143,7 @@ namespace nslib
       ConnectionRelationshipEditWidget::parentDock( )->hide( );
       _conRelationshipEditWidget->hide( );
     }
-    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( )
+    if( !_entityConnectListWidget->isHidden( )
         && _entityConnectListWidget->entity( ) == entity_ )
     {
       EntityConnectionListWidget::parentDock( )->hide( );

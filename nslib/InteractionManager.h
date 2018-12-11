@@ -89,10 +89,12 @@ namespace nslib
       ConnectionRelationshipEditWidget::TConnectionType connectionType_ =
       ConnectionRelationshipEditWidget::TConnectionType::AUTO );
 
+    static void start( );
+
     static void createOrEditEntity(
       shift::Entity* entity_, EntityEditWidget::TEntityEditWidgetAction action_,
       shift::Entity* parentEntity_= nullptr,
-      bool addToScene_ = true, QWidget *parentWidget_ = nullptr );
+      bool addToScene_ = true );
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
@@ -154,7 +156,6 @@ namespace nslib
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;
     static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
-
   };
 }
 

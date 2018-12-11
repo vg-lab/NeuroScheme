@@ -61,9 +61,11 @@ namespace nslib
   public slots:
 
     void validateDialog( void );
+    void eraseEntity( void );
     void cancelDialog( void );
     void toggleAutoClose( void );
     void toggleCheckUniqueness( void );
+    void refreshEntity( void );
 
   private:
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
@@ -83,12 +85,18 @@ namespace nslib
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _entityParamCont;
 
     shift::Entity* _entity;
+    shift::Entity* _updateEntity;
     shift::Entity* _parentEntity;
+    shift::Entity* _updateParentEntity;
+
+    QTimer* _entityUpdateTimer;
 
     TEntityEditWidgetAction _action;
+    TEntityEditWidgetAction _updateAction;
 
     bool _isNew;
     bool _addToScene;
+    bool _updateAddToScene;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
