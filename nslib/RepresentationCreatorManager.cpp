@@ -79,7 +79,7 @@ namespace nslib
     bool linkRepsToObjs,
     unsigned int repCreatorId )
   {
-    //TODO check if exists
+    //Check if exists performed in the repCreators
     if ( _repCreators.count( repCreatorId ) == 1 )
       _repCreators[ repCreatorId ]->create( entities, representations,
                                             _entitiesToReps[ repCreatorId ],

@@ -88,6 +88,14 @@ namespace nslib
       CAMERA_ENABLED = 0x04,
       SCATTERPLOT_ENABLED = 0x08
     };
+    enum TLayoutIndexes {
+      UNDEFINED = -1,
+      GRID = 0,
+      CAMERA = 1,
+      SCATTER = 2,
+      CIRCULAR = 3,
+      FREE = 4
+    };
 
     Layout( const std::string& name_ = "unnamed",
             unsigned int flags_ = 0 );
@@ -123,12 +131,10 @@ namespace nslib
   protected:
     void _drawCorners( );
     void _clearScene( );
-    void _addRepresentations( const shift::Representations& reps );
+    virtual void _addRepresentations( const shift::Representations& reps );
     virtual void _arrangeItems( const shift::Representations& /* reps */,
-                                bool /* animate */,
-                                const shift::Representations&
-                                preFilterReps =
-                                shift::Representations( ))
+      bool /* animate */,
+      const shift::Representations& preFilterReps =  shift::Representations( ))
     { ( void ) preFilterReps; }
     virtual void _updateOptionsWidget( void );
 

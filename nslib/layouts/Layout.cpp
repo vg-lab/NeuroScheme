@@ -104,12 +104,12 @@ namespace nslib
   }
 
   void Layout::display( shift::Entities& entities,
-                        shift::Representations& representations,
-                        bool animate )
+    shift::Representations& representations,
+    bool animate )
   {
-    nslib::Loggers::get( )->log(
+    Loggers::get( )->log(
       "display " + std::to_string( entities.size( )),
-      nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+      LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     representations.clear( );
 
     bool doFiltering =
@@ -157,7 +157,7 @@ namespace nslib
       for ( const auto& entity : objects )
         filteredAndSortedEntities.add( static_cast< shift::Entity* >( entity ));
 
-      nslib::RepresentationCreatorManager::create(
+      RepresentationCreatorManager::create(
         filteredAndSortedEntities, representations,
         true, true );
 
@@ -165,14 +165,14 @@ namespace nslib
       for ( const auto& entity : objectsPreFilter )
         entitiesPreFilter.add( static_cast< shift::Entity* >( entity ));
 
-      nslib::RepresentationCreatorManager::create(
+      RepresentationCreatorManager::create(
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
       // Generate relationship representations
-      nslib::RepresentationCreatorManager::generateRelations(
+      RepresentationCreatorManager::generateRelations(
         filteredAndSortedEntities, relationshipReps, "connectsTo", false );
-      nslib::RepresentationCreatorManager::generateRelations(
+      RepresentationCreatorManager::generateRelations(
         filteredAndSortedEntities, relationshipReps,
         "aggregatedConnectsTo", true );
 
@@ -184,15 +184,15 @@ namespace nslib
       std::sort( vector.begin( ), vector.end( ),
                  []( const shift::Entity* a, const shift::Entity* b )
                  { return b->entityGid( ) < a->entityGid( ); } );
-      nslib::RepresentationCreatorManager::create(
+      RepresentationCreatorManager::create(
        entities, representations,
         true, true );
 
       // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
       // Generate relationship representations
-      nslib::RepresentationCreatorManager::generateRelations( entities,
+      RepresentationCreatorManager::generateRelations( entities,
         relationshipReps, "connectsTo", false );
-      nslib::RepresentationCreatorManager::generateRelations( entities,
+      RepresentationCreatorManager::generateRelations( entities,
         relationshipReps, "aggregatedConnectsTo", true );
     }
 
@@ -342,7 +342,7 @@ namespace nslib
           representation );
       if ( !graphicsItemRep )
       {
-        std::cerr << "Item null" << std::endl;
+        Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );
       }
       else
       {
@@ -362,7 +362,7 @@ namespace nslib
         if ( repsToEntities.count( representation ) > 0 )
         {
           const auto entities = repsToEntities.at( representation );
-          if ( entities.size( ) < 1 )
+          if ( entities.empty( ))
             Loggers::get( )->log(
               "No entities associated to representation",
               LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
@@ -386,7 +386,6 @@ namespace nslib
               else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
                 shapeItem->setPen(
                   SelectableItem::partiallySelectedPen( ));
-
             }
           }
         }

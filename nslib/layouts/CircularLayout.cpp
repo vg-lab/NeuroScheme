@@ -113,25 +113,29 @@ namespace nslib
     else
       canvasAspectRatio = float( gv->height( )) / float( gv->width( ));
 
-    float deltaAngle = 2 * M_PI / repsToBeArranged;
+    float deltaAngle = 2.0f * static_cast< float >( M_PI ) / repsToBeArranged;
     float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
 
 
-    unsigned int numRows =
-      floor( sqrt( iconAspectRatio * float( repsToBeArranged ) /
-                   canvasAspectRatio ));
+    unsigned int numRows =  static_cast< unsigned int >(
+      floorf( sqrtf( iconAspectRatio * float( repsToBeArranged ) /
+                   canvasAspectRatio )));
 
     if ( numRows < 1 && repsToBeArranged > 0 )
       numRows = 1;
 
-    unsigned int numColumns =
-      ceil( float( repsToBeArranged ) / float( numRows ));
+    unsigned int numColumns = static_cast< unsigned int >(
+      ceilf( float( repsToBeArranged ) / float( numRows )));
 
     if ( numColumns < 1 && repsToBeArranged > 0 )
+    {
       numColumns = 1;
+    }
 
-    if ( gv->width( ) < gv->height( ) )
+    if ( gv->width( ) < gv->height( ))
+    {
       std::swap( numColumns, numRows );
+    }
 
     // std::cout << "Num rows: " << numRows << " Num cols: " << numColumns << std::endl;
     // float scale;
@@ -147,9 +151,8 @@ namespace nslib
     // int topMargin = (( deltaY * scale ) +
     //                  ( gv->height( ) - numRows * deltaY * scale )) / 2;
 
-    auto opacity = 1.0f;
-    if ( _filterWidget )
-      opacity = float( _filterWidget->opacityValue( )) / 100.0;
+    auto opacity = _filterWidget
+      ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -157,7 +160,7 @@ namespace nslib
           representation );
       if ( !graphicsItemRep )
       {
-        std::cerr << "Item null" << std::endl;
+        Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );
       }
       else
       {
@@ -171,25 +174,34 @@ namespace nslib
         {
           QRectF rect = graphicsItem->childrenBoundingRect( ) |
             graphicsItem->boundingRect( );
-          qreal angle = counter * deltaAngle;
-          qreal posX = radius * cos( angle );
-          qreal posY = radius * sin( angle );
-          // qreal posX = _x * deltaX * scale - gv->width( ) / 2 +
-          //   leftMargin - scale * rect.center( ).x( );
-          // qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
-          //   topMargin - scale * rect.center( ).y( );
+
+          qreal posX;
+          qreal posY;
           float scale;
-          float scaleX = deltaAngle * radius / rect.width( );
-          float scaleY = deltaAngle * radius / rect.height( );
-          scale = std::min( scaleX, scaleY ) * 0.9f;
+          float scaleX;
+          float scaleY;
+
 
           if ( repsToBeArranged == 1 )
           {
-            scaleX = float( gv->width( ) - 2 * marginX ) / rect.width( );
-            scaleY = float( gv->height( ) - 2 * marginY ) / rect.height( );
+            scaleX = float( gv->width( ) - 2 * marginX  / rect.width( ));
+            scaleY = float( gv->height( ) - 2 * marginY  / rect.height( ));
             scale = std::min( scaleX, scaleY );
             posX = 0;
             posY = 0;
+          }
+          else
+          {
+            scaleX = float( deltaAngle * radius / rect.width( ));
+            scaleY = float( deltaAngle * radius / rect.height( ));
+            scale = std::min( scaleX, scaleY ) * 0.9f;
+            qreal angle = counter * deltaAngle;
+            posX = radius * cos( angle );
+            posY = radius * sin( angle );
+            // qreal posX = _x * deltaX * scale - gv->width( ) / 2 +
+            //   leftMargin - scale * rect.center( ).x( );
+            // qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
+            //   topMargin - scale * rect.center( ).y( );
           }
           qreal scale_ = forceScale ? forcedScale : scale;
 
@@ -219,7 +231,7 @@ namespace nslib
       if (((unsigned int ) _x ) >= numColumns )
       {
         _x = 0;
-        _y++;
+        ++_y;
       }
 
     }

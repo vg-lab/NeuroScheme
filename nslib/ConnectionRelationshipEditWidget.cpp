@@ -294,7 +294,7 @@ namespace nslib
     // TODO improvement: check if cache needs to be cleared or if just the
     // items related to the entity under edition
     // if ( needToClearCache ) {
-    RepresentationCreatorManager::clearRelationshipsCache( );
+    //RepresentationCreatorManager::clearRelationshipsCache( );
     // }
 
     for ( auto pane : PaneManager::panes( ))

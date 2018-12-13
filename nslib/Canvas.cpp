@@ -45,10 +45,7 @@ namespace nslib
         dynamic_cast< Canvas* >( this->parentWidget( )));
 
     auto item = itemAt( event_->pos( ));
-    if ( item )
-      InteractionManager::mousePressEvent( item, event_ );
-    else
-      InteractionManager::mousePressEvent( nullptr, event_ );
+    InteractionManager::mousePressEvent( this, item, event_ );
 
     QGraphicsView::mousePressEvent( event_ );
   }
@@ -56,10 +53,7 @@ namespace nslib
   void GraphicsView::mouseReleaseEvent( QMouseEvent* event_ )
   {
     auto item = itemAt( event_->pos( ));
-    if ( item )
-      InteractionManager::mouseReleaseEvent( item, event_ );
-    else
-      InteractionManager::mouseReleaseEvent( nullptr, event_ );
+    InteractionManager::mouseReleaseEvent( item, event_ );
 
     QGraphicsView::mouseReleaseEvent( event_ );
   }
@@ -258,10 +252,10 @@ namespace nslib
 
   void Canvas::layoutChanged( int index )
   {
-    if ( index == -1 )
+    if ( index <= Layout::TLayoutIndexes::UNDEFINED )
     {
-      Loggers::get( )->log( "Trying to change to a layout with -1 index",
-                            LOG_LEVEL_WARNING );
+      Loggers::get( )->log( "Trying to change to a layout with negative index",
+        LOG_LEVEL_WARNING );
 
       return;
     }
@@ -271,6 +265,7 @@ namespace nslib
     {
       _activeLayoutIndex = index;
       _layouts.getLayout( index )->optionsWidget( );
+      _layouts.layoutSelector( )->setCurrentIndex( index );
       auto layout_ = PaneManager::layout( );
       if ( layout_ )
       {

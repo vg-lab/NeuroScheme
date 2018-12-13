@@ -346,7 +346,7 @@ namespace nslib
             if ( _isNew ||
               caster->toString( prop ) != pStr ) // If value changed
             {
-              const auto &entities = nslib::DataManager::entities( ).vector( );
+              const auto &entities = DataManager::entities( ).vector( );
               for( const auto entity: entities )
               {
                 if ( entity->isSameEntityType( _entity ) &&
@@ -392,7 +392,7 @@ namespace nslib
 
       bool needToClearCache = false;
       for ( const auto& creatorPair :
-        nslib::RepresentationCreatorManager::creators( ))
+        RepresentationCreatorManager::creators( ))
       {
         needToClearCache = needToClearCache ||
           creatorPair.second->entityUpdatedOrCreated( _entity );
@@ -401,18 +401,18 @@ namespace nslib
       // TODO improvemente: check if cache needs to be cleared or if just the
       // items related to the entity under edition
       // if ( needToClearCache ) {
-      nslib::RepresentationCreatorManager::clearEntitiesToReps( );
-      nslib::RepresentationCreatorManager::clearRelationshipsCache( );
+      //RepresentationCreatorManager::clearEntitiesToReps( );
+      //RepresentationCreatorManager::clearRelationshipsCache( );
       // }
 
       if ( _action == DUPLICATE_ENTITY || _isNew )
       {
-        nslib::DataManager::entities( ).add( _entity );
+        DataManager::entities( ).add( _entity );
 
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
 
-        auto& _entities = nslib::DataManager::entities( );
+        auto& _entities = DataManager::entities( );
         auto& relSuperEntityOf =
           *( _entities.relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
         auto& relSubEntityOf =
@@ -423,8 +423,8 @@ namespace nslib
         {
           shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
-          nslib::DataManager::entities( ).add( subentity );
-          nslib::PaneManager::activePane( )->addEntity( subentity );
+          DataManager::entities( ).add( subentity );
+          PaneManager::activePane( )->addEntity( subentity );
         }
 
         if( _entity->isNotHierarchy( ))
@@ -442,11 +442,11 @@ namespace nslib
         {
           if ( _addToScene )
           {
-            nslib::PaneManager::activePane( )->addEntity( _entity );
+            PaneManager::activePane( )->addEntity( _entity );
           }
           if ( _parentEntity )
           {
-            auto& entities = nslib::DataManager::entities( );
+            auto& entities = DataManager::entities( );
             auto& relParentOf =
               *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
             auto& relChildOf =
@@ -462,7 +462,7 @@ namespace nslib
           }
           else
           {
-            nslib::DataManager::rootEntities( ).add( _entity );
+            DataManager::rootEntities( ).add( _entity );
           }
         }
       }
@@ -477,14 +477,14 @@ namespace nslib
           parent->autoUpdateProperties( );
         }
         for( const auto& repPair :
-          nslib::RepresentationCreatorManager::repsToEntities( ))
+          RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
           delete rep;
         }
       }
     }
-    for ( auto pane : nslib::PaneManager::panes( ))
+    for ( auto pane : PaneManager::panes( ))
     {
       pane->reps( ).clear( );
       pane->displayEntities( false, true );
