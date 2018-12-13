@@ -78,13 +78,13 @@ namespace nslib
     ConnectionTableWidget* _connectedByTable;
     ConnectionTableWidget* _aggregatedConnectsToTable;
     ConnectionTableWidget* _aggregatedConnectedByTable;
-    std::unique_ptr< QGridLayout > _gridLayout;
-    std::unique_ptr< QLabel > _entityNameLabel;
-    std::unique_ptr< QLabel > _autoCloseLabel;
-    std::unique_ptr< QCheckBox > _autoCloseCheck;
-    std::unique_ptr< QLabel > _allPropertiesLabel;
-    std::unique_ptr< QCheckBox > _allPropertiesCheck;
-    std::unique_ptr< QPushButton > _cancelButton;
+    QGridLayout* _gridLayout;
+    QLabel* _entityNameLabel;
+    QLabel* _autoCloseLabel;
+    QCheckBox* _autoCloseCheck;
+    QLabel* _allPropertiesLabel;
+    QCheckBox* _allPropertiesCheck;
+    QPushButton* _cancelButton;
   };
 
 }

@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Juan Pedro Brito <juanpedro.brito@upm.es>
+ *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -24,10 +25,9 @@
 #include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "DomainManager.h"
+#include "InteractionManager.h"
 
 #include <QtGui>
-#include <QPushButton>
-#include <QGridLayout>
 #include <QInputDialog>
 
 #include <QFileDialog>
@@ -38,172 +38,242 @@
 #include <memory>
 #include <shift/Relationship.h>
 
+//TODO: Add realtion of parent of to entities
+
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;
   bool EntityEditWidget::_autoCloseChecked = false;
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
-  EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity_, TEntityEditWidgetAction action_,
-    shift::Entity* parentEntity_, bool addToScene_, QWidget *parentWidget_)
+  EntityEditWidget::EntityEditWidget( QWidget *parentWidget_)
     : QWidget( parentWidget_ )
-    , _entity( entity_ )
-    , _parentEntity( parentEntity_ )
-    , _addToScene( addToScene_ )
-    , _action( action_ )
-    , _isNew( action_ == TEntityEditWidgetAction::NEW_ENTITY )
+    , _gridLayout ( new QGridLayout )
+    , _gridLayoutProps ( new QGridLayout )
+    , _numNewEntities ( new QLineEdit )
     , _autoCloseCheck( new QCheckBox )
     , _checkUniquenessCheck( new QCheckBox )
+    , _eraseButton( new QPushButton( tr( "Delete" )))
+    , _cancelButton( new QPushButton( tr( "Close" )))
+    , _validationButton( new QPushButton )
+    , _titleLabel( new QLabel )
+    , _numEntitiesLabel( new QLabel( tr( "Number of entities" )))
+    , _separation( new QFrame( ))
+    , _entity( nullptr )
+    , _updateEntity( nullptr )
+    , _entityUpdateTimer( new QTimer( this ))
   {
-    QGridLayout* gridLayout = new QGridLayout;
-    gridLayout->setAlignment( Qt::AlignTop );
-    gridLayout->setColumnStretch( 1, 1 );
-    gridLayout->setColumnMinimumWidth( 1, 150 );
+    _gridLayout->setAlignment( Qt::AlignTop );
+    _gridLayout->setColumnStretch( 1, 1 );
+    _gridLayout->setColumnMinimumWidth( 1, 150 );
 
-    unsigned int element = 0;
+    _titleLabel->setStyleSheet( "font-weight:bold" );
 
-    if ( _entity )
+    unsigned  int rowNum = 0;
+
+    _gridLayout->addWidget( _titleLabel, rowNum, 0, 1, 2 );
+    _gridLayout->addLayout( _gridLayoutProps, ++rowNum, 0, 1, 2 );
+
+    _separation->setFrameShape( QFrame::HLine );
+    _gridLayout->addWidget( _separation, ++rowNum, 0, 1, 2 );
+
+    _gridLayout->addWidget( _numEntitiesLabel, ++rowNum, 0 );
+
+    _numNewEntities->setEnabled( true );
+
+    _gridLayout->addWidget( _numNewEntities, rowNum, 1 );
+
+    _gridLayout->addWidget( _cancelButton, ++rowNum, 0 );
+
+
+    _gridLayout->addWidget( _validationButton, rowNum, 1 );
+
+    _gridLayout->addWidget( _eraseButton, ++rowNum, 0, 1, 2 );
+
+    QLabel* autoCloseLabel = new QLabel( tr( "Auto-close" ));
+
+    _gridLayout->addWidget( autoCloseLabel, ++rowNum, 0 );
+
+    _autoCloseCheck->setChecked( _autoCloseChecked );
+    connect( _autoCloseCheck, SIGNAL( clicked( )),
+      this, SLOT( toggleAutoClose( )));
+    _gridLayout->addWidget( _autoCloseCheck, rowNum, 1 );
+
+    QLabel* checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
+    _gridLayout->addWidget( checkUniquenessLabel, ++rowNum, 0 );
+
+    _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
+    connect( _checkUniquenessCheck, SIGNAL( clicked( )),
+      this, SLOT( toggleCheckUniqueness( )));
+    _gridLayout->addWidget( _checkUniquenessCheck, rowNum, 1 );
+
+    connect( _cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
+    connect( _validationButton, SIGNAL( clicked( )),
+      this, SLOT( validateDialog( )));
+    connect( _eraseButton, SIGNAL( clicked( )),
+      this, SLOT( eraseEntity( )));
+
+    setLayout( _gridLayout );
+    _parentDock->setWidget( this );
+    connect( _entityUpdateTimer, SIGNAL(timeout( )), this,
+      SLOT( refreshEntity( )));
+    _entityUpdateTimer->start(/*timeout*/ );
+    //timeout of 0 will time out as soon as all events in the event queue
+    // have been processed
+  }
+
+  void EntityEditWidget::eraseEntity( )
+  {
+    InteractionManager::deleteEntity( _entity->entityGid( ));
+    cancelDialog( );
+  }
+
+  void EntityEditWidget::updateEntity( shift::Entity* entity_,
+    TEntityEditWidgetAction action_,
+    shift::Entity* parentEntity_, bool addToScene_)
+  {
+    _updateParentEntity = parentEntity_;
+    _updateAction = action_;
+    _updateAddToScene = addToScene_;
+    _updateEntity = entity_;
+  }
+
+  void EntityEditWidget::refreshEntity( )
+  {
+    if( _updateEntity )
     {
-      TWidgetType widgetType;
-      QWidget* widget;
+      _parentEntity = _updateParentEntity;
+      _action = _updateAction;
+      _addToScene = _updateAddToScene;
+      _entity = _updateEntity;
+      _updateEntity = nullptr;
 
-      for ( const auto& propPair : _entity->properties( ))
+      _isNew = _action == TEntityEditWidgetAction::NEW_ENTITY;
+
+      unsigned int element = 0;
+      QLayoutItem* item;
+      while( ( item = _gridLayoutProps->takeAt( 0 )) != nullptr )
       {
-        const auto prop = propPair.first;
-        auto caster = fires::PropertyManager::getPropertyCaster( prop );
-        if ( caster )
+        delete item->widget( );
+        delete item;
+      }
+      _entityParamCont.clear( );
+
+      if( _entity )
+      {
+        if( _action == DUPLICATE_ENTITY || _isNew )
         {
-          auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-          auto label = new QLabel(
-            QString::fromStdString( propName ));
+          _separation->setVisible( true );
+          _numEntitiesLabel->setVisible( true );
+          _numNewEntities->setText( "1" );
+          _numNewEntities->setVisible( true );
 
-          gridLayout->addWidget( label, element, 0 );
-
-          const auto& categories = caster->categories( );
-
-          bool isEditable = _entity->hasPropertyFlag(
-            propName, shift::Entity::TPropertyFlag::EDITABLE );
-
-          if ( !categories.empty( ) )
+          if( _isNew )
           {
-            widgetType = TWidgetType::COMBO;
-            auto comboBoxWidget = new QComboBox;
-            widget = comboBoxWidget;
-            auto currentCategory = caster->toString( propPair.second );
-            unsigned int index = 0;
-            for ( const auto& category : categories )
-              comboBoxWidget->addItem( QString::fromStdString( category ));
-            for ( const auto& category : categories )
-            {
-              if ( category != currentCategory )
-              {
-                ++index;
-              }
-              else
-              {
-                break;
-              }
-            }
-            comboBoxWidget->setCurrentIndex( index );
-            comboBoxWidget->setEnabled( isEditable );
-            connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-              this, SLOT( refreshSubproperties( )));
+            _eraseButton->setVisible( false );
+            _validationButton->setText( tr( "New" ));
+            _titleLabel->setText( tr( "Creating new: " )
+              + QString::fromStdString( _entity->entityName( )));
           }
           else
           {
-            widgetType = TWidgetType::LINE_EDIT;
-            auto lineEditwidget = new QLineEdit;
-            widget = lineEditwidget;
-            lineEditwidget->setText( QString::fromStdString(
-              caster->toString( propPair.second )));
-            lineEditwidget->setEnabled( isEditable );
+            _eraseButton->setVisible( false );
+            _validationButton->setText( tr( "Duplicate" ));
+            _titleLabel->setText( tr( "Duplicate: " )
+              + QString::fromStdString( _entity->entityName( )));
           }
-          gridLayout->addWidget( widget, element, 1 );
-          ++element;
+        }
+        else
+        {
+          _eraseButton->setVisible( true );
+          _separation->setVisible( false );
+          _numEntitiesLabel->setVisible( false );
+          _numNewEntities->setVisible( false );
+          _validationButton->setText( tr( "Save" ));
+          _titleLabel->setText( tr( "Editing: " )
+            + QString::fromStdString( _entity->entityName( )));
+        }
 
-          _entityParamCont.push_back(
-            std::make_tuple( widgetType, label, widget ));
-          if ( !_entity->evalConstraint( shift::Properties::SUBPROPERTY,
-            propName ))
+        TWidgetType widgetType;
+        QWidget* widget;
+
+        for( const auto& propPair : _entity->properties( ))
+        {
+          const auto prop = propPair.first;
+          auto caster = fires::PropertyManager::getPropertyCaster( prop );
+          if( caster )
           {
-            label->hide( );
-            widget->hide( );
+            auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
+            auto label = new QLabel( QString::fromStdString( propName ));
+
+            _gridLayoutProps->addWidget( label, element, 0 );
+
+            const auto& categories = caster->categories( );
+
+            const bool isEditable = _entity->hasPropertyFlag( propName,
+              shift::Entity::TPropertyFlag::EDITABLE );
+
+            if( !categories.empty( ))
+            {
+              widgetType = TWidgetType::COMBO;
+              auto comboBoxWidget = new QComboBox;
+              widget = comboBoxWidget;
+              auto currentCategory = caster->toString( propPair.second );
+              unsigned int index = 0;
+              for( const auto& category : categories )
+                comboBoxWidget->addItem( QString::fromStdString( category ));
+              for( const auto& category : categories )
+              {
+                if( category != currentCategory )
+                {
+                  ++index;
+                }
+                else
+                {
+                  break;
+                }
+              }
+              comboBoxWidget->setCurrentIndex( index );
+              comboBoxWidget->setEnabled( isEditable );
+              connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
+                this, SLOT( refreshSubproperties( )));
+            }
+            else
+            {
+              widgetType = TWidgetType::LINE_EDIT;
+              auto lineEditwidget = new QLineEdit;
+              widget = lineEditwidget;
+              lineEditwidget->setText( QString::fromStdString(
+                caster->toString( propPair.second )));
+              lineEditwidget->setEnabled( isEditable );
+            }
+            _gridLayoutProps->addWidget( widget, element, 1 );
+            ++element;
+
+            _entityParamCont.push_back( std::make_tuple(
+              widgetType, label, widget ));
+
+            if ( !_entity->evalConstraint( shift::Properties::SUBPROPERTY,
+              propName ))
+            {
+              label->hide( );
+              widget->hide( );
+            }
           }
         }
       }
-
-      if ( _action == DUPLICATE_ENTITY || _isNew )
-      {
-        QFrame* sep3 = new QFrame( );
-        QFrame* sep4 = new QFrame( );
-        sep3->setFrameShape( QFrame::HLine );
-        sep4->setFrameShape( QFrame::HLine );
-
-        gridLayout->addWidget( sep3,element,0 );
-        gridLayout->addWidget( sep4,element,1 );
-        ++element;
-
-        widgetType = TWidgetType::LINE_EDIT;
-        auto label = new QLabel(
-          QString::fromStdString( "Number of entities" ));
-        gridLayout->addWidget( label, element, 0 );
-
-        _numNewEntities.reset( new QLineEdit );
-        widget = _numNewEntities.get( );
-        _numNewEntities->setText( "1" );
-
-        _numNewEntities->setEnabled( true );
-        gridLayout->addWidget( widget, element, 1 );
-      }
-      ++element;
+      _parentDock->show( );
+      this->show( );
     }
-
-    QPushButton* cancelButton = new QPushButton( tr( "Close" ));
-    gridLayout->addWidget( cancelButton, element, 0 );
-
-    QPushButton* validationButton = new QPushButton(
-      ( _isNew ? tr( "New" ) : tr( "Save" )));
-    gridLayout->addWidget( validationButton, element, 1 );
-
-    ;
-    auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
-    gridLayout->addWidget( autoCloseLabel, ++element, 0 );
-
-    _autoCloseCheck->setChecked( _autoCloseChecked );
-    connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
-             this, SLOT( toggleAutoClose( )));
-    gridLayout->addWidget( _autoCloseCheck.get( ), element, 1 );
-
-    auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
-    gridLayout->addWidget( checkUniquenessLabel, ++element, 0 );
-
-    //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
-    _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
-    connect( _checkUniquenessCheck.get( ), SIGNAL( clicked( )),
-             this, SLOT( toggleCheckUniqueness( )));
-    gridLayout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
-
-    connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
-    connect( validationButton, SIGNAL( clicked( )),
-             this, SLOT( validateDialog( )));
-
-    setLayout( gridLayout );
-    setWindowTitle( tr( "Entity inspector" ));
-
-    _parentDock->setWidget( this );
-    _parentDock->show( );
-    this->show( );
   }
 
   void EntityEditWidget::validateDialog( void )
   {
-    auto origEntity = _entity;
     unsigned int numEles = 1;
 
     if ( _action == DUPLICATE_ENTITY || _isNew )
     {
-      numEles = _numNewEntities->text( ).toInt( );
+      numEles = _numNewEntities->text( ).toUInt( );
     }
 
     for ( unsigned int i = 0; i < numEles; ++i )
@@ -222,7 +292,7 @@ namespace nslib
         const auto& labelWidget = std::get< TEditTuple::LABEL >( entityParam );
         const auto& label = labelWidget->text( ).toStdString( );
 
-        const bool isEditable = origEntity->hasPropertyFlag(
+        const bool isEditable = _entity->hasPropertyFlag(
           label, shift::Entity::TPropertyFlag::EDITABLE );
 
         if ( ( _action == EDIT_ENTITY ) && !isEditable )
@@ -258,7 +328,7 @@ namespace nslib
         {
           // WAR: This is to force create/copy properties not defined in the
           // JSON but defined in when loading data, but does not solve all cases
-          auto prop = origEntity->getProperty( label );
+          auto prop = _entity->getProperty( label );
           _entity->registerProperty( label, prop );
         }
         auto& prop = _entity->getProperty( label );
@@ -316,8 +386,7 @@ namespace nslib
       {
         if ( _autoCloseCheck->isChecked( ))
         {
-          this->hide( );
-          _parentDock->close( );
+          cancelDialog( );
         }
       }
 
@@ -339,6 +408,7 @@ namespace nslib
       if ( _action == DUPLICATE_ENTITY || _isNew )
       {
         nslib::DataManager::entities( ).add( _entity );
+
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
 
@@ -359,10 +429,10 @@ namespace nslib
 
         if( _entity->isNotHierarchy( ))
         {
-          nslib::DataManager::noHierarchyEntities( ).add( _entity );
-          if( nslib::Config::_showNoHierarchyEntities( ))
+          DataManager::noHierarchyEntities( ).add( _entity );
+          if( Config::_showNoHierarchyEntities( ))
           {
-            for ( auto pane : nslib::PaneManager::panes( ))
+            for ( auto pane : PaneManager::panes( ))
             {
               pane->addEntity( _entity, true );
             }
@@ -374,7 +444,7 @@ namespace nslib
           {
             nslib::PaneManager::activePane( )->addEntity( _entity );
           }
-          if( _parentEntity )
+          if ( _parentEntity )
           {
             auto& entities = nslib::DataManager::entities( );
             auto& relParentOf =
@@ -399,14 +469,14 @@ namespace nslib
       if ( _action == EDIT_ENTITY )
       {
         auto& relChildOf = *( DataManager::entities( ).relationships( )
-          [ "isChildOf" ]->asOneToOne( ));
+        [ "isChildOf" ]->asOneToOne( ));
         auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
-        if ( parentID > 0 )
+        if( parentID > 0 )
         {
           auto parent = DataManager::entities( ).at( parentID );
           parent->autoUpdateProperties( );
         }
-        for ( const auto& repPair :
+        for( const auto& repPair :
           nslib::RepresentationCreatorManager::repsToEntities( ))
         {
           shift::Representation* rep = repPair.first;
@@ -475,6 +545,7 @@ namespace nslib
       }
     }
   }
+
 
   void EntityEditWidget::cancelDialog( void )
   {

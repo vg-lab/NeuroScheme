@@ -2,7 +2,7 @@
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
  * Authors: Juan Jose Garcia Cantero <juanjose.garcia@urjc.es>
-*           Iago Calvo Lista <i.calvol@alumnos.urjc.es>
+ *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -44,10 +44,10 @@ namespace nslib
 
   public:
     typedef enum { AUTO, SIMPLE, AGGREGATED  } TConnectionType;
-    ConnectionRelationshipEditWidget( shift::Entity*  originEntity_,
+    ConnectionRelationshipEditWidget( QWidget* parentWidget_ = nullptr );
+    void updateWidget( shift::Entity*  originEntity_,
       shift::Entity* destinationEntity_,
-      TConnectionType connectionType_ = TConnectionType::AUTO,
-      QWidget* parentWidget_ = nullptr );
+      TConnectionType connectionType_ = TConnectionType::AUTO );
     ~ConnectionRelationshipEditWidget( void );
     static void parentDock( QDockWidget* parentDock_ );
     static QDockWidget* parentDock( void );
@@ -73,18 +73,19 @@ namespace nslib
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
     bool _isNew;
-    std::unique_ptr< QLabel > _autoCloseLabel;
-    std::unique_ptr< QCheckBox > _autoCloseCheck;
-    std::unique_ptr< QPushButton > _validationButton;
-    std::unique_ptr< QPushButton > _eraseButton;
-    std::unique_ptr< QPushButton > _cancelButton;
-    std::unique_ptr< QGridLayout > _gridLayout;
+    QLabel* _labelRel;
+    QCheckBox* _autoCloseCheck;
+    QPushButton* _validationButton;
+    QPushButton* _eraseButton;
+    QPushButton* _cancelButton;
+    QGridLayout* _gridLayout;
+    QGridLayout* _gridPropertiesLayout;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
 
-    void checkClose( );
-    void refreshValues( );
+    void checkClose( void );
+    void refreshValues( void );
   };
 }
 #endif
