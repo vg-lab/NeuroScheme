@@ -55,9 +55,9 @@ namespace nslib
     _isGrid = false;
     _optionsWidget->layout( )->addWidget( _toolbox, 0, 0 );
 
-    _sortWidget = 0;
-    _filterWidget = 0;
-    _scatterPlotWidget = 0;
+    _sortWidget = nullptr;
+    _filterWidget = nullptr;
+    _scatterPlotWidget = nullptr;
 
     if ( _flags & SORT_ENABLED )
     {
@@ -169,12 +169,15 @@ namespace nslib
         entitiesPreFilter, preFilterRepresentations,
         true, true );
 
-      // Generate relationship representations
-      RepresentationCreatorManager::generateRelations(
-        filteredAndSortedEntities, relationshipReps, "connectsTo", false );
-      RepresentationCreatorManager::generateRelations(
-        filteredAndSortedEntities, relationshipReps,
-        "aggregatedConnectsTo", true );
+      if ( Config::showConnectivity( ))
+      {
+        // Generate relationship representations
+        RepresentationCreatorManager::generateRelations(
+          filteredAndSortedEntities, relationshipReps, "connectsTo", false );
+        RepresentationCreatorManager::generateRelations(
+          filteredAndSortedEntities, relationshipReps,
+          "aggregatedConnectsTo", true );
+      }
 
     }
     else
@@ -189,11 +192,15 @@ namespace nslib
         true, true );
 
       // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
-      // Generate relationship representations
-      RepresentationCreatorManager::generateRelations( entities,
-        relationshipReps, "connectsTo", false );
-      RepresentationCreatorManager::generateRelations( entities,
-        relationshipReps, "aggregatedConnectsTo", true );
+
+      if ( Config::showConnectivity( ))
+      {
+        // Generate relationship representations
+        RepresentationCreatorManager::generateRelations( entities,
+          relationshipReps, "connectsTo", false );
+        RepresentationCreatorManager::generateRelations( entities,
+          relationshipReps, "aggregatedConnectsTo", true );
+      }
     }
 
     // shift::Representations relationshipReps;
@@ -211,9 +218,6 @@ namespace nslib
         _addRepresentations( representations );
     }
 
-    if ( Config::showConnectivity( ))
-      _addRepresentations( relationshipReps );
-
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
       _arrangeItems( preFilterRepresentations, animate, representations );
@@ -223,10 +227,17 @@ namespace nslib
       _arrangeItems( representations, animate );
     }
 
-    OpConfig opConfig( &_canvas->scene( ), animate, _isGrid );
+    if ( Config::showConnectivity( ))
+    {
+      _addRepresentations( relationshipReps );
 
-    for ( auto& relationshipRep : relationshipReps )
-      relationshipRep->preRender( &opConfig );
+      OpConfig opConfig( &_canvas->scene( ), animate, _isGrid );
+
+      for ( auto& relationshipRep : relationshipReps )
+      {
+        relationshipRep->preRender( &opConfig );
+      }
+    }
   }
 
    void Layout::refreshWidgetsProperties(
@@ -316,6 +327,15 @@ namespace nslib
       {
         _canvas->scene( ).removeItem( item );
       }
+    }
+
+    //todo iago debug
+    std::cout <<"escena con items sin eliminar eliminados: " << PaneManager::activePane()->scene( ).items( ).size( ) << std::endl;
+    for (auto item : PaneManager::activePane()->scene( ).items( ))
+    {
+      std::cout <<"Item init: Pos " << item->pos().x() << "\t-\t"
+                << item->pos().y( )<<"\t"<< item->boundingRect( ).width( )<<"\t"
+                <<  item->scale( ) << "\tid:\t"<<item << std::endl;
     }
 
     // // Remove the rest

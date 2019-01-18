@@ -259,16 +259,27 @@ namespace nslib
 
       return;
     }
+    if ( index == _activeLayoutIndex )
+    {
+      Loggers::get( )->log( "Trying to change to a layout already in use",
+        LOG_LEVEL_WARNING );
+      return;
+    }
     Loggers::get( )->log( "Layout changed to " + std::to_string( index ),
-                         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+      LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     if ( _layouts.getLayout( index ))
     {
       _activeLayoutIndex = index;
-      _layouts.getLayout( index )->optionsWidget( );
+      auto actualLayout = _layouts.getLayout( index );
+      actualLayout->optionsWidget( );
       _layouts.layoutSelector( )->setCurrentIndex( index );
       auto layout_ = PaneManager::layout( );
       if ( layout_ )
       {
+        if( _activeLayoutIndex == Layout::TLayoutIndexes::FREE )
+        {
+          dynamic_cast< FreeLayout* >( actualLayout )->init( );
+        }
         auto item = layout_->itemAtPosition( 2, 0 );
         if ( item )
         {
@@ -474,6 +485,26 @@ namespace nslib
       _sceneEntities.removeIfContains( entity_ );
     }
     _entities.removeIfContains( entity_ );
+  }
+
+  qreal Canvas::padding( ) const
+  {
+    return _padding;
+  }
+
+  void Canvas::padding( qreal padding_ )
+  {
+    _padding = padding_;
+  }
+
+  qreal Canvas::repsScale( ) const
+  {
+    return _repsScale;
+  }
+
+  void Canvas::repsScale( qreal repsScale_ )
+  {
+    _repsScale = repsScale_;
   }
 
 } // namespace nslib

@@ -82,11 +82,11 @@ namespace nslib
     //Check if exists performed in the repCreators
     if ( _repCreators.count( repCreatorId ) == 1 )
       _repCreators[ repCreatorId ]->create( entities, representations,
-                                            _entitiesToReps[ repCreatorId ],
-                                            _repsToEntities[ repCreatorId ],
-                                            _gidsToEntitiesReps[ repCreatorId ],
-                                            linkEntitiesToReps,
-                                            linkRepsToObjs );
+        _entitiesToReps[ repCreatorId ],
+        _repsToEntities[ repCreatorId ],
+        _gidsToEntitiesReps[ repCreatorId ],
+        linkEntitiesToReps,
+        linkRepsToObjs );
   }
 
 

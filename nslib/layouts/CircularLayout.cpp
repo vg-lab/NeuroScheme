@@ -77,10 +77,10 @@ namespace nslib
           QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
           if ( rect.width( ) > maxItemWidth )
-            maxItemWidth = rect.width( );
+            maxItemWidth = static_cast<unsigned int>(rect.width( ));
 
           if ( rect.height( ) > maxItemHeight )
-            maxItemHeight = rect.height( );
+            maxItemHeight = static_cast<unsigned int>(rect.height( ));
         }
         // else std::cout << "Item with parentItem, skipping" << std::endl;
       }
@@ -88,8 +88,6 @@ namespace nslib
     //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
     // std::cout << "Arranging " << repsToBeArranged << std::endl;
 
-    bool forceScale = false;
-    float forcedScale = 1.0f;
     const unsigned int marginX = 20;
     const unsigned int marginY = 20;
     // const float scalePaddingX = 1.1f;
@@ -115,16 +113,16 @@ namespace nslib
 
     float deltaAngle = 2.0f * static_cast< float >( M_PI ) / repsToBeArranged;
     float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
+    float deltaAngleMultRadius = 0.9f * deltaAngle * radius;
 
-
-    unsigned int numRows =  static_cast< unsigned int >(
+    auto numRows =  static_cast< unsigned int >(
       floorf( sqrtf( iconAspectRatio * float( repsToBeArranged ) /
                    canvasAspectRatio )));
 
     if ( numRows < 1 && repsToBeArranged > 0 )
       numRows = 1;
 
-    unsigned int numColumns = static_cast< unsigned int >(
+    auto numColumns = static_cast< unsigned int >(
       ceilf( float( repsToBeArranged ) / float( numRows )));
 
     if ( numColumns < 1 && repsToBeArranged > 0 )
@@ -153,6 +151,7 @@ namespace nslib
 
     auto opacity = _filterWidget
       ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
+    qreal repsScale;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -177,24 +176,22 @@ namespace nslib
 
           qreal posX;
           qreal posY;
-          float scale;
           float scaleX;
           float scaleY;
-
 
           if ( repsToBeArranged == 1 )
           {
             scaleX = float( gv->width( ) - 2 * marginX  / rect.width( ));
             scaleY = float( gv->height( ) - 2 * marginY  / rect.height( ));
-            scale = std::min( scaleX, scaleY );
+            repsScale = std::min( scaleX, scaleY );
             posX = 0;
             posY = 0;
           }
           else
           {
-            scaleX = float( deltaAngle * radius / rect.width( ));
-            scaleY = float( deltaAngle * radius / rect.height( ));
-            scale = std::min( scaleX, scaleY ) * 0.9f;
+            scaleX = float( deltaAngleMultRadius / rect.width( ));
+            scaleY = float( deltaAngleMultRadius / rect.height( ));
+            repsScale = std::min( scaleX, scaleY );
             qreal angle = counter * deltaAngle;
             posX = radius * cos( angle );
             posY = radius * sin( angle );
@@ -203,7 +200,6 @@ namespace nslib
             // qreal posY = _y * deltaY * scale - gv->height( ) / 2 +
             //   topMargin - scale * rect.center( ).y( );
           }
-          qreal scale_ = forceScale ? forcedScale : scale;
 
           if ( useOpacityForFilter &&
                filteredOutItems.count( graphicsItem ) == 1 )
@@ -216,16 +212,18 @@ namespace nslib
 
           if ( obj && animate )
           {
-            animateItem( graphicsItem, scale_, QPoint( posX, posY ));
+            animateItem( graphicsItem, repsScale, QPoint( posX, posY ));
           }
           else
           {
             graphicsItem->setPos( posX, posY );
-            graphicsItem->setScale( scale_ );
+            graphicsItem->setScale( repsScale );
           }
           // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }
+
+      _canvas->repsScale( repsScale );
 
       counter++;
       if (((unsigned int ) _x ) >= numColumns )

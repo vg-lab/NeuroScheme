@@ -50,7 +50,8 @@ namespace nslib
         dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
       if ( !graphicsItemRep )
       {
-        std::cerr << "Item null" << std::endl;
+        nslib::Loggers::get( )->log( "Item null",
+          nslib::LOG_LEVEL_WARNING );
       }
       else
       {
@@ -85,14 +86,13 @@ namespace nslib
     //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
     // std::cout << "Arranging " << repsToBeArranged << std::endl;
 
-    bool forceScale = false;
-    float forcedScale = 1.0f;
+    //todo iago continue
     const unsigned int marginX = 20;
     const unsigned int marginY = 20;
-    const float scalePaddingX = 1.1f;
-    const float scalePaddingY = 1.1f;
-    const unsigned int fixedPaddingX = 0;
-    const unsigned int fixedPaddingY = 0;
+    const float scalePaddingX = 1.0f;//todo iago editar en widget
+    const float scalePaddingY = 1.0f;//todo iago editar en widget
+    const unsigned int fixedPaddingX = 0u;//todo iago editar en widget
+    const unsigned int fixedPaddingY = 0u;//todo iago editar en widget
 
     unsigned int deltaX = static_cast< unsigned int >(
       scalePaddingX * maxItemWidth + fixedPaddingX );
@@ -132,19 +132,18 @@ namespace nslib
 
     // std::cout << "Num rows: " << numRows << " Num cols: " << numColumns << std::endl;
 
-    float scale;
     float scaleX = float( gv->width( ) - 2.0f * marginX ) /
       float( numColumns * deltaX );
     float scaleY = float( gv->height( ) - 2.0f * marginY ) /
       float( numRows * deltaY );
-    scale = std::min( scaleX, scaleY );
+    qreal repsScale = std::min( scaleX, scaleY );
 
     // std::cout << "Scale: " << scaleX << " " << scaleY << " " << scale << std::endl;
 
-    int leftMargin = static_cast< int >( ( ( deltaX * scale ) +
-      ( gv->width( ) - numColumns * deltaX * scale )) * 0.5f );
-    int topMargin = static_cast< int >( ( ( deltaY * scale ) +
-      ( gv->height( ) - numRows * deltaY * scale )) * 0.5f);
+    int leftMargin = static_cast< int >( ( ( deltaX * repsScale ) +
+      ( gv->width( ) - numColumns * deltaX * repsScale )) * 0.5f );
+    int topMargin = static_cast< int >( ( ( deltaY * repsScale ) +
+      ( gv->height( ) - numRows * deltaY * repsScale )) * 0.5f);
 
     auto opacity = _filterWidget
       ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
@@ -168,11 +167,10 @@ namespace nslib
         {
           QRectF rect = graphicsItem->childrenBoundingRect( ) |
             graphicsItem->boundingRect( );
-          qreal posX = _x * deltaX * scale - gv->width( ) * 0.5f +
-            leftMargin - scale * rect.center( ).x( );
-          qreal posY = _y * deltaY * scale - gv->height( ) * 0.5f +
-            topMargin - scale * rect.center( ).y( );
-          qreal scale_ = forceScale ? forcedScale : scale;
+          qreal posX = _x * deltaX * repsScale - gv->width( ) * 0.5f +
+            leftMargin - repsScale * rect.center( ).x( );
+          qreal posY = _y * deltaY * repsScale - gv->height( ) * 0.5f +
+            topMargin - repsScale * rect.center( ).y( );
 
           if ( useOpacityForFilter &&
                filteredOutItems.count( graphicsItem ) == 1 )
@@ -185,16 +183,18 @@ namespace nslib
 
           if ( obj && animate )
           {
-            animateItem( graphicsItem, scale_, QPoint( posX, posY ));
+            animateItem( graphicsItem, repsScale, QPoint( posX, posY ));
           }
           else
           {
             graphicsItem->setPos( posX, posY );
-            graphicsItem->setScale( scale_ );
+            graphicsItem->setScale( repsScale );
           }
           // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }
+
+      _canvas->repsScale( repsScale );
 
       ++_x;
       if (((unsigned int ) _x ) >= numColumns )

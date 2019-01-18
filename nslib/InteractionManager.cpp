@@ -613,32 +613,32 @@ namespace nslib
       else if( item_ )
       {
         auto parentItem = item_->parentItem( );
-        while( parentItem )
+        while ( parentItem )
         {
           auto selectableItem = dynamic_cast< SelectableItem*>( item_ );
-          if( selectableItem )
+          if ( selectableItem )
             break;
           item_ = parentItem;
           parentItem = item_->parentItem( );
         }
 
-        if( _item == item_ )
+        if ( _item == item_ )
         {
           // Selection event
-          if( _buttons & Qt::LeftButton )
+          if ( _buttons & Qt::LeftButton )
           {
             auto item = dynamic_cast< Item* >( item_ );
 
             auto selectableItem = dynamic_cast< SelectableItem* >( item );
-            if( selectableItem )
+            if ( selectableItem )
             {
               const auto& repsToEntities =
                 RepresentationCreatorManager::repsToEntities( );
-              if( repsToEntities.find( item->parentRep( )) !=
+              if ( repsToEntities.find( item->parentRep( )) !=
                  repsToEntities.end( ))
               {
                 const auto entities = repsToEntities.at( item->parentRep( ));
-                if( selectableItem->partiallySelected( ))
+                if ( selectableItem->partiallySelected( ))
                 {
                   selectableItem->setSelected( );
                 }
@@ -655,7 +655,7 @@ namespace nslib
 // std::cout << "-- ShiFT gid: "
 //           << int( entity->entityGid( )) << std::endl;
 
-                  if( selectableItem->selected( ))
+                  if ( selectableItem->selected( ))
                   {
                     SelectionManager::setSelectedState(
                       entity, SelectedState::SELECTED );
@@ -696,7 +696,7 @@ namespace nslib
                         SelectionManager::setSelectedState(
                           allEntities.at( groupedId.first ), entityState );
                         // Save unique parent set for updating only once per parent
-                        if( relChildOf.count( groupedId.first ) > 0 )
+                        if ( relChildOf.count( groupedId.first ) > 0 )
                           parentIds.insert( relChildOf.at(
                           groupedId.first ).entity );
                       }
@@ -704,13 +704,13 @@ namespace nslib
                         allEntities, relSuperEntityOf, relAGroupOf,
                         relSubEntityOf.at( entityGid ).entity );
                       std::unordered_set<unsigned int> uniqueParentChildIds;
-                      for( auto const& parentId : parentIds )
+                      for ( auto const& parentId : parentIds )
                       {
                         uniqueParentChildIds.insert(
                           relParentOf.at( parentId ).begin( )->first );
                       }
                       // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
-                      for( auto const& uniqueParentChildId : uniqueParentChildIds )
+                      for ( auto const& uniqueParentChildId : uniqueParentChildIds )
                       {
                         _propagateSelectedStateToParent(
                           allEntities, relChildOf, relParentOf,
@@ -721,11 +721,11 @@ namespace nslib
                   } // if subentity
                   else
                   {
-                    if( relSuperEntityOf.count( entityGid ) > 0 )
+                    if ( relSuperEntityOf.count( entityGid ) > 0 )
                     {
                       const auto& subEntities =
                         relSuperEntityOf.at( entityGid );
-                      for( const auto& subEntity : subEntities )
+                      for ( const auto& subEntity : subEntities )
                         SelectionManager::setSelectedState(
                           allEntities.at( subEntity.first ), entityState );
                     }
@@ -754,12 +754,12 @@ namespace nslib
             }
 
             // Publish selection
-            std::vector<unsigned int> ids;
+            std::vector< unsigned int > ids;
             SelectionManager::selectableEntitiesIds( ids );
 
-            if( Config::autoPublishSelection( ))
+            if ( Config::autoPublishSelection( ))
               ZeroEQManager::publishSelection( ids );
-            if( Config::autoPublishFocusOnSelection( ))
+            if ( Config::autoPublishFocusOnSelection( ))
               ZeroEQManager::publishFocusOnSelection( ids );
           } // selection event
         }
@@ -771,11 +771,11 @@ namespace nslib
             auto originItem = dynamic_cast< Item* >( _item );
             auto destinationItem = dynamic_cast< Item* >( item_ );
 
-            if( destinationItem )
+            if ( destinationItem )
             {
               const auto& repsToEntities =
                 RepresentationCreatorManager::repsToEntities( );
-              if( ( repsToEntities.find( originItem->parentRep( )) !=
+              if ( ( repsToEntities.find( originItem->parentRep( )) !=
                     repsToEntities.end( )) &&
                   ( repsToEntities.find( destinationItem->parentRep( )) !=
                     repsToEntities.end( )))

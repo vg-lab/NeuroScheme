@@ -24,7 +24,10 @@
 
 #include <nslib/api.h>
 #include <shift/shift.h>
+#include <nslib/layouts/FreeLayout.h>
 #include "Canvas.h"
+#include "PaneManager.h"
+#include "Config.h"
 // #include "domains/domains.h"
 
 namespace nslib
@@ -71,8 +74,22 @@ namespace nslib
 
     static void clearRelationshipsCache( unsigned int repCreatorId = 0 )
     {
+      if( Config::showConnectivity( ))
+      {
+        for( const auto& pane : PaneManager::panes( ))
+        {
+          if( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE )
+          {
+            FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
+              pane->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+            freeLayout->removeRelationshipsReps( );
+          }
+        }
+      }
       for ( auto& relPair : _relatedEntitiesReps[ repCreatorId ] )
-          delete std::get< 0 >( relPair.second );
+      {
+        delete std::get< 0 >( relPair.second );
+      }
       _relatedEntitiesReps[ repCreatorId ].clear( );
     }
 

@@ -96,12 +96,19 @@ namespace nslib
     TEntityEditWidgetAction _updateAction;
 
     bool _isNew;
+    bool _isNewOrDuplicated;
+    bool _isEditing;
     bool _addToScene;
     bool _updateAddToScene;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
     static bool _checkUniquenessChecked;
+
+    void updateEntitiyRepresentations( shift::RepresentationCreator* creatorRep_,
+      const shift::Entity* entity_,
+      std::set< shift::Representation* > entityReps_,
+      const bool freeLayoutInUse_ ) const;
   };
 }
 

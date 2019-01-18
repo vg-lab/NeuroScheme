@@ -168,7 +168,6 @@ namespace nslib
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;
     static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
-
   };
 }
 

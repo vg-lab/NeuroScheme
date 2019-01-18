@@ -37,11 +37,15 @@ namespace nslib
     void startMoveRepresentation( QGraphicsItem* item_,
       const QPointF clickPos_ );
 
+    void init( void );
+
     void moveRepresentation( const QPointF newPos_ );
 
     /**/void display( shift::Entities& entities,
       shift::Representations& representations,
       bool animate = true ) override;//*/
+
+    void removeRelationshipsReps( void );
 
     protected:
     void _addRepresentations( const shift::Representations& reps ) override;

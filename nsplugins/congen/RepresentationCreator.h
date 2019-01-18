@@ -43,6 +43,11 @@ namespace nslib
 
       virtual ~RepresentationCreator( void ) {};
 
+      void updateRepresentation(
+          const shift::Entity* entity,
+          shift::Representation* representation
+      ) final;
+
       void create(
         const shift::Entities& entities,
         shift::Representations& representations,
@@ -51,6 +56,7 @@ namespace nslib
         shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false ) final;
+
         void maxAbsoluteWeight(
           float maxAbsoluteWeight_, bool compare = false );
         void maxNeuronsPerPopulation(
@@ -79,14 +85,24 @@ namespace nslib
         shift::RelationshipProperties* relProperties ) final;
 
     protected:
-
       unsigned int _maxNeuronsPerPopulation;
       float _maxAbsoluteWeight;
+
+      MapperFloatToFloat _neuronsToPercentage;
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
       scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorModel >
         _neuronStimulatorModelColorMap;
       scoop::Color _superPopColor;
+
+      void updateNeuronPopRep( const shift::Entity* entity,
+        shift::Representation* representation );
+
+      void updateSuperPopRep( const shift::Entity* entity,
+        shift::Representation* representation );
+
+      void updateStimulator( const shift::Entity* entity,
+        shift::Representation* representation );
 };
 
   } // namespace congen

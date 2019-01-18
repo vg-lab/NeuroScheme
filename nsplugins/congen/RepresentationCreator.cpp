@@ -43,6 +43,7 @@ namespace nslib
     RepresentationCreator::RepresentationCreator( void )
       : _maxNeuronsPerPopulation( 1 )
       , _maxAbsoluteWeight( 0.0f )
+      ,  _neuronsToPercentage( 0, 1, 0.0f, 1.0f )
       , _superPopColor( "#a8f7ac" )
     {
       _neuronModelColorMap.setColor(
@@ -78,6 +79,72 @@ namespace nslib
         scoop::Color( "#a88459" ));
     }
 
+    void RepresentationCreator::updateRepresentation(
+      const shift::Entity* entity, shift::Representation* entityRep
+    )
+    {
+      if ( dynamic_cast< const shiftgen::NeuronPop* >( entity ) != nullptr )
+      {
+        updateNeuronPopRep( entity, entityRep );
+      }
+      else if( dynamic_cast< const shiftgen::NeuronSuperPop* >( entity ))
+      {
+        updateNeuronPopRep( entity, entityRep );
+      }
+      else if(  dynamic_cast< const shiftgen::Stimulator* >( entity ))
+      {
+        updateStimulator( entity, entityRep );
+      }
+    }
+
+    void RepresentationCreator::updateNeuronPopRep( const shift::Entity* neuronPopEntity,
+      shift::Representation* entityRep )
+    {
+      if ( neuronPopEntity->hasProperty( "Neuron model" ))
+      {
+        entityRep->setProperty(
+          "color", _neuronModelColorMap.getColor(
+          neuronPopEntity->getProperty( "Neuron model" )
+          .value< shiftgen::NeuronPop::TNeuronModel >( )));
+      }
+      else
+      {
+        entityRep->setProperty( "color", _neuronModelColorMap.getColor(
+          shiftgen::NeuronPop::TNeuronModel::undefined ) );
+      }
+      entityRep->setProperty( "line perc", _neuronsToPercentage.map(
+        neuronPopEntity->getProperty( "Nb of neurons" ).value< uint >( )));
+    }
+
+    void RepresentationCreator::updateSuperPopRep( const shift::Entity* entity,
+      shift::Representation* representation )
+    {
+      representation->setProperty( "color", _superPopColor );
+
+      representation->setProperty( "line perc", _neuronsToPercentage.map(
+        entity->getProperty( "Nb of neurons Mean" ).value<uint>( )));
+    }
+
+    void RepresentationCreator::updateStimulator( const shift::Entity* entity,
+                           shift::Representation* representation )
+    {
+      if( entity->hasProperty( "Stimulator model" ))
+      {
+        representation->setProperty(
+          "color", _neuronStimulatorModelColorMap.getColor(
+          entity->getProperty( "Stimulator model" )
+          .value<shiftgen::Stimulator::TStimulatorModel >( )));
+      }
+      else
+      {
+        representation->setProperty( "color",
+          _neuronStimulatorModelColorMap.getColor(
+          shiftgen::Stimulator::TStimulatorModel::undefined_generator ));
+      }
+      representation->setProperty( "line perc", _neuronsToPercentage.map(
+        entity->getProperty( "Nb of neurons" ).value< uint >( )));
+    }
+
     void RepresentationCreator::create(
       const shift::Entities& entities,
       shift::Representations& representations,
@@ -91,8 +158,6 @@ namespace nslib
       nslib::Loggers::get( )->log( "create",
         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-      MapperFloatToFloat
-        neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
 
       // scoop::SequentialColorMap neuronTypeColorMapper(
       //   scoop::ColorPalette::colorBrewerSequential(
@@ -114,20 +179,7 @@ namespace nslib
         if ( neuronPopEntity )
         {
           entityRep = new NeuronPopRep( );
-          if ( neuronPopEntity->hasProperty( "Neuron model" ))
-          {
-            entityRep->setProperty(
-              "color", _neuronModelColorMap.getColor(
-              neuronPopEntity->getProperty( "Neuron model" ).
-              value< shiftgen::NeuronPop::TNeuronModel >( )));
-          }
-          else
-          {
-            entityRep->setProperty( "color", _neuronModelColorMap.getColor(
-              shiftgen::NeuronPop::TNeuronModel::undefined ) );
-          }
-          entityRep->setProperty( "line perc", neuronsToPercentage.map(
-            neuronPopEntity->getProperty( "Nb of neurons" ).value< uint >( )));
+          updateNeuronPopRep( entity, entityRep );
         }
         else
         {
@@ -136,12 +188,7 @@ namespace nslib
           if( neuronSuperPopEntity )
           {
             entityRep = new NeuronSuperPopRep( );
-
-            entityRep->setProperty( "color", _superPopColor );
-
-            entityRep->setProperty( "line perc", neuronsToPercentage.map(
-              neuronSuperPopEntity->getProperty( "Nb of neurons Mean" )
-              .value<uint>( )));
+            updateNeuronPopRep( entity, entityRep );
           }
           else
           {
@@ -150,22 +197,7 @@ namespace nslib
             if( neuronPopInput )
             {
               entityRep = new StimulatorRep( );
-              if( neuronPopInput->hasProperty( "Stimulator model" ))
-              {
-                entityRep->setProperty(
-                  "color", _neuronStimulatorModelColorMap.getColor(
-                  neuronPopInput->getProperty( "Stimulator model" ).
-                  value<shiftgen::Stimulator::TStimulatorModel >( )));
-              }
-              else
-              {
-                entityRep->setProperty( "color",
-                  _neuronStimulatorModelColorMap.getColor(
-                  shiftgen::Stimulator::TStimulatorModel::undefined_generator ));
-              }
-              entityRep->setProperty( "line perc", neuronsToPercentage.map(
-                neuronPopInput->getProperty( "Nb of neurons" )
-                .value< uint >( )));
+              updateStimulator( entity, entityRep );
             }
           }
         }
@@ -447,6 +479,8 @@ namespace nslib
       {
         this->clear( );
         _maxNeuronsPerPopulation = newNeuronsPerPopulation;
+        _neuronsToPercentage =
+          MapperFloatToFloat ( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
         return true;
       }
       else
@@ -514,6 +548,8 @@ namespace nslib
       if ( !compare || maxNeuronsPerPopulation_ > _maxNeuronsPerPopulation )
       {
         _maxNeuronsPerPopulation = maxNeuronsPerPopulation_;
+        _neuronsToPercentage =
+          MapperFloatToFloat ( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f );
       }
     }
 

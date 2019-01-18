@@ -37,6 +37,16 @@ namespace nslib
   namespace cortex
   {
 
+    void RepresentationCreator::updateRepresentation(
+      const shift::Entity* entity,
+      shift::Representation* representation
+    )
+    {
+      //todo iago
+      (void) entity;
+      (void) representation;
+    }
+
     void RepresentationCreator::create(
       const shift::Entities& entities,
       shift::Representations& representations,

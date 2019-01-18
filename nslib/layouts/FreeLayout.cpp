@@ -38,15 +38,19 @@ namespace nslib
   FreeLayout::FreeLayout( void )
     : Layout( "Free", 0 )
   {
-    //todo resize
-    //todo pan
-    //todo new entities resize and position
+    //todo iago resize
+    //todo iago pan
+    //todo iago new entities position
+    //todo iago padding
+    //todo iago relationships
+    _isGrid = false;
+
   }
 
   void FreeLayout::_arrangeItems( const shift::Representations& reps,
     const bool animate, const shift::Representations& postFilterReps )
   {
-    _isGrid = false;
+    //todo iago debug
     std::cout << "arranging free layout" << std::endl;//todo resize
     std::cout << "reps " << reps.size( ) <<std::endl;
     std::cout << "animate " << animate <<std::endl;
@@ -97,34 +101,31 @@ namespace nslib
                         shift::Representations& representations,
                         bool animate )
   {
+    //todo iago debug
     std::cout << "display: " << animate << std::endl;
-    Loggers::get( )->log(
-        "display " + std::to_string( entities.size( ) ),
-        LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+    Loggers::get( )->log( "display "
+      + std::to_string( entities.size( )),
+      LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
     representations.clear( );
     RepresentationCreatorManager::create(
       entities, representations,
       true, true );
 
-    if( !animate )
+    shift::Representations removeReps;
+    for( const auto& oldRep : _entitiesReps )
     {
-      shift::Representations removeReps;
-      for( const auto& oldRep : _entitiesReps )
+      if( std::find( representations.begin( ), representations.end( ),
+        oldRep ) == representations.end( ))
       {
-        if( std::find( representations.begin( ), representations.end( ),
-          oldRep ) == representations.end( ))
-        {
-          removeReps.push_back( oldRep );
-        }
+        removeReps.push_back( oldRep );
       }
-      _removeRepresentations( removeReps );
-      _addRepresentations( representations );
-      _entitiesReps = representations;
     }
+    _removeRepresentations( removeReps );
+    _addRepresentations( representations );
+    _entitiesReps = representations;
 
-    _removeRepresentations( _relationshipReps );
-    _relationshipReps.clear( );
+    removeRelationshipsReps( );
     if ( Config::showConnectivity( ))
     {
       shift::Representations newRepresentations;
@@ -132,11 +133,10 @@ namespace nslib
         newRepresentations, "connectsTo", false );
       RepresentationCreatorManager::generateRelations( entities,
         newRepresentations, "aggregatedConnectsTo", true );
-      _addRepresentations( newRepresentations );
       _relationshipReps = newRepresentations;
       _addRepresentations( _relationshipReps );
 
-      OpConfig opConfig( &_canvas->scene( ), animate, _isGrid );
+      OpConfig opConfig( &_canvas->scene( ), false, _isGrid );
       for ( auto& relationshipRep : _relationshipReps )
       {
         relationshipRep->preRender( &opConfig );
@@ -147,8 +147,9 @@ namespace nslib
   void FreeLayout::_addRepresentations( const shift::Representations& reps )
   {
     const auto& repsToEntities =
-        RepresentationCreatorManager::repsToEntities( );
+      RepresentationCreatorManager::repsToEntities( );
 
+    qreal repsScale = _canvas->repsScale( );
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -209,8 +210,9 @@ namespace nslib
           && !_canvas->scene( ).items( ).contains( item ))
         {
           _canvas->scene( ).addItem( item );
-          //todo check if position center; and move to mouse position
-          //todo resize to scene
+          item->setScale( repsScale );
+          std::cout << repsScale << std::endl;
+          //todo iago check if position center; and move to mouse position
         }
 
       }
@@ -249,6 +251,18 @@ namespace nslib
   Layout* FreeLayout::clone( void ) const
   {
     return new FreeLayout( );
+  }
+
+  void FreeLayout::removeRelationshipsReps( )
+  {
+    _removeRepresentations( _relationshipReps );
+    _relationshipReps.clear( );
+  }
+
+  void FreeLayout::init( )
+  {
+    _relationshipReps.clear( );
+    _entitiesReps.clear( );
   }
 
 }

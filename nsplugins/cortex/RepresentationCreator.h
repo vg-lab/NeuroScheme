@@ -41,6 +41,11 @@ namespace nslib
     public:
       virtual ~RepresentationCreator( void ) {};
 
+      void updateRepresentation(
+          const shift::Entity* entity,
+          shift::Representation* representation
+      ) final;
+
       void create(
         const shift::Entities& entities,
         shift::Representations& representations,
