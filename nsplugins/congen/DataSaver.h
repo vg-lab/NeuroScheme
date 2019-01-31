@@ -36,8 +36,9 @@ namespace nslib
     class DataSaver
     {
       public:
-
         NSLIBCONGEN_API static void saveXmlScene( QWidget* parent );
+        NSLIBCONGEN_API static void saveXmlConnections(
+          const shift::RelationshipOneToN &relation, XMLExporter* exporter_ );
     };
   } /* namespace congen */
 } /* namespace nslib */

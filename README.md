@@ -73,12 +73,21 @@ try to visualize a very simple scene by running:
 ./bin/NeuroScheme -d cortex -xml nsol/testData/scene.xml
 ```
 
-Cortex domain does not support exporting data.
-
 #### Congen domain
 
-Congen domain at the moment only allows creating data but does not support
-loading data yet (soon we hope!).
+Congen domain allows importing and exporting data to NeuroML.
+
+```bash
+./bin/NeuroScheme -d congen -x /path/to/neuroML.xml
+```
+
+#### All domains
+
+All domains have an importer and exporter to our custom JSON format.
+
+```bash
+./bin/NeuroScheme -d domain --json /path/to/file.json
+```
 
 ### Interacting with data
 

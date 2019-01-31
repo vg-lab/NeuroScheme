@@ -22,6 +22,7 @@
 
 #include "Domain.h"
 #include "Neuron.h"
+#include <shift/RelationshipProperties.h>
 #include <nslib/RepresentationCreatorManager.h>
 #include <nslib/DataManager.h>
 #include <nslib/PaneManager.h>
@@ -86,40 +87,40 @@ namespace nslib
       {
         this->setWindowTitle( "BlueConfig loading options:" );
 
-        _layout.reset( new QGridLayout );
+        _layout = new QGridLayout;
         int row = 0;
 
-        _labelLoadMorpho.reset(
-          new QLabel( tr( "Load morphologies:" )));
-        _checkLoadMorpho.reset( new QCheckBox( ));
+        _labelLoadMorpho =
+          new QLabel( tr( "Load morphologies:" ));
+        _checkLoadMorpho = new QCheckBox( );
         _checkLoadMorpho->setChecked( true );
-        _labelLoadMorpho->setBuddy( _checkLoadMorpho.get( ));
-        _layout->addWidget( _labelLoadMorpho.get( ), row, 0);
-        _layout->addWidget( _checkLoadMorpho.get( ), row, 1);
+        _labelLoadMorpho->setBuddy( _checkLoadMorpho );
+        _layout->addWidget( _labelLoadMorpho, row, 0 );
+        _layout->addWidget( _checkLoadMorpho, row, 1 );
         row++;
 
-        _labelLoadConnectivity.reset(
-          new QLabel( tr( "Load connectivity:" )));
-        _checkLoadConnectivity.reset( new QCheckBox( ));
+        _labelLoadConnectivity =
+          new QLabel( tr( "Load connectivity:" ));
+        _checkLoadConnectivity = new QCheckBox( );
         _checkLoadConnectivity->setChecked( false );
-        _labelLoadConnectivity->setBuddy( _checkLoadConnectivity.get( ));
-        _layout->addWidget( _labelLoadConnectivity.get( ), row, 0);
-        _layout->addWidget( _checkLoadConnectivity.get( ), row, 1);
+        _labelLoadConnectivity->setBuddy( _checkLoadConnectivity );
+        _layout->addWidget( _labelLoadConnectivity, row, 0 );
+        _layout->addWidget( _checkLoadConnectivity, row, 1 );
         row++;
 
-        _labelLoadCSVStats.reset(
-          new QLabel( tr( "Load csv stats file:" )));
-        _checkLoadCSVStats.reset( new QCheckBox( ));
+        _labelLoadCSVStats =
+          new QLabel( tr( "Load csv stats file:" ));
+        _checkLoadCSVStats = new QCheckBox( );
         _checkLoadCSVStats->setChecked( false );
-        _labelLoadCSVStats->setBuddy( _checkLoadCSVStats.get( ));
-        _layout->addWidget( _labelLoadCSVStats.get( ), row, 0);
-        _layout->addWidget( _checkLoadCSVStats.get( ), row, 1);
+        _labelLoadCSVStats->setBuddy( _checkLoadCSVStats );
+        _layout->addWidget( _labelLoadCSVStats, row, 0 );
+        _layout->addWidget( _checkLoadCSVStats, row, 1 );
         row++;
 
-        _okButton.reset( new QPushButton( "Ok" ));
-        _layout->addWidget( _okButton.get( ), row, 1);
-        connect( _okButton.get( ), SIGNAL( clicked( )), this, SLOT( close( )));
-        setLayout( _layout.get( ));
+        _okButton = new QPushButton( "Ok" );
+        _layout->addWidget( _okButton, row, 1);
+        connect( _okButton, SIGNAL( clicked( )), this, SLOT( close( )));
+        setLayout( _layout );
       }
 
       bool loadMorphology( void ) { return _checkLoadMorpho->isChecked( ); }
@@ -130,14 +131,14 @@ namespace nslib
     //   void ok( void ) { this->close( ); }
 
     protected:
-      std::unique_ptr< QLabel > _labelLoadMorpho;
-      std::unique_ptr< QCheckBox > _checkLoadMorpho;
-      std::unique_ptr< QLabel > _labelLoadConnectivity;
-      std::unique_ptr< QCheckBox > _checkLoadConnectivity;
-      std::unique_ptr< QLabel > _labelLoadCSVStats;
-      std::unique_ptr< QCheckBox > _checkLoadCSVStats;
-      std::unique_ptr< QGridLayout > _layout;
-      std::unique_ptr< QPushButton > _okButton;
+      QLabel* _labelLoadMorpho;
+      QCheckBox* _checkLoadMorpho;
+      QLabel* _labelLoadConnectivity;
+      QCheckBox* _checkLoadConnectivity;
+      QLabel* _labelLoadCSVStats;
+      QCheckBox* _checkLoadCSVStats;
+      QGridLayout* _layout;
+      QPushButton* _okButton;
     };
 
     void DomainGUI::loadBlueConfig( void )
@@ -257,7 +258,10 @@ namespace nslib
         new Eigen4VectorCaster( ));
 
       this->_exportRelations =
-        { "connectsTo", "isParentOf", "isAGroupOf", "isSuperEntityOf" };
+        { "isParentOf", "isAGroupOf", "isSuperEntityOf", "connectsTo",
+          "aggregatedConnectsTo","aggregatedConnectedBy" };
+      this->_exportAggregatedRelations = { false, false, false, false, true,
+        true };
       this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
       this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
@@ -271,8 +275,8 @@ namespace nslib
 
       _entities.relationships( )[ "isParentOf" ] =
         new shift::RelationshipOneToN( "isParentOf" );
-      _entities.relationships( )[ "isChildOf" ] =
-        new shift::RelationshipOneToOne( "isChildOf" );
+      auto relChildOf = new shift::RelationshipOneToOne( "isChildOf" );
+      _entities.relationships( )[ "isChildOf" ] = relChildOf;
 
       _entities.relationships( )[ "isAGroupOf" ] =
         new shift::RelationshipOneToN( "isAGroupOf" );
@@ -284,11 +288,21 @@ namespace nslib
       _entities.relationships( )[ "isSubEntityOf" ] =
         new shift::RelationshipOneToOne( "isSubEntityOf" );
 
-      _entities.relationships( )[ "connectsTo" ] =
-        new shift::RelationshipOneToN( "connectsTo" );
-      _entities.relationships( )[ "connectedBy" ] =
-        new shift::RelationshipOneToN( "connectedBy");
+      auto relConnectsTo = new shift::RelationshipOneToN( "connectsTo" );
+      auto relConnectedBy = new shift::RelationshipOneToN( "connectedBy" );
+      _entities.relationships( )[ "connectsTo" ] = relConnectsTo;
+      _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
 
+      shift::RelationshipProperties* connectsToObj =
+        _relationshipPropertiesTypes->getRelationshipProperties(
+        "aggregatedConnectsTo" );
+
+      _entities.relationships( )[ "aggregatedConnectsTo" ] =
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo",
+        connectsToObj, relChildOf, relConnectsTo );
+      _entities.relationships( )[ "aggregatedConnectedBy" ] =
+        new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy",
+        connectsToObj, relChildOf,relConnectedBy);
     }
 
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
@@ -326,36 +340,35 @@ namespace nslib
 
     }
 
-    void Domain::addRelationsOfType(
-      const boost::property_tree::ptree&  relations,
-      std::string relationName,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    void Domain::importRelationshipsJSON(
+      const boost::property_tree::ptree& relationships,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
-      if ( relationName == "connectsTo")
-      {
-        addConnectsToRelationsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isParentOf" )
-      {
-        addIsParentOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isAGroupOf" )
-      {
-        addIsAGroupOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else if ( relationName == "isSuperEntityOf" )
-      {
-        addIsSuperEntityOfRelationshipsToJSON( relations, oldGUIToEntity );
-      }
-      else
-      {
-        SHIFT_THROW( "ERROR: unknown type of relation: "+relationName );
-      }
+
+      addIsParentOfRelationshipsFromJSON( getRelationsOfType(
+        "isParentOf", relationships ), oldGIDToEntity );
+
+      addConnectsToRelationsFromJSON( getRelationsOfType(
+        "connectsTo", relationships ), oldGIDToEntity );
+
+      addIsAGroupOfRelationshipsToJSON( getRelationsOfType(
+        "isAGroupOf", relationships ), oldGIDToEntity );
+
+      addIsSuperEntityOfRelationshipsToJSON( getRelationsOfType(
+        "isSuperEntityOf", relationships ), oldGIDToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectedBy", relationships ), "aggregatedConnectedBy",
+        oldGIDToEntity );
+
+      addAggregatedConnectionFromJSON( getRelationsOfType(
+        "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
+        oldGIDToEntity );
     }
 
     void Domain::addIsAGroupOfRelationshipsToJSON(
       const boost::property_tree::ptree&  relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
       auto& relGroupOf = *( DataManager::entities( )
         .relationships( )[ "isAGroupOf" ]->asOneToN( ) );
@@ -367,8 +380,8 @@ namespace nslib
         shift::Entity* origEntity;
         shift::Entity* destEntity;
 
-        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "isParentOf" );
+        importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
+          destEntity, "GroupOf", true );
 
         shift::Relationship::Establish( relGroupOf, relGroupBy,
           origEntity, destEntity );
@@ -379,7 +392,7 @@ namespace nslib
     void
     Domain::addIsSuperEntityOfRelationshipsToJSON(
       const boost::property_tree::ptree&  relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
       auto& relSuperEntity = *( DataManager::entities( )
         .relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
@@ -391,8 +404,8 @@ namespace nslib
         shift::Entity* origEntity;
         shift::Entity* destEntity;
 
-        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
-          destEntity, "isParentOf" );
+        importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
+          destEntity, "SuperEntityOf", true );
 
         shift::Relationship::Establish( relSuperEntity, relSubEntity,
           origEntity, destEntity );

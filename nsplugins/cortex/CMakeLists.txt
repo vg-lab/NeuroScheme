@@ -22,7 +22,7 @@ list( APPEND SHIFT_GENERATED_HEADER_FILES
   ${SHIFT_GENERATED_DIR}/shift_cortex_entities.h )
 
 # Generate relationships
-set( SHIFT_GENERATED_OBJECTS ConnectsWith ParentOf ChildOf )
+set( SHIFT_GENERATED_OBJECTS ConnectsWith AggregatedConnectsWith ParentOf ChildOf )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 shift_generate_cxx(

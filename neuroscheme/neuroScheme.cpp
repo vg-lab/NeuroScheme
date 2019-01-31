@@ -48,6 +48,7 @@ void usageMessage( const std::string& errorMsg = "" )
             << std::endl
             << "\t[ [ --scale | -sc ] scaleFactor = 1.0f ]"
             << "\t[ [ --log-file | -l ] log_file_name ]"
+            << "\t[ [--json ] JSON_file_name ]"
             << "\t[ [ --not-colored-log | -ncl ]";
   std::cout << std::endl;
   std::cout << std::endl;

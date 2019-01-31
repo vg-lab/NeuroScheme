@@ -2,7 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Juan Pedro Brito <juanpedro.brito@upm.es>
- *
+ *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  * This file is part of NeuroScheme
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -44,9 +44,10 @@ namespace nslib
     typedef enum { NEW_ENTITY, EDIT_ENTITY, DUPLICATE_ENTITY }
     TEntityEditWidgetAction;
 
-    EntityEditWidget( shift::Entity* entity, TEntityEditWidgetAction action,
-      QWidget *parentWidget_ = 0, bool addToScene_ = true,
-      shift::Entity* parentEntity_= nullptr);
+    EntityEditWidget( shift::Entity* entity_, TEntityEditWidgetAction action_,
+      shift::Entity* parentEntity_= nullptr,
+      bool addToScene_ = true, QWidget* parentWidget_ = nullptr );
+    shift::Entity* entity( );
 
     ~EntityEditWidget( void );
 
@@ -69,12 +70,12 @@ namespace nslib
     bool _addToScene;
     TEntityEditWidgetAction _action;
 
-    std::unique_ptr< QLineEdit > _numNewEntities;
+    QLineEdit* _numNewEntities;
 
     bool _isNew;
 
-    std::unique_ptr< QCheckBox > _autoCloseCheck;
-    std::unique_ptr< QCheckBox > _checkUniquenessCheck;
+    QCheckBox* _autoCloseCheck;
+    QCheckBox* _checkUniquenessCheck;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

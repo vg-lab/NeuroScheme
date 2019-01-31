@@ -49,9 +49,9 @@ namespace nslib
                         unsigned int repCreatorId = 0 );
 
     static void generateRelations( const shift::Entities& entities,
-                                   shift::Representations& representations,
-                                   const std::string& relationName,
-                                   unsigned int repCreatorId = 0 );
+      shift::Representations& representations,
+      const std::string& name, bool aggregated = false,
+      unsigned int repCreatorId = 0 );
 
     static const shift::TEntitiesToReps& entitiesToReps(
         unsigned int repCreatorId = 0 );
