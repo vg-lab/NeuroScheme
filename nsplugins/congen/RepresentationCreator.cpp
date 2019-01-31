@@ -32,6 +32,7 @@
 #include "ConnectionArrowRep.h"
 #include "AutoConnectionArrowRep.h"
 #include <algorithm>
+#include <shift_AggregatedConnectsWith.h>
 
 namespace nslib
 {
@@ -147,11 +148,8 @@ namespace nslib
       const shift::TGidToEntitiesReps& gidsToEntitiesReps,
       shift::TRelatedEntitiesReps& relatedEntitiesReps,
       shift::Representations& relatedEntities,
-      const std::string& relationName )
+      shift::RelationshipOneToN* relatedElements )
     {
-      const auto& relatedElements =
-        DataManager::entities( ).relationships( )[ relationName ]->asOneToN( );
-
       MapperFloatToFloat nbConnectionsToWidth(
         0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
         1.0f, 5.0f );
@@ -197,30 +195,160 @@ namespace nslib
             }
             else
             {
-              relationRep =
-                new ConnectionArrowRep( srcEntityRep->second.second,
-                  otherRep->second.second );
+              relationRep = new ConnectionArrowRep( srcEntityRep->second.second,
+                otherRep->second.second );
             }
             const std::unordered_multimap< shift::EntityGid,
               shift::RelationshipProperties* >& relMMap =
               ( *relatedElements )[ entity->entityGid( ) ];
 
             auto relMMapIt = relMMap.find( other->entityGid( ));
-            if ( relMMapIt != relMMap.end( ) )
+            if ( relMMapIt != relMMap.end( ))
             {
+              float weightPropertyValue = 0.0f;
+              if ( relMMapIt->second->hasProperty( "Weight" ))
+              {
+                weightPropertyValue = relMMapIt->second
+                  ->getProperty( "Weight" ).value< float >( );
+              }
+              else
+              {
+                Loggers::get( )->log("Expected propery Weight.",
+                  LOG_LEVEL_WARNING );
+              }
+
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                 nbConnectionsToWidth.map( fabsf( weightPropertyValue ))));
+
               // If fixed weight over zero or if gaussian and mean over zero
               // then circle
-              if (( relMMapIt->second->getProperty( "Weight Type" ).
-                value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                shiftgen::ConnectsWith::TFixedOrDistribution::Fixed &&
-                relMMapIt->second->getProperty( "Weight" ).value< float >( )
-                  < 0.0f ) ||
-                ( relMMapIt->second->getProperty( "Weight Type" ).
-                  value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-                  shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian &&
-                  relMMapIt->second->getProperty( "Weight Gaussian Mean" ).
-                    value< float >( )
-                    < 0.0f ))
+              relationRep->setProperty(
+                "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
+              if ( relMMapIt->second->hasProperty( "Weight Type" ))
+              {
+                auto weightType = relMMapIt->second->getProperty("Weight Type" )
+                  .value< shiftgen::ConnectsWith::TFixedOrDistribution >( );
+                if ( weightType ==
+                  shiftgen::ConnectsWith::TFixedOrDistribution::Fixed
+                  && weightPropertyValue < 0.0f )
+                {
+                  relationRep->setProperty( "head",
+                    shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
+                }
+                else if ( weightType
+                  == shiftgen::ConnectsWith::TFixedOrDistribution::Gaussian )
+                {
+                  if ( relMMapIt->second->hasProperty( "Weight Gaussian" ))
+                  {
+                    if ( relMMapIt->second->getProperty( "Weight Gaussian" )
+                      .value< float >( ) < 0.0f )
+                    {
+                      relationRep->setProperty( "head",
+                        shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
+                    }
+                  }
+                  else
+                  {
+                    Loggers::get( )->log("Expected propery Weight Gaussian.",
+                      LOG_LEVEL_WARNING );
+                  }
+                }
+              }
+            }
+
+            alreadyConnected = relatedEntitiesReps.insert(
+              std::make_pair( combinedKey,
+              std::make_tuple( relationRep, entity, other,
+              srcEntityRep->second.second, otherRep->second.second )));
+          }
+          relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
+        }
+      }
+    } // generateRelations
+
+    void RepresentationCreator::generateRelations(
+      const shift::Entities& entities,
+      const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+      shift::TRelatedEntitiesReps& relatedEntitiesReps,
+      shift::Representations& relatedEntities,
+      shift::RelationshipAggregatedOneToN* relatedElements )
+    {
+      MapperFloatToFloat nbConnectionsToWidth(
+        0, _maxAbsoluteWeight == 0 ? 0.1f : _maxAbsoluteWeight,
+        1.0f, 5.0f );
+
+      for( auto& entity : entities.vector( ))
+      {
+        auto srcEntityRep = gidsToEntitiesReps.find( entity->entityGid( ));
+        if( srcEntityRep == gidsToEntitiesReps.end( ))
+          continue;
+
+        auto entityRelations = relatedElements->mapAggregatedRels( )
+          .find( entity->entityGid( ));
+
+        if( entityRelations == relatedElements->mapAggregatedRels( ).end( ))
+          continue;
+
+        for( auto& other : entities.vector( ))
+        {
+          auto otherRep = gidsToEntitiesReps.find( other->entityGid( ));
+          if( otherRep == gidsToEntitiesReps.end( ))
+            continue;
+
+          auto otherEntityConnection = entityRelations->second
+            ->find( other->entityGid( ));
+          if( otherEntityConnection == entityRelations->second->end( ))
+            continue;
+
+          // TODO: Change to equal_range whenever multiple relationships between
+          // the same elements are imported. Then, create a loop to iterate
+          // over the given results and create a new one if not found.
+          auto combinedKey = std::make_pair( entity->entityGid( ),
+                                             other->entityGid( ));
+          auto alreadyConnected =
+            relatedEntitiesReps.find( combinedKey );
+
+          if( alreadyConnected == relatedEntitiesReps.end( ))
+          {
+            ConnectionArrowRep* relationRep;
+            if( srcEntityRep->second.second == otherRep->second.second )
+            {
+              relationRep =
+                new AutoConnectionArrowRep( srcEntityRep->second.second );
+            }
+            else
+            {
+              relationRep = new ConnectionArrowRep(
+                srcEntityRep->second.second, otherRep->second.second );
+            }
+
+            shift::RelationshipProperties* relationProperties =
+              otherEntityConnection->second
+              .relationshipAggregatedProperties.get( );
+            if ( relationProperties )
+            {
+              float weightPropertyValue = 0.0f;
+              if ( relationProperties->hasProperty( "Weight mean" ))
+              {
+                weightPropertyValue = relationProperties
+                  ->getProperty( "Weight mean" ).value< float >( );
+              }
+              else
+              {
+                Loggers::get( )->log("Expected propery Weight mean.",
+                  LOG_LEVEL_WARNING );
+              }
+              relationRep->setProperty(
+                "width", ( unsigned int ) roundf(
+                nbConnectionsToWidth.map( fabsf( weightPropertyValue ))));
+
+              // If fixed weight over zero or if gaussian and mean over zero
+              // then circle
+              if ( weightPropertyValue < 0.0f  || ( relationProperties
+                ->hasProperty( "Weight Gaussian Mean mean" )
+                &&  relationProperties->getProperty(
+                "Weight Gaussian Mean mean" ).value< float >( ) < 0.0f ))
               {
                 relationRep->setProperty(
                   "head", shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE );
@@ -230,21 +358,13 @@ namespace nslib
                 relationRep->setProperty(
                   "head", shiftgen::ConnectionArrowRep::TArrowHead::TRIANGLE );
               }
-
-              relationRep->setProperty(
-                "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map( fabsf(
-                    relMMapIt->second->getProperty(
-                      "Weight" ).value< float >( )))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
               std::make_pair( combinedKey,
                 std::make_tuple( relationRep,
-                  entity,
-                  other,
-                  srcEntityRep->second.second,
-                  otherRep->second.second )));
+                entity, other, srcEntityRep->second.second,
+                otherRep->second.second )));
           }
           relatedEntities.push_back( std::get< 0 >( alreadyConnected->second ));
         }
@@ -253,47 +373,89 @@ namespace nslib
 
     bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
     {
-      bool needToClear = false;
-
+      auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
+      unsigned int newNeuronsPerPopulation = 0;
       if ( dynamic_cast< shiftgen::NeuronPop* >( entity ))
       {
-        auto oldMaxNeuronsPerPopulation = _maxNeuronsPerPopulation;
-        auto newNeuronsPerPopulation =
-          entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
-        _maxNeuronsPerPopulation= std::max( newNeuronsPerPopulation,
-          _maxNeuronsPerPopulation );
-
-        needToClear = ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation );
-
+        if( entity->hasProperty( "Nb of neurons" ))
+        {
+          newNeuronsPerPopulation =
+            entity->getProperty( "Nb of neurons" ).value< unsigned int >( );
+        }
+        else
+        {
+          Loggers::get( )->log("Expected propery Nb of neurons.",
+            LOG_LEVEL_WARNING );
+        }
       }
-      if ( needToClear )
+      else if ( dynamic_cast< shiftgen::NeuronPop* >( entity ))
+      {
+        if( entity->hasProperty( "Nb of neurons Mean" ))
+        {
+          newNeuronsPerPopulation = entity
+              ->getProperty( "Nb of neurons Mean" ).value< unsigned int >( );
+        }
+        else
+        {
+          Loggers::get( )->log("Expected propery Nb of neurons Mean.",
+             LOG_LEVEL_WARNING );
+        }
+      }
+      _maxNeuronsPerPopulation = std::max( newNeuronsPerPopulation,
+         _maxNeuronsPerPopulation );
+      if ( _maxNeuronsPerPopulation != oldMaxNeuronsPerPopulation )
+      {
         this->clear( );
+        return true;
+      }
+      else
+      {
+        return false;
+      }
 
-      return needToClear;
     }
 
     bool RepresentationCreator::relationshipUpdatedOrCreated(
       shift::RelationshipProperties* relProperties )
     {
-      bool needToClear = false;
-
+      auto oldMaxAbsoluteWeight = _maxAbsoluteWeight;
+      float newAbsoluteWeight = 0.0f;
       if ( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
       {
-        auto oldMaxAbsoluteWeight = _maxAbsoluteWeight;
-        auto newAbsoluteWeight = fabsf(
-          ( relProperties->getProperty( "Weight Type" ).
-            value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
-              shiftgen::ConnectsWith::TFixedOrDistribution::Fixed  ?
+        if( relProperties->hasProperty( "Weight Type" )
+          &&  relProperties->hasProperty( "Weight" )
+          && relProperties->hasProperty( "Weight Gaussian Mean" ))
+        {
+          newAbsoluteWeight = fabsf( ( relProperties
+            ->getProperty( "Weight Type" )
+            .value< shiftgen::ConnectsWith::TFixedOrDistribution >( ) ==
+            shiftgen::ConnectsWith::TFixedOrDistribution::Fixed ?
             relProperties->getProperty( "Weight" ).value< float >( ) :
-            relProperties->getProperty( "Weight Gaussian Mean" ).value< float >( )));
-
-        _maxAbsoluteWeight= std::max( newAbsoluteWeight,
-          _maxAbsoluteWeight );
-
-        needToClear = ( _maxAbsoluteWeight != oldMaxAbsoluteWeight );
+            relProperties->getProperty( "Weight Gaussian Mean" )
+            .value< float >( )));
+        }
+        else
+        {
+          Loggers::get( )->log("Expected properies in connects with.",
+            LOG_LEVEL_WARNING );
+        }
       }
-
-      return needToClear;
+      else if ( dynamic_cast
+        < shiftgen::AggregatedConnectsWith* >( relProperties ))
+      {
+        if( relProperties->hasProperty( "Weight mean" ))
+        {
+          newAbsoluteWeight = fabsf( (
+            relProperties->getProperty( "Weight mean" ).value< float >( )));
+        }
+        else
+        {
+          Loggers::get( )->log("Expected properies in connects with.",
+            LOG_LEVEL_WARNING );
+        }
+      }
+      _maxAbsoluteWeight= std::max( newAbsoluteWeight, _maxAbsoluteWeight );
+      return _maxAbsoluteWeight != oldMaxAbsoluteWeight;
     }
 
     void RepresentationCreator::maxAbsoluteWeight(

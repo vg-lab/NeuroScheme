@@ -2,6 +2,7 @@
  * Copyright (c) 2017 GMRV/URJC/UPM.
  *
  * Authors: Juan Jose Garcia Cantero <juanjose.garcia@urjc.es>
+ *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -23,37 +24,66 @@
 #ifndef __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 #define __NSLIB_CONNECTION_RELATIONSHIP_EDIT_WIDGET__
 
+#include <nslib/api.h>
+
 #include <QDialog>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <shift/shift.h>
+#include <QDockWidget>
+#include <QGridLayout>
 
 namespace nslib
 {
-  class ConnectionRelationshipEditWidget:
-    public QDialog
+  class NSLIB_API ConnectionRelationshipEditWidget:
+    public QWidget
   {
     Q_OBJECT
 
   public:
-    ConnectionRelationshipEditWidget(shift::Entity*  originEntity_,
-      shift::Entity* destinationEntity_, QWidget* parent_ = nullptr,
-      bool modal = false );
+    typedef enum { AUTO, SIMPLE, AGGREGATED  } TConnectionType;
+    ConnectionRelationshipEditWidget( shift::Entity*  originEntity_,
+      shift::Entity* destinationEntity_,
+      TConnectionType connectionType_ = TConnectionType::AUTO,
+      QWidget* parentWidget_ = nullptr );
+    ~ConnectionRelationshipEditWidget( void );
+    static void parentDock( QDockWidget* parentDock_ );
+    static QDockWidget* parentDock( void );
 
-  public slots:
+    shift::Entity* originEntity( ) const;
+    shift::Entity* destEntity( ) const;
+    bool isAggregated( ) const;
+
+    public slots:
     void validateDialog( void );
     void cancelDialog( void );
+    void breakDialog( void );
     void refreshSubproperties( void );
+    void toggleAutoClose( void );
 
   private:
-    shift::Entity* _originEntity;
-    shift::Entity* _destinationEntity;
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
     typedef enum { WIDGET_TYPE, LABEL, WIDGET } TEditTuple;
+
+    shift::Entity* _originEntity;
+    shift::Entity* _destEntity;
+    bool _isAggregated;
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
-    shift::Properties* _propObject;
+    shift::RelationshipProperties* _propObject;
+    bool _isNew;
+    QLabel* _autoCloseLabel;
+    QCheckBox* _autoCloseCheck;
+    QPushButton* _validationButton;
+    QPushButton* _eraseButton;
+    QPushButton* _cancelButton;
+    QGridLayout* _gridLayout;
+
+    static QDockWidget* _parentDock;
+    static bool _autoCloseChecked;
+
+    void checkClose( );
   };
 }
 #endif

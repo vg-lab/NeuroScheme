@@ -61,7 +61,14 @@ namespace nslib
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        const std::string& relationName );
+        shift::RelationshipOneToN* relations ) override;
+
+      void generateRelations(
+        const shift::Entities& entities,
+        const shift::TGidToEntitiesReps& gidsToEntitiesReps,
+        shift::TRelatedEntitiesReps& relatedEntitiesReps,
+        shift::Representations& relatedEntities,
+        shift::RelationshipAggregatedOneToN* relatedElements ) override ;
 
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
 

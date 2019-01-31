@@ -47,14 +47,14 @@ namespace nslib
   bool EntityEditWidget::_checkUniquenessChecked = true;
 
   EntityEditWidget::EntityEditWidget(
-    shift::Entity* entity, TEntityEditWidgetAction action, QWidget *parentWidget_,
-    bool addToScene_, shift::Entity* parentEntity_)
+    shift::Entity* entity_, TEntityEditWidgetAction action_,
+    shift::Entity* parentEntity_, bool addToScene_, QWidget *parentWidget_ )
     : QWidget( parentWidget_ )
-    , _entity( nullptr )
+    , _entity( entity_ )
     , _parentEntity( parentEntity_ )
     , _addToScene( addToScene_ )
-    , _action( action )
-    , _isNew( action == TEntityEditWidgetAction::NEW_ENTITY )
+    , _action( action_ )
+    , _isNew( action_ == TEntityEditWidgetAction::NEW_ENTITY )
     , _autoCloseCheck( new QCheckBox )
     , _checkUniquenessCheck( new QCheckBox )
   {
@@ -65,12 +65,12 @@ namespace nslib
 
     unsigned int element = 0;
 
-    if ( entity )
+    if ( _entity )
     {
       TWidgetType widgetType;
       QWidget* widget;
 
-      for ( const auto& propPair : entity->properties( ))
+      for ( const auto& propPair : _entity->properties( ))
       {
         const auto prop = propPair.first;
         auto caster = fires::PropertyManager::getPropertyCaster( prop );
@@ -84,7 +84,7 @@ namespace nslib
 
           const auto& categories = caster->categories( );
 
-          bool isEditable = entity->hasPropertyFlag(
+          bool isEditable = _entity->hasPropertyFlag(
             propName, shift::Entity::TPropertyFlag::EDITABLE );
 
           if ( !categories.empty( ) )
@@ -130,8 +130,8 @@ namespace nslib
         sep3->setFrameShape( QFrame::HLine );
         sep4->setFrameShape( QFrame::HLine );
 
-        gridLayout->addWidget( sep3,element,0 );
-        gridLayout->addWidget( sep4,element,1 );
+        gridLayout->addWidget( sep3,element, 0 );
+        gridLayout->addWidget( sep4,element, 1 );
         ++element;
 
         widgetType = TWidgetType::LINE_EDIT;
@@ -139,8 +139,7 @@ namespace nslib
           QString::fromStdString( "Number of entities" ));
         gridLayout->addWidget( label, element, 0 );
 
-        _numNewEntities.reset( new QLineEdit );
-        widget = _numNewEntities.get( );
+        widget = _numNewEntities = new QLineEdit;
         _numNewEntities->setText( "1" );
 
         _numNewEntities->setEnabled( true );
@@ -156,24 +155,22 @@ namespace nslib
       ( _isNew ? tr( "New" ) : tr( "Save" )));
     gridLayout->addWidget( validationButton, element, 1 );
 
-    ++element;
     auto autoCloseLabel = new QLabel( tr( "Auto-close" ));
-    gridLayout->addWidget( autoCloseLabel, element, 0 );
+    gridLayout->addWidget( autoCloseLabel, ++element, 0 );
 
     _autoCloseCheck->setChecked( _autoCloseChecked );
-    connect( _autoCloseCheck.get( ), SIGNAL( clicked( )),
+    connect( _autoCloseCheck, SIGNAL( clicked( )),
              this, SLOT( toggleAutoClose( )));
-    gridLayout->addWidget( _autoCloseCheck.get( ), element, 1 );
+    gridLayout->addWidget( _autoCloseCheck, element, 1 );
 
-    ++element;
     auto checkUniquenessLabel = new QLabel( tr( "Check uniqueness" ));
-    gridLayout->addWidget( checkUniquenessLabel, element, 0 );
+    gridLayout->addWidget( checkUniquenessLabel, ++element, 0 );
 
     //_checkUniquenessCheck.reset( ); // = new QCheckBox( );
     _checkUniquenessCheck->setChecked( _checkUniquenessChecked );
-    connect( _checkUniquenessCheck.get( ), SIGNAL( clicked( )),
+    connect( _checkUniquenessCheck, SIGNAL( clicked( )),
              this, SLOT( toggleCheckUniqueness( )));
-    gridLayout->addWidget( _checkUniquenessCheck.get( ), element, 1 );
+    gridLayout->addWidget( _checkUniquenessCheck, element, 1 );
 
     connect( cancelButton, SIGNAL( clicked( )), this, SLOT( cancelDialog( )));
     connect( validationButton, SIGNAL( clicked( )),
@@ -182,7 +179,9 @@ namespace nslib
     setLayout( gridLayout );
     setWindowTitle( tr( "Entity inspector" ));
 
-    _entity = entity;
+    _parentDock->setWidget( this );
+    _parentDock->show( );
+    this->show( );
   }
 
   void EntityEditWidget::validateDialog( void )
@@ -192,7 +191,7 @@ namespace nslib
 
     if ( _action == DUPLICATE_ENTITY || _isNew )
     {
-      numEles = _numNewEntities->text( ).toInt( );
+      numEles = _numNewEntities->text( ).toUInt( );
     }
 
     for ( unsigned int i = 0; i < numEles; ++i )
@@ -360,11 +359,16 @@ namespace nslib
 
           auto& entities = nslib::DataManager::entities( );
           auto& relParentOf =
-            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ) );
+            *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
           auto& relChildOf =
-            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ) );
+            *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
+          auto& relAggregatedConnectsTo = *( entities.relationships( )
+            [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+          auto& relAggregatedConnectedBy = *( entities.relationships( )
+            [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-          shift::Relationship::Establish( relParentOf, relChildOf,
+          shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
+            relAggregatedConnectsTo, relAggregatedConnectedBy,
             _parentEntity, _entity );
           nslib::PaneManager::activePane( )->refreshProperties (
             nslib::PaneManager::activePane( )->entities( ));
@@ -430,6 +434,11 @@ namespace nslib
 
   EntityEditWidget::~EntityEditWidget( void )
   {
+  }
+
+  shift::Entity* EntityEditWidget::entity( )
+  {
+    return _entity;
   }
 
 } // namespace

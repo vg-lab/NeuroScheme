@@ -27,6 +27,7 @@
 #include "EntityEditWidget.h"
 #include "reps/SelectableItem.h"
 #include "ConnectionRelationshipEditWidget.h"
+#include "EntityConnectionListWidget.h"
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
 #include <QGraphicsSceneMouseEvent>
@@ -74,8 +75,24 @@ namespace nslib
                                 QAbstractGraphicsShapeItem* shapeItem,
                                 QMouseEvent* event );
 
+    static void updateEntityConnectionList( shift::EntityGid origEntity_,
+      shift::EntityGid destEntity, bool updateAggregatedTo_ = true,
+      bool updateAggregatedBy_ = true );
+
+    static void refreshEntityConnectionList( void );
+
+    static void updateConnectionRelationship(
+      shift::Entity* originEntity_, shift::Entity* destEntity_ );
+
     static void createConnectionRelationship(
-      shift::Entity* originEntity_, shift::Entity* destinationEntity_ );
+      shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+      ConnectionRelationshipEditWidget::TConnectionType connectionType_ =
+      ConnectionRelationshipEditWidget::TConnectionType::AUTO );
+
+    static void createOrEditEntity(
+      shift::Entity* entity_, EntityEditWidget::TEntityEditWidgetAction action_,
+      shift::Entity* parentEntity_= nullptr,
+      bool addToScene_ = true, QWidget *parentWidget_ = nullptr );
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
@@ -84,7 +101,21 @@ namespace nslib
       bool& allChildrenSelected,
       bool& noChildrenSelected );
 
+    static void deleteEntity( shift::EntityGid entityGid_ );
+
   protected:
+
+    static void basicDeleteEntity( shift::Entity* entity_,
+      shift::Entities& dataEntities_, shift::RelationshipOneToN& relConnectsTo_,
+      shift::RelationshipOneToN& relConnectedBy_,
+      shift::RelationshipOneToN& relParentOf_,
+      shift::RelationshipOneToOne& relChildOf_,
+      shift::RelationshipAggregatedOneToN& relAggregatedConnectsTo_,
+      shift::RelationshipAggregatedOneToN& relAggregatedConnectBy_,
+      shift::RelationshipOneToOne& relSubEntityOf_,
+      shift::RelationshipOneToN& relSuperEntityOf_,
+      shift::RelationshipOneToN& relAGroupOf_,
+      shift::RelationshipOneToN& relAPartOf_);
 
     static void _propagateSelectedStateToChilds(
       const shift::Entities& entities,
@@ -118,6 +149,7 @@ namespace nslib
     static QMenu* _contextMenu;
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
     static EntityEditWidget* _entityEditWidget;
+    static EntityConnectionListWidget* _entityConnectListWidget;
     static QGraphicsItem* _item;
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;

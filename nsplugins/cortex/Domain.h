@@ -115,20 +115,20 @@ namespace nslib
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
 
-      virtual void exportRepresentationMaxMin(
+      void exportRepresentationMaxMin(
         std::ostream& outputStream, bool minimizeStream ) const override;
 
-      void addRelationsOfType( const boost::property_tree::ptree&  relations,
-        std::string relationName, std::unordered_map
-        < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
+      void importRelationshipsJSON(
+        const boost::property_tree::ptree& relationships,
+        std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity ) override;
 
       void addIsAGroupOfRelationshipsToJSON(
         const boost::property_tree::ptree&  relations,
-        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+        std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
 
       void addIsSuperEntityOfRelationshipsToJSON(
         const boost::property_tree::ptree&  relations,
-        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+        std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
 
       void importMaximumsJSON( const boost::property_tree::ptree& maximums ) override;
 
