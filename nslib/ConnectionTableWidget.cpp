@@ -45,8 +45,10 @@ namespace nslib
     , _columnCount( 0 )
     , _rowCount( 0 )
     , _numConnections( 0 )
+    , _entity( nullptr )
     , _isAggregated( isAggregated_ )
     , _entityIsOrigin( entityIsOrigin_ )
+    , _allProperties( false )
     , _emptyString( emptyString_ )
     , _tableData( std::vector< fires::Property * >( ))
     , _entitiesData( std::vector<shift::Entity*>( ))
@@ -61,7 +63,7 @@ namespace nslib
     {
       const auto prop = propPair.first;
       _propertiesCaster.push_back(
-          fires::PropertyManager::getPropertyCaster( prop ));
+        fires::PropertyManager::getPropertyCaster( prop ));
       std::string propertyLabel =
         fires::PropertyGIDsManager::getPropertyLabel( prop );
       _headerData.push_back( QString::fromStdString( propertyLabel ));
@@ -109,7 +111,7 @@ namespace nslib
     if( connectsMap_ )
     {
       auto iterator = connectsMap_->begin( );
-      while( iterator != connectsMap_->end( ) )
+      while( iterator != connectsMap_->end( ))
       {
         auto connectedEntity = DataManager::entities( ).at( iterator->first );
         fires::Property& entityName = connectedEntity->getProperty(
@@ -118,7 +120,7 @@ namespace nslib
           ->second.relationshipAggregatedProperties;
         _tableData.push_back( &entityName );
         _entitiesData.push_back( connectedEntity );
-        for( auto& propPair : connectionProperties->properties( ) )
+        for( auto& propPair : connectionProperties->properties( ))
         {
           fires::Property& property = propPair.second;
           _tableData.push_back( &property );
@@ -373,7 +375,7 @@ namespace nslib
   {
     this->horizontalHeader( )->setDefaultSectionSize( 150 );
     this->horizontalHeader( )->setSectionResizeMode(
-        QHeaderView::ResizeToContents );
+      QHeaderView::ResizeToContents );
     int lastColumn = _model->columnCount( ) - 1;
     if( lastColumn != 0 )
     {
@@ -461,7 +463,7 @@ namespace nslib
           auto connectedEntity = _model->connectedEntityAt( rowIndex );
           const bool isAggregated = _model->isAggregated( );
           if( isAggregated || clickX < cellX +
-            static_cast< int >( cellWidth * 0.5f ) )
+            static_cast< int >( cellWidth * 0.5f ))
           {
             auto type = isAggregated
               ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED

@@ -82,7 +82,8 @@ namespace nslib
 
       void importRelationshipsJSON(
         const boost::property_tree::ptree& relationships,
-        std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity ) override;
+        std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity
+        ) override;
 
       void exportRepresentationMaxMin(
         std::ostream& outputStream, bool minimizeStream ) const override;

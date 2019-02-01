@@ -150,7 +150,7 @@ namespace nslib
         connectsToObj, relChildOf, relConnectsTo );
       _entities.relationships( )[ "aggregatedConnectedBy" ] =
         new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy",
-        connectsToObj, relChildOf, relConnectedBy);
+        connectsToObj, relChildOf, relConnectedBy );
     }
 
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
@@ -174,21 +174,21 @@ namespace nslib
 
     void Domain::importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
       addIsParentOfRelationshipsFromJSON( getRelationsOfType(
-        "isParentOf", relationships ), oldGUIToEntity );
+        "isParentOf", relationships ), oldGIDToEntity );
 
       addConnectsToRelationsFromJSON( getRelationsOfType(
-        "connectsTo", relationships ), oldGUIToEntity );
+        "connectsTo", relationships ), oldGIDToEntity );
 
       addAggregatedConnectionFromJSON( getRelationsOfType(
         "aggregatedConnectedBy", relationships ), "aggregatedConnectedBy",
-        oldGUIToEntity );
+        oldGIDToEntity );
 
       addAggregatedConnectionFromJSON( getRelationsOfType(
         "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
-        oldGUIToEntity );
+        oldGIDToEntity );
 
     }
 

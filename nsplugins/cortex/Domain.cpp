@@ -120,7 +120,7 @@ namespace nslib
         _okButton = new QPushButton( "Ok" );
         _layout->addWidget( _okButton, row, 1);
         connect( _okButton, SIGNAL( clicked( )), this, SLOT( close( )));
-        setLayout( _layout);
+        setLayout( _layout );
       }
 
       bool loadMorphology( void ) { return _checkLoadMorpho->isChecked( ); }
@@ -294,7 +294,8 @@ namespace nslib
       _entities.relationships( )[ "connectedBy" ] = relConnectedBy;
 
       shift::RelationshipProperties* connectsToObj =
-        _relationshipPropertiesTypes->getRelationshipProperties( "aggregatedConnectsTo" );
+        _relationshipPropertiesTypes->getRelationshipProperties(
+        "aggregatedConnectsTo" );
 
       _entities.relationships( )[ "aggregatedConnectsTo" ] =
         new shift::RelationshipAggregatedOneToN( "aggregatedConnectsTo",
@@ -302,7 +303,6 @@ namespace nslib
       _entities.relationships( )[ "aggregatedConnectedBy" ] =
         new shift::RelationshipAggregatedOneToN( "aggregatedConnectedBy",
         connectsToObj, relChildOf,relConnectedBy);
-
     }
 
     bool Domain::isSelectableEntity( shift::Entity* entity ) const
@@ -342,33 +342,33 @@ namespace nslib
 
     void Domain::importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
 
       addIsParentOfRelationshipsFromJSON( getRelationsOfType(
-        "isParentOf", relationships ), oldGUIToEntity );
+        "isParentOf", relationships ), oldGIDToEntity );
 
       addConnectsToRelationsFromJSON( getRelationsOfType(
-        "connectsTo", relationships ), oldGUIToEntity );
+        "connectsTo", relationships ), oldGIDToEntity );
 
       addIsAGroupOfRelationshipsToJSON( getRelationsOfType(
-        "isAGroupOf", relationships ), oldGUIToEntity );
+        "isAGroupOf", relationships ), oldGIDToEntity );
 
       addIsSuperEntityOfRelationshipsToJSON( getRelationsOfType(
-        "isSuperEntityOf", relationships ), oldGUIToEntity );
+        "isSuperEntityOf", relationships ), oldGIDToEntity );
 
       addAggregatedConnectionFromJSON( getRelationsOfType(
         "aggregatedConnectedBy", relationships ), "aggregatedConnectedBy",
-        oldGUIToEntity );
+        oldGIDToEntity );
 
       addAggregatedConnectionFromJSON( getRelationsOfType(
         "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
-        oldGUIToEntity );
+        oldGIDToEntity );
     }
 
     void Domain::addIsAGroupOfRelationshipsToJSON(
       const boost::property_tree::ptree&  relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
       auto& relGroupOf = *( DataManager::entities( )
         .relationships( )[ "isAGroupOf" ]->asOneToN( ) );
@@ -380,7 +380,7 @@ namespace nslib
         shift::Entity* origEntity;
         shift::Entity* destEntity;
 
-        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+        importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "GroupOf", true );
 
         shift::Relationship::Establish( relGroupOf, relGroupBy,
@@ -392,7 +392,7 @@ namespace nslib
     void
     Domain::addIsSuperEntityOfRelationshipsToJSON(
       const boost::property_tree::ptree&  relations,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
       auto& relSuperEntity = *( DataManager::entities( )
         .relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
@@ -404,7 +404,7 @@ namespace nslib
         shift::Entity* origEntity;
         shift::Entity* destEntity;
 
-        importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+        importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "SuperEntityOf", true );
 
         shift::Relationship::Establish( relSuperEntity, relSubEntity,

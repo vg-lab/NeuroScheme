@@ -177,10 +177,10 @@ namespace nslib
         + std::string( ex.what( )));
     };
 
-     auto oldGUIToEntity =
+     auto oldGIDToEntity =
        new std::unordered_map <unsigned int,shift::Entity*>( );
 
-    importEntititiesJSON( entities, oldGUIToEntity );
+    importEntititiesJSON( entities, oldGIDToEntity );
 
     boost::property_tree::ptree relationships;
     try
@@ -193,7 +193,7 @@ namespace nslib
         + std::string( ex.what( )));
     };
 
-    importRelationshipsJSON( relationships, oldGUIToEntity );
+    importRelationshipsJSON( relationships, oldGIDToEntity );
 
     auto canvas = nslib::PaneManager::activePane( );
     canvas->displayEntities( nslib::DataManager::rootEntities( ), false, true );
@@ -423,16 +423,16 @@ namespace nslib
 
   void Domain::importJSONRelationGIDS(
     const  boost::property_tree::ptree& relation,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
+    std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity,
     shift::Entity*& origEntity, shift::Entity*& destEntity,
     const std::string& relationName, const bool checkConstrained )
   {
     try
     {
       unsigned int origGID = relation.get< unsigned int >( "Source" );
-      auto search = oldGUIToEntity->find( origGID );
-      SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
-        "ERROR: old origGUI doesn't exist");
+      auto search = oldGIDToEntity->find( origGID );
+      SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
+        "ERROR: old origGID doesn't exist");
       origEntity = search->second;
     }
     catch ( std::exception const& ex )
@@ -444,9 +444,9 @@ namespace nslib
     try
     {
       unsigned int destGID = relation.get< unsigned int >( "Dest");
-      auto search = oldGUIToEntity->find( destGID );
-      SHIFT_CHECK_THROW( search != oldGUIToEntity->end( ),
-        "ERROR: old destGUI doesn't exist");
+      auto search = oldGIDToEntity->find( destGID );
+      SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
+        "ERROR: old destGID doesn't exist");
       destEntity = search->second;
     }
     catch ( std::exception const& ex )
@@ -457,15 +457,15 @@ namespace nslib
     if( checkConstrained )
     {
       SHIFT_CHECK_THROW( shift::RelationshipPropertiesTypes::isConstrained(
-        relationName, origEntity->entityName( ), destEntity->entityName( )),
+        relationName, origEntity->typeName( ), destEntity->typeName( )),
         "ERROR: relation: " + relationName + " not supported between: " +
-        origEntity->entityName( ) +" - " + destEntity->entityName( ));
+        origEntity->typeName( ) +" - " + destEntity->typeName( ));
     }
   }
 
   void Domain::addConnectsToRelationsFromJSON(
     const boost::property_tree::ptree& relations,
-    std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity )
+    std::unordered_map< unsigned int, shift::Entity* >* oldGIDToEntity )
   {
     auto& relAggregatedConnectsTo = *( DataManager::entities( )
       .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
@@ -477,7 +477,7 @@ namespace nslib
       shift::Entity* origEntity;
       shift::Entity* destEntity;
 
-      importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+      importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ConnectedTo", true );
       boost::property_tree::ptree firesData;
       try
@@ -501,7 +501,7 @@ namespace nslib
 
   void Domain::addIsParentOfRelationshipsFromJSON(
     const boost::property_tree::ptree& relations,
-    std::unordered_map<unsigned int, shift::Entity*>* oldGUIToEntity )
+    std::unordered_map<unsigned int, shift::Entity*>* oldGIDToEntity )
   {
     auto entities = DataManager::entities( );
     auto& relParentOf = *( entities
@@ -517,7 +517,7 @@ namespace nslib
     {
       shift::Entity* origEntity;
       shift::Entity* destEntity;
-      importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+      importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ParentOf", true );
       shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
         relAggregatedConnectsTo, relAggregatedConnectedBy,
@@ -527,15 +527,15 @@ namespace nslib
 
   void Domain::importEntititiesJSON(
     const boost::property_tree::ptree& entities,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity )
+    std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
   {
     for ( const auto& entityJSON : entities )
     {
       shift::Entity* entity ;
       bool isRootEntity;
-      unsigned int oldGUI;
-      importEntityJSON( entityJSON.second, entity, isRootEntity, oldGUI );
-      oldGUIToEntity->insert( std::make_pair( oldGUI, entity ));
+      unsigned int oldGID;
+      importEntityJSON( entityJSON.second, entity, isRootEntity, oldGID );
+      oldGIDToEntity->insert( std::make_pair( oldGID, entity ));
       DataManager::entities( ).add( entity );
       if( entity->isNotHierarchy( ))
       {
@@ -589,7 +589,7 @@ namespace nslib
       char isRoot = ( rootEntitiesMap.find( entityGID )
         != rootEntitiesMap.end( )) ? 't' : 'f';
 
-      outputStream << entityTypeLabel  << entity->entityName( )
+      outputStream << entityTypeLabel  << entity->typeName( )
         << rootEntityLabel << isRoot << entityGIDLabel
         << entityGID << entityDataLabel;
 
@@ -599,7 +599,7 @@ namespace nslib
 
   void Domain::addAggregatedConnectionFromJSON(
     const boost::property_tree::ptree& relations, const std::string& name,
-    std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity )
+    std::unordered_map< unsigned int, shift::Entity* >* oldGIDToEntity )
   {
     auto& relAggregatedOneToN = *( DataManager::entities( )
       .relationships( )[ name ]->asAggregatedOneToN( ));
@@ -608,7 +608,7 @@ namespace nslib
       shift::Entity* origEntity;
       shift::Entity* destEntity;
 
-      importJSONRelationGIDS( relation.second, oldGUIToEntity, origEntity,
+      importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, name, false );
       boost::property_tree::ptree firesData;
       try

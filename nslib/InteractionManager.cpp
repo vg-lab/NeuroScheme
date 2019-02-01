@@ -53,6 +53,7 @@ namespace nslib
     InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
   EntityConnectionListWidget* InteractionManager::_entityConnectListWidget =
       nullptr;
+
   void InteractionManager::start( )
   {
     _entityEditWidget = new EntityEditWidget( );
@@ -146,7 +147,6 @@ namespace nslib
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
-          //auto entityGid = ( *entities.begin( ))->entityGid( );
           createOrEditEntity( *entities.begin( ),
             EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
         }
@@ -223,9 +223,9 @@ namespace nslib
         {
           _contextMenu->addSeparator( );
         }
-        for( const auto& type : domainEntitiesTypes.notHierarchyTypes( ))
+        for ( const auto& type : domainEntitiesTypes.notHierarchyTypes( ))
         {
-          if( !std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
+          if ( !std::get< shift::EntitiesTypes::IS_SUBENTITY >( type ))
           {
             std::string childType =
               std::get< shift::EntitiesTypes::ENTITY_NAME >( type );
@@ -281,7 +281,7 @@ namespace nslib
             deleteEntity = _contextMenu->addAction( "Delete" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
               if(shift::RelationshipPropertiesTypes::isConstrained(
-                "ConnectedTo", entity->entityName( ),entity->entityName( )))
+                "ConnectedTo", entity->typeName( ),entity->typeName( )))
               {
                 autoEntity = _contextMenu->addAction( "Add Auto Connection" );
               }
@@ -936,7 +936,7 @@ namespace nslib
     const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    if( !_entityConnectListWidget->isHidden( ))
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
     {
       _entityConnectListWidget->updateConnections( origEntity_, destEntity,
         updateAggregatedTo_, updateAggregatedBy_ );
@@ -945,7 +945,7 @@ namespace nslib
 
   void InteractionManager::refreshEntityConnectionList( void )
   {
-    if( !_entityConnectListWidget->isHidden( ))
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( ))
     {
       _entityConnectListWidget->hide( );
       _entityConnectListWidget->show( );
@@ -955,7 +955,7 @@ namespace nslib
   void InteractionManager::updateConnectionRelationship(
     shift::Entity* originEntity_, shift::Entity* destEntity_ )
   {
-    if( !_conRelationshipEditWidget->isHidden( ))
+    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( ))
     {
       auto destEntity = _conRelationshipEditWidget->destEntity( );
       auto origEntity = _conRelationshipEditWidget->originEntity( );
@@ -966,7 +966,6 @@ namespace nslib
         auto type = isAggregated
           ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED
           : ConnectionRelationshipEditWidget::TConnectionType::SIMPLE;
-        delete _conRelationshipEditWidget;
         _conRelationshipEditWidget->updateWidget(
           origEntity, destEntity, type );
       }
@@ -1024,7 +1023,8 @@ namespace nslib
       {
         parentEntity->autoUpdateProperties( );
       }
-      if( !_entityConnectListWidget->isHidden( ))
+      if( _entityConnectListWidget
+        && !_entityConnectListWidget->isHidden( ))
       {
         _entityConnectListWidget->updateConnections( );
       }
@@ -1069,8 +1069,8 @@ namespace nslib
       for( auto connectEntity : connectedEntites.vector( ))
       {
         shift::Relationship::BreakAnAggregatedRelation(
-            relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
-            entity_, connectEntity );
+          relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
+          entity_, connectEntity );
       }
       connectedEntites.clear( );
       connectedEntites.addRelatedEntitiesOneToN( relConnectedBy_, entity_,
@@ -1112,20 +1112,20 @@ namespace nslib
     }
 
     dataEntities_.remove( entity_ );
-    if( !_entityEditWidget->isHidden( )
+    if( _entityEditWidget && !_entityEditWidget->isHidden( )
         && _entityEditWidget->entity( ) == entity_ )
     {
       EntityEditWidget::parentDock( )->hide( );
       _entityEditWidget->hide( );
     }
-    if( !_conRelationshipEditWidget->isHidden( )
+    if( _conRelationshipEditWidget && !_conRelationshipEditWidget->isHidden( )
         && ( _conRelationshipEditWidget->originEntity( ) == entity_
         || _conRelationshipEditWidget->destEntity( ) == entity_ ))
     {
       ConnectionRelationshipEditWidget::parentDock( )->hide( );
       _conRelationshipEditWidget->hide( );
     }
-    if( !_entityConnectListWidget->isHidden( )
+    if( _entityConnectListWidget && !_entityConnectListWidget->isHidden( )
         && _entityConnectListWidget->entity( ) == entity_ )
     {
       EntityConnectionListWidget::parentDock( )->hide( );
@@ -1170,7 +1170,7 @@ namespace nslib
       shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
       childrenTypesNames =
         shift::RelationshipPropertiesTypes::constraints( "ParentOf",
-        parentEntity_->entityName( ));
+        parentEntity_->typeName( ));
       for( auto childTypeName = childrenTypesNames.first;
         childTypeName != childrenTypesNames.second; ++childTypeName )
       {
@@ -1183,6 +1183,5 @@ namespace nslib
     }
     return entityIdx;
   }
-
 
 } // namespace nslib

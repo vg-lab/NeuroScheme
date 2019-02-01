@@ -173,14 +173,14 @@ namespace nslib
             _eraseButton->setVisible( false );
             _validationButton->setText( tr( "New" ));
             _titleLabel->setText( tr( "Creating new: " )
-              + QString::fromStdString( _entity->entityName( )));
+              + QString::fromStdString( _entity->typeName( )));
           }
           else
           {
             _eraseButton->setVisible( false );
             _validationButton->setText( tr( "Duplicate" ));
             _titleLabel->setText( tr( "Duplicate: " )
-              + QString::fromStdString( _entity->entityName( )));
+              + QString::fromStdString( _entity->typeName( )));
           }
         }
         else
@@ -191,17 +191,17 @@ namespace nslib
           _numNewEntities->setVisible( false );
           _validationButton->setText( tr( "Save" ));
           _titleLabel->setText( tr( "Editing: " )
-            + QString::fromStdString( _entity->entityName( )));
+            + QString::fromStdString( _entity->typeName( )));
         }
 
         TWidgetType widgetType;
         QWidget* widget;
 
-        for( const auto& propPair : _entity->properties( ))
+        for ( const auto& propPair : _entity->properties( ))
         {
           const auto prop = propPair.first;
           auto caster = fires::PropertyManager::getPropertyCaster( prop );
-          if( caster )
+          if ( caster )
           {
             auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
             auto label = new QLabel( QString::fromStdString( propName ));
@@ -220,11 +220,11 @@ namespace nslib
               widget = comboBoxWidget;
               auto currentCategory = caster->toString( propPair.second );
               unsigned int index = 0;
-              for( const auto& category : categories )
+              for ( const auto& category : categories )
                 comboBoxWidget->addItem( QString::fromStdString( category ));
-              for( const auto& category : categories )
+              for ( const auto& category : categories )
               {
-                if( category != currentCategory )
+                if ( category != currentCategory )
                 {
                   ++index;
                 }

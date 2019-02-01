@@ -44,6 +44,7 @@ namespace nslib
 
   public:
     typedef enum { AUTO, SIMPLE, AGGREGATED  } TConnectionType;
+
     ConnectionRelationshipEditWidget( QWidget* parentWidget_ = nullptr );
     void updateWidget( shift::Entity*  originEntity_,
       shift::Entity* destinationEntity_,
@@ -56,7 +57,7 @@ namespace nslib
     shift::Entity* destEntity( ) const;
     bool isAggregated( ) const;
 
-    public slots:
+  public slots:
     void validateDialog( void );
     void cancelDialog( void );
     void breakDialog( void );
@@ -80,6 +81,7 @@ namespace nslib
     QPushButton* _cancelButton;
     QGridLayout* _gridLayout;
     QGridLayout* _gridPropertiesLayout;
+
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

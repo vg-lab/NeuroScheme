@@ -86,16 +86,16 @@ namespace nslib
     propConnectionType = relationshipPropertiesTypes
         .getRelationshipProperties( "aggregatedConnectsTo" );
     _aggregatedConnectsToTable = new ConnectionTableWidget( QString( tr(
-        "Aggregated connected to entities:" )), true, true, QString( tr(
-        "Entity not aggregated connected to." )), propConnectionType,
-        entityNameCaster, entityNameLabel, entityNameSorter,
+      "Aggregated connected to entities:" )), true, true, QString( tr(
+      "Entity not aggregated connected to." )), propConnectionType,
+      entityNameCaster, entityNameLabel, entityNameSorter,
       _gridLayout, 5, this );
 
     _aggregatedConnectedByTable = new ConnectionTableWidget( QString( tr(
-        "Aggregated connected by entities:" )), false, true, QString( tr(
-        "Entity not aggregated connected by." )), propConnectionType,
-        entityNameCaster, entityNameLabel, entityNameSorter,
-        _gridLayout, 7, this );
+      "Aggregated connected by entities:" )), false, true, QString( tr(
+      "Entity not aggregated connected by." )), propConnectionType,
+      entityNameCaster, entityNameLabel, entityNameSorter,
+      _gridLayout, 7, this );
 
     _gridLayout->setAlignment( Qt::AlignTop );
     _gridLayout->setColumnStretch( 1, 1 );
@@ -146,9 +146,9 @@ namespace nslib
     _entityNameLabel->setText(QString::fromStdString( "Connections of entity: "
       + _entity->getProperty( "Entity name" ).value< std::string >( )));
     _aggregatedConnectedByTable->setTableData(
-        aggregatedConnectedByMap_, _entity, _allPropsChecked );
+      aggregatedConnectedByMap_, _entity, _allPropsChecked );
     _aggregatedConnectsToTable->setTableData(
-        aggregatedConnectsToMap_, _entity, _allPropsChecked );
+      aggregatedConnectsToMap_, _entity, _allPropsChecked );
     _connectedByTable->setTableData( connectedByMap_, _entity,
       _allPropsChecked );
     _connectsToTable->setTableData( connectsToMap_, _entity, _allPropsChecked );
@@ -194,9 +194,9 @@ namespace nslib
     shift::EntityGid destEntity_, const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    if( _entity && !this->isHidden( ))
+    if( _entity )
     {
-      auto entityGid =  _entity->entityGid( );
+      auto entityGid = _entity->entityGid( );
       auto dataRelations = DataManager::entities( ).relationships( );
       auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
       auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
@@ -211,7 +211,7 @@ namespace nslib
         shift::RelationshipOneToNMapDest* connectsMap =
           ( connectsIt == relConnectsTo.end( )
           || connectsIt->second.empty( ))
-          ? nullptr : & connectsIt->second;
+          ? nullptr : &connectsIt->second;
         _connectsToTable->setTableData( connectsMap, _entity );
       }
       if( entityGid == destEntity_ )
@@ -220,7 +220,7 @@ namespace nslib
         shift::RelationshipOneToNMapDest* connectsMap =
           ( connectsIt == relConnectedBy.end( )
           || connectsIt->second.empty( ))
-          ? nullptr : & connectsIt->second;
+          ? nullptr : &connectsIt->second;
         _connectedByTable->setTableData( connectsMap, _entity );
       }
       if( updateAggregatedBy_ )
@@ -229,7 +229,7 @@ namespace nslib
         shift::AggregatedOneToNAggregatedDests* connectsMap =
           ( connectsIt == relAggregatedConnectBy.end( )
           || connectsIt->second->empty( ))
-          ? nullptr : connectsIt->second.get();
+          ? nullptr : connectsIt->second.get( );
         _aggregatedConnectedByTable->setTableData( connectsMap, _entity );
       }
       if( updateAggregatedTo_ )
@@ -238,7 +238,7 @@ namespace nslib
         shift::AggregatedOneToNAggregatedDests* connectsMap =
           ( connectsIt == relAggregatedConnectsTo.end( )
           || connectsIt->second->empty( ))
-          ? nullptr : connectsIt->second.get();
+          ? nullptr : connectsIt->second.get( );
         _aggregatedConnectsToTable->setTableData( connectsMap, _entity );
       }
     }
@@ -246,43 +246,40 @@ namespace nslib
 
   void EntityConnectionListWidget::updateConnections( void )
   {
-    if( _entity && !this->isHidden( ))
-    {
-      auto entityGid = _entity->entityGid( );
-      auto dataRelations = DataManager::entities( ).relationships( );
-      auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
-      auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
-      auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
-        ->asAggregatedOneToN( )->mapAggregatedRels( );
-      auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
-        ->asAggregatedOneToN( )->mapAggregatedRels( );
+    auto entityGid =  _entity->entityGid( );
+    auto dataRelations = DataManager::entities( ).relationships( );
+    auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
+    auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
+    auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
+      ->asAggregatedOneToN( )->mapAggregatedRels( );
+    auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
+      ->asAggregatedOneToN( )->mapAggregatedRels( );
 
-      auto connectsIt = relConnectsTo.find( entityGid );
-      shift::RelationshipOneToNMapDest* connectsMap =
-        ( connectsIt == relConnectsTo.end( ) || connectsIt->second.empty( ))
-        ? nullptr : &connectsIt->second;
-      _connectsToTable->setTableData( connectsMap, _entity );
+    auto connectsIt = relConnectsTo.find( entityGid );
+    shift::RelationshipOneToNMapDest* connectsMap =
+      ( connectsIt == relConnectsTo.end( ) || connectsIt->second.empty( ))
+      ? nullptr : &connectsIt->second;
+    _connectsToTable->setTableData( connectsMap, _entity );
 
-      auto connectsIt1 = relConnectedBy.find( entityGid );
-      shift::RelationshipOneToNMapDest* connectsMap1 =
-        ( connectsIt1 == relConnectedBy.end( ) || connectsIt1->second.empty( ))
-        ? nullptr : &connectsIt1->second;
-      _connectedByTable->setTableData( connectsMap1, _entity );
+    auto connectsIt1 = relConnectedBy.find( entityGid );
+    shift::RelationshipOneToNMapDest* connectsMap1 =
+      ( connectsIt1 == relConnectedBy.end( ) || connectsIt1->second.empty( ))
+      ? nullptr : &connectsIt1->second;
+    _connectedByTable->setTableData( connectsMap1, _entity );
 
-      auto connectsIt2 = relAggregatedConnectBy.find( entityGid );
-      shift::AggregatedOneToNAggregatedDests* connectsMap2 =
-        ( connectsIt2 == relAggregatedConnectBy.end( )
-        || connectsIt2->second->empty( ))
-        ? nullptr : connectsIt2->second.get( );
-      _aggregatedConnectedByTable->setTableData( connectsMap2, _entity );
+    auto connectsIt2 = relAggregatedConnectBy.find( entityGid );
+    shift::AggregatedOneToNAggregatedDests* connectsMap2 =
+      ( connectsIt2 == relAggregatedConnectBy.end( )
+      || connectsIt2->second->empty( )) ? nullptr : connectsIt2->second.get( );
+    _aggregatedConnectedByTable->setTableData( connectsMap2, _entity );
 
-      auto connectsIt3 = relAggregatedConnectsTo.find( entityGid );
-      shift::AggregatedOneToNAggregatedDests* connectsMap3 =
-        ( connectsIt3 == relAggregatedConnectsTo.end( )
-        || connectsIt3->second->empty( ))
-        ? nullptr : connectsIt3->second.get( );
-      _aggregatedConnectsToTable->setTableData( connectsMap3, _entity );
-    }
+    auto connectsIt3 = relAggregatedConnectsTo.find( entityGid );
+    shift::AggregatedOneToNAggregatedDests* connectsMap3 =
+      ( connectsIt3 == relAggregatedConnectsTo.end( )
+      || connectsIt3->second->empty( ))
+      ? nullptr : connectsIt3->second.get( );
+    _aggregatedConnectsToTable->setTableData( connectsMap3, _entity );
+
   }
 
   void EntityConnectionListWidget::checkClose( void )

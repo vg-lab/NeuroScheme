@@ -89,7 +89,7 @@ namespace nslib
 
     virtual void importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity ) = 0;
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity ) = 0;
 
     virtual boost::property_tree::ptree& getRelationsOfType(
       const std::string& relationName,
@@ -97,25 +97,25 @@ namespace nslib
 
     virtual void importJSONRelationGIDS(
       const boost::property_tree::ptree& relation,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity,
       shift::Entity*& origEntity, shift::Entity*& destEntity,
       const std::string& relationName, bool checkConstrained );
 
     virtual void addConnectsToRelationsFromJSON(
       const boost::property_tree::ptree& relations,
-      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map< unsigned int, shift::Entity* >* oldGIDToEntity );
 
     virtual void addAggregatedConnectionFromJSON(
       const boost::property_tree::ptree& relations, const std::string& name,
-      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map< unsigned int, shift::Entity* >* oldGIDToEntity );
 
     virtual void addIsParentOfRelationshipsFromJSON(
       const boost::property_tree::ptree& relations,
-      std::unordered_map< unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map< unsigned int, shift::Entity* >* oldGIDToEntity );
 
     virtual void importEntititiesJSON(
       const boost::property_tree::ptree& entities,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGUIToEntity );
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
 
     virtual void exportEntitiesJSON( std::ostream& outputStream,
       bool minimizeStream ) const;

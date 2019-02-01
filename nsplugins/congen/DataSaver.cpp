@@ -89,7 +89,7 @@ namespace nslib
               QString::number( entity->getProperty( "Random stim Frequency" )
                 .value< unsigned int >( )),QString::fromStdString( caster->toString(
                 entity->getProperty( "Random stim synaptic mechanism" ))),
-                connectedEntities);
+                connectedEntities );
           }
         }
 

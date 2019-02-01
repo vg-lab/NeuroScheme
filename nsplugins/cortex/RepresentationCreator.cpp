@@ -116,22 +116,24 @@ namespace nslib
           default:
             break;
           }
-
-          switch (
-            neuron->getProperty(
-              "Funct Type" ).value< Neuron::TFunctionalType >( ))
+          if( neuron->hasProperty( "Funct Type" ))
           {
-          case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
-            neuronRep->setProperty( "bg", Color( 100, 100, 100 ));
-            break;
-          case Neuron::INTERNEURON:
-            neuronRep->setProperty( "bg", Color( 200, 100, 100 ));
-            break;
-          case Neuron::PYRAMIDAL:
-            neuronRep->setProperty( "bg", Color( 100, 100, 200 ));
-            break;
-          default:
-            break;
+              switch (
+              neuron->getProperty(
+                "Funct Type" ).value< Neuron::TFunctionalType >( ))
+            {
+            case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
+              neuronRep->setProperty( "bg", Color( 100, 100, 100 ));
+              break;
+            case Neuron::INTERNEURON:
+              neuronRep->setProperty( "bg", Color( 200, 100, 100 ));
+              break;
+            case Neuron::PYRAMIDAL:
+              neuronRep->setProperty( "bg", Color( 100, 100, 200 ));
+              break;
+            default:
+              break;
+            }
           }
 
           shiftgen::NeuronRep::Rings rings;
@@ -479,9 +481,9 @@ namespace nslib
             {
               relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map(
-                    relationProperties->getProperty( "count sum" ).
-                    value< unsigned int >( ))));
+                nbConnectionsToWidth.map(
+                relationProperties->getProperty( "count sum" )
+                .value< unsigned int >( ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(

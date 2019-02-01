@@ -94,12 +94,12 @@ namespace nslib
     if( connectionType_ != TConnectionType::AGGREGATED )
     {
       if( !shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
-        originEntity_->entityName( ), destinationEntity_->entityName( )))
+        originEntity_->typeName( ), destinationEntity_->typeName( )))
       {
         if ( connectionType_ == TConnectionType::SIMPLE )
         {
-          Loggers::get( )->log( "A " + originEntity_->entityName( ) +
-            " cannot be connected to a " + destinationEntity_->entityName( ) +
+          Loggers::get( )->log( "A " + originEntity_->typeName( ) +
+            " cannot be connected to a " + destinationEntity_->typeName( ) +
             '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
           this->hide( );
           _parentDock->hide( );
@@ -108,8 +108,8 @@ namespace nslib
         else
         {
           _isAggregated = true;
-          Loggers::get( )->log( "A " + originEntity_->entityName( ) +
-            " cannot be connected to a " + destinationEntity_->entityName( ) +
+          Loggers::get( )->log( "A " + originEntity_->typeName( ) +
+            " cannot be connected to a " + destinationEntity_->typeName( ) +
             ". Searching aggregated connections.", LOG_LEVEL_VERBOSE,
             NEUROSCHEME_FILE_LINE );
         }
@@ -221,7 +221,6 @@ namespace nslib
 
           lineEditwidget->setEnabled( isEditable );
         }
-
         _gridPropertiesLayout->addWidget( widget, numProp, 1 );
 
         if( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
@@ -428,8 +427,8 @@ namespace nslib
     }
     else
     {
-      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-          ->relationshipPropertiesTypes( );
+      auto relationshipPropertiesTypes =
+          DomainManager::getActiveDomain( )->relationshipPropertiesTypes( );
       _propObject = relationshipPropertiesTypes.getRelationshipProperties(
           "connectsTo" )->create( );
       _isNew = true;
@@ -454,6 +453,5 @@ namespace nslib
   {
     return _isAggregated;
   }
-
 
 }
