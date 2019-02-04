@@ -167,27 +167,6 @@ namespace nslib
           ( ( destItem->boundingRect( ).width( ) * 0.5f *
             originItem->scale( )) * QVector2D( destItem->pos( ) -
             originItem->pos( )).normalized( ));
-/*todo iago debug**
-        std::cout << std::endl<<"escena con items: " << PaneManager::activePane()->scene( ).items( ).size( ) << std::endl;
-        for (auto item : PaneManager::activePane()->scene( ).items( ))
-        {
-          std::cout <<"Item init: Pos " << item->pos().x() << "\t-\t"
-                    << item->pos().y( )<<"\t"<< item->boundingRect( ).width( )<<"\t"
-                    <<  item->scale( ) << "\tid:\t"<<item << std::endl;
-        }
-
-        std::cout <<"Item orig: Pos " << originItem->pos().x() << "\t-\t"
-                  << originItem->pos().y( )<<"\t"<< originItem->boundingRect( ).width( )<<"\t"
-                  <<  originItem->scale( ) << "\tid:\t"<<originItem << std::endl;
-
-
-        std::cout <<"Item dest: Pos " << destItem->pos().x() << "\t-\t"
-                  << destItem->pos().y( )<<"\t"<< destItem->boundingRect( ).width( )<<"\t"
-                  <<  destItem->scale( )<< "\tid:\t"<<destItem  << std::endl;
-
-        std::cout << "destOrig: "<<destOri.x() << "-"
-                    << destOri.y( ) << " destDest: "<<destDest.x() << "-"
-                                    << destDest.y( )<< std::endl;//*/
 
         dynamic_cast< ConnectionArrowItem* >( arrowItem )->
           createArrow( QPointF( destOri.x( ), destOri.y( )),

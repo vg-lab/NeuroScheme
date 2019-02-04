@@ -44,21 +44,25 @@ namespace nslib
     return _layout;
   }
 
-  Layout::Layout( const std::string& name_,
-                  unsigned int flags_ )
+  Layout::Layout( const std::string& name_,  unsigned int flags_,
+    QWidget* layoutOptions_ )
     : _canvas( nullptr )
     , _flags( flags_ )
     , _optionsWidget( new LayoutOptionsWidget )
     , _name( name_ )
     , _toolbox( new QToolBox( _optionsWidget ))
+    , _sortWidget( nullptr )
+    , _filterWidget( nullptr )
+    , _scatterPlotWidget( nullptr )
+    , _layoutSpecialProperties( layoutOptions_ )
+    , _isGrid( false )
   {
-    _isGrid = false;
     _optionsWidget->layout( )->addWidget( _toolbox, 0, 0 );
 
-    _sortWidget = nullptr;
-    _filterWidget = nullptr;
-    _scatterPlotWidget = nullptr;
-
+    if ( _layoutSpecialProperties )
+    {
+      _toolbox->addItem(layoutOptions_, QString("Layout options"));
+    }
     if ( _flags & SORT_ENABLED )
     {
       _sortWidget = new SortWidget( this );
@@ -74,9 +78,9 @@ namespace nslib
     if ( _flags & SCATTERPLOT_ENABLED )
     {
       _scatterPlotWidget = new ScatterPlotWidget( this );
-      QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
+      QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png" ));
       _toolbox->addItem( _scatterPlotWidget, filterIcon,
-                         QString( "ScatterPlot" ));
+        QString( "ScatterPlot" ));
     }
 
     // _toolbox->show( );
@@ -329,15 +333,6 @@ namespace nslib
       }
     }
 
-    //todo iago debug
-    std::cout <<"escena con items sin eliminar eliminados: " << PaneManager::activePane()->scene( ).items( ).size( ) << std::endl;
-    for (auto item : PaneManager::activePane()->scene( ).items( ))
-    {
-      std::cout <<"Item init: Pos " << item->pos().x() << "\t-\t"
-                << item->pos().y( )<<"\t"<< item->boundingRect( ).width( )<<"\t"
-                <<  item->scale( ) << "\tid:\t"<<item << std::endl;
-    }
-
     // // Remove the rest
     // for ( auto& item : _canvas->scene( ).items( ))
     // {
@@ -517,5 +512,9 @@ namespace nslib
 
   }
 
+  void Layout::refreshCanvas( void )
+  {
+    _canvas->displayEntities( false, false );
+  }
 
 }

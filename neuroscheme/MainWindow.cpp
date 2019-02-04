@@ -166,7 +166,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   canvas->addLayout( new nslib::CameraBasedLayout( ));
   canvas->addLayout( new nslib::ScatterPlotLayout( ));
   canvas->addLayout( new nslib::CircularLayout( ));
-  canvas->addLayout( new nslib::FreeLayout( ));
+  canvas->addLayout( new nslib::FreeLayout( statusBar( )));
 
   // Layouts dock
   {

@@ -39,7 +39,6 @@
 #include <memory>
 #include <shift/Relationship.h>
 #include <nslib/reps/QGraphicsItemRepresentation.h>
-#include <build/include/nslib/Logger.hpp>
 
 //TODO: Add realtion of parent of to entities
 

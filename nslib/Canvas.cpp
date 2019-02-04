@@ -107,6 +107,7 @@ namespace nslib
     : _graphicsView( new GraphicsView( parent_ ))
     , _graphicsScene( new GraphicsScene )
     , _activeLayoutIndex( -1 )
+    , _repsScale( 1.0f )
   {
     _graphicsScene->setParent( this );
     _graphicsView->setScene( _graphicsScene );
@@ -139,9 +140,9 @@ namespace nslib
   void Canvas::connectLayoutSelector( void )
   {
     connect( this->layouts( ).layoutSelector( ),
-             SIGNAL( currentIndexChanged( int )),
-             this,
-             SLOT( layoutChanged( int )));
+      SIGNAL( currentIndexChanged( int )),
+      this,
+      SLOT( layoutChanged( int )));
 
   }
 
@@ -303,11 +304,11 @@ namespace nslib
       }
       else
         Loggers::get( )->log( "Null pane layout",
-                             LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
     }
     else
       Loggers::get( )->log( "Null layout with index" + std::to_string( index ),
-                           LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+        LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
 
   }
 
@@ -485,16 +486,6 @@ namespace nslib
       _sceneEntities.removeIfContains( entity_ );
     }
     _entities.removeIfContains( entity_ );
-  }
-
-  qreal Canvas::padding( ) const
-  {
-    return _padding;
-  }
-
-  void Canvas::padding( qreal padding_ )
-  {
-    _padding = padding_;
   }
 
   qreal Canvas::repsScale( ) const

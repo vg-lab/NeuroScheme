@@ -24,6 +24,7 @@
 #define __NSLIB_FREE_LAYOUT__
 
 #include <nslib/api.h>
+#include <QtWidgets/QStatusBar>
 #include "Layout.h"
 
 namespace nslib
@@ -32,23 +33,27 @@ namespace nslib
   class NSLIB_API FreeLayout : public Layout
   {
     public:
-    FreeLayout( void );
+    FreeLayout( QStatusBar* statusBar_ );
 
     void startMoveRepresentation( QGraphicsItem* item_,
       const QPointF clickPos_ );
+
+    void stopMoveActualRepresentation( void );
 
     void init( void );
 
     void moveRepresentation( const QPointF newPos_ );
 
-    /**/void display( shift::Entities& entities,
+    void display( shift::Entities& entities,
       shift::Representations& representations,
-      bool animate = true ) override;//*/
+      bool animate = true ) override;
 
     void removeRelationshipsReps( void );
 
     protected:
     void _addRepresentations( const shift::Representations& reps ) override;
+    void _addRepresentations( const shift::Representations& reps,
+      const bool isEntity );
     void _removeRepresentations( const shift::Representations& reps );
 
     void _arrangeItems( const shift::Representations& reps, bool animate = true,
@@ -62,9 +67,11 @@ namespace nslib
     private:
     QGraphicsItem* _movedItem;
     QPointF _moveStart;
+    QCheckBox* _moveNewCheckBox;
     OpConfig preRenderOpConfig;
     shift::Representations _relationshipReps;
     shift::Representations _entitiesReps;
+    QStatusBar* _statusBar;
   };
 
 }

@@ -68,7 +68,7 @@ namespace nslib
     static void contextMenuEvent( QAbstractGraphicsShapeItem* item,
                                   QGraphicsSceneContextMenuEvent* event );
 
-    static void mousePressEvent(  const QGraphicsView* graphicsView,
+    static void mousePressEvent( const QGraphicsView* graphicsView,
       QGraphicsItem* item, const QMouseEvent* event );
 
     static void mouseReleaseEvent( QGraphicsItem* item,

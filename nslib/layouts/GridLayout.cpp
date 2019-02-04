@@ -25,13 +25,45 @@
 #include "../error.h"
 #include "../RepresentationCreatorManager.h"
 #include <QToolBox>
+#include <QtWidgets>
 
 namespace nslib
 {
 
   GridLayout::GridLayout( void )
-    : Layout( "Grid", Layout::SORT_ENABLED | Layout::FILTER_ENABLED )
+    : Layout( "Grid", Layout::SORT_ENABLED | Layout::FILTER_ENABLED, new QWidget )
+    , _lineEditPaddingX( new QDoubleSpinBox )
+    , _lineEditPaddingY( new QDoubleSpinBox )
   {
+    auto layout_ = new QGridLayout;
+    layout_->setAlignment( Qt::AlignTop );
+    _layoutSpecialProperties->setLayout( layout_ );
+
+    const auto labelPaddingX =
+      new QLabel( QString::fromStdString( "Padding X:" ));
+    _lineEditPaddingX->setRange( 95.0, 230.0 );
+    _lineEditPaddingX->setValue( 110 );
+    _lineEditPaddingX->setEnabled( true );
+
+    layout_->addWidget( labelPaddingX, 0, 0 );
+    layout_->addWidget( _lineEditPaddingX, 0, 1 );
+
+    const auto labelPaddingY =
+      new QLabel( QString::fromStdString( "Padding Y:" ));
+    _lineEditPaddingY->setRange( 95.0, 230.0 );
+    _lineEditPaddingY->setValue( 110 );
+    _lineEditPaddingY->setEnabled( true );
+
+    layout_->addWidget( labelPaddingY, 1, 0 );
+    layout_->addWidget( _lineEditPaddingY, 1, 1 );
+
+    QPushButton* button = new QPushButton( "Apply" );
+
+    layout_->addWidget( button, 2, 0, 1, 2 );
+
+    connect( button, SIGNAL( clicked( )), this,
+      SLOT( refreshCanvas( )));
+
   }
 
   void GridLayout::_arrangeItems( const shift::Representations& reps,
@@ -86,18 +118,17 @@ namespace nslib
     //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
     // std::cout << "Arranging " << repsToBeArranged << std::endl;
 
-    //todo iago continue
     const unsigned int marginX = 20;
     const unsigned int marginY = 20;
-    const float scalePaddingX = 1.0f;//todo iago editar en widget
-    const float scalePaddingY = 1.0f;//todo iago editar en widget
-    const unsigned int fixedPaddingX = 0u;//todo iago editar en widget
-    const unsigned int fixedPaddingY = 0u;//todo iago editar en widget
+    const float scalePaddingX = static_cast< float >(
+      _lineEditPaddingX->value( )) * 0.01f;
+    const float scalePaddingY = static_cast< float >(
+      _lineEditPaddingY->value( )) * 0.01f;
 
     unsigned int deltaX = static_cast< unsigned int >(
-      scalePaddingX * maxItemWidth + fixedPaddingX );
+      scalePaddingX * maxItemWidth );
     unsigned int deltaY = static_cast< unsigned int >(
-      scalePaddingY * maxItemHeight + fixedPaddingY );
+      scalePaddingY * maxItemHeight );
 
     int _x = 0;
     int _y = 0;

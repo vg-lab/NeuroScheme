@@ -30,31 +30,42 @@
 #include <nslib/reps/QGraphicsItemRepresentation.h>
 #include <nslib/Config.h>
 #include <nslib/SelectionManager.h>
+#include <QtWidgets/QMainWindow>
 
 
 namespace nslib
 {
 
-  FreeLayout::FreeLayout( void )
-    : Layout( "Free", 0 )
+  FreeLayout::FreeLayout( QStatusBar* statusBar_ )
+    : Layout( "Free", 0, new QWidget )
+    , _moveNewCheckBox( new QCheckBox )
+    , _statusBar(statusBar_)
   {
-    //todo iago resize
-    //todo iago pan
-    //todo iago new entities position
-    //todo iago padding
-    //todo iago relationships
     _isGrid = false;
+    auto layout_ = new QGridLayout;
+    layout_->setAlignment( Qt::AlignTop );
+    _layoutSpecialProperties->setLayout( layout_ );
 
+    const auto labelMoveNewEntities =
+        new QLabel( QString::fromStdString( "Move new entities:" ));
+    _moveNewCheckBox->setChecked( true );
+    _moveNewCheckBox->setEnabled( true );
+
+    layout_->addWidget( labelMoveNewEntities, 0, 0 );
+    layout_->addWidget( _moveNewCheckBox, 0, 1 );
   }
 
-  void FreeLayout::_arrangeItems( const shift::Representations& reps,
-    const bool animate, const shift::Representations& postFilterReps )
+  void FreeLayout::_arrangeItems( const shift::Representations& /*reps*/,
+    const bool /*animate*/, const shift::Representations& /*postFilterReps*/ )
   {
-    //todo iago debug
-    std::cout << "arranging free layout" << std::endl;//todo resize
-    std::cout << "reps " << reps.size( ) <<std::endl;
-    std::cout << "animate " << animate <<std::endl;
-    std::cout << "filterreps " << postFilterReps.size( ) <<std::endl;
+    Loggers::get( )->log( "Free Layout unable to arrange items.",
+      LOG_LEVEL_WARNING );
+  }
+
+  void FreeLayout::stopMoveActualRepresentation( void )
+  {
+    _movedItem = nullptr;
+    _statusBar->showMessage( "",5 );
   }
 
   void FreeLayout::startMoveRepresentation( QGraphicsItem* item_,
@@ -82,7 +93,11 @@ namespace nslib
 
   void FreeLayout::moveRepresentation( const QPointF newPos_ )
   {
-    _movedItem->setPos( newPos_ - _moveStart );
+    QPointF newItemPos = newPos_ - _moveStart;
+    _movedItem->setPos( newItemPos );
+    _statusBar->showMessage(
+      QString( "X: " ) + QString::number( newItemPos.x( )) +
+      QString( " Y: " ) + QString::number( newItemPos.y( )));
     if( Config::showConnectivity( ))
     {
       for ( auto& relationshipRep : _relationshipReps )
@@ -96,13 +111,10 @@ namespace nslib
   {
 
   }
-/**/
+
   void FreeLayout::display( shift::Entities& entities,
-                        shift::Representations& representations,
-                        bool animate )
+    shift::Representations& representations, bool /*animate*/ )
   {
-    //todo iago debug
-    std::cout << "display: " << animate << std::endl;
     Loggers::get( )->log( "display "
       + std::to_string( entities.size( )),
       LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
@@ -122,7 +134,7 @@ namespace nslib
       }
     }
     _removeRepresentations( removeReps );
-    _addRepresentations( representations );
+    _addRepresentations( representations, true );
     _entitiesReps = representations;
 
     removeRelationshipsReps( );
@@ -134,7 +146,7 @@ namespace nslib
       RepresentationCreatorManager::generateRelations( entities,
         newRepresentations, "aggregatedConnectsTo", true );
       _relationshipReps = newRepresentations;
-      _addRepresentations( _relationshipReps );
+      _addRepresentations( _relationshipReps, false );
 
       OpConfig opConfig( &_canvas->scene( ), false, _isGrid );
       for ( auto& relationshipRep : _relationshipReps )
@@ -142,14 +154,18 @@ namespace nslib
         relationshipRep->preRender( &opConfig );
       }
     }
-  }//*/
+  }
 
-  void FreeLayout::_addRepresentations( const shift::Representations& reps )
+  void FreeLayout::_addRepresentations( const shift::Representations& reps,
+    const bool isEntity )
   {
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
     qreal repsScale = _canvas->repsScale( );
+    auto view = _canvas->scene( ).views( ).first( );
+    const bool moveNewEntities = _moveNewCheckBox->isChecked( );
+
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
@@ -177,29 +193,33 @@ namespace nslib
         {
           const auto entities = repsToEntities.at( representation );
           if ( entities.empty( ))
+          {
             Loggers::get( )->log(
-                "No entities associated to representation",
-                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-
+              "No entities associated to representation",
+              LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          }
           auto selectableItem = dynamic_cast< SelectableItem* >( item );
           if ( selectableItem )
           {
             auto selectedState = SelectionManager::getSelectedState(
-                *entities.begin( ));
+              *entities.begin( ));
 
             // if ( selectedState == selectedStateSelectedState::SELECTED )
             selectableItem->setSelected( selectedState );
-
 
             auto shapeItem =
                 dynamic_cast< QAbstractGraphicsShapeItem* >( item );
             if ( shapeItem )
             {
               if ( selectedState == SelectedState::SELECTED )
+              {
                 shapeItem->setPen( SelectableItem::selectedPen( ));
+              }
               else if ( selectedState == SelectedState::PARTIALLY_SELECTED )
+              {
                 shapeItem->setPen(
-                    SelectableItem::partiallySelectedPen( ));
+                  SelectableItem::partiallySelectedPen( ) );
+              }
             }
           }
         }
@@ -209,12 +229,32 @@ namespace nslib
         if ( !item->parentItem( )
           && !_canvas->scene( ).items( ).contains( item ))
         {
+          if ( isEntity )
+          {
+            if( moveNewEntities )
+            {
+              qreal posX = view->x( );
+              qreal posY = item->y( );
+              qreal glyphRadius =
+                2.05f * float( item->scale( ))
+                * float( item->boundingRect( ).width( ));
+              auto viewItem = view->itemAt( view->mapFromScene( posX, posY ));
+              while( viewItem )
+              {
+                posX += glyphRadius;
+                if( posX > view->width( ))
+                {
+                  posX = item->x( );
+                  posY += glyphRadius;
+                }
+                viewItem = view->itemAt( view->mapFromScene( posX, posY ));
+              }
+              item->setPos( posX, posY );
+            }
+            item->setScale( repsScale );
+          }
           _canvas->scene( ).addItem( item );
-          item->setScale( repsScale );
-          std::cout << repsScale << std::endl;
-          //todo iago check if position center; and move to mouse position
         }
-
       }
     }
   } // _addRepresentations
@@ -224,7 +264,7 @@ namespace nslib
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
-          dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
+        dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
       if ( !graphicsItemRep )
       {
         Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );
@@ -250,7 +290,7 @@ namespace nslib
 
   Layout* FreeLayout::clone( void ) const
   {
-    return new FreeLayout( );
+    return new FreeLayout( _statusBar );
   }
 
   void FreeLayout::removeRelationshipsReps( )
@@ -263,6 +303,11 @@ namespace nslib
   {
     _relationshipReps.clear( );
     _entitiesReps.clear( );
+  }
+
+  void FreeLayout::_addRepresentations( const shift::Representations& reps )
+  {
+    FreeLayout::_addRepresentations( reps, true );
   }
 
 }

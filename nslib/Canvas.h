@@ -106,9 +106,6 @@ namespace nslib
 
     void repsScale( qreal repsScale_ );
     qreal repsScale ( void ) const;
-    void padding( qreal padding_ );//todo iago
-    qreal padding ( void ) const;//todo iago
-
 
 protected:
     GraphicsView* _graphicsView;
@@ -121,7 +118,6 @@ protected:
     shift::Entities _sceneEntities;
     TProperties _properties;
 
-    qreal _padding;
     qreal _repsScale;
 
   public slots:

@@ -32,31 +32,47 @@ namespace nslib
 {
 
   CircularLayout::CircularLayout( void )
-    : Layout( "Circular",
-              Layout::SORT_ENABLED |
-              Layout::FILTER_ENABLED )
+    : Layout( "Circular", Layout::SORT_ENABLED | Layout::FILTER_ENABLED,
+        new QWidget )
+    , _lineEditRadius( new QDoubleSpinBox )
   {
+    auto layout_ = new QGridLayout;
+    layout_->setAlignment( Qt::AlignTop );
+    _layoutSpecialProperties->setLayout( layout_ );
+
+    const auto labelRadius =
+      new QLabel( QString::fromStdString( "Radius:" ));
+    _lineEditRadius->setRange( 5.0, 305.0 );
+    _lineEditRadius->setValue( 50.0 );
+    _lineEditRadius->setEnabled( true );
+
+    layout_->addWidget( labelRadius, 0, 0 );
+    layout_->addWidget( _lineEditRadius, 0, 1 );
+
+    QPushButton* button = new QPushButton( "Apply" );
+
+    layout_->addWidget( button, 1, 0, 1, 2 );
+
+    connect( button, SIGNAL( clicked( )), this,
+      SLOT( refreshCanvas( )));
   }
 
   void CircularLayout::_arrangeItems( const shift::Representations& reps,
-                                  bool animate,
-                                  const shift::Representations& postFilterReps )
+    bool animate, const shift::Representations& postFilterReps )
   {
     std::unordered_set< QGraphicsItem* > filteredOutItems;
     auto useOpacityForFilter = _filterWidget->useOpacityForFiltering( );
-    bool doFiltering =
-      _filterWidget &&
-      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
+    const bool doFiltering =
+      _filterWidget && !_filterWidget->filterSetConfig( ).filters( ).empty( );
     unsigned int maxItemWidth = 0, maxItemHeight = 0;
     unsigned int repsToBeArranged = 0;
     for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
-        dynamic_cast< nslib::QGraphicsItemRepresentation* >(
-          representation );
+        dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
       if ( !graphicsItemRep )
       {
-        std::cerr << "Item null" << std::endl;
+        Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );
       }
       else
       {
@@ -68,7 +84,7 @@ namespace nslib
           if ( doFiltering && useOpacityForFilter )
           {
             if ( std::find( postFilterReps.begin( ), postFilterReps.end( ),
-                            representation ) == postFilterReps.end( ))
+              representation ) == postFilterReps.end( ))
             {
               filteredOutItems.insert( item );
             }
@@ -77,10 +93,10 @@ namespace nslib
           QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
           if ( rect.width( ) > maxItemWidth )
-            maxItemWidth = static_cast<unsigned int>(rect.width( ));
+            maxItemWidth = static_cast< unsigned int >(rect.width( ));
 
           if ( rect.height( ) > maxItemHeight )
-            maxItemHeight = static_cast<unsigned int>(rect.height( ));
+            maxItemHeight = static_cast< unsigned int >(rect.height( ));
         }
         // else std::cout << "Item with parentItem, skipping" << std::endl;
       }
@@ -113,11 +129,13 @@ namespace nslib
 
     float deltaAngle = 2.0f * static_cast< float >( M_PI ) / repsToBeArranged;
     float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
-    float deltaAngleMultRadius = 0.9f * deltaAngle * radius;
+    float deltaAngleMultRadius =
+      ( 1.0f - static_cast< float >( _lineEditRadius->value( )) * 0.01f )
+      * deltaAngle * radius;
 
     auto numRows =  static_cast< unsigned int >(
       floorf( sqrtf( iconAspectRatio * float( repsToBeArranged ) /
-                   canvasAspectRatio )));
+      canvasAspectRatio )));
 
     if ( numRows < 1 && repsToBeArranged > 0 )
       numRows = 1;
@@ -151,12 +169,11 @@ namespace nslib
 
     auto opacity = _filterWidget
       ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
-    qreal repsScale;
+    qreal repsScale = 1.0f;
     for ( const auto representation : reps )
     {
       auto graphicsItemRep =
-        dynamic_cast< nslib::QGraphicsItemRepresentation* >(
-          representation );
+        dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
       if ( !graphicsItemRep )
       {
         Loggers::get( )->log( "Item null", LOG_LEVEL_WARNING );

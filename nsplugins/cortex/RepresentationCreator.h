@@ -39,6 +39,8 @@ namespace nslib
     class RepresentationCreator : public shift::RepresentationCreator
     {
     public:
+      RepresentationCreator( void );
+
       virtual ~RepresentationCreator( void ) {};
 
       void updateRepresentation(
@@ -69,24 +71,15 @@ namespace nslib
         shift::Representations& relatedEntities,
         shift::RelationshipOneToN* relatedElements ) override;
 
-      void setMaximums( float maxNeuronSomaVolume_,
-                        float maxNeuronSomaArea_,
-                        float maxNeuronDendsVolume_,
-                        float maxNeuronDendsArea_,
-                        unsigned int maxNeurons_,
-                        unsigned int maxNeuronsPerColumn_,
-                        unsigned int maxNeuronsPerMiniColumn_,
-                        unsigned int maxConnectionsPerEntity_ )
-      {
-        _maxNeuronSomaVolume = maxNeuronSomaVolume_;
-        _maxNeuronSomaArea = maxNeuronSomaArea_;
-        _maxNeuronDendsVolume = maxNeuronDendsVolume_;
-        _maxNeuronDendsArea = maxNeuronDendsArea_;
-        _maxNeurons = maxNeurons_;
-        _maxNeuronsPerColumn = maxNeuronsPerColumn_;
-        _maxNeuronsPerMiniColumn = maxNeuronsPerMiniColumn_;
-        _maxConnectionsPerEntity = maxConnectionsPerEntity_;
-      }
+      void setMaximums(
+        float maxNeuronSomaVolume_,
+        float maxNeuronSomaArea_,
+        float maxNeuronDendsVolume_,
+        float maxNeuronDendsArea_,
+        unsigned int maxNeurons_,
+        unsigned int maxNeuronsPerColumn_,
+        unsigned int maxNeuronsPerMiniColumn_,
+        unsigned int maxConnectionsPerEntity_ );
 
       virtual void clear( void ) final
       {
@@ -137,43 +130,40 @@ namespace nslib
 
     protected:
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
-      typedef std::map<
-        std::pair< shift::EntityGid,
-                   std::pair< unsigned int,
-                              std::pair< unsigned int, unsigned int>>>,
-      LayerRep* > LayersMap;
 
 #define QuadKey( x, y, z, w )                                         \
       std::make_pair( x, std::make_pair( y, std::make_pair( z, w )))
+
 #define PentaKey( a, b, c, d, e )                                       \
       std::make_pair( a, std::make_pair( b, std::make_pair(             \
                                          c, std::make_pair( d, e ))))
 
-      typedef std::map<
-        std::pair< shift::EntityGid,
-                   std::pair< unsigned int,
-                              std::pair< unsigned int,
-                                         std::pair< unsigned int,
-                                                    unsigned int >>>>,
+      typedef std::pair< shift::EntityGid, std::pair< unsigned int,
+        std::pair< unsigned int, unsigned int>>>
+        LayersMapKey;
+
+      typedef std::map< std::pair< shift::EntityGid, std::pair< unsigned int,
+        std::pair< unsigned int, unsigned int>>>, LayerRep* > LayersMap;
+
+      typedef std::pair< shift::EntityGid, std::pair< unsigned int,
+        std::pair< unsigned int, std::pair< unsigned int,  unsigned int >>>>
+        NeuronTypeAggsMapKey;
+
+      typedef std::map< NeuronTypeAggsMapKey,
         NeuronTypeAggregationRep* > NeuronTypeAggsMaps;
 
-      void _createColumnOrMiniColumn(
-        shift::Entity *obj,
-        shift::Representation* rep,
-        shift::EntityGid entityGid,
-        unsigned int id,
-        unsigned int columnOrMiniColumn,
-        MapperFloatToFloat& somaAreaToAngle,
-        MapperFloatToFloat& dendAreaToAngle,
-        scoop::SequentialColorMap& somaVolumeToColor,
-        scoop::SequentialColorMap& dendVolumeToColor,
-        MapperFloatToFloat& neuronsToPercentage,
-        MapperFloatToFloat& layerNeuronsToPercentage,
-        LayersMap& layersMap,
-        shift::TEntitiesToReps& entitiesToReps,
-        shift::TRepsToEntities& repsToEntities,
-        bool linkEntitiesToReps,
-        bool linkRepsToEntities );
+      void updateColumnOrMiniColumnRep(
+        const shift::Entity* entity_,
+        shift::Representation* entityRep_,
+        unsigned int columnOrMiniColumn );
+
+      void updateNeuronRep( const shift::Entity* entity_,
+        shift::Representation* entityRep_ );
+
+      shift::Representation*
+        getNeuronTypeAggregationRep( const shift::Entity* entity_ );
+
+      shift::Representation* getLayerRep( const shift::Entity* entity_ );
 
       float _maxNeuronSomaVolume;
       float _maxNeuronSomaArea;
@@ -185,6 +175,15 @@ namespace nslib
       unsigned int _maxConnectionsPerEntity;
       LayersMap _layersMap;
       NeuronTypeAggsMaps _neuronTypeAggsMap;
+
+      scoop::SequentialColorMap _greenMapper;
+      scoop::SequentialColorMap _redMapper;
+      MapperFloatToFloat _somaAreaToAngle;
+      MapperFloatToFloat _dendAreaToAngle;
+      MapperFloatToFloat _neuronsToPercentage;
+      MapperFloatToFloat _columnNeuronsToPercentage;
+      MapperFloatToFloat _miniColumnNeuronsToPercentage;
+      MapperFloatToFloat _nbConnectionsToWidth;
     };
 
   } // namespace cortex

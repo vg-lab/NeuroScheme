@@ -98,7 +98,7 @@ namespace nslib
     };
 
     Layout( const std::string& name_ = "unnamed",
-            unsigned int flags_ = 0 );
+            unsigned int flags_ = 0, QWidget* layoutOptions_ = nullptr );
 
     virtual ~Layout( void );
 
@@ -127,6 +127,9 @@ namespace nslib
 
     void refreshWidgetsProperties( const TProperties& properties );
 
+  public slots:
+    void refreshCanvas( void );
+
 
   protected:
     void _drawCorners( );
@@ -146,6 +149,7 @@ namespace nslib
     SortWidget* _sortWidget;
     FilterWidget* _filterWidget;
     ScatterPlotWidget* _scatterPlotWidget;
+    QWidget* _layoutSpecialProperties;
     bool _isGrid;
   };
 
