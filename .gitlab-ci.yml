@@ -36,7 +36,7 @@ Ubuntu-Subproject-master:
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - export BUILD_GENERATOR="Ninja"
   - export GITHUB_MIRROR_URL="git@github.com:gmrvvis/NeuroScheme"
-  - bash .gitlabci.sh
+  - bash .gitlab-ci.sh
  only:
   - master
  tags:
