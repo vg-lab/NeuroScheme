@@ -45,14 +45,14 @@ namespace nslib
       , _maxAbsoluteWeight( 0.1f )
       , _nbConnectionsToWidth( 0, _maxAbsoluteWeight, 1.0f, 5.0f )
       ,  _neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f )
-      , _superPopColor( "#a8f7ac" )
+      , _superPopColor( "#b6d7a8" )
     {
       _neuronModelColorMap.setColor(
         shiftgen::NeuronPop::TNeuronModel::iaf_psc_alpha,
-        scoop::Color( "#5c8daa" ));
+        scoop::Color( "#9fc5e8" ));
       _neuronModelColorMap.setColor(
         shiftgen::NeuronPop::TNeuronModel::undefined,
-        scoop::Color( "#e7ba83" ));
+        scoop::Color( "#ea9999" ));
 
       _neuronStimulatorModelColorMap.setColor(
         shiftgen::Stimulator::TStimulatorModel::AC_generator,
