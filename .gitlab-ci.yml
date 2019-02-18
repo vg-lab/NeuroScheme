@@ -21,9 +21,24 @@ Ubuntu-Subproject:
   - date
   - hostname
   - uname -a
-  - export BUILD_GENERATOR="Ninja";
+  - export BUILD_GENERATOR="Ninja"
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - bash .gitlab-ci.sh
+ tags:
+  - ubuntu
+
+Ubuntu-Subproject-master:
+ stage: build
+ script:
+  - date
+  - hostname
+  - uname -a
+  - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
+  - export BUILD_GENERATOR="Ninja"
+  - export GITHUB_MIRROR_URL="git@github.com:gmrvvis/NeuroScheme"
+  - bash .gitlabci.sh
+ only:
+  - master
  tags:
   - ubuntu
 
