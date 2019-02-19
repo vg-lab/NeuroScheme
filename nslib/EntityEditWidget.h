@@ -105,10 +105,9 @@ namespace nslib
     static bool _autoCloseChecked;
     static bool _checkUniquenessChecked;
 
-    void updateEntitiyRepresentations( shift::RepresentationCreator* creatorRep_,
-      const shift::Entity* entity_,
-      std::set< shift::Representation* > entityReps_,
-      const bool freeLayoutInUse_ ) const;
+    void updateRelatedEntities( shift::EntitiesWithRelationships& dataEntities_,
+      shift::RelationshipOneToOne& relChildOf_,
+      bool freeLayoutInUse_, shift::Entity* entity_ ) const;
   };
 }
 

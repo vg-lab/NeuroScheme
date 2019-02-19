@@ -87,7 +87,7 @@ namespace nslib
         _neuronTypeAggsMap.clear( );
       }
 
-      bool entityUpdatedOrCreated( shift::Entity* entity ) override;
+      bool entityUpdatedOrCreated( const shift::Entity* entity ) final;
 
       float maxNeuronSomaVolume( void ) const;
 

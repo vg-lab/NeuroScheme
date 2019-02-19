@@ -82,7 +82,7 @@ namespace nslib
     void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
       bool isGrid_, QPointF glyphCenter_ )
     {
-      float itemInvScale = nslib::Config::scale( )
+      float itemInvScale = 1.0f
         / static_cast< float >( this->scale( ));
 
       auto glyphCenter = itemInvScale * glyphCenter_;

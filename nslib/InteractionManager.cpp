@@ -184,7 +184,6 @@ namespace nslib
           {
             item->setPen( SelectableItem::unselectedPen( ));
           }
-          usleep(rand()%100);
           lastShapeItemHoveredOnMouseMove = nullptr;
           return;
         }

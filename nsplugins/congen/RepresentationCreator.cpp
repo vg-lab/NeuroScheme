@@ -453,11 +453,11 @@ namespace nslib
     } // generateRelations
 
 
-    bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    bool RepresentationCreator::entityUpdatedOrCreated( const shift::Entity* entity )
     {
       unsigned int newNeuronsPerPopulation = 0;
-      if ( dynamic_cast< shiftgen::NeuronPop* >( entity )
-        || dynamic_cast< shiftgen::Stimulator* >( entity ))
+      if ( dynamic_cast< const shiftgen::NeuronPop* >( entity )
+        || dynamic_cast< const shiftgen::Stimulator* >( entity ))
       {
         if( entity->hasProperty( "Nb of neurons" ))
         {
@@ -470,7 +470,7 @@ namespace nslib
             LOG_LEVEL_WARNING );
         }
       }
-      else if ( dynamic_cast< shiftgen::NeuronSuperPop* >( entity ))
+      else if ( dynamic_cast< const shiftgen::NeuronSuperPop* >( entity ))
       {
         if(entity->hasProperty( "Nb of neurons Mean"))
         {
@@ -497,10 +497,10 @@ namespace nslib
     }
 
     bool RepresentationCreator::relationshipUpdatedOrCreated(
-      shift::RelationshipProperties* relProperties )
+      const shift::RelationshipProperties* relProperties )
     {
       float newAbsoluteWeight = 0.0f;
-      if ( dynamic_cast< shiftgen::ConnectsWith* >( relProperties ))
+      if ( dynamic_cast< const shiftgen::ConnectsWith* >( relProperties ))
       {
         if( relProperties->hasProperty( "Weight Type" )
           &&  relProperties->hasProperty( "Weight" )
@@ -521,7 +521,7 @@ namespace nslib
         }
       }
       else if ( dynamic_cast
-        < shiftgen::AggregatedConnectsWith* >( relProperties ))
+        < const shiftgen::AggregatedConnectsWith* >( relProperties ))
       {
         if( relProperties->hasProperty( "Weight mean" ))
         {

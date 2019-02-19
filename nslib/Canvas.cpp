@@ -335,7 +335,7 @@ namespace nslib
   void Canvas::setEntities( shift::Entities& entities_)
   {
     _sceneEntities = _entities = entities_;
-    if ( Config::_showNoHierarchyEntities( ))
+    if ( Config::showNoHierarchyEntities( ))
     {
       _entities.addEntities( DataManager::noHierarchyEntities( ));
     }

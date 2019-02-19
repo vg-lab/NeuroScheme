@@ -80,9 +80,9 @@ namespace nslib
 
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
 
-      bool entityUpdatedOrCreated( shift::Entity* entity ) final;
+      bool entityUpdatedOrCreated( const shift::Entity* entity ) final;
       bool relationshipUpdatedOrCreated(
-        shift::RelationshipProperties* relProperties ) final;
+        const shift::RelationshipProperties* relProperties ) final;
 
     protected:
       unsigned int _maxNeuronsPerPopulation;

@@ -769,10 +769,11 @@ namespace nslib
     }
 
 
-    bool RepresentationCreator::entityUpdatedOrCreated( shift::Entity* entity )
+    bool RepresentationCreator::entityUpdatedOrCreated(
+      const shift::Entity* entity )
     {
       bool needToClearCache = false;
-      if ( dynamic_cast< Neuron* >( entity ))
+      if ( dynamic_cast< const Neuron* >( entity ))
       {
         if( entity->hasProperty( "Soma Volume" ))
         {
@@ -835,7 +836,7 @@ namespace nslib
             LOG_LEVEL_WARNING );
         }
       }
-      else if ( dynamic_cast< Layer* >( entity ))
+      else if ( dynamic_cast< const Layer* >( entity ))
       {
         unsigned int newMaxNeurons = 0u;
         if( entity->hasProperty( "Num Pyramidals" ))

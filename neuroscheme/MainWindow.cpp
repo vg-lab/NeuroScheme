@@ -131,22 +131,22 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
-           this, SLOT( toggleShowConnectivity( )));
+    this, SLOT( toggleShowConnectivity( )));
 
   connect( _ui->actionShowNoHierarchyEntities, SIGNAL( triggered( )),
-           this, SLOT( toggleShowNoHierarchyEntities( )));
+    this, SLOT( toggleShowNoHierarchyEntities( )));
 
   connect( _ui->actionSplitHorizontally, SIGNAL( triggered( )),
-           this, SLOT( duplicateActivePane( )));
+    this, SLOT( duplicateActivePane( )));
 
   connect( _ui->actionSplitVertically, SIGNAL( triggered( )),
-           this, SLOT( duplicateActivePane( )));
+    this, SLOT( duplicateActivePane( )));
 
   connect( _ui->actionKillPane, SIGNAL( triggered( )),
-           this, SLOT( killActivePane( )));
+    this, SLOT( killActivePane( )));
 
   connect( _ui->actionHome, SIGNAL( triggered( )),
-           this, SLOT( home( )));
+    this, SLOT( home( )));
 
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
@@ -667,7 +667,7 @@ void MainWindow::toggleShowConnectivity( void )
 
 void MainWindow::toggleShowNoHierarchyEntities( void )
 {
-  nslib::Config::_showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
+  nslib::Config::showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
 
   for ( auto canvas : nslib::PaneManager::panes( ))
   {

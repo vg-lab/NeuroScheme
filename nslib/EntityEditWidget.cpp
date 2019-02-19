@@ -216,7 +216,7 @@ namespace nslib
             const auto& categories = caster->categories( );
 
             const bool isEditable = _entity->hasPropertyFlag( propName,
-              shift::Entity::TPropertyFlag::EDITABLE );
+              shift::Properties::TPropertyFlag::EDITABLE );
 
             if( !categories.empty( ))
             {
@@ -278,7 +278,7 @@ namespace nslib
     auto& dataEntities = DataManager::entities( );
     auto& dataRelations = dataEntities.relationships( );
     auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
-    bool freeLayoutInUse = false; //todo: use this
+    bool freeLayoutInUse = false;
     for( const auto& pane : PaneManager::panes( ))
     {
       freeLayoutInUse = freeLayoutInUse ||
@@ -307,7 +307,7 @@ namespace nslib
         const auto& label = labelWidget->text( ).toStdString( );
 
         const bool isEditable = _entity->hasPropertyFlag(
-          label, shift::Entity::TPropertyFlag::EDITABLE );
+          label, shift::Properties::TPropertyFlag::EDITABLE );
 
         if ( _isEditing && !isEditable )
         {
@@ -427,7 +427,7 @@ namespace nslib
         if( _entity->isNotHierarchy( ))
         {
           DataManager::noHierarchyEntities( ).add( _entity );
-          if( Config::_showNoHierarchyEntities( ))
+          if( Config::showNoHierarchyEntities( ))
           {
             for ( auto pane : PaneManager::panes( ))
             {
@@ -459,48 +459,52 @@ namespace nslib
           }
         }
       }
-      else if ( _isEditing )
-      {
-        auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
-        if( parentID > 0 )
-        {
-          auto parent = dataEntities.at( parentID );
-          parent->autoUpdateProperties( );
-        }
-      }
+    }
+
+    updateRelatedEntities( dataEntities, relChildOf, freeLayoutInUse,
+      _entity );
+
+
+  }
+
+  void EntityEditWidget::updateRelatedEntities(
+    shift::EntitiesWithRelationships& dataEntities_,
+    shift::RelationshipOneToOne& relChildOf_, bool freeLayoutInUse_,
+    shift::Entity* entity_ ) const
+  {
+    shift::Entities updatedEntities;
+    updatedEntities.add( entity_ );
+    auto parentID = relChildOf_[ entity_->entityGid( ) ].entity;
+    while( parentID > 0 )
+    {
+      const auto parent = dataEntities_.at( parentID );
+      parent->autoUpdateProperties( );
+      updatedEntities.add( parent );
+      parentID = relChildOf_[ parentID ].entity;
     }
 
     for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
     {
-      if( creatorPair.second->entityUpdatedOrCreated( _entity ))
+      bool representationUpdated = false;
+      for (const auto updatedEntity : updatedEntities.vector( ))
       {
-        if ( freeLayoutInUse )
-        {
-          auto entitiesToReps =
-              RepresentationCreatorManager::entitiesToReps( creatorPair.first );
-          for(const auto entityReps : entitiesToReps )
-          {
-            updateEntitiyRepresentations( creatorPair.second, entityReps.first,
-              entityReps.second,freeLayoutInUse );
-          }
-        }
-        else
-        {
-          RepresentationCreatorManager::clearEntitiesToReps( creatorPair.first );
-        }
+        representationUpdated =
+          creatorPair.second->entityUpdatedOrCreated( updatedEntity );
+      }
+      if( representationUpdated )
+      {
+        RepresentationCreatorManager::clearEntitiesCache(
+          creatorPair.first, freeLayoutInUse_ );
       }
       else if ( _isEditing || ( _isNewOrDuplicated && _parentEntity ))
       {
         auto entitiesToReps =
           RepresentationCreatorManager::entitiesToReps( creatorPair.first );
-        shift::Entities parentEntities;
-        parentEntities.addRelatedEntitiesOneToOne(
-          relChildOf, _entity, dataEntities );
-        if ( _isEditing )
+        if ( !_isEditing )
         {
-          parentEntities.add( _entity );
+          updatedEntities.remove( entity_ );
         }
-        for( const auto& entity : parentEntities.vector( ))
+        for( const auto& entity : updatedEntities.vector( ))
         {
           const auto entityReps = entitiesToReps.find( entity );
           if( entityReps == entitiesToReps.end( ))
@@ -511,8 +515,8 @@ namespace nslib
           }
           else
           {
-            updateEntitiyRepresentations( creatorPair.second, entity,
-              entityReps->second,freeLayoutInUse );
+            RepresentationCreatorManager::updateEntitiyRepresentations( entity,
+              entityReps->second, creatorPair.first, freeLayoutInUse_ );
           }
         }
       }
@@ -523,41 +527,6 @@ namespace nslib
     for ( auto pane : PaneManager::panes( ))
     {
       pane->displayEntities( false, true );
-    }
-  }
-
-  void EntityEditWidget::updateEntitiyRepresentations( shift::RepresentationCreator* creatorRep_,
-    const shift::Entity* entity_, std::set< shift::Representation* > entityReps_,
-    const bool freeLayoutInUse_ ) const
-  {
-    for ( shift::Representation* rep : entityReps_ )
-    {
-      creatorRep_->updateRepresentation( entity_, rep );
-      auto graphicsItemRep =
-        dynamic_cast< QGraphicsItemRepresentation* >( rep );
-      for( auto canvas : PaneManager::panes( ))
-      {
-        auto canvasReps = canvas->reps( );
-        if( std::find( canvasReps.begin( ), canvasReps.end( ), rep )
-          != canvasReps.end( ))
-        {
-          auto item = graphicsItemRep->item( &canvas->scene( ));
-          canvas->scene( ).removeItem( item );
-          if( freeLayoutInUse_ )
-          {
-            auto pos = item->pos( );
-            graphicsItemRep->deleteItem( &canvas->scene( ));
-            auto newItem = graphicsItemRep->item( &canvas->scene( ));
-            canvas->scene( ).addItem( newItem );
-            newItem->setScale( canvas->repsScale( ));
-            newItem->setPos( pos );
-          }
-          else
-          {
-            graphicsItemRep->deleteItem( &canvas->scene( ));
-          }
-        }
-      }
     }
   }
 

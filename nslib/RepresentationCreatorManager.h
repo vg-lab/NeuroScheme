@@ -62,36 +62,18 @@ namespace nslib
     static const shift::TRepsToEntities& repsToEntities(
         unsigned int repCreatorId = 0 );
 
-    static void clearEntitiesToReps( unsigned int repCreatorId = 0 )
-    {
-      //_repCreators[ repCreatorId ]->clear( );
-      for ( auto& repPair : _repsToEntities[ repCreatorId ] )
-          delete repPair.first;
-      _entitiesToReps[ repCreatorId ].clear( );
-      _repsToEntities[ repCreatorId ].clear( );
-      _gidsToEntitiesReps[ repCreatorId ].clear( );
-    }
+    static void clearEntitiesToReps( unsigned int repCreatorId = 0 );
 
-    static void clearRelationshipsCache( unsigned int repCreatorId = 0 )
-    {
-      if( Config::showConnectivity( ))
-      {
-        for( const auto& pane : PaneManager::panes( ))
-        {
-          if( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE )
-          {
-            FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
-              pane->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
-            freeLayout->removeRelationshipsReps( );
-          }
-        }
-      }
-      for ( auto& relPair : _relatedEntitiesReps[ repCreatorId ] )
-      {
-        delete std::get< 0 >( relPair.second );
-      }
-      _relatedEntitiesReps[ repCreatorId ].clear( );
-    }
+    static void clearEntitiesCache( unsigned int repCreatorId = 0,
+      const bool freeLayoutInUse = false );
+
+    static void clearRelationshipsCache( unsigned int repCreatorId = 0 );
+
+    static void updateEntitiyRepresentations(
+      const shift::Entity* entity_,
+      std::set< shift::Representation* > entityReps_,
+      unsigned int repCreatorId = 0,
+      const bool freeLayoutInUse_ = false );
 
     static const shift::TRelatedEntitiesReps& relatedEntities(
         unsigned int repCreatorID = 0 );
