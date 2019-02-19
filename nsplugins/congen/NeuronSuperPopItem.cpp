@@ -51,7 +51,6 @@ namespace nslib
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
-      (void)( bgColor );
       auto circleItem = new QGraphicsEllipseItem( this );
       auto circleItemSize = roundf( size * 0.9f );
       int halfcircleItemSize = - static_cast< int >(roundf( size * 0.45f ));
@@ -64,7 +63,7 @@ namespace nslib
       auto circleItemSizeInner = roundf( size * 0.7f );
       int halfcircleItemSizeInner = - static_cast< int >( roundf( size * 0.35f ));
       circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
-                                circleItemSizeInner, circleItemSizeInner );
+        circleItemSizeInner, circleItemSizeInner );
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
@@ -79,8 +78,7 @@ namespace nslib
 
       auto bar = new QGraphicsRectItem(
         -barWidth, halfcircleItemSizeInner-2,
-        2 * barWidth, circleItemSizeInner+4
-        );
+        2 * barWidth, circleItemSizeInner+4 );
       bar->setPen( QColor( bgColor ));
       bar->setBrush( QColor( 255, 255, 255 ));
       bar->setParentItem( this );

@@ -59,7 +59,6 @@ namespace nslib
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
-      (void)( bgColor );
       auto circleItem = new QGraphicsEllipseItem( this );
       auto circleItemSize = roundf( size * 0.9f );
       int halfcircleItemSize = - static_cast< int >(roundf( size * 0.45f ));

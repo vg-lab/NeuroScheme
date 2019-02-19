@@ -92,7 +92,7 @@ namespace nslib
       MapperFloatToFloat _neuronsToPercentage;
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
-      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorModel >
+      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorType >
         _neuronStimulatorModelColorMap;
       scoop::Color _superPopColor;
 

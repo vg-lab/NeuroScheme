@@ -55,29 +55,11 @@ namespace nslib
         scoop::Color( "#ea9999" ));
 
       _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::AC_generator,
-        scoop::Color( "#721346" ));
+        shiftgen::Stimulator::TStimulatorType::Pulse_input,
+        scoop::Color( "#DDF231" ));
       _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::DC_generator,
-        scoop::Color( "#af2f3c" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::MIP_generator,
-        scoop::Color( "#af4a1f" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::Noise_generator,
-        scoop::Color( "#b23431" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::Poisson_generator,
-        scoop::Color( "#a12320" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::Spike_generator,
-        scoop::Color( "#a33250" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::Step_current_generator,
-        scoop::Color( "#8e3766" ));
-      _neuronStimulatorModelColorMap.setColor(
-        shiftgen::Stimulator::TStimulatorModel::undefined_generator,
-        scoop::Color( "#a88459" ));
+        shiftgen::Stimulator::TStimulatorType::Random_stim,
+        scoop::Color( "#b075f0" ));
     }
 
     void RepresentationCreator::updateRepresentation(
@@ -151,14 +133,14 @@ namespace nslib
       {
         entityRep_->setProperty(
           "color", _neuronStimulatorModelColorMap.getColor(
-          entity_->getProperty( "Stimulator model" )
-          .value< shiftgen::Stimulator::TStimulatorModel >( )));
+          entity_->getProperty( "Stimulator type" )
+          .value< shiftgen::Stimulator::TStimulatorType >( )));
       }
       else
       {
         entityRep_->setProperty( "color",
           _neuronStimulatorModelColorMap.getColor(
-          shiftgen::Stimulator::TStimulatorModel::undefined_generator ));
+          shiftgen::Stimulator::Random_stim ));
       }
       if ( entity_->hasProperty( "Nb of neurons" ))
       {
