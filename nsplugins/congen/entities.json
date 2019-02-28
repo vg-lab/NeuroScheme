@@ -24,9 +24,9 @@
                     "flags": [ "EDITABLE" ]
                 },
                 {
-                    "name": "Level",
+                    "name": "child depth",
                     "type": "uint",
-                    "flags": [ "EDITABLE" ]
+                    "flags": [ "HIDE" ]
                 }
             ],
             "types": [
@@ -52,16 +52,16 @@
                     "flags": [ "EDITABLE", "UNIQUE" ]
                 },
                 {
-                    "name": "Level",
+                    "name": "child depth",
                     "type": "uint",
-                    "flags": [ "HIDE" ],
+                    "flags": [ ],
                     "auto":
                     {
                         "op": "MAXPLUS1",
                         "source":
                         {
                             "relName" : "isParentOf",
-                            "property" : "Level",
+                            "property" : "child depth",
                             "entities" : [ "NeuronPop", "NeuronSuperPop" ]
                         }
                     }

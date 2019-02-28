@@ -36,6 +36,7 @@ namespace nslib
 
   NSLIB_CONFIG_INIT( bool, showConnectivity, false );
   NSLIB_CONFIG_INIT( bool, showNoHierarchyEntities, false );
+  NSLIB_CONFIG_INIT( bool, showEntitiesName, false );
   NSLIB_CONFIG_INIT( bool, autoPublishSelection, true );
   NSLIB_CONFIG_INIT( bool, autoPublishFocusOnSelection, false );
   NSLIB_CONFIG_INIT( bool, autoPublishFocusOnDisplayed, false );

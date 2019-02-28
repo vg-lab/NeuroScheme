@@ -197,23 +197,27 @@ namespace nslib
     {
       std::string maxWeightLabel;
       std::string maxNbNeuronsLabel;
+      std::string maxSuperPopLevelsLabel;
       std::string closeQuotationsLabel;
       if ( minimizeStream )
       {
         maxWeightLabel = "\"maxWeight\":\"";
         maxNbNeuronsLabel = "\",\"maxNbNeurons\":\"";
+        maxSuperPopLevelsLabel = "\",\"maxSuperPopLevels\":\"";
         closeQuotationsLabel = "\"";
       }
       else
       {
         maxWeightLabel = "    \"maxWeight\": \"";
         maxNbNeuronsLabel = "\",\n    \"maxNbNeurons\": \"";
+        maxSuperPopLevelsLabel = "\",\n    \"maxSuperPopLevels\": \"";
         closeQuotationsLabel = "\"\n";
       }
       auto repCreator = ( RepresentationCreator* )
         nslib::RepresentationCreatorManager::getCreator( );
       outputStream << maxWeightLabel << repCreator->maxAbsoluteWeight( )
         << maxNbNeuronsLabel << repCreator->maxNeuronsPerPopulation( )
+        << maxSuperPopLevelsLabel << repCreator->maxLevelsPerSuperPop( )
         << closeQuotationsLabel;
     }
 
@@ -243,6 +247,17 @@ namespace nslib
       catch ( std::exception const& ex )
       {
         Loggers::get( )->log( "ERROR: getting maxWeight from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
+      };
+      try
+      {
+        unsigned int maxSuperPopLevels =
+          maximums.get< unsigned int >( "maxSuperPopLevels" );
+        repCreator->maxLevelsPerSuperPop( maxSuperPopLevels, true );
+      }
+      catch ( std::exception const& ex )
+      {
+        Loggers::get( )->log( "ERROR: getting maxSuperPopLevels from JSON: "
           + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
     }

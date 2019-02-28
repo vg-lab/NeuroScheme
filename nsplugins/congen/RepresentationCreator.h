@@ -94,6 +94,7 @@ namespace nslib
       unsigned int _maxLevelsPerSuperPop;
       float _maxAbsoluteWeight;
 
+      float _superPopSeparation;
       float _superPopLevelSeparation;
 
       MapperFloatToFloat _nbConnectionsToWidth;
@@ -102,6 +103,7 @@ namespace nslib
         _neuronModelColorMap;
       scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorType >
         _neuronStimulatorModelColorMap;
+      scoop::SequentialColorMap _superPopLevelColorMap;
       scoop::Color _superPopColor;
 
       void updateNeuronPopRep( const shift::Entity* entity_,

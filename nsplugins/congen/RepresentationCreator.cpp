@@ -45,10 +45,13 @@ namespace nslib
       : _maxNeuronsPerPopulation( 1 )
       , _maxLevelsPerSuperPop( 1 )
       , _maxAbsoluteWeight( 0.1f )
-      , _superPopLevelSeparation( NeuronSuperPopItem::rangeCircle /
-        (_maxLevelsPerSuperPop + 1 ))
+      , _superPopSeparation( 1.0f / (_maxLevelsPerSuperPop + 1 ))
+      , _superPopLevelSeparation( NeuronSuperPopItem::rangeCircle
+          * _superPopSeparation)
       , _nbConnectionsToWidth( 0, _maxAbsoluteWeight, 1.0f, 5.0f )
       ,  _neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f )
+      , _superPopLevelColorMap( 0.0f, scoop::Color( "#b6d7a8" ),
+          1.0f, scoop::Color( "#b075f0" ))
       , _superPopColor( "#b6d7a8" )
     {
       _neuronModelColorMap.setColor(
@@ -64,6 +67,7 @@ namespace nslib
       _neuronStimulatorModelColorMap.setColor(
         shiftgen::Stimulator::TStimulatorType::Random_stim,
         scoop::Color( "#b075f0" ));
+
     }
 
     void RepresentationCreator::updateRepresentation(
@@ -74,13 +78,13 @@ namespace nslib
       {
         updateNeuronPopRep( entity_, entityRep_ );
       }
-      else if( dynamic_cast< const shiftgen::NeuronSuperPop* >( entity_ ))
-      {
-        updateSuperPopRep( entity_, entityRep_ );
-      }
       else if(  dynamic_cast< const shiftgen::Stimulator* >( entity_ ))
       {
         updateStimulator( entity_, entityRep_ );
+      }
+      else if( dynamic_cast< const shiftgen::NeuronSuperPop* >( entity_ ))
+      {
+        updateSuperPopRep( entity_, entityRep_ );
       }
     }
 
@@ -117,6 +121,10 @@ namespace nslib
     {
       entityRep_->setProperty( "color", _superPopColor );
       entityRep_->setProperty( "circles separation", _superPopLevelSeparation );
+      entityRep_->setProperty( "circles color separation",
+        _superPopSeparation );
+      entityRep_->setProperty( "circles color map", _superPopLevelColorMap );
+
       if ( entity_->hasProperty( "Nb of neurons Mean" ))
       {
         entityRep_->setProperty( "line perc", _neuronsToPercentage.map(
@@ -129,10 +137,21 @@ namespace nslib
         entityRep_->setProperty( "line perc",
           _neuronsToPercentage.map( 0u ));
       }
-      if ( entity_->hasProperty( "Level" ))
+      if ( entity_->hasProperty( "child depth" ))
       {
-        entityRep_->setProperty( "num circles", entity_->getProperty( "Level" )
+        entityRep_->setProperty( "num circles", entity_->getProperty( "child depth" )
           .value<unsigned int>( ));
+      }
+      else
+      {
+        Loggers::get( )->log( "Expected property Level.",
+          LOG_LEVEL_WARNING );
+        entityRep_->setProperty( "num circles", 0u);
+      }
+      if ( entity_->hasProperty( "Entity name" ))
+      {
+        entityRep_->setProperty( "Entity name", entity_->getProperty( "Entity name" )
+          .value<std::string>( ));
       }
       else
       {
@@ -481,10 +500,10 @@ namespace nslib
           Loggers::get( )->log("Expected property Nb of neurons Mean.",
             LOG_LEVEL_WARNING );
         }
-        if( entity->hasProperty( "Level"))
+        if( entity->hasProperty( "child depth"))
         {
           unsigned  int newLevel =
-            entity->getProperty( "Level" ).value< unsigned int >( );
+            entity->getProperty( "child depth" ).value< unsigned int >( );
           if( newLevel > _maxLevelsPerSuperPop )
           {
             this->clear( );
@@ -581,12 +600,13 @@ namespace nslib
     void RepresentationCreator::maxLevelsPerSuperPop(
         unsigned int maxLevelsPerSuperPop_, bool compare )
     {
-      _maxLevelsPerSuperPop = maxLevelsPerSuperPop_;
       if ( !compare || maxLevelsPerSuperPop_ > _maxLevelsPerSuperPop )
       {
         _maxLevelsPerSuperPop = maxLevelsPerSuperPop_;
-        _superPopLevelSeparation = NeuronSuperPopItem::rangeCircle /
-          (_maxLevelsPerSuperPop + 1 );
+        _superPopSeparation = 1.0f / ( _maxLevelsPerSuperPop + 1 );
+        _superPopLevelSeparation = NeuronSuperPopItem::rangeCircle
+          * _superPopSeparation;
+          ;
       }
     }
 
@@ -600,7 +620,7 @@ namespace nslib
       return _maxNeuronsPerPopulation;
     }
 
-    unsigned int RepresentationCreator::maxLevelsPerSuperPop( ) const
+    unsigned int RepresentationCreator::maxLevelsPerSuperPop( void ) const
     {
       return _maxLevelsPerSuperPop;
     }
