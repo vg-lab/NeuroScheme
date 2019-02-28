@@ -182,10 +182,11 @@ namespace nslib
       {
         const auto prop = propPair.first;
         const auto caster = fires::PropertyManager::getPropertyCaster( prop );
-        if ( caster )
+        const auto propName =
+          fires::PropertyGIDsManager::getPropertyLabel( prop );
+        if ( caster  && !_propObject->hasPropertyFlag( propName,
+          shift::Properties::TPropertyFlag::HIDE ))
         {
-          const auto propName = fires::PropertyGIDsManager::getPropertyLabel(
-            prop );
           const auto label = new QLabel( QString::fromStdString( propName ));
           _gridPropertiesLayout->addWidget( label, numProp, 0 );
 

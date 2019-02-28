@@ -29,6 +29,14 @@
                     "type": "Color"
                 },
                 {
+                    "name": "num circles",
+                    "type": "uint"
+                },
+                {
+                    "name": "circles separation",
+                    "type": "float"
+                },
+                {
                     "name": "line perc",
                     "type": "float"
                 }

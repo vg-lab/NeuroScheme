@@ -37,6 +37,10 @@ namespace nslib
 {
   namespace congen
   {
+    const float NeuronSuperPopItem::minCircle = 0.1f;
+    const float NeuronSuperPopItem::maxCircle = 0.7f;
+    const float NeuronSuperPopItem::rangeCircle = maxCircle - minCircle;
+
     NeuronSuperPopItem::NeuronSuperPopItem( const NeuronSuperPopRep& neuronRep,
       unsigned int size, bool interactive_ )
     {
@@ -46,48 +50,62 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast< int >( ceil( float( size ) * 0.5f ));
+      int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
       auto circleItem = new QGraphicsEllipseItem( this );
-      auto circleItemSize = roundf( size * 0.9f );
-      int halfcircleItemSize = - static_cast< int >(roundf( size * 0.45f ));
+      float circleItemSize = size * 0.9f;
+      float halfcircleItemSize = - 0.5f * circleItemSize;
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
       auto circleItemInner = new QGraphicsEllipseItem( this );
-      auto circleItemSizeInner = roundf( size * 0.7f );
-      int halfcircleItemSizeInner = - static_cast< int >( roundf( size * 0.35f ));
+      float circleItemSizeInner = size * maxCircle;
+      float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
       circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
         circleItemSizeInner, circleItemSizeInner );
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      auto circleItemInner2 = new QGraphicsEllipseItem( this );
-      auto circleItemSizeInner2 = roundf( size * 0.6f );
-      int halfcircleItemSizeInner2 = - static_cast< int >( roundf( size * 0.3f ));
-      circleItemInner2->setRect( halfcircleItemSizeInner2, halfcircleItemSizeInner2,
-                                circleItemSizeInner2, circleItemSizeInner2 );
-      circleItemInner2->setPen( bgColor );
+      int numCircles = neuronRep.getProperty( "num circles" )
+        .value< unsigned int >( );
 
-      int barWidth = roundf( size * 0.05f );
+      float circleSeparation = neuronRep.getProperty("circles separation")
+        .value< float >( );
+
+      float realCircleSeparation = circleSeparation * size;
+      float circleSizeInner2 = circleItemSizeInner;
+
+      for( int i = 0; i < numCircles; ++i ){
+        auto circleItemInner2 = new QGraphicsEllipseItem( this );
+        circleSizeInner2 -= realCircleSeparation;
+        float halfcircleItemSizeInner2 = - 0.5f * circleSizeInner2;
+        circleItemInner2->setRect( halfcircleItemSizeInner2, halfcircleItemSizeInner2,
+          circleSizeInner2, circleSizeInner2 );
+        circleItemInner2->setPen( bgColor );
+      }
+
+      float barHeight = size * minCircle;
+      float halfBarHeight = - 0.5f * barHeight;
+      float barWidth = circleItemSizeInner * 1.1f;
+      float halfBarWidth = - 0.5f * barWidth;
 
       auto bar = new QGraphicsRectItem(
-        -barWidth, halfcircleItemSizeInner-2,
-        2 * barWidth, circleItemSizeInner+4 );
+        halfBarWidth, halfBarHeight,
+        barWidth,  barHeight );
       bar->setPen( QColor( bgColor ));
       bar->setBrush( QColor( 255, 255, 255 ));
       bar->setParentItem( this );
 
       auto barFill = new QGraphicsRectItem(
-        -barWidth, halfcircleItemSizeInner-2,
-        2 * barWidth,
-        roundf(( circleItemSizeInner + 4 ) *
-                 neuronRep.getProperty( "line perc" ).value< float >( )));
+        halfBarWidth, halfBarHeight,
+        roundf(barWidth *
+        neuronRep.getProperty( "line perc" ).value< float >( )),
+        barHeight);
       barFill->setPen( Qt::NoPen );
       barFill->setBrush( QColor( bgColor ));
       barFill->setParentItem( bar );

@@ -32,6 +32,7 @@
 #include "StimulatorRep.h"
 #include "ConnectionArrowRep.h"
 #include "AutoConnectionArrowRep.h"
+#include "NeuronSuperPopItem.h"
 #include <algorithm>
 #include <shift_AggregatedConnectsWith.h>
 
@@ -42,7 +43,10 @@ namespace nslib
 
     RepresentationCreator::RepresentationCreator( void )
       : _maxNeuronsPerPopulation( 1 )
+      , _maxLevelsPerSuperPop( 1 )
       , _maxAbsoluteWeight( 0.1f )
+      , _superPopLevelSeparation( NeuronSuperPopItem::rangeCircle /
+        (_maxLevelsPerSuperPop + 1 ))
       , _nbConnectionsToWidth( 0, _maxAbsoluteWeight, 1.0f, 5.0f )
       ,  _neuronsToPercentage( 0, _maxNeuronsPerPopulation, 0.0f, 1.0f )
       , _superPopColor( "#b6d7a8" )
@@ -112,6 +116,7 @@ namespace nslib
       shift::Representation* entityRep_ )
     {
       entityRep_->setProperty( "color", _superPopColor );
+      entityRep_->setProperty( "circles separation", _superPopLevelSeparation );
       if ( entity_->hasProperty( "Nb of neurons Mean" ))
       {
         entityRep_->setProperty( "line perc", _neuronsToPercentage.map(
@@ -123,6 +128,17 @@ namespace nslib
           LOG_LEVEL_WARNING );
         entityRep_->setProperty( "line perc",
           _neuronsToPercentage.map( 0u ));
+      }
+      if ( entity_->hasProperty( "Level" ))
+      {
+        entityRep_->setProperty( "num circles", entity_->getProperty( "Level" )
+          .value<unsigned int>( ));
+      }
+      else
+      {
+        Loggers::get( )->log( "Expected property Level.",
+          LOG_LEVEL_WARNING );
+        entityRep_->setProperty( "num circles", 0u);
       }
     }
 
@@ -437,6 +453,7 @@ namespace nslib
 
     bool RepresentationCreator::entityUpdatedOrCreated( const shift::Entity* entity )
     {
+      bool updatedValues = false;
       unsigned int newNeuronsPerPopulation = 0;
       if ( dynamic_cast< const shiftgen::NeuronPop* >( entity )
         || dynamic_cast< const shiftgen::Stimulator* >( entity ))
@@ -464,18 +481,30 @@ namespace nslib
           Loggers::get( )->log("Expected property Nb of neurons Mean.",
             LOG_LEVEL_WARNING );
         }
+        if( entity->hasProperty( "Level"))
+        {
+          unsigned  int newLevel =
+            entity->getProperty( "Level" ).value< unsigned int >( );
+          if( newLevel > _maxLevelsPerSuperPop )
+          {
+            this->clear( );
+            maxLevelsPerSuperPop( newLevel, false );
+            updatedValues = true;
+          }
+        }
+        else
+        {
+          Loggers::get( )->log("Expected property Nb of neurons Mean.",
+            LOG_LEVEL_WARNING );
+        }
       }
       if ( newNeuronsPerPopulation > _maxNeuronsPerPopulation )
       {
         this->clear( );
         maxNeuronsPerPopulation( newNeuronsPerPopulation, false );
-        return true;
+        updatedValues =  true;
       }
-      else
-      {
-        return false;
-      }
-
+      return updatedValues;
     }
 
     bool RepresentationCreator::relationshipUpdatedOrCreated(
@@ -549,6 +578,18 @@ namespace nslib
       }
     }
 
+    void RepresentationCreator::maxLevelsPerSuperPop(
+        unsigned int maxLevelsPerSuperPop_, bool compare )
+    {
+      _maxLevelsPerSuperPop = maxLevelsPerSuperPop_;
+      if ( !compare || maxLevelsPerSuperPop_ > _maxLevelsPerSuperPop )
+      {
+        _maxLevelsPerSuperPop = maxLevelsPerSuperPop_;
+        _superPopLevelSeparation = NeuronSuperPopItem::rangeCircle /
+          (_maxLevelsPerSuperPop + 1 );
+      }
+    }
+
     float RepresentationCreator::maxAbsoluteWeight( void ) const
     {
       return _maxAbsoluteWeight;
@@ -557,6 +598,11 @@ namespace nslib
     unsigned int RepresentationCreator::maxNeuronsPerPopulation( void ) const
     {
       return _maxNeuronsPerPopulation;
+    }
+
+    unsigned int RepresentationCreator::maxLevelsPerSuperPop( ) const
+    {
+      return _maxLevelsPerSuperPop;
     }
 
   } // namespace congen

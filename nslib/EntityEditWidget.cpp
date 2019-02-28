@@ -206,9 +206,11 @@ namespace nslib
         {
           const auto prop = propPair.first;
           auto caster = fires::PropertyManager::getPropertyCaster( prop );
-          if ( caster )
+          auto propName =
+            fires::PropertyGIDsManager::getPropertyLabel( prop );
+          if ( caster && !_entity->hasPropertyFlag( propName,
+            shift::Properties::TPropertyFlag::HIDE ))
           {
-            auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
             auto label = new QLabel( QString::fromStdString( propName ));
 
             _gridLayoutProps->addWidget( label, element, 0 );
@@ -482,6 +484,7 @@ namespace nslib
       updatedEntities.add( parent );
       parentID = relChildOf_[ parentID ].entity;
     }
+
 
     for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
     {
