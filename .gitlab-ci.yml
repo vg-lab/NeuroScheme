@@ -24,6 +24,8 @@ Ubuntu-Subproject:
   - export BUILD_GENERATOR="Ninja"
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - bash .gitlab-ci.sh
+ except:
+  - master
  tags:
   - ubuntu
 
