@@ -125,6 +125,13 @@ namespace nslib
 
     virtual void importMaximumsJSON(
       const boost::property_tree::ptree& maximums ) = 0;
+
+    virtual void importLayoutJSON(
+      const boost::property_tree::ptree& layoutObject,
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
+
+    virtual void exportLayoutJSON( std::ostream& outputStream,
+      const bool minimizeStream ) const;
   };
 }
 

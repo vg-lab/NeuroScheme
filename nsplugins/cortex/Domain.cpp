@@ -477,8 +477,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronSomaVolume for JSON: "
-           + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronSomaVolume for JSON: "
+           + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -489,8 +489,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronSomaArea for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronSomaArea from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -501,8 +501,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronDendsVolume for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronDendsVolume from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -513,8 +513,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronDendsArea for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronDendsArea from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -525,8 +525,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeurons for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeurons from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -537,8 +537,9 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronsPerColumn for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronsPerColumn from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
+
       };
 
       try
@@ -549,8 +550,9 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNeuronsPerMiniColumn for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log(
+          "ERROR: getting maxNeuronsPerMiniColumn from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -561,8 +563,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxConnsPerEntity for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNeuronSomaVolume from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
     }
 

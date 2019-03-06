@@ -50,6 +50,10 @@ namespace nslib
 
     void removeRelationshipsReps( void );
 
+    bool moveNewEntitiesChecked( void );
+
+    void moveNewEntitiesChecked( bool moveNewEntitiesChecked_ );
+
     protected:
     void _addRepresentations( const shift::Representations& reps ) override;
     void _addRepresentations( const shift::Representations& reps,

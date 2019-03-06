@@ -310,4 +310,14 @@ namespace nslib
     FreeLayout::_addRepresentations( reps, true );
   }
 
+  bool FreeLayout::moveNewEntitiesChecked( void )
+  {
+    return _moveNewCheckBox->isChecked();
+  }
+
+  void FreeLayout::moveNewEntitiesChecked( bool moveNewEntitiesChecked_ )
+  {
+    _moveNewCheckBox->setChecked( moveNewEntitiesChecked_ );
+  }
+
 }

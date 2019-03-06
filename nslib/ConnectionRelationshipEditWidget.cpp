@@ -351,7 +351,7 @@ namespace nslib
 
   ConnectionRelationshipEditWidget::~ConnectionRelationshipEditWidget( void )
   {
-    if ( _isNew )
+    if ( _isNew && _destEntity && _originEntity )
     {
       delete _propObject;
     }
