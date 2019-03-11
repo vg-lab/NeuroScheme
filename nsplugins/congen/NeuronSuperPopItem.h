@@ -67,8 +67,9 @@ namespace nslib
       // }
 
 
-    protected:
-
+      static const float minCircle;
+      static const float maxCircle;
+      static const float rangeCircle;
 
     };
 

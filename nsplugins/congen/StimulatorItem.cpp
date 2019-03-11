@@ -2,7 +2,6 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
- *          Iago Calvo <i.cavol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -24,17 +23,23 @@
 #include <nslib/reps/RingItem.h>
 #include <QPen>
 
-#define POSX0 0.70710678118f    // Precomputed value for cos(45)
-#define POSY0 0.70710678118f    // Precomputed value for sin(45)
+#define POSX0 1.0f                    // Precomputed values for cos(0)
+#define POSY0 0.0f                    // Precomputed values for sin(0)
 
-#define POSX1 -0.70710678118f   // Precomputed value for cos(135)
-#define POSY1 0.70710678118f    // Precomputed value for sin(135)
+#define POSX1 0.5000007660251953f     // Precomputed values for cos(60)
+#define POSY1 0.8660249615191342f     // Precomputed values for sin(60)
 
-#define POSX2 -0.70710678118f   // Precomputed value for cos(225)
-#define POSY2 -0.70710678118f   // Precomputed value for sin(225)
+#define POSX2 -0.49999846794843594f   // Precomputed values for cos(120)
+#define POSY2 0.8660262883130146f     // Precomputed values for sin(120)
 
-#define POSX3 0.70710678118f    // Precomputed value for cos(315)
-#define POSY3 -0.70710678118f   // Precomputed value for sin(315)
+#define POSX3 -0.9999999999964793f    // Precomputed values for cos(180)
+#define POSY3 0.00000265358979335273f // Precomputed values for sin(180)
+
+#define POSX4 -0.5000030640984338f    // Precomputed values for cos(240)
+#define POSY4 -0.8660236347191557f    // Precomputed values for sin(240)
+
+#define POSX5 0.49999616986815576f    // Precomputed values for cos(300)
+#define POSY5 -0.8660276151007971f    // Precomputed values for sin(300)
 
 namespace nslib
 {
@@ -49,87 +54,44 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast<int>( ceil( float( size ) * 0.5f ));
+      int itemSize = static_cast< int >( ceil( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor =
-        stimulatorRep.getProperty( "color" ).value< Color >( );
-
-      auto circleItem = new QGraphicsEllipseItem( /* this */ );
-      auto circleItemSize = roundf( size * 0.75f );
-      int halfcircleItemSize = - static_cast<int>(roundf( size * 0.375f ));
+      const Color& bgColor = stimulatorRep.getProperty( "color" ).value< Color >( );
+      auto circleItem = new QGraphicsEllipseItem( this );
+      auto circleItemSize = roundf( size * 0.9f );
+      int halfcircleItemSize = - static_cast< int >(roundf( size * 0.45f ));
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
-      QPainterPath path_;
-      QPolygon poly;
+      auto circleItemInner = new QGraphicsEllipseItem( this );
+      auto circleItemSizeInner = roundf( size * 0.7f );
+      int halfcircleItemSizeInner = - static_cast< int >( roundf( size * 0.35f ));
+      circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
+        circleItemSizeInner, circleItemSizeInner );
+      circleItemInner->setPen( Qt::NoPen );
+      circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      float size_2 = roundf( size * 0.5f );
+      int barWidth = roundf( size * 0.05f );
 
-      poly << QPoint(
-        ( size_2 * POSX0 ),
-        ( size_2 * POSY0 )
-      );
+      auto bar = new QGraphicsRectItem(
+        -barWidth, halfcircleItemSizeInner - 2,
+        2 * barWidth, circleItemSizeInner + 4 );
+      bar->setPen( QColor( bgColor ));
+      bar->setBrush( QColor( 255, 255, 255 ));
+      bar->setParentItem( this );
 
-      poly << QPoint(
-        ( size_2 * POSX1 ),
-        ( size_2 * POSY1 )
-      );
-
-      poly << QPoint(
-        ( size_2 * POSX2 ),
-        ( size_2 * POSY2 )
-      );
-
-      poly << QPoint(
-        ( size_2 * POSX3 ),
-        ( size_2 * POSY3 )
-      );
-
-      path_.addPolygon( poly );
-      path_.closeSubpath(  );
-
-      auto icon = new QGraphicsPathItem( this );
-      icon->setPath( path_ );
-      icon->setPen( Qt::NoPen );
-      icon->setBrush( bgColor ); //QBrush( QColor( 114, 188, 196 )));
-      //icon->setBrush( QBrush( baseColor ));
-
-      // auto lineContainerWidth = roundf( circleItemSize * .9f );
-      // auto lineContainerHeight = roundf( circleItemSize * .1f );
-      // auto lineContainer = new QGraphicsRectItem(
-      //   roundf( - int( lineContainerWidth ) * .5f ),
-      //   roundf( - int( lineContainerHeight ) * .5f ),
-      //   lineContainerWidth,
-      //   lineContainerHeight );
-
-      // lineContainer->setPen( Qt::NoPen );
-      // lineContainer->setBrush( QBrush( QColor( 255, 255, 255 )));
-      // // lineContainer->setParentItem( this );
-
-      //auto linePadding = roundf( lineContainerWidth * 0.01f );
-      // auto lineWidth = lineContainerWidth; //roundf(  circleItemSize * .85f );
-      // auto lineHeight = lineContainerHeight; //roundf( circleItemSize * .09f );
-      auto line = new QGraphicsRectItem(
-        size_2 * POSX1,
-        size_2 * POSY1 - size_2 * 0.03,
-        roundf( size_2 * ( POSX0 - POSX1 ) *
-          stimulatorRep.getProperty( "line perc" ).value< float >( )),
-        size_2 * 0.06 );
-
-        // roundf( - int( lineWidth ) * .5f ) + linePadding,
-        // roundf( - int( lineHeight ) * .5f ) + linePadding,
-        // roundf( lineWidth *
-        //         neuronRep.getProperty( "line perc" ).value< float >( )) -
-        // 2 * linePadding,
-        // lineHeight - 2 * linePadding);
-
-      line->setPen( Qt::NoPen );
-      line->setBrush( QBrush( QColor( 180, 70, 70 )));
-      line->setParentItem( this );
+      auto barFill = new QGraphicsRectItem(
+        -barWidth, halfcircleItemSizeInner-2,
+        2 * barWidth,
+        roundf(( circleItemSizeInner + 4 ) *
+                 stimulatorRep.getProperty( "line perc" ).value< float >( )));
+      barFill->setPen( Qt::NoPen );
+      barFill->setBrush( QColor( bgColor ));
+      barFill->setParentItem( bar );
 
       this->_parentRep = &( const_cast< StimulatorRep& >( stimulatorRep ));
     }

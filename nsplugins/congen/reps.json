@@ -29,6 +29,26 @@
                     "type": "Color"
                 },
                 {
+                    "name": "Entity name",
+                    "type": "std::string"
+                },
+                {
+                    "name": "num circles",
+                    "type": "uint"
+                },
+                {
+                    "name": "circles separation",
+                    "type": "float"
+                },
+                {
+                    "name": "circles color map",
+                    "type": "scoop::SequentialColorMap"
+                },
+                {
+                    "name": "circles color separation",
+                    "type": "float"
+                },
+                {
                     "name": "line perc",
                     "type": "float"
                 }

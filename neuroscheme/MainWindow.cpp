@@ -136,6 +136,9 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionShowNoHierarchyEntities, SIGNAL( triggered( )),
     this, SLOT( toggleShowNoHierarchyEntities( )));
 
+  connect( _ui->actionShowEntitiesName, SIGNAL( triggered( )),
+    this, SLOT( toggleShowEntitiesName( )));
+
   connect( _ui->actionSplitHorizontally, SIGNAL( triggered( )),
     this, SLOT( duplicateActivePane( )));
 
@@ -675,6 +678,30 @@ void MainWindow::toggleShowNoHierarchyEntities( void )
     // canvas->layouts( ).getLayout(
     //   canvas->activeLayoutIndex( ))->refresh( false );
   }
+}
+
+void MainWindow::toggleShowEntitiesName( void )
+{
+  nslib::Config::showEntitiesName( _ui->actionShowEntitiesName->isChecked( ));
+
+  bool freeLayoutInUse = false;
+  for( const auto& pane : nslib::PaneManager::panes( ))
+  {
+    freeLayoutInUse = freeLayoutInUse ||
+      ( pane->activeLayoutIndex( ) == nslib::Layout::TLayoutIndexes::FREE );
+  }
+  for ( const auto& creatorPair : nslib::RepresentationCreatorManager::creators( ))
+  {
+    nslib::RepresentationCreatorManager::clearEntitiesCache(
+      creatorPair.first, freeLayoutInUse );
+    nslib::RepresentationCreatorManager::clearRelationshipsCache(
+      creatorPair.first );
+  }
+  for ( auto canvas : nslib::PaneManager::panes( ))
+  {
+    canvas->displayEntities( canvas->sceneEntities( ), false, false );
+  }
+
 }
 
 

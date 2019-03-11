@@ -22,6 +22,11 @@
                     "name": "Neuron model",
                     "type": "TNeuronModel",
                     "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "child depth",
+                    "type": "uint",
+                    "flags": [ "HIDE" ]
                 }
             ],
             "types": [
@@ -45,6 +50,21 @@
                     "name": "Entity name",
                     "type": "std::string",
                     "flags": [ "EDITABLE", "UNIQUE" ]
+                },
+                {
+                    "name": "child depth",
+                    "type": "uint",
+                    "flags": [ ],
+                    "auto":
+                    {
+                        "op": "MAXPLUS1",
+                        "source":
+                        {
+                            "relName" : "isParentOf",
+                            "property" : "child depth",
+                            "entities" : [ "NeuronPop", "NeuronSuperPop" ]
+                        }
+                    }
                 },
                 {
                     "name": "Nb of neurons Mean",

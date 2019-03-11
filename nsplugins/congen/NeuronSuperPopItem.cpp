@@ -23,6 +23,7 @@
 #include "NeuronSuperPopItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
+#include <nslib/Config.h>
 
 #define POSX0 0.0f              // Precomputed value for cos(270)
 #define POSY0 -1.0f             // Precomputed value for sin(270)
@@ -37,6 +38,10 @@ namespace nslib
 {
   namespace congen
   {
+    const float NeuronSuperPopItem::minCircle = 0.1f;
+    const float NeuronSuperPopItem::maxCircle = 0.7f;
+    const float NeuronSuperPopItem::rangeCircle = maxCircle - minCircle;
+
     NeuronSuperPopItem::NeuronSuperPopItem( const NeuronSuperPopRep& neuronRep,
       unsigned int size, bool interactive_ )
     {
@@ -46,81 +51,83 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast<int>( ceil( float( size ) * 0.5f ));
+      int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
-
-      auto circleItem = new QGraphicsEllipseItem( /* this */ );
-      auto circleItemSize = roundf( size * 0.75f );
-      int halfcircleItemSize = - static_cast<int>(roundf( size * 0.375f ));
+      auto circleItem = new QGraphicsEllipseItem( this );
+      float circleItemSize = size * 0.9f;
+      float halfcircleItemSize = - 0.5f * circleItemSize;
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
-      QPainterPath path_;
-      QPolygon poly;
+      auto circleItemInner = new QGraphicsEllipseItem( this );
+      float circleItemSizeInner = size * maxCircle;
+      float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
+      circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
+        circleItemSizeInner, circleItemSizeInner );
+      circleItemInner->setPen( Qt::NoPen );
+      circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      float size_2 = roundf( size * 0.5f );
+      int numCircles = neuronRep.getProperty( "num circles" )
+        .value< unsigned int >( );
 
-      poly << QPoint(
-        ( size_2 * POSX0 ),
-        ( size_2 * POSY0 )
-      );
+      float circleSeparation =
+        neuronRep.getProperty("circles separation").value< float >( );
+      float colorSeparation =
+          neuronRep.getProperty("circles color separation").value< float >( );
+      scoop::SequentialColorMap colorMap = neuronRep
+        .getProperty("circles color map").value< scoop::SequentialColorMap >( );
 
-      poly << QPoint(
-        ( size_2 * POSX1 ),
-        ( size_2 * POSY1 )
-      );
+      float realCircleSeparation = circleSeparation * size;
+      float circleSizeInner2 = circleItemSizeInner;
+      float colorValue = 0.0f;
 
-      poly << QPoint(
-        ( size_2 * POSX2 ),
-        ( size_2 * POSY2 )
-      );
+      for( int i = 0; i < numCircles; ++i ){
+        auto circleItemInner2 = new QGraphicsEllipseItem( this );
+        circleSizeInner2 -= realCircleSeparation;
+        colorValue += colorSeparation;
+        float halfcircleItemSizeInner2 = - 0.5f * circleSizeInner2;
+        circleItemInner2->setRect( halfcircleItemSizeInner2, halfcircleItemSizeInner2,
+          circleSizeInner2, circleSizeInner2 );
+        circleItemInner2->setPen( colorMap.getColor( colorValue ));
+      }
 
-      path_.addPolygon( poly );
-      path_.closeSubpath(  );
+      float barHeight = size * minCircle;
+      float halfBarHeight = - 0.5f * barHeight;
+      float barWidth = circleItemSizeInner * 1.1f;
+      float halfBarWidth = - 0.5f * barWidth;
 
-      auto icon = new QGraphicsPathItem( this );
-      icon->setPath( path_ );
-      icon->setPen( Qt::NoPen );
-      icon->setBrush( bgColor ); //QBrush( QColor( 114, 188, 196 )));
-      //icon->setBrush( QBrush( baseColor ));
+      auto bar = new QGraphicsRectItem(
+        halfBarWidth, halfBarHeight,
+        barWidth,  barHeight );
+      bar->setPen( QColor( bgColor ));
+      bar->setBrush( QColor( 255, 255, 255 ));
+      bar->setParentItem( this );
 
-      // auto lineContainerWidth = roundf( circleItemSize * .9f );
-      // auto lineContainerHeight = roundf( circleItemSize * .1f );
-      // auto lineContainer = new QGraphicsRectItem(
-      //   roundf( - int( lineContainerWidth ) * .5f ),
-      //   roundf( - int( lineContainerHeight ) * .5f ),
-      //   lineContainerWidth,
-      //   lineContainerHeight );
+      auto barFill = new QGraphicsRectItem(
+        halfBarWidth, halfBarHeight,
+        roundf(barWidth *
+        neuronRep.getProperty( "line perc" ).value< float >( )),
+        barHeight);
+      barFill->setPen( Qt::NoPen );
+      barFill->setBrush( QColor( bgColor ));
+      barFill->setParentItem( bar );
 
-      // lineContainer->setPen( Qt::NoPen );
-      // lineContainer->setBrush( QBrush( QColor( 255, 255, 255 )));
-      // // lineContainer->setParentItem( this );
+      if ( nslib::Config::showEntitiesName( ))
+      {
+        auto text = new QGraphicsTextItem( QString::fromStdString(
+          neuronRep.getProperty( "Entity name" ).value<std::string>( )));
+        text->setPos( -0.32f * text->boundingRect( ).width( ),
+          -0.32f * text->boundingRect( ).height( ));
+        text->setDefaultTextColor( QColor::fromRgb( 0, 0, 0, 255 ));
+        text->setScale( 0.64f );
+        text->setParentItem( this );
+      }
 
-      //auto linePadding = roundf( lineContainerWidth * 0.01f );
-      // auto lineWidth = lineContainerWidth; //roundf(  circleItemSize * .85f );
-      // auto lineHeight = lineContainerHeight; //roundf( circleItemSize * .09f );
-      auto line = new QGraphicsRectItem(
-        size_2 * POSX1,
-        size_2 * POSY1 - size_2 * 0.03,
-        roundf( size_2 * ( POSX2 - POSX1) *
-                neuronRep.getProperty( "line perc" ).value< float >( )),
-        size_2 * 0.06 );
-
-        // roundf( - int( lineWidth ) * .5f ) + linePadding,
-        // roundf( - int( lineHeight ) * .5f ) + linePadding,
-        // roundf( lineWidth *
-        //         neuronRep.getProperty( "line perc" ).value< float >( )) -
-        // 2 * linePadding,
-        // lineHeight - 2 * linePadding);
-
-      line->setPen( Qt::NoPen );
-      line->setBrush( QBrush( QColor( 180, 70, 70 )));
-      line->setParentItem( this );
 
       this->_parentRep = &( const_cast< NeuronSuperPopRep& >( neuronRep ));
     }

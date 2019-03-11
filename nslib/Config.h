@@ -89,6 +89,7 @@ public: NSLIB_API static TYPE NAME( void ) { return _##NAME; }
 
     NSLIB_CONFIG( bool, showConnectivity );
     NSLIB_CONFIG( bool, showNoHierarchyEntities );
+    NSLIB_CONFIG( bool, showEntitiesName );
     NSLIB_CONFIG( bool, autoPublishSelection );
     NSLIB_CONFIG( bool, autoPublishFocusOnSelection );
     NSLIB_CONFIG( bool, autoPublishFocusOnDisplayed );

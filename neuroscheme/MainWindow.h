@@ -79,6 +79,7 @@ public slots:
   void home( void );
   void toggleShowConnectivity( void );
   void toggleShowNoHierarchyEntities( void );
+  void toggleShowEntitiesName( void );
   // void saveScene( void );
   void actionPublishSelectionToggle( void );
   void actionPublishFocusOnSelectionToggle( void );

@@ -84,16 +84,26 @@ namespace nslib
       bool relationshipUpdatedOrCreated(
         const shift::RelationshipProperties* relProperties ) final;
 
-    protected:
+      unsigned int maxLevelsPerSuperPop( void ) const;
+
+      void maxLevelsPerSuperPop( unsigned int _maxLevelsPerSuperPop,
+        bool compare = false );
+
+      protected:
       unsigned int _maxNeuronsPerPopulation;
+      unsigned int _maxLevelsPerSuperPop;
       float _maxAbsoluteWeight;
+
+      float _superPopSeparation;
+      float _superPopLevelSeparation;
 
       MapperFloatToFloat _nbConnectionsToWidth;
       MapperFloatToFloat _neuronsToPercentage;
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
-      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorModel >
+      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorType >
         _neuronStimulatorModelColorMap;
+      scoop::SequentialColorMap _superPopLevelColorMap;
       scoop::Color _superPopColor;
 
       void updateNeuronPopRep( const shift::Entity* entity_,
