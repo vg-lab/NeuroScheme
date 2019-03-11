@@ -481,9 +481,9 @@ namespace nslib
             {
               relationRep->setProperty(
                 "width", ( unsigned int ) roundf(
-                  nbConnectionsToWidth.map(
-                    relationProperties->getProperty( "count sum" ).
-                    value< unsigned int >( ))));
+                nbConnectionsToWidth.map(
+                relationProperties->getProperty( "count sum" )
+                .value< unsigned int >( ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(

@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *          Iago Calvo <i.cavol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -19,33 +20,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "NeuronPopItem.h"
+#include "StimulatorItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
 
-#define POSX0 1.0f                    // Precomputed values for cos(0)
-#define POSY0 0.0f                    // Precomputed values for sin(0)
+#define POSX0 0.70710678118f    // Precomputed value for cos(45)
+#define POSY0 0.70710678118f    // Precomputed value for sin(45)
 
-#define POSX1 0.5000007660251953f     // Precomputed values for cos(60)
-#define POSY1 0.8660249615191342f     // Precomputed values for sin(60)
+#define POSX1 -0.70710678118f   // Precomputed value for cos(135)
+#define POSY1 0.70710678118f    // Precomputed value for sin(135)
 
-#define POSX2 -0.49999846794843594f   // Precomputed values for cos(120)
-#define POSY2 0.8660262883130146f     // Precomputed values for sin(120)
+#define POSX2 -0.70710678118f   // Precomputed value for cos(225)
+#define POSY2 -0.70710678118f   // Precomputed value for sin(225)
 
-#define POSX3 -0.9999999999964793f    // Precomputed values for cos(180)
-#define POSY3 0.00000265358979335273f // Precomputed values for sin(180)
-
-#define POSX4 -0.5000030640984338f    // Precomputed values for cos(240)
-#define POSY4 -0.8660236347191557f    // Precomputed values for sin(240)
-
-#define POSX5 0.49999616986815576f    // Precomputed values for cos(300)
-#define POSY5 -0.8660276151007971f    // Precomputed values for sin(300)
+#define POSX3 0.70710678118f    // Precomputed value for cos(315)
+#define POSY3 -0.70710678118f   // Precomputed value for sin(315)
 
 namespace nslib
 {
   namespace congen
   {
-    NeuronPopItem::NeuronPopItem( const NeuronPopRep& neuronRep,
+    StimulatorItem::StimulatorItem( const StimulatorRep& stimulatorRep,
       unsigned int size, bool interactive_ )
     {
       setInteractive( interactive_ );
@@ -54,15 +49,16 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast< int >( ceil( float( size ) * 0.5f ));
+      int itemSize = static_cast<int>( ceil( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
+      const Color& bgColor =
+        stimulatorRep.getProperty( "color" ).value< Color >( );
 
       auto circleItem = new QGraphicsEllipseItem( /* this */ );
       auto circleItemSize = roundf( size * 0.75f );
-      int halfcircleItemSize = - static_cast< int >(roundf( size * 0.375f ));
+      int halfcircleItemSize = - static_cast<int>(roundf( size * 0.375f ));
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
@@ -93,16 +89,6 @@ namespace nslib
         ( size_2 * POSY3 )
       );
 
-      poly << QPoint(
-        ( size_2 * POSX4 ),
-        ( size_2 * POSY4 )
-      );
-
-      poly << QPoint(
-        ( size_2 * POSX5 ),
-        ( size_2 * POSY5 )
-      );
-
       path_.addPolygon( poly );
       path_.closeSubpath(  );
 
@@ -128,10 +114,10 @@ namespace nslib
       // auto lineWidth = lineContainerWidth; //roundf(  circleItemSize * .85f );
       // auto lineHeight = lineContainerHeight; //roundf( circleItemSize * .09f );
       auto line = new QGraphicsRectItem(
-        size_2 * POSX2,
-        size_2 * POSY2 - size_2 * 0.03,
-        roundf( size_2 * ( POSX1 - POSX2) *
-                neuronRep.getProperty( "line perc" ).value< float >( )),
+        size_2 * POSX1,
+        size_2 * POSY1 - size_2 * 0.03,
+        roundf( size_2 * ( POSX0 - POSX1 ) *
+          stimulatorRep.getProperty( "line perc" ).value< float >( )),
         size_2 * 0.06 );
 
         // roundf( - int( lineWidth ) * .5f ) + linePadding,
@@ -145,10 +131,10 @@ namespace nslib
       line->setBrush( QBrush( QColor( 180, 70, 70 )));
       line->setParentItem( this );
 
-      this->_parentRep = &( const_cast< NeuronPopRep& >( neuronRep ));
+      this->_parentRep = &( const_cast< StimulatorRep& >( stimulatorRep ));
     }
 
-    void NeuronPopItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    void StimulatorItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
       {
@@ -168,7 +154,7 @@ namespace nslib
         InteractionManager::highlightConnectivity( this );
       }
     }
-    void NeuronPopItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    void StimulatorItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
       {
@@ -190,7 +176,7 @@ namespace nslib
       }
     }
 
-    void NeuronPopItem::contextMenuEvent(
+    void StimulatorItem::contextMenuEvent(
       QGraphicsSceneContextMenuEvent* event_ )
     {
       if ( _interactive )

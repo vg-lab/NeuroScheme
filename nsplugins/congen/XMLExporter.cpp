@@ -201,25 +201,57 @@ namespace nslib
       } else throw "Unknown Connectivity Model";
     }
 
-    void  XMLExporter::addInput( const QString& name, const QString& frecuency,
-        const QString& population, const QString& site_patterns )
+    void  XMLExporter::addInput( const QString& name,
+      const bool isRandomStim, const QString& delay,
+      const QString& duration, const QString& amplitude,
+      const QString& frequency, const QString& synaptic_mechanism,
+      const shift::Entities& connectedEntities )
     {
       if ( nodeImpulses == nullptr )
       {
         nodeImpulses = new QDomElement( );
         *nodeImpulses = addElement( domDoc, nodeRoot , "inputs" );
+        nodeImpulses->setAttribute( "units", "SI Units" );
       }
       QDomElement input = addElement( domDoc, *nodeImpulses, "input" );
       input.setAttribute( "name", name );
 
-      QDomElement random_stim = addElement( domDoc, input, "random_stim" );
-      random_stim.setAttribute( "frecuency", frecuency );
+      if( isRandomStim )
+      {
+        QDomElement random_stim = addElement( domDoc, input, "random_stim" );
+        random_stim.setAttribute( "frequency", frequency );
+        random_stim.setAttribute( "synaptic_mechanism", synaptic_mechanism );
+      }
+      else
+      {
+        QDomElement pulse_input = addElement( domDoc, input, "pulse_input" );
+        pulse_input.setAttribute( "delay", delay );
+        pulse_input.setAttribute( "duration", duration );
+        pulse_input.setAttribute( "amplitude", amplitude );
+      }
+      if( connectedEntities.empty( ))
+      {
+        QDomElement target = addElement( domDoc, input, "target" );
+        target.setAttribute( "population", "UNDEFINED" );
 
-      QDomElement target = addElement( domDoc, input, "target" );
-      target.setAttribute( "population", population );
-
-      QDomElement site_pattern_ = addElement( domDoc, target, "site_pattern" );
-      QDomElement site_pattern_type = addElement( domDoc, site_pattern_, site_patterns);
+        QDomElement sites = addElement( domDoc, target, "sites" );
+        sites.setAttribute( "size", "1" );
+        QDomElement site = addElement( domDoc, sites, "site");
+        site.setAttribute( "cell_id", "0" );
+      }
+      else
+      {
+        for( const auto& entity : connectedEntities.vector( ))
+        {
+          QDomElement target = addElement( domDoc, input, "target" );
+          target.setAttribute( "population", QString::fromStdString(
+            entity->getProperty( "Entity name" ).value< std::string >( )));
+          QDomElement sites = addElement( domDoc, target, "sites" );
+          sites.setAttribute( "size", "1" );
+          QDomElement site = addElement( domDoc, sites, "site");
+          site.setAttribute( "cell_id", "0" );
+        }
+      }
     }
 
     void XMLExporter::loadConGenXML( const QString& pFilePath )

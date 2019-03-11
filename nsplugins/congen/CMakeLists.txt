@@ -2,7 +2,7 @@ include( shift_generate_cxx )
 
 # Generate objects
 set( SHIFT_GENERATED_OBJECTS
-  NeuronPop NeuronSuperPop )
+  NeuronPop NeuronSuperPop Stimulator )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 shift_generate_cxx(
@@ -45,7 +45,7 @@ list( APPEND SHIFT_GENERATED_IMPL_FILES
   ${SHIFT_GENERATED_DIR}/shift_congen_relationshipProperties.cpp )
 
 # Generate representations
-set( SHIFT_GENERATED_OBJECTS NeuronPopRep ConnectionArrowRep )
+set( SHIFT_GENERATED_OBJECTS NeuronPopRep NeuronSuperPopRep StimulatorRep ConnectionArrowRep )
 set( SHIFT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/ShiFT )
 file( MAKE_DIRECTORY ${SHIFT_GENERATED_DIR} )
 shift_generate_cxx(
@@ -72,6 +72,10 @@ set( NSLIBCONGEN_SOURCES
   Domain.cpp
   NeuronPopRep.cpp
   NeuronPopItem.cpp
+  NeuronSuperPopRep.cpp
+  NeuronSuperPopItem.cpp
+  StimulatorRep.cpp
+  StimulatorItem.cpp
   RepresentationCreator.cpp
   XMLExporter.cpp
   DataSaver.cpp  
@@ -87,6 +91,10 @@ set( NSLIBCONGEN_HEADERS
   Domain.h
   NeuronPopRep.h
   NeuronPopItem.h
+  NeuronSuperPopRep.h
+  NeuronSuperPopItem.h
+  StimulatorRep.cpp
+  StimulatorItem.cpp
   RepresentationCreator.h
   XMLExporter.h
   DataSaver.h  

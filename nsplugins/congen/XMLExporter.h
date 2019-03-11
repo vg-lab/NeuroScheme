@@ -30,6 +30,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <shift/Entities.h>
+
 namespace nslib
 {
   namespace congen
@@ -60,10 +62,14 @@ namespace nslib
 
           void addProjection ( const std::unordered_map< std::string, std::string >& params );
 
-          void addInput( const QString& name, const QString& frecuency,
-                         const QString& population, const QString& site_patterns);
+          void addInput( const QString& name,
+            const bool isRandomStim,
+            const QString& delay,const QString& duration,
+            const QString& amplitude, const QString& frequency,
+            const QString& synaptic_mechanism,
+            const shift::Entities& connectedEntities );
 
-        private:
+      private:
           QDomElement addElement(	QDomDocument& doc,
                                   QDomNode& node,
                                   const QString& tag,

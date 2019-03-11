@@ -24,6 +24,8 @@
 #include <shift/shift.h>
 #include <nslib/mappers/VariableMapper.h>
 #include <scoop/scoop.h>
+#include <shift_NeuronPop.h>
+#include <shift_Stimulator.h>
 
 #include <unordered_map>
 #include <set>
@@ -80,6 +82,11 @@ namespace nslib
 
       unsigned int _maxNeuronsPerPopulation;
       float _maxAbsoluteWeight;
+      scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
+        _neuronModelColorMap;
+      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorModel >
+        _neuronStimulatorModelColorMap;
+      scoop::Color _superPopColor;
 };
 
   } // namespace congen

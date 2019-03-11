@@ -78,6 +78,7 @@ public slots:
   void duplicateActivePane( void );
   void home( void );
   void toggleShowConnectivity( void );
+  void toggleShowNoHierarchyEntities( void );
   // void saveScene( void );
   void actionPublishSelectionToggle( void );
   void actionPublishFocusOnSelectionToggle( void );

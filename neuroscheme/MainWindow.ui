@@ -47,6 +47,7 @@
     </property>
     <addaction name="actionHome"/>
     <addaction name="actionShowConnectivity"/>
+    <addaction name="actionShowNoHierarchyEntities"/>
    </widget>
    <widget class="QMenu" name="menuEvents">
     <property name="title">
@@ -88,6 +89,7 @@
    </attribute>
    <addaction name="actionHome"/>
    <addaction name="actionShowConnectivity"/>
+   <addaction name="actionShowNoHierarchyEntities"/>
    <addaction name="separator"/>
    <addaction name="actionLayouts"/>
    <addaction name="actionStoredSelections"/>
@@ -206,6 +208,24 @@
    </property>
    <property name="shortcut">
     <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actionShowNoHierarchyEntities">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/showNoHierarchyEntities.svg</normaloff>:/icons/showNoHierarchyEntities.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Show &amp;no hierarchy entities</string>
+   </property>
+   <property name="toolTip">
+    <string>Show no hierarchy entities</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+I</string>
    </property>
   </action>
   <action name="actionSave">

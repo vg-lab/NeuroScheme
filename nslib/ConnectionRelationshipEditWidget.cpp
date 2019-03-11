@@ -40,184 +40,33 @@ namespace nslib
   bool ConnectionRelationshipEditWidget::_autoCloseChecked = false;
 
   ConnectionRelationshipEditWidget::ConnectionRelationshipEditWidget(
-    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
-    TConnectionType connectionType_,
     QWidget* parentWidget_ )
     : QWidget ( parentWidget_ )
-    , _originEntity( originEntity_ )
-    , _destEntity( destinationEntity_ )
-    , _isAggregated( true )
-    , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
+    , _originEntity( nullptr )
+    , _destEntity( nullptr )
+    , _labelRel( new QLabel )
     , _autoCloseCheck( new QCheckBox( ))
+    , _validationButton( new QPushButton )
     , _eraseButton( new QPushButton( QString( tr( "Delete" ))))
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
     , _gridLayout( new QGridLayout( ))
-{
-  if( connectionType_ != TConnectionType::AGGREGATED )
+    , _gridPropertiesLayout( new QGridLayout( ))
   {
-    if( !shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
-      originEntity_->typeName( ), destinationEntity_->typeName( )))
-    {
-      if ( connectionType_ == TConnectionType::SIMPLE )
-      {
-        Loggers::get( )->log( "A " + originEntity_->typeName( ) +
-          " cannot be connected to a " + destinationEntity_->typeName( ) +
-          '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
-        this->hide( );
-        _parentDock->hide( );
-        return;
-      }
-      else
-      {
-        Loggers::get( )->log( "A " + originEntity_->typeName( ) +
-          " cannot be connected to a " + destinationEntity_->typeName( ) +
-          ". Searching aggregated connections.", LOG_LEVEL_VERBOSE,
-          NEUROSCHEME_FILE_LINE );
-      }
-    }
-    else
-    {
-      _isAggregated = false;
-    }
-  }
-  auto originName = _originEntity->getProperty( "Entity name" )
-    .value<std::string>( );
-  auto destName = _destEntity->getProperty( "Entity name" )
-    .value<std::string>( );
-  QString relationName;
-  if( _isAggregated )
-  {
-    auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-    _propObject = relAggregatedConnectsTo.getRelationProperties(
-      _originEntity->entityGid( ), _destEntity->entityGid( ));
-    if( !_propObject )
-    {
-      Loggers::get( )->log( "Entity " + originName +
-        " cannot be aggregated connected to entity " +
-        destName + '.', LOG_LEVEL_WARNING,
-        NEUROSCHEME_FILE_LINE );
-      this->hide( );
-      _parentDock->hide( );
-      return;
-    }
-    relationName = tr( " Editing Aggregated Relationship Parameters: " );
-    _isNew = false;
-  }
-  else
-  {
-    auto& relConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "connectsTo" ]->asOneToN( ));
-    _propObject = relConnectsTo.getRelationProperties(
-      _originEntity->entityGid( ), _destEntity->entityGid( ));
-    if( _propObject )
-    {
-      _isNew = false;
-    }
-    else
-    {
-      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-        ->relationshipPropertiesTypes( );
-      _propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" )->create( );
-      _propObject->setProperty("Name","R:" + originName + "-" + destName );
-      _isNew = true;
-    }
-    relationName = tr( " Editing Relationship Parameters: " );
-  }
   unsigned int numProp = 0u;
   _gridLayout->setAlignment( Qt::AlignTop );
   _gridLayout->setColumnStretch( 1, 1 );
   _gridLayout->setColumnMinimumWidth( 1, 150 );
+  _labelRel->setStyleSheet( "font-weight:bold" );
+  _gridLayout->addWidget( _labelRel, numProp, 0, 1, 0 );
 
+  _gridLayout->addLayout(_gridPropertiesLayout, ++numProp, 0, 1, 2 );
 
-  assert( _propObject );
+  _gridLayout->addWidget( _cancelButton, ++numProp, 0 );
 
-  auto labelRel = new QLabel( relationName
-    + QString::fromStdString( originName + " - " + destName ));
-  _gridLayout->addWidget( labelRel, numProp++, 0, 1, 0 );
-
-  for( const auto& propPair: _propObject->properties( ))
-  {
-    const auto prop = propPair.first;
-    auto caster = fires::PropertyManager::getPropertyCaster( prop );
-    if ( caster )
-    {
-      auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
-      auto label = new QLabel( QString::fromStdString( propName ));
-      _gridLayout->addWidget( label, numProp, 0 );
-
-      const auto& categories = caster->categories( );
-      TWidgetType widgetType;
-      QWidget* widget;
-      bool isEditable = _propObject->hasPropertyFlag(
-        propName, shift::RelationshipProperties::TPropertyFlag::EDITABLE );
-      if ( !categories.empty( ))
-      {
-        widgetType = TWidgetType::COMBO;
-        auto comboBoxWidget = new QComboBox;
-        widget = comboBoxWidget;
-        auto currentCategory = caster->toString( propPair.second );
-        unsigned int index = 0;
-        for ( const auto& category : categories )
-          comboBoxWidget->addItem( QString::fromStdString( category ));
-        for ( const auto& category : categories )
-        {
-          if ( category != currentCategory )
-            ++index;
-          else
-            break;
-        }
-        comboBoxWidget->setCurrentIndex( index );
-        comboBoxWidget->setEnabled( isEditable );
-        connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
-          this, SLOT( refreshSubproperties( )));
-      }
-      else
-      {
-        widgetType = TWidgetType::LINE_EDIT;
-        auto lineEditwidget = new QLineEdit;
-        widget = lineEditwidget;
-        lineEditwidget->setText( QString::fromStdString(
-          caster->toString( propPair.second )));
-
-        lineEditwidget->setEnabled( isEditable );
-      }
-
-      _gridLayout->addWidget( widget, numProp, 1 );
-
-      if ( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
-        propName ))
-      {
-        label->hide( );
-        widget->hide( );
-      }
-      ++numProp;
-      _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
-    }
-  }
-
-
-  _gridLayout->addWidget( _cancelButton, numProp, 0 );
-
-  if ( _isNew )
-  {
-    setWindowTitle( tr( "Create connection relationship" ));
-    _validationButton = new QPushButton( QString( tr( "Create" )));
-    _eraseButton->hide( );
-  }
-  else
-  {
-    if( _isAggregated )
-    {
-      _eraseButton->hide( );
-    }
-    setWindowTitle( tr( "Edit connection relationship" ));
-    _validationButton = new QPushButton( QString( tr( "Save" )));
-  }
   _gridLayout->addWidget( _validationButton, numProp, 1 );
   _gridLayout->addWidget( _eraseButton, ++numProp, 0, 1, 2);
-  _gridLayout->addWidget( _autoCloseLabel, ++numProp, 0 );
+  QLabel* autoCloseLabel =  new QLabel( tr( "Auto-close" ));
+  _gridLayout->addWidget( autoCloseLabel, ++numProp, 0 );
 
   _autoCloseCheck->setChecked( _autoCloseChecked );
   _gridLayout->addWidget( _autoCloseCheck, numProp, 1 );
@@ -234,39 +83,180 @@ namespace nslib
   setLayout( _gridLayout );
 
   _parentDock->setWidget( this );
-  _parentDock->show( );
-  this->show( );
+  }
+
+  void ConnectionRelationshipEditWidget::updateWidget(
+    shift::Entity* originEntity_, shift::Entity* destinationEntity_,
+    TConnectionType connectionType_ )
+  {
+    _originEntity = originEntity_;
+    _destEntity = destinationEntity_;
+    if( connectionType_ != TConnectionType::AGGREGATED )
+    {
+      if( !shift::RelationshipPropertiesTypes::isConstrained( "ConnectedTo",
+        originEntity_->typeName( ), destinationEntity_->typeName( )))
+      {
+        if ( connectionType_ == TConnectionType::SIMPLE )
+        {
+          Loggers::get( )->log( "A " + originEntity_->typeName( ) +
+            " cannot be connected to a " + destinationEntity_->typeName( ) +
+            '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+          this->hide( );
+          _parentDock->hide( );
+          return;
+        }
+        else
+        {
+          _isAggregated = true;
+          Loggers::get( )->log( "A " + originEntity_->typeName( ) +
+            " cannot be connected to a " + destinationEntity_->typeName( ) +
+            ". Searching aggregated connections.", LOG_LEVEL_VERBOSE,
+            NEUROSCHEME_FILE_LINE );
+        }
+      }
+      else
+      {
+        _isAggregated = false;
+      }
+    }
+    const auto originName = _originEntity->getProperty( "Entity name" )
+      .value< std::string >( );
+    const auto destName = _destEntity->getProperty( "Entity name" )
+      .value< std::string >( );
+    QString relationName;
+    if( _isAggregated )
+    {
+      auto& relAggregatedConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+      _propObject = relAggregatedConnectsTo.getRelationProperties(
+        _originEntity->entityGid( ), _destEntity->entityGid( ));
+      if( !_propObject )
+      {
+        Loggers::get( )->log( "Entity " + originName +
+          " cannot be aggregated connected to entity " +
+          destName + '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+        cancelDialog( );
+        return;
+      }
+      relationName = tr( "Editing Aggregated Relationship Parameters: " );
+      _isNew = false;
+    }
+    else
+    {
+      auto& relConnectsTo = *( DataManager::entities( )
+        .relationships( )[ "connectsTo" ]->asOneToN( ));
+      _propObject = relConnectsTo.getRelationProperties(
+          _originEntity->entityGid( ), _destEntity->entityGid( ));
+      if( _propObject )
+      {
+        _isNew = false;
+        relationName = tr( "Creating Relationship Parameters: " );
+      }
+      else
+      {
+        auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
+          ->relationshipPropertiesTypes( );
+        _propObject = relationshipPropertiesTypes.getRelationshipProperties(
+          "connectsTo" )->create( );
+        _propObject->setProperty("Name","R:" + originName + "-" + destName );
+        _isNew = true;
+        relationName = tr( "Editing Relationship Parameters: " );
+      }
+    }
+    assert( _propObject );
+    _labelRel->setText( relationName
+      + QString::fromStdString( originName + " - " + destName ));
+
+    unsigned int numProp = 0u;
+    QLayoutItem* item;
+    while( ( item = _gridPropertiesLayout->takeAt( 0 )) != nullptr )
+    {
+      delete item->widget( );
+      delete item;
+    }
+    _propParamCont.clear( );
+    for( const auto& propPair: _propObject->properties( ))
+    {
+      const auto prop = propPair.first;
+      const auto caster = fires::PropertyManager::getPropertyCaster( prop );
+      if ( caster )
+      {
+        const auto propName = fires::PropertyGIDsManager::getPropertyLabel( prop );
+        const auto label = new QLabel( QString::fromStdString( propName ));
+        _gridPropertiesLayout->addWidget( label, numProp, 0 );
+
+        const auto& categories = caster->categories( );
+        TWidgetType widgetType;
+        QWidget* widget;
+        const bool isEditable = _propObject->hasPropertyFlag(
+          propName, shift::RelationshipProperties::TPropertyFlag::EDITABLE );
+        if ( !categories.empty( ))
+        {
+          widgetType = TWidgetType::COMBO;
+          auto comboBoxWidget = new QComboBox;
+          widget = comboBoxWidget;
+          auto currentCategory = caster->toString( propPair.second );
+          unsigned int index = 0;
+          for ( const auto& category : categories )
+            comboBoxWidget->addItem( QString::fromStdString( category ));
+          for ( const auto& category : categories )
+          {
+            if ( category != currentCategory )
+              ++index;
+            else
+              break;
+          }
+          comboBoxWidget->setCurrentIndex( index );
+          comboBoxWidget->setEnabled( isEditable );
+          connect( comboBoxWidget, SIGNAL( currentIndexChanged( int )),
+            this, SLOT( refreshSubproperties( )));
+        }
+        else
+        {
+          widgetType = TWidgetType::LINE_EDIT;
+          auto lineEditwidget = new QLineEdit;
+          widget = lineEditwidget;
+          lineEditwidget->setText( QString::fromStdString(
+            caster->toString( propPair.second )));
+
+          lineEditwidget->setEnabled( isEditable );
+        }
+        _gridPropertiesLayout->addWidget( widget, numProp, 1 );
+
+        if( !_propObject->evalConstraint( shift::Properties::SUBPROPERTY,
+          propName ))
+        {
+          label->hide( );
+          widget->hide( );
+        }
+        ++numProp;
+        _propParamCont.push_back( std::make_tuple( widgetType, label, widget ));
+      }
+    }
+    if ( _isNew )
+    {
+      _validationButton->setText( tr( "Create" ));
+      _eraseButton->hide( );
+    }
+    else
+    {
+      if( _isAggregated )
+      {
+        _eraseButton->hide( );
+      }
+      else
+      {
+        _eraseButton->show( );
+      }
+      _validationButton->setText( tr( "Save" ));
+    }
+    _parentDock->show( );
+    this->show( );
   }
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
   {
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = _propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
+    refreshValues( );
 
     bool needToClearCache = false;
     for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
@@ -275,9 +265,9 @@ namespace nslib
         creatorPair.second->relationshipUpdatedOrCreated( _propObject );
     }
     auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
     if( _isNew )
     {
       shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
@@ -290,8 +280,8 @@ namespace nslib
     else
     {
       InteractionManager::refreshEntityConnectionList( );
-      auto originGid = _originEntity->entityGid( );
-      auto destGid = _destEntity->entityGid( );
+      const auto originGid = _originEntity->entityGid( );
+      const auto destGid = _destEntity->entityGid( );
       relAggregatedConnectsTo.updateDependentRelations( originGid, destGid );
       relAggregatedConnectedBy.updateDependentRelations( destGid, originGid );
       if( _autoCloseCheck->isChecked( ) )
@@ -313,7 +303,41 @@ namespace nslib
     }
   }
 
-  void ConnectionRelationshipEditWidget::cancelDialog(  )
+  void ConnectionRelationshipEditWidget::refreshValues( )
+  {
+    for ( const auto& propParam: _propParamCont )
+    {
+      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
+      const auto& label = labelWidget->text( ).toStdString( );
+
+      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
+      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
+      QString paramString;
+      if ( editType ==  TWidgetType::COMBO )
+      {
+        const auto comboWidget = dynamic_cast< QComboBox* >( widget );
+        paramString = comboWidget->currentText( );
+      }
+      else if ( editType == TWidgetType::LINE_EDIT )
+      {
+        const auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
+        paramString = lineEditwidget->text( );
+      }
+      else
+      {
+        assert( false );
+      }
+
+      const auto caster = fires::PropertyManager::getPropertyCaster( label );
+      auto& prop = _propObject->getProperty( label );
+      assert ( caster );
+
+      caster->fromString( prop, paramString.toStdString( ));
+    }
+  }
+
+
+  void ConnectionRelationshipEditWidget::cancelDialog( void )
   {
     this->hide( );
     _parentDock->close( );
@@ -345,9 +369,9 @@ namespace nslib
   void ConnectionRelationshipEditWidget::breakDialog(  )
   {
     auto& relAggregatedConnectsTo = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
-      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
     shift::Relationship::BreakAnAggregatedRelation( relAggregatedConnectsTo,
       relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
       _destEntity );
@@ -364,34 +388,7 @@ namespace nslib
   void ConnectionRelationshipEditWidget::refreshSubproperties( void )
   {
     // First set all values via caster
-    // TODO this code is the same as in validate
-    for ( const auto& propParam: _propParamCont )
-    {
-      const auto& labelWidget = std::get< TEditTuple::LABEL >( propParam );
-      const auto& label = labelWidget->text( ).toStdString( );
-      const auto& editType = std::get< TEditTuple::WIDGET_TYPE >( propParam );
-      const auto& widget = std::get< TEditTuple::WIDGET >( propParam );
-      QString paramString;
-
-      if ( editType ==  TWidgetType::COMBO )
-      {
-        auto comboWidget = dynamic_cast< QComboBox* >( widget );
-        paramString = comboWidget->currentText( );
-      }
-      else if ( editType == TWidgetType::LINE_EDIT )
-      {
-        auto lineEditwidget = dynamic_cast< QLineEdit* >( widget );
-        paramString = lineEditwidget->text( );
-      }
-      else
-        assert( false );
-
-      auto caster = fires::PropertyManager::getPropertyCaster( label );
-      auto& prop = _propObject->getProperty( label );
-      assert ( caster );
-
-      caster->fromString( prop, paramString.toStdString( ));
-    }
+    refreshValues( );
 
     // Now hide/show widgets depending on the values set before
     for ( const auto& propParam: _propParamCont )
@@ -430,10 +427,10 @@ namespace nslib
     }
     else
     {
-      auto relationshipPropertiesTypes = DomainManager::getActiveDomain( )
-        ->relationshipPropertiesTypes( );
+      auto relationshipPropertiesTypes =
+          DomainManager::getActiveDomain( )->relationshipPropertiesTypes( );
       _propObject = relationshipPropertiesTypes.getRelationshipProperties(
-        "connectsTo" )->create( );
+          "connectsTo" )->create( );
       _isNew = true;
       _validationButton->setText( tr( "Create" ));
       setWindowTitle( tr( "Edit connection relationship" ));

@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *          Iago Calvo <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -19,27 +20,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__NEURON_REP__
-#define __NSLIB__NEURON_REP__
+#ifndef __NSLIB__NEURON_SUPER_REP__
+#define __NSLIB__NEURON_SUPER_REP__
 
 #include <nslib/reps/QGraphicsItemRepresentation.h>
 #include <shift/shift.h>
-#include <shift_NeuronPopRep.h>
+#include <shift_NeuronSuperPopRep.h>
 
 namespace nslib
 {
   namespace congen
   {
-    class NeuronPopRep
-      : public shiftgen::NeuronPopRep
+    class NeuronSuperPopRep
+      : public shiftgen::NeuronSuperPopRep
       , public QGraphicsItemRepresentation
     {
     public:
 
-      NeuronPopRep( void );
-      NeuronPopRep( const NeuronPopRep& );
-      NeuronPopRep( const shiftgen::NeuronPopRep& );
-      virtual ~NeuronPopRep( void ) {}
+      NeuronSuperPopRep( void );
+      NeuronSuperPopRep( const NeuronSuperPopRep& );
+      NeuronSuperPopRep( const shiftgen::NeuronSuperPopRep& );
+      virtual ~NeuronSuperPopRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
         bool create = true );
 

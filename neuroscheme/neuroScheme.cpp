@@ -27,6 +27,7 @@
 #include <nslib/version.h>
 #include <nsplugins/cortex/Domain.h>
 #include <nsplugins/congen/Domain.h>
+#include <nslib/InteractionManager.h>
 #include "MainWindow.h"
 
 
@@ -267,8 +268,9 @@ int main( int argc, char** argv )
 
   MainWindow mainWindow( 0,  zeroEQ );
   mainWindow.setWindowTitle( "NeuroScheme" );
-  mainWindow.show( );
   mainWindow.selectDomain( );
+  nslib::InteractionManager::start( );
+  mainWindow.show( );
 
   if ( initWindowSize )
     mainWindow.resize( initWindowWidth, initWindowHeight );

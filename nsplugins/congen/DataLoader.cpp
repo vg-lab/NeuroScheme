@@ -27,6 +27,7 @@
 #include "RepresentationCreator.h"
 #include <shift_ConnectsWith.h>
 #include <shift_NeuronPop.h>
+#include <nslib/DomainManager.h>
 
 namespace nslib
 {
@@ -50,9 +51,9 @@ namespace nslib
 
         Loggers::get( )->log(
           "Loading NeuroML xml",
-          nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-        nslib::congen::DataLoader::loadNeuroML(
+        congen::DataLoader::loadNeuroML(
           std::string( args.at( "-x" )[0] ));
       } // "-x"
 
@@ -91,11 +92,10 @@ namespace nslib
               maxNeuronsPerPopulation = popSize;
             }
           }
-
+          xml.skipCurrentElement( ); // random_arrangement
         }
         xml.skipCurrentElement( ); // pop_location
       }
-      xml.skipCurrentElement( ); // random_arrangement
       xml.skipCurrentElement( ); // population
 
       NeuronPop::TNeuronModel neuronModel =
@@ -107,8 +107,8 @@ namespace nslib
       shift::Entity* neuronPop = new NeuronPop( popName, popSize, neuronModel );
       popNameToGid[ popName ] = neuronPop->entityGid( );
 
-      auto& entities = nslib::DataManager::entities( );
-      auto& rootEntities = nslib::DataManager::rootEntities( );
+      auto& entities = DataManager::entities( );
+      auto& rootEntities = DataManager::rootEntities( );
       entities.add( neuronPop );
       rootEntities.add( neuronPop );
     }
@@ -138,16 +138,6 @@ namespace nslib
         weightType = shiftgen::ConnectsWith::TFixedOrDistribution::Fixed,
         delayType = shiftgen::ConnectsWith::TFixedOrDistribution::Fixed;
 
-      auto sourceIt = popNameToGid.find( sourceName );
-      auto targetIt = popNameToGid.find( targetName );
-      unsigned int sourceGid = 0, targetGid = 0;
-      if ( sourceIt != popNameToGid.end( ) &&
-           targetIt != popNameToGid.end( ))
-      {
-        sourceGid = sourceIt->second;
-        targetGid = targetIt->second;
-      }
-
       std::string lastGaussianPossibleElement;
       bool weightTextProcessed = false, delayTextProcessed = false;
 
@@ -155,9 +145,7 @@ namespace nslib
              !( xml.name( ) == "projection" &&
                 xml.tokenType( ) == QXmlStreamReader::EndElement ))
       {
-
         xml.readNext( );
-
         if ( xml.tokenType( ) == QXmlStreamReader::Characters )
         {
           if ( lastGaussianPossibleElement == "weight" && !weightTextProcessed )
@@ -281,23 +269,137 @@ namespace nslib
         weightType, weight, weightGaussMean, weightGaussSigma,
         delayType, delay, delayGaussMean, delayGaussSigma, threshold );
 
-      auto& entities = nslib::DataManager::entities( );
-      auto& relConnectsTo =
-        *( entities.relationships( )[ "connectsTo" ]->asOneToN( ));
-      auto& relConnectedBy =
-        *( entities.relationships( )[ "connectedBy" ]->asOneToN( ));
-      relConnectsTo[ sourceGid ].insert(
-        std::make_pair( targetGid, connProps ));
-      relConnectedBy[ targetGid ].insert(
-        std::make_pair( sourceGid, nullptr ));
-      connProps->setProperty( "Name",projName );
+      const auto sourceIt = popNameToGid.find( sourceName );
+      const auto targetIt = popNameToGid.find( targetName );
+      unsigned int sourceGid = 0, targetGid = 0;
+      if ( sourceIt != popNameToGid.end( ) &&
+           targetIt != popNameToGid.end( ))
+      {
+        sourceGid = sourceIt->second;
+        targetGid = targetIt->second;
+        auto& dataEntities = DataManager::entities( );
+        auto& entities = dataEntities.entities( );
+        auto& relAggregatedConnectsTo = *( dataEntities
+          .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ) );
+        auto& relAggregatedConnectedBy = *( dataEntities
+          .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ) );
+        shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
+          relAggregatedConnectedBy, dataEntities,entities.at( sourceGid ),
+          entities.at( targetGid ), connProps, connProps );
+      }
+    }
 
+    void DataLoader::_loadInput(
+        QXmlStreamReader& xml,
+        std::unordered_map< std::string, unsigned int >& popNameToGid )
+    {
+      auto attributes = xml.attributes( );
+      std::string popName;
+      unsigned int popSize = 0u;
+      shiftgen::Stimulator::TStimulatorModel model =
+        shiftgen::Stimulator::TStimulatorModel::undefined_generator;
+      shiftgen::Stimulator::TStimulatorType type =
+        shiftgen::Stimulator::TStimulatorType::Pulse_input;
+      float delay = 0.0f;
+      float duration = 0.0f;
+      float amplitude = 0.0f;
+      unsigned int frequency = 0u;
+      shiftgen::Stimulator::TSynapticMechanism synaptic_mechanism =
+        shiftgen::Stimulator::TSynapticMechanism::undefined;
+
+      if( attributes.hasAttribute( "name" ))
+      {
+        popName = attributes.value( "name" ).toString( ).toStdString( );
+      }
+
+      xml.readNextStartElement( );
+      if ( xml.name( ) == "pulse_input" )
+      {
+        attributes = xml.attributes( );
+        if( attributes.hasAttribute( "delay" ))
+        {
+          delay = attributes.value( "delay" ).toFloat( );
+        }
+        if( attributes.hasAttribute( "duration" ))
+        {
+          duration = attributes.value( "duration" ).toFloat( );
+        }
+        if( attributes.hasAttribute( "amplitude" ))
+        {
+          amplitude = attributes.value( "amplitude" ).toFloat( );
+        }
+        xml.skipCurrentElement( ); //pulse_input
+      }
+      else if ( xml.name( ) == "random_stim" )
+      {
+        type =
+            shiftgen::Stimulator::TStimulatorType::Random_stim;
+        attributes = xml.attributes( );
+        if( attributes.hasAttribute( "frequency" ))
+        {
+          frequency = attributes.value( "frequency" ).toUInt( );
+        }
+        if( attributes.hasAttribute( "synaptic_mechanism" ))
+        {
+          std::string synapticMechanism = attributes
+              .value( "synaptic_mechanism" ).toString( ).toStdString( );
+          if( synapticMechanism == "DoubExpSynA" ){
+            synaptic_mechanism =
+              shiftgen::Stimulator::TSynapticMechanism::DoubExpSynA;
+          }
+        }
+        xml.skipCurrentElement( ); // random_stim
+      }
+      auto& dataEntities = DataManager::entities( );
+      auto& entities = dataEntities.entities( );
+      auto& noHierarchyEntities = DataManager::noHierarchyEntities( );
+      auto& relAggregatedConnectsTo = *( dataEntities
+        .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+      auto& relAggregatedConnectedBy = *( dataEntities
+        .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+
+      shift::Entity* stimulator =
+        new shiftgen::Stimulator( popName, popSize, model, type, delay,
+        duration, amplitude, frequency, synaptic_mechanism );
+
+      dataEntities.add( stimulator );
+      noHierarchyEntities.add( stimulator );
+      const auto& relationshipProperties = DomainManager::getActiveDomain( )
+        ->relationshipPropertiesTypes( );
+      while( xml.readNextStartElement( ))
+      {
+        if( xml.name( ) == "target" ){
+          attributes = xml.attributes( );
+          if( attributes.hasAttribute( "population" ))
+          {
+            std::string targetName =
+              attributes.value( "population" ).toString( ).toStdString( );
+            auto targetIt = popNameToGid.find( targetName );
+            if ( targetIt != popNameToGid.end( ))
+            {
+              auto connProps = relationshipProperties.getRelationshipProperties(
+                "connectsTo" )->create( );
+              connProps->setProperty("Name","R:" + popName + "-" + targetName );
+              shift::Relationship::EstablishAndAggregate(
+                relAggregatedConnectsTo,relAggregatedConnectedBy, dataEntities,
+                stimulator, entities.at( targetIt->second ), connProps,
+                connProps );
+            }
+          }
+          xml.skipCurrentElement( );//target
+        }
+        else
+        {
+          xml.skipCurrentElement( );
+        }
+      }
     }
 
     bool DataLoader::loadNeuroML( const std::string& fileName )
     {
-      auto& entities = nslib::DataManager::entities( );
-      auto& rootEntities = nslib::DataManager::rootEntities( );
+      auto& entities = DataManager::entities( );
+      auto& rootEntities = DataManager::rootEntities( );
+      DataManager::noHierarchyEntities( ).clear( );
       fires::PropertyManager::clear( );
       entities.clear( );
       rootEntities.clear( );
@@ -308,7 +410,7 @@ namespace nslib
       if ( ! qFile.exists( ))
       {
         Loggers::get( )->log( "NeuroML file not found",
-          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -317,7 +419,7 @@ namespace nslib
       if ( !qFile.isOpen( ))
       {
         Loggers::get( )->log( "NeuroML file not readable",
-          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -326,7 +428,7 @@ namespace nslib
       if ( xml.hasError( ))
       {
         Loggers::get( )->log( "NeuroML file has errors",
-          nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
         return false;
       }
 
@@ -341,14 +443,22 @@ namespace nslib
           continue;
 
         if ( xml.name( ) == "population" )
+        {
           _loadPopulation( xml, popNameToGid, maxNeuronsPerPopulation );
+        }
         else if ( xml.name( ) == "projection" )
+        {
           _loadProjection( xml, popNameToGid, maxAbsoluteWeight );
+        }
+        else if ( xml.name( ) == "input" )
+        {
+          _loadInput( xml, popNameToGid );
+        }
       }
 
       // Sets new maximum and minimum in the RepresentationCreator
       auto repCreator = ( RepresentationCreator* )
-        nslib::RepresentationCreatorManager::getCreator( );
+        RepresentationCreatorManager::getCreator( );
       repCreator->maxAbsoluteWeight( maxAbsoluteWeight );
       repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
 

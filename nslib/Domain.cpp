@@ -537,7 +537,11 @@ namespace nslib
       importEntityJSON( entityJSON.second, entity, isRootEntity, oldGID );
       oldGIDToEntity->insert( std::make_pair( oldGID, entity ));
       DataManager::entities( ).add( entity );
-      if ( isRootEntity )
+      if( entity->isNotHierarchy( ))
+      {
+        DataManager::noHierarchyEntities( ).add( entity );
+      }
+      else if ( isRootEntity )
       {
         DataManager::rootEntities( ).add( entity );
       }

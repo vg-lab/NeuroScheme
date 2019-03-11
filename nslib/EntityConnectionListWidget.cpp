@@ -44,6 +44,7 @@ namespace nslib
   EntityConnectionListWidget::EntityConnectionListWidget(
     QWidget* parentWidget_ )
     : QWidget ( parentWidget_ )
+    , _entity( nullptr )
     , _gridLayout( new QGridLayout( ))
     , _entityNameLabel( new QLabel )
     , _autoCloseLabel( new QLabel( tr( "Auto-close" )))
@@ -133,8 +134,6 @@ namespace nslib
       });
     setLayout( _gridLayout );
     _parentDock->setWidget( this );
-    _parentDock->show( );
-    this->show( );
   }
 
   void EntityConnectionListWidget::setConnections( shift::Entity*  entity_,
@@ -195,50 +194,53 @@ namespace nslib
     shift::EntityGid destEntity_, const bool updateAggregatedTo_,
     const bool updateAggregatedBy_ )
   {
-    auto entityGid =  _entity->entityGid( );
-    auto dataRelations = DataManager::entities( ).relationships( );
-    auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
-    auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
-    auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
-      ->asAggregatedOneToN( )->mapAggregatedRels( );
-    auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
-      ->asAggregatedOneToN( )->mapAggregatedRels( );
+    if( _entity )
+    {
+      auto entityGid = _entity->entityGid( );
+      auto dataRelations = DataManager::entities( ).relationships( );
+      auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
+      auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
+      auto relAggregatedConnectsTo = dataRelations[ "aggregatedConnectsTo" ]
+        ->asAggregatedOneToN( )->mapAggregatedRels( );
+      auto relAggregatedConnectBy = dataRelations[ "aggregatedConnectedBy" ]
+        ->asAggregatedOneToN( )->mapAggregatedRels( );
 
-    if( entityGid == origEntity_ )
-    {
-      auto connectsIt = relConnectsTo.find( entityGid );
-      shift::RelationshipOneToNMapDest* connectsMap =
-        ( connectsIt == relConnectsTo.end( )
-        || connectsIt->second.empty( ))
-        ? nullptr : & connectsIt->second;
-      _connectsToTable->setTableData( connectsMap, _entity );
-    }
-    if( entityGid == destEntity_ )
-    {
-      auto connectsIt = relConnectedBy.find( entityGid );
-      shift::RelationshipOneToNMapDest* connectsMap =
-        ( connectsIt == relConnectedBy.end( )
-        || connectsIt->second.empty( ))
-        ? nullptr : & connectsIt->second;
-      _connectedByTable->setTableData( connectsMap, _entity );
-    }
-    if( updateAggregatedBy_ )
-    {
-      auto connectsIt = relAggregatedConnectBy.find( entityGid );
-      shift::AggregatedOneToNAggregatedDests* connectsMap =
-        ( connectsIt == relAggregatedConnectBy.end( )
-        || connectsIt->second->empty( ))
-        ? nullptr : connectsIt->second.get();
-      _aggregatedConnectedByTable->setTableData( connectsMap, _entity );
-    }
-    if( updateAggregatedTo_ )
-    {
-      auto connectsIt = relAggregatedConnectsTo.find( entityGid );
-      shift::AggregatedOneToNAggregatedDests* connectsMap =
-        ( connectsIt == relAggregatedConnectsTo.end( )
-        || connectsIt->second->empty( ))
-        ? nullptr : connectsIt->second.get();
-      _aggregatedConnectsToTable->setTableData( connectsMap, _entity );
+      if( entityGid == origEntity_ )
+      {
+        auto connectsIt = relConnectsTo.find( entityGid );
+        shift::RelationshipOneToNMapDest* connectsMap =
+          ( connectsIt == relConnectsTo.end( )
+          || connectsIt->second.empty( ))
+          ? nullptr : &connectsIt->second;
+        _connectsToTable->setTableData( connectsMap, _entity );
+      }
+      if( entityGid == destEntity_ )
+      {
+        auto connectsIt = relConnectedBy.find( entityGid );
+        shift::RelationshipOneToNMapDest* connectsMap =
+          ( connectsIt == relConnectedBy.end( )
+          || connectsIt->second.empty( ))
+          ? nullptr : &connectsIt->second;
+        _connectedByTable->setTableData( connectsMap, _entity );
+      }
+      if( updateAggregatedBy_ )
+      {
+        auto connectsIt = relAggregatedConnectBy.find( entityGid );
+        shift::AggregatedOneToNAggregatedDests* connectsMap =
+          ( connectsIt == relAggregatedConnectBy.end( )
+          || connectsIt->second->empty( ))
+          ? nullptr : connectsIt->second.get( );
+        _aggregatedConnectedByTable->setTableData( connectsMap, _entity );
+      }
+      if( updateAggregatedTo_ )
+      {
+        auto connectsIt = relAggregatedConnectsTo.find( entityGid );
+        shift::AggregatedOneToNAggregatedDests* connectsMap =
+          ( connectsIt == relAggregatedConnectsTo.end( )
+          || connectsIt->second->empty( ))
+          ? nullptr : connectsIt->second.get( );
+        _aggregatedConnectsToTable->setTableData( connectsMap, _entity );
+      }
     }
   }
 

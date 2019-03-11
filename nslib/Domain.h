@@ -59,7 +59,7 @@ namespace nslib
 
     DataLoader* dataLoader( void );
 
-    const shift::EntitiesTypes &entitiesTypes( void ) const;
+    const shift::EntitiesTypes& entitiesTypes( void ) const;
 
     const shift::RelationshipPropertiesTypes &
     relationshipPropertiesTypes( void ) const;

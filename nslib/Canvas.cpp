@@ -291,7 +291,7 @@ namespace nslib
 
         layout_->addWidget( _layouts.getLayout( index )->optionsWidget( ),
                             2, 0 );
-        displayEntities( _entities, true, false );
+        displayEntities( true, false );
         _layouts.getLayout( index )->optionsWidget( )->show( );
 
       }
@@ -305,28 +305,40 @@ namespace nslib
 
   }
 
-  void Canvas::displayEntities( shift::Entities& entities_,
-                                bool animate, bool refreshProperties_ )
+  void Canvas::displayEntities( bool animate, bool refreshProperties_ )
   {
     nslib::Loggers::get( )->log(
-      "displayEntities " + std::to_string( entities_.size( )),
+      "displayEntities " + std::to_string( _entities.size( )),
       nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
     if ( refreshProperties_ )
     {
-      refreshProperties( entities_ );
+      refreshProperties( );
       for ( auto& layout_ : layouts( ).map( ))
       {
         layout_.second->refreshWidgetsProperties( _properties );
       }
     }
 
-    _entities = entities_;
     assert( _layouts.getLayout( _activeLayoutIndex ));
-    _layouts.getLayout( _activeLayoutIndex )->display( entities_,
-                                                       _reps,
-                                                       animate );
+    _layouts.getLayout( _activeLayoutIndex )->display( _entities,
+      _reps, animate );
+  }
 
+  void Canvas::setEntities( shift::Entities& entities_)
+  {
+    _sceneEntities = _entities = entities_;
+    if ( Config::_showNoHierarchyEntities( ))
+    {
+      _entities.addEntities( DataManager::noHierarchyEntities( ));
+    }
+  }
+
+  void Canvas::displayEntities( shift::Entities& entities_,
+    bool animate, bool refreshProperties_ )
+  {
+    setEntities( entities_ );
+    displayEntities( animate, refreshProperties_ );
   }
 
   void Canvas::addLayout( Layout* layout_ )
@@ -343,6 +355,7 @@ namespace nslib
     canvas->_properties = _properties;
     canvas->_reps = _reps;
     canvas->_entities = _entities;
+    canvas->_sceneEntities = _sceneEntities;
     assert( canvas->scene( ).views( ).size( ) != 0 );
     for ( auto layout_ : _layouts.map( ))
     {
@@ -351,7 +364,7 @@ namespace nslib
       canvas->addLayout( newLayout );
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
-    canvas->displayEntities( canvas->_entities, false, true );
+    canvas->displayEntities( false, true );
     canvas->layouts( ).layoutSelector( )->setCurrentIndex(
       this->_activeLayoutIndex );
     canvas->connectLayoutSelector( );
@@ -367,15 +380,14 @@ namespace nslib
     return _reps;
   }
 
-  void Canvas::refreshProperties(
-    const shift::Entities& entities_ )
+  void Canvas::refreshProperties( void )
   {
     fires::Objects objs;
     fires::Objects filteredObjs;
 
     _properties.clear( );
 
-    for ( const auto& entity : entities_.vector( ))
+    for ( const auto& entity : _entities.vector( ))
     {
       if ( DataManager::entities( ).
            relationships( ).count( "isSubEntityOf" ) != 0 )
@@ -450,5 +462,23 @@ namespace nslib
 
   }
 
+  void Canvas::addEntity( shift::Entity* entity_, const bool isInput_  )
+  {
+    if( !isInput_)
+    {
+      _sceneEntities.add( entity_ );
+    }
+    _entities.add( entity_ );
+  }
+
+  void Canvas::removeEntity( const shift::Entity* entity_,
+    const bool isInput_  )
+  {
+    if( !isInput_)
+    {
+      _sceneEntities.removeIfContains( entity_ );
+    }
+    _entities.removeIfContains( entity_ );
+  }
 
 } // namespace nslib

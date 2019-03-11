@@ -100,7 +100,7 @@ namespace nslib
 
   void Layout::refresh( bool animate )
   {
-    display( _canvas->entities( ), _canvas->reps( ), animate );
+    display( _canvas->allEntities( ), _canvas->reps( ), animate );
   }
 
   void Layout::display( shift::Entities& entities,

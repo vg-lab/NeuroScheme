@@ -32,6 +32,8 @@ namespace nslib
 {
   shift::Entities DataManager::_rootEntities =
     shift::Entities( );
+  shift::Entities DataManager::_noHierarchyEntities =
+    shift::Entities( );
 #ifdef NEUROSCHEME_USE_NSOL
   nsol::DataSet DataManager::_nsolDataSet = nsol::DataSet( );
 #endif
@@ -112,10 +114,9 @@ namespace nslib
 #endif
 
   void DataManager::loadBlueConfig( const std::string& blueConfig,
-                                    const std::string& targetLabel,
-                                    const bool loadMorphologies,
-                                    const std::string& csvNeuronStatsFileName,
-                                    const bool loadConnectivity )
+    const std::string& targetLabel, const bool loadMorphologies,
+    const std::string& csvNeuronStatsFileName,
+    const bool loadConnectivity )
   {
 #ifndef NSOL_USE_BRION
     ( void ) blueConfig;
@@ -125,9 +126,9 @@ namespace nslib
     ( void ) loadConnectivity;
 
     Loggers::get( )->log("Error loading BlueConfig: Brion support not built-in",
-                         LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+      LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
     QMessageBox::critical(0, "Error loading BlueConfig",
-                         "Brion support not built-in");
+      "Brion support not built-in");
     return;
 #else
     ( void ) csvNeuronStatsFileName;
@@ -218,7 +219,7 @@ namespace nslib
 #else
     (void) xmlSceneFile;
     Loggers::get( )->log( "nsol not built or built without QtCore",
-                         LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+      LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
 #endif
   }

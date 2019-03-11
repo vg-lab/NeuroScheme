@@ -38,12 +38,18 @@ namespace nslib
   public:
 
     static shift::EntitiesWithRelationships& entities( void );
-    static shift::Entities& rootEntities( void ) { return _rootEntities; }
+    static shift::Entities& rootEntities( void )
+    {
+      return _rootEntities;
+    }
+    static shift::Entities& noHierarchyEntities( void )
+    {
+      return _noHierarchyEntities;
+    }
     static void loadBlueConfig( const std::string& blueConfig,
-                                const std::string& targetLabel,
-                                const bool loadMorphologies,
-                                const std::string& csvNeuronStatsFileName,
-                                const bool loadConnectivity );
+      const std::string& targetLabel,  const bool loadMorphologies,
+      const std::string& csvNeuronStatsFileName,
+      const bool loadConnectivity );
 
     static void loadNsolXmlScene( const std::string& xmlSceneFile );
 
@@ -53,6 +59,7 @@ namespace nslib
 
   protected:
     static shift::Entities _rootEntities;
+    static shift::Entities _noHierarchyEntities;
 
 #ifdef NEUROSCHEME_USE_NSOL
     static nsol::DataSet _nsolDataSet;
