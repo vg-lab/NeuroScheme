@@ -49,7 +49,7 @@ namespace nslib
 
     public:
 
-      NeuronSuperPopItem( const NeuronSuperPopRep& neuronRep,
+      NeuronSuperPopItem( const NeuronSuperPopRep& entityRep,
         unsigned int size = 100, bool interactive = true );
 
       virtual ~NeuronSuperPopItem( void ) {}

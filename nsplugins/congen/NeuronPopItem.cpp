@@ -2,6 +2,7 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
+ *          Iago Calvo <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -22,30 +23,13 @@
 #include "NeuronPopItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
-
-#define POSX0 1.0f                    // Precomputed values for cos(0)
-#define POSY0 0.0f                    // Precomputed values for sin(0)
-
-#define POSX1 0.5000007660251953f     // Precomputed values for cos(60)
-#define POSY1 0.8660249615191342f     // Precomputed values for sin(60)
-
-#define POSX2 -0.49999846794843594f   // Precomputed values for cos(120)
-#define POSY2 0.8660262883130146f     // Precomputed values for sin(120)
-
-#define POSX3 -0.9999999999964793f    // Precomputed values for cos(180)
-#define POSY3 0.00000265358979335273f // Precomputed values for sin(180)
-
-#define POSX4 -0.5000030640984338f    // Precomputed values for cos(240)
-#define POSY4 -0.8660236347191557f    // Precomputed values for sin(240)
-
-#define POSX5 0.49999616986815576f    // Precomputed values for cos(300)
-#define POSY5 -0.8660276151007971f    // Precomputed values for sin(300)
+#include <nslib/Config.h>
 
 namespace nslib
 {
   namespace congen
   {
-    NeuronPopItem::NeuronPopItem( const NeuronPopRep& neuronRep,
+    NeuronPopItem::NeuronPopItem( const NeuronPopRep& entityRep,
       unsigned int size, bool interactive_ )
     {
       setInteractive( interactive_ );
@@ -54,47 +38,60 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast< int >( ceil( float( size ) * 0.5f ));
+      int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
+      const Color& bgColor = entityRep.getProperty( "color" ).value< Color >( );
       auto circleItem = new QGraphicsEllipseItem( this );
-      auto circleItemSize = roundf( size * 0.9f );
-      int halfcircleItemSize = - static_cast< int >(roundf( size * 0.45f ));
+      float circleItemSize = size * 0.9f;
+      float halfcircleItemSize = - 0.5f * circleItemSize;
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
       auto circleItemInner = new QGraphicsEllipseItem( this );
-      auto circleItemSizeInner = roundf( size * 0.7f );
-      int halfcircleItemSizeInner = - static_cast< int >( roundf( size * 0.35f ));
+      float circleItemSizeInner = size * 0.7f;
+      float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
       circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
         circleItemSizeInner, circleItemSizeInner );
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      int barWidth = roundf( size * 0.05f );
+      float barHeight = size * 0.1f;
+      float halfBarHeight = - 0.5f * barHeight;
+      float barWidth = circleItemSizeInner * 1.1f;
+      float halfBarWidth = - 0.5f * barWidth;
 
       auto bar = new QGraphicsRectItem(
-        -barWidth, halfcircleItemSizeInner-2,
-        2 * barWidth, circleItemSizeInner+4
-        );
+        halfBarWidth, halfBarHeight,
+        barWidth,  barHeight );
       bar->setPen( QColor( bgColor ));
       bar->setBrush( QColor( 255, 255, 255 ));
       bar->setParentItem( this );
 
       auto barFill = new QGraphicsRectItem(
-        -barWidth, halfcircleItemSizeInner-2,
-        2 * barWidth,
-        roundf(( circleItemSizeInner + 4 ) *
-                 neuronRep.getProperty( "line perc" ).value< float >( )));
+        halfBarWidth, halfBarHeight,
+        roundf(barWidth *
+        entityRep.getProperty( "line perc" ).value< float >( )),
+        barHeight);
       barFill->setPen( Qt::NoPen );
       barFill->setBrush( QColor( bgColor ));
       barFill->setParentItem( bar );
 
-      this->_parentRep = &( const_cast< NeuronPopRep& >( neuronRep ));
+      if ( nslib::Config::showEntitiesName( ))
+      {
+        auto text = new QGraphicsTextItem( QString::fromStdString(
+          entityRep.getProperty( "Entity name" ).value<std::string>( )));
+        text->setPos( -0.32f * text->boundingRect( ).width( ),
+          -0.32f * text->boundingRect( ).height( ));
+        text->setDefaultTextColor( QColor::fromRgb( 0, 0, 0, 255 ));
+        text->setScale( 0.64f );
+        text->setParentItem( this );
+      }
+
+      this->_parentRep = &( const_cast< NeuronPopRep& >( entityRep ));
     }
 
     void NeuronPopItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )

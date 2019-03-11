@@ -91,6 +91,17 @@ namespace nslib
     void RepresentationCreator::updateNeuronPopRep(
       const shift::Entity* entity_, shift::Representation* entityRep_ )
     {
+      if ( entity_->hasProperty( "Entity name" ))
+      {
+        entityRep_->setProperty( "Entity name", entity_->getProperty( "Entity name" )
+            .value<std::string>( ));
+      }
+      else
+      {
+        Loggers::get( )->log( "Expected property Entity name.",
+          LOG_LEVEL_WARNING );
+        entityRep_->setProperty( "Entity name", " " );
+      }
       if ( entity_->hasProperty( "Neuron model" ))
       {
         entityRep_->setProperty(
@@ -155,9 +166,9 @@ namespace nslib
       }
       else
       {
-        Loggers::get( )->log( "Expected property Level.",
+        Loggers::get( )->log( "Expected property Entity name.",
           LOG_LEVEL_WARNING );
-        entityRep_->setProperty( "num circles", 0u);
+        entityRep_->setProperty( "Entity name", " " );
       }
     }
 
@@ -187,6 +198,17 @@ namespace nslib
         Loggers::get( )->log( "Expected property Nb of neurons.",
           LOG_LEVEL_WARNING );
         entityRep_->setProperty( "line perc", _neuronsToPercentage.map( 0u ));
+      }
+      if ( entity_->hasProperty( "Entity name" ))
+      {
+        entityRep_->setProperty( "Entity name", entity_->getProperty( "Entity name" )
+            .value<std::string>( ));
+      }
+      else
+      {
+        Loggers::get( )->log( "Expected property Entity name.",
+                              LOG_LEVEL_WARNING );
+        entityRep_->setProperty( "Entity name", " " );
       }
     }
 
