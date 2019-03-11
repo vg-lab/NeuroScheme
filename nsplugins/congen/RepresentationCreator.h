@@ -43,6 +43,11 @@ namespace nslib
 
       virtual ~RepresentationCreator( void ) {};
 
+      void updateRepresentation(
+          const shift::Entity* entity_,
+          shift::Representation* entityRep_
+      ) final;
+
       void create(
         const shift::Entities& entities,
         shift::Representations& representations,
@@ -51,6 +56,7 @@ namespace nslib
         shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
         bool linkRepsToObjs = false ) final;
+
         void maxAbsoluteWeight(
           float maxAbsoluteWeight_, bool compare = false );
         void maxNeuronsPerPopulation(
@@ -74,19 +80,30 @@ namespace nslib
 
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
 
-      bool entityUpdatedOrCreated( shift::Entity* entity ) final;
+      bool entityUpdatedOrCreated( const shift::Entity* entity ) final;
       bool relationshipUpdatedOrCreated(
-        shift::RelationshipProperties* relProperties ) final;
+        const shift::RelationshipProperties* relProperties ) final;
 
     protected:
-
       unsigned int _maxNeuronsPerPopulation;
       float _maxAbsoluteWeight;
+
+      MapperFloatToFloat _nbConnectionsToWidth;
+      MapperFloatToFloat _neuronsToPercentage;
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
       scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorModel >
         _neuronStimulatorModelColorMap;
       scoop::Color _superPopColor;
+
+      void updateNeuronPopRep( const shift::Entity* entity_,
+        shift::Representation* entityRep_ );
+
+      void updateSuperPopRep( const shift::Entity* entity_,
+        shift::Representation* entityRep_ );
+
+      void updateStimulator( const shift::Entity* entity_,
+        shift::Representation* entityRep_ );
 };
 
   } // namespace congen

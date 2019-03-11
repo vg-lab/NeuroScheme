@@ -230,8 +230,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxNbNeurons for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxNbNeurons from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
 
       try
@@ -242,8 +242,8 @@ namespace nslib
       }
       catch ( std::exception const& ex )
       {
-        SHIFT_THROW( "ERROR: getting maxWeight for JSON: "
-          + std::string( ex.what( )));
+        Loggers::get( )->log( "ERROR: getting maxWeight from JSON: "
+          + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
     }
 

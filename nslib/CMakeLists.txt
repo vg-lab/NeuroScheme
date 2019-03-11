@@ -29,6 +29,7 @@ set( NSLIB_PUBLIC_HEADERS
   ZeroEQManager.h
   layouts/CameraBasedLayout.h
   layouts/CircularLayout.h
+  layouts/FreeLayout.h
   layouts/GridLayout.h
   layouts/Layout.h
   layouts/LayoutManager.h
@@ -65,6 +66,7 @@ set( NSLIB_SOURCES
   SortWidget.cpp
   ZeroEQManager.cpp
   layouts/CircularLayout.cpp
+  layouts/FreeLayout.cpp
   layouts/GridLayout.cpp
   layouts/Layout.cpp
   layouts/CameraBasedLayout.cpp

@@ -26,6 +26,7 @@
 #include "RepresentationCreatorManager.h"
 #include "DomainManager.h"
 #include "InteractionManager.h"
+#include "Loggers.h"
 
 #include <QtGui>
 #include <QInputDialog>
@@ -37,6 +38,7 @@
 
 #include <memory>
 #include <shift/Relationship.h>
+#include <nslib/reps/QGraphicsItemRepresentation.h>
 
 //TODO: Add realtion of parent of to entities
 
@@ -130,7 +132,7 @@ namespace nslib
 
   void EntityEditWidget::updateEntity( shift::Entity* entity_,
     TEntityEditWidgetAction action_,
-    shift::Entity* parentEntity_, bool addToScene_)
+    shift::Entity* parentEntity_, bool addToScene_ )
   {
     _updateParentEntity = parentEntity_;
     _updateAction = action_;
@@ -149,6 +151,9 @@ namespace nslib
       _updateEntity = nullptr;
 
       _isNew = _action == TEntityEditWidgetAction::NEW_ENTITY;
+      _isNewOrDuplicated = _isNew
+        || (_action == TEntityEditWidgetAction::DUPLICATE_ENTITY );
+      _isEditing = _action == TEntityEditWidgetAction::EDIT_ENTITY;
 
       unsigned int element = 0;
       QLayoutItem* item;
@@ -161,7 +166,7 @@ namespace nslib
 
       if( _entity )
       {
-        if( _action == DUPLICATE_ENTITY || _isNew )
+        if( _isNewOrDuplicated )
         {
           _separation->setVisible( true );
           _numEntitiesLabel->setVisible( true );
@@ -211,7 +216,7 @@ namespace nslib
             const auto& categories = caster->categories( );
 
             const bool isEditable = _entity->hasPropertyFlag( propName,
-              shift::Entity::TPropertyFlag::EDITABLE );
+              shift::Properties::TPropertyFlag::EDITABLE );
 
             if( !categories.empty( ))
             {
@@ -270,15 +275,24 @@ namespace nslib
   void EntityEditWidget::validateDialog( void )
   {
     unsigned int numEles = 1;
+    auto& dataEntities = DataManager::entities( );
+    auto& dataRelations = dataEntities.relationships( );
+    auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
+    bool freeLayoutInUse = false;
+    for( const auto& pane : PaneManager::panes( ))
+    {
+      freeLayoutInUse = freeLayoutInUse ||
+        ( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE );
+    }
 
-    if ( _action == DUPLICATE_ENTITY || _isNew )
+    if ( _isNewOrDuplicated )
     {
       numEles = _numNewEntities->text( ).toUInt( );
     }
 
     for ( unsigned int i = 0; i < numEles; ++i )
     {
-      if ( _action == DUPLICATE_ENTITY || _isNew )
+      if ( _isNewOrDuplicated )
       {
         _entity = _entity->create( );
       }
@@ -293,9 +307,9 @@ namespace nslib
         const auto& label = labelWidget->text( ).toStdString( );
 
         const bool isEditable = _entity->hasPropertyFlag(
-          label, shift::Entity::TPropertyFlag::EDITABLE );
+          label, shift::Properties::TPropertyFlag::EDITABLE );
 
-        if ( ( _action == EDIT_ENTITY ) && !isEditable )
+        if ( _isEditing && !isEditable )
         {
           continue;
         }
@@ -346,7 +360,7 @@ namespace nslib
             if ( _isNew ||
               caster->toString( prop ) != pStr ) // If value changed
             {
-              const auto &entities = nslib::DataManager::entities( ).vector( );
+              const auto& entities = dataEntities.vector( );
               for( const auto entity: entities )
               {
                 if ( entity->isSameEntityType( _entity ) &&
@@ -390,47 +404,30 @@ namespace nslib
         }
       }
 
-      bool needToClearCache = false;
-      for ( const auto& creatorPair :
-        nslib::RepresentationCreatorManager::creators( ))
+      if ( _isNewOrDuplicated )
       {
-        needToClearCache = needToClearCache ||
-          creatorPair.second->entityUpdatedOrCreated( _entity );
-      }
-
-      // TODO improvemente: check if cache needs to be cleared or if just the
-      // items related to the entity under edition
-      // if ( needToClearCache ) {
-      nslib::RepresentationCreatorManager::clearEntitiesToReps( );
-      nslib::RepresentationCreatorManager::clearRelationshipsCache( );
-      // }
-
-      if ( _action == DUPLICATE_ENTITY || _isNew )
-      {
-        nslib::DataManager::entities( ).add( _entity );
+        dataEntities.add( _entity );
 
         std::vector< shift::Entity* > subentities;
         _entity->createSubEntities( subentities );
 
-        auto& _entities = nslib::DataManager::entities( );
         auto& relSuperEntityOf =
-          *( _entities.relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
+          *( dataRelations[ "isSuperEntityOf" ]->asOneToN( ));
         auto& relSubEntityOf =
-          *( _entities.relationships( )[ "isSubEntityOf" ]->asOneToOne( ));
+          *( dataRelations[ "isSubEntityOf" ]->asOneToOne( ));
 
-        //TODO: improve this set of adds which will do push_backs
         for ( const auto& subentity : subentities )
         {
           shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
-          nslib::DataManager::entities( ).add( subentity );
-          nslib::PaneManager::activePane( )->addEntity( subentity );
+          dataEntities.add( subentity );
+          PaneManager::activePane( )->addEntity( subentity );
         }
 
         if( _entity->isNotHierarchy( ))
         {
           DataManager::noHierarchyEntities( ).add( _entity );
-          if( Config::_showNoHierarchyEntities( ))
+          if( Config::showNoHierarchyEntities( ))
           {
             for ( auto pane : PaneManager::panes( ))
             {
@@ -442,18 +439,14 @@ namespace nslib
         {
           if ( _addToScene )
           {
-            nslib::PaneManager::activePane( )->addEntity( _entity );
+            PaneManager::activePane( )->addEntity( _entity );
           }
           if ( _parentEntity )
           {
-            auto& entities = nslib::DataManager::entities( );
-            auto& relParentOf =
-              *( entities.relationships( )[ "isParentOf" ]->asOneToN( ));
-            auto& relChildOf =
-              *( entities.relationships( )[ "isChildOf" ]->asOneToOne( ));
-            auto& relAggregatedConnectsTo = *( entities.relationships( )
+            auto& relParentOf = *( dataRelations[ "isParentOf" ]->asOneToN( ));
+            auto& relAggregatedConnectsTo = *( dataRelations
               [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-            auto& relAggregatedConnectedBy = *( entities.relationships( )
+            auto& relAggregatedConnectedBy = *( dataRelations
               [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
             shift::Relationship::EstablishWithHierarchy( relParentOf,
@@ -462,31 +455,77 @@ namespace nslib
           }
           else
           {
-            nslib::DataManager::rootEntities( ).add( _entity );
+            DataManager::rootEntities( ).add( _entity );
           }
         }
       }
-      if ( _action == EDIT_ENTITY )
+    }
+
+    updateRelatedEntities( dataEntities, relChildOf, freeLayoutInUse,
+      _entity );
+
+
+  }
+
+  void EntityEditWidget::updateRelatedEntities(
+    shift::EntitiesWithRelationships& dataEntities_,
+    shift::RelationshipOneToOne& relChildOf_, bool freeLayoutInUse_,
+    shift::Entity* entity_ ) const
+  {
+    shift::Entities updatedEntities;
+    updatedEntities.add( entity_ );
+    auto parentID = relChildOf_[ entity_->entityGid( ) ].entity;
+    while( parentID > 0 )
+    {
+      const auto parent = dataEntities_.at( parentID );
+      parent->autoUpdateProperties( );
+      updatedEntities.add( parent );
+      parentID = relChildOf_[ parentID ].entity;
+    }
+
+    for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
+    {
+      bool representationUpdated = false;
+      for (const auto updatedEntity : updatedEntities.vector( ))
       {
-        auto& relChildOf = *( DataManager::entities( ).relationships( )
-        [ "isChildOf" ]->asOneToOne( ));
-        auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
-        if( parentID > 0 )
+        representationUpdated =
+          creatorPair.second->entityUpdatedOrCreated( updatedEntity );
+      }
+      if( representationUpdated )
+      {
+        RepresentationCreatorManager::clearEntitiesCache(
+          creatorPair.first, freeLayoutInUse_ );
+      }
+      else if ( _isEditing || ( _isNewOrDuplicated && _parentEntity ))
+      {
+        auto entitiesToReps =
+          RepresentationCreatorManager::entitiesToReps( creatorPair.first );
+        if ( !_isEditing )
         {
-          auto parent = DataManager::entities( ).at( parentID );
-          parent->autoUpdateProperties( );
+          updatedEntities.remove( entity_ );
         }
-        for( const auto& repPair :
-          nslib::RepresentationCreatorManager::repsToEntities( ))
+        for( const auto& entity : updatedEntities.vector( ))
         {
-          shift::Representation* rep = repPair.first;
-          delete rep;
+          const auto entityReps = entitiesToReps.find( entity );
+          if( entityReps == entitiesToReps.end( ))
+          {
+            Loggers::get( )->log(
+              "Not found the representation of the edited entity.",
+              LOG_LEVEL_WARNING );
+          }
+          else
+          {
+            RepresentationCreatorManager::updateEntitiyRepresentations( entity,
+              entityReps->second, creatorPair.first, freeLayoutInUse_ );
+          }
         }
       }
+      RepresentationCreatorManager::clearRelationshipsCache(
+        creatorPair.first );
     }
-    for ( auto pane : nslib::PaneManager::panes( ))
+
+    for ( auto pane : PaneManager::panes( ))
     {
-      pane->reps( ).clear( );
       pane->displayEntities( false, true );
     }
   }

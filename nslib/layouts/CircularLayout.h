@@ -23,6 +23,7 @@
 #define __NSLIB_CIRCULAR_LAYOUT__
 
 #include <nslib/api.h>
+#include <QtWidgets/QDoubleSpinBox>
 #include "Layout.h"
 
 namespace nslib
@@ -35,13 +36,14 @@ namespace nslib
 
   protected:
     void _arrangeItems( const shift::Representations& reps,
-                        bool animate = true,
-                        const shift::Representations& postFilterReps =
-                        shift::Representations( ));
+      bool animate = true,
+      const shift::Representations& postFilterReps =
+      shift::Representations( ));
     void _updateOptionsWidget( void );
 
     Layout* clone( void ) const;
 
+    QDoubleSpinBox* _lineEditRadius;
   };
 
 }

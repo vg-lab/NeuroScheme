@@ -27,6 +27,7 @@
 #include "EntityEditWidget.h"
 #include "reps/SelectableItem.h"
 #include "ConnectionRelationshipEditWidget.h"
+#include "PaneManager.h"
 #include "EntityConnectionListWidget.h"
 #include <shift/shift.h>
 #include <QAbstractGraphicsShapeItem>
@@ -34,6 +35,8 @@
 #include <QGraphicsView>
 #include <QMenu>
 #include <QPen>
+#include <nslib/layouts/FreeLayout.h>
+
 namespace nslib
 {
 
@@ -65,15 +68,15 @@ namespace nslib
     static void contextMenuEvent( QAbstractGraphicsShapeItem* item,
                                   QGraphicsSceneContextMenuEvent* event );
 
-    static void mousePressEvent( QGraphicsItem* item,
-                                 QMouseEvent* event );
+    static void mousePressEvent( const QGraphicsView* graphicsView,
+      QGraphicsItem* item, const QMouseEvent* event );
 
     static void mouseReleaseEvent( QGraphicsItem* item,
-                                   QMouseEvent* event );
+      const QMouseEvent* event );
 
-    static void mouseMoveEvent( QGraphicsView* graphicsView,
-                                QAbstractGraphicsShapeItem* shapeItem,
-                                QMouseEvent* event );
+    static void mouseMoveEvent( const QGraphicsView* graphicsView,
+      QAbstractGraphicsShapeItem* shapeItem,
+      const QMouseEvent* event );
 
     static void updateEntityConnectionList( shift::EntityGid origEntity_,
       shift::EntityGid destEntity, bool updateAggregatedTo_ = true,
@@ -157,6 +160,7 @@ namespace nslib
       bool& noGroupedSelected );
 
     static QMenu* _contextMenu;
+    static nslib::FreeLayout* _movingLayout;
     static ConnectionRelationshipEditWidget* _conRelationshipEditWidget;
     static EntityEditWidget* _entityEditWidget;
     static EntityConnectionListWidget* _entityConnectListWidget;

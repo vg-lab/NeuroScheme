@@ -24,8 +24,8 @@
 #include "DomainManager.h"
 #include "InteractionManager.h"
 #include "layouts/LayoutManager.h"
+#include "layouts/FreeLayout.h"
 #include "Loggers.h"
-#include "PaneManager.h"
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
 #include "reps/ConnectivityRep.h"
@@ -41,6 +41,7 @@
 namespace nslib
 {
   QMenu* InteractionManager::_contextMenu = nullptr;
+  FreeLayout* InteractionManager::_movingLayout = nullptr;
   EntityEditWidget* InteractionManager::_entityEditWidget = nullptr;
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
@@ -48,7 +49,7 @@ namespace nslib
   Qt::MouseButtons InteractionManager::_buttons = nullptr;
   std::unique_ptr< TemporalConnectionLine >
     InteractionManager::_tmpConnectionLine =
-    std::unique_ptr< TemporalConnectionLine >( new TemporalConnectionLine( ));
+    std::unique_ptr< TemporalConnectionLine >( nullptr );
   QAbstractGraphicsShapeItem*
     InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
   EntityConnectionListWidget* InteractionManager::_entityConnectListWidget =
@@ -61,6 +62,7 @@ namespace nslib
     _conRelationshipEditWidget = new ConnectionRelationshipEditWidget( );
     _contextMenu = new QMenu( );
   }
+
   void InteractionManager::highlightConnectivity(
     QAbstractGraphicsShapeItem* shapeItem, bool highlight )
   {
@@ -124,33 +126,39 @@ namespace nslib
     QAbstractGraphicsShapeItem* shapeItem,
     QGraphicsSceneHoverEvent* event )
   {
-    // std::cout << "hover" << std::endl;
-    auto selectableItem = dynamic_cast< SelectableItem* >( shapeItem );
-    if ( selectableItem )
+    if( lastShapeItemHoveredOnMouseMove != shapeItem )
     {
-      selectableItem->hover( true );
-      selectableItem->setSelected( selectableItem->selectedState( ));
-    }
-    else
-    {
-      shapeItem->setPen( SelectableItem::hoverUnselectedPen( ));
-    }
-
-    if ( event && event->modifiers( ).testFlag( Qt::ControlModifier ))
-    {
-      auto item = dynamic_cast< Item* >( shapeItem );
-      if ( item )
+      hoverLeaveEvent( lastShapeItemHoveredOnMouseMove, event );
+      // std::cout << "hover" << std::endl;
+      auto selectableItem = dynamic_cast< SelectableItem* >( shapeItem );
+      if ( selectableItem )
       {
-        assert( item->parentRep( ));
-        const auto& repsToEntities =
-          RepresentationCreatorManager::repsToEntities( );
-        if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
+        selectableItem->hover( true );
+        selectableItem->setSelected( selectableItem->selectedState( ));
+      }
+      else
+      {
+        shapeItem->setPen( SelectableItem::hoverUnselectedPen( ));
+      }
+
+      if ( event && event->modifiers( ).testFlag( Qt::ControlModifier ))
+      {
+        auto item = dynamic_cast< Item* >( shapeItem );
+        if ( item )
         {
-          const auto entities = repsToEntities.at( item->parentRep( ));
-          createOrEditEntity( *entities.begin( ),
-            EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+          assert( item->parentRep( ));
+          const auto& repsToEntities =
+            RepresentationCreatorManager::repsToEntities( );
+          if ( repsToEntities.find( item->parentRep( )) !=
+            repsToEntities.end( ))
+          {
+            const auto entities = repsToEntities.at( item->parentRep( ));
+            createOrEditEntity( *entities.begin( ),
+              EntityEditWidget::TEntityEditWidgetAction::EDIT_ENTITY );
+          }
         }
       }
+      lastShapeItemHoveredOnMouseMove = shapeItem;
     }
   }
 
@@ -159,18 +167,28 @@ namespace nslib
     QAbstractGraphicsShapeItem* item,
     QGraphicsSceneHoverEvent* /* event */ )
   {
-    if ( !item )
-      return;
-
-    auto selectableItem = dynamic_cast< SelectableItem* >( item );
-    if ( selectableItem )
+    if ( lastShapeItemHoveredOnMouseMove &&
+      item == lastShapeItemHoveredOnMouseMove )
     {
-      selectableItem->hover( false );
-      selectableItem->setSelected( selectableItem->selectedState( ));
-    }
-    else
-    {
-      item->setPen( SelectableItem::unselectedPen( ));
+      for( const auto& pane : PaneManager::panes( ))
+      {
+        if( pane->scene( ).items( ).contains( item ))
+        {
+          auto selectableItem = dynamic_cast< SelectableItem* >( item );
+          if ( selectableItem )
+          {
+            selectableItem->hover( false );
+            selectableItem->setSelected( selectableItem->selectedState( ) );
+          }
+          else
+          {
+            item->setPen( SelectableItem::unselectedPen( ));
+          }
+          lastShapeItemHoveredOnMouseMove = nullptr;
+          return;
+        }
+      }
+      lastShapeItemHoveredOnMouseMove = nullptr;
     }
   }
 
@@ -483,6 +501,10 @@ namespace nslib
             }
             else if ( showConnections && showConnections == selectedAction )
             {
+              if( !_entityConnectListWidget )
+              {
+                _entityConnectListWidget = new EntityConnectionListWidget( );
+              }
               _entityConnectListWidget->setConnections( entity,
                 connectsToMap, connectedByMap, aggregatedConnectsToMap,
                 aggregatedConnectedByMap );
@@ -518,31 +540,43 @@ namespace nslib
   } // context menu
 
 
-  void InteractionManager::mousePressEvent( QGraphicsItem* item,
-                                            QMouseEvent* event )
+  void InteractionManager::mousePressEvent( const QGraphicsView* graphicsView,
+    QGraphicsItem* item, const QMouseEvent* event )
   {
     if ( item )
     {
       // _tmpConnectionLine.reset(
       //   new QGraphicsLineItem( QLineF( item->scenePos( ), item->scenePos( ))));
-
-      if ( _tmpConnectionLine )
+      if ( event->modifiers( ).testFlag( Qt::ShiftModifier ))
       {
-        _tmpConnectionLine->setLine( QLineF( item->scenePos( ), item->scenePos( )));
+        Canvas* movingPane = PaneManager::activePane( );
+        movingPane->layoutChanged( Layout::TLayoutIndexes::FREE );
+        _movingLayout = dynamic_cast< FreeLayout* >(
+          movingPane->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+        auto newPos = graphicsView->mapToScene( event->pos( ));
+        _movingLayout->startMoveRepresentation(item, newPos );
+
+      }
+      else
+      {
+        _tmpConnectionLine.reset(new TemporalConnectionLine( ));
+        _tmpConnectionLine->setLine(
+          QLineF( item->scenePos( ), item->scenePos( )));
         _tmpConnectionLine->setZValue( -100000 );
-        _tmpConnectionLine->setPen( QPen( QColor( 128, 128, 128),
+        _tmpConnectionLine->setPen( QPen( QColor( 128, 128, 128 ),
           nslib::Config::scale( ), Qt::DotLine ));
 
         auto scene = item->scene( );
         scene->addItem( _tmpConnectionLine.get( ));
       }
-
       auto parentItem = item->parentItem( );
       while ( parentItem )
       {
         auto selectableItem = dynamic_cast< SelectableItem*>( item );
         if ( selectableItem )
+        {
           break;
+        }
         item = parentItem;
         parentItem = item->parentItem( );
       }
@@ -556,210 +590,227 @@ namespace nslib
     }
   }
 
-  void InteractionManager::mouseMoveEvent( QGraphicsView* graphicsView,
-    QAbstractGraphicsShapeItem* shapeItem, QMouseEvent* event )
+  void InteractionManager::mouseMoveEvent( const QGraphicsView* graphicsView,
+    QAbstractGraphicsShapeItem* shapeItem, const QMouseEvent* event )
   {
     // It _item has value means that a link its being drawn
-    if ( _item && _tmpConnectionLine )
+    if ( _item )
     {
-      const auto& initPoint = _tmpConnectionLine->line( ).p1( );
       auto newPos = graphicsView->mapToScene( event->pos( ));
-      _tmpConnectionLine->setLine( QLineF( initPoint, newPos ));
-
-      if ( shapeItem && dynamic_cast< Item* >( shapeItem ))
+      if ( _movingLayout )
       {
-        InteractionManager::hoverLeaveEvent( lastShapeItemHoveredOnMouseMove,
-          nullptr );
-        InteractionManager::hoverEnterEvent( shapeItem, nullptr );
-        lastShapeItemHoveredOnMouseMove = shapeItem;
+        _movingLayout->moveRepresentation( newPos );
+      }
+      else if( _tmpConnectionLine.get( ))
+      {
+        const auto& initPoint = _tmpConnectionLine->line( ).p1( );
+        _tmpConnectionLine->setLine( QLineF( initPoint, newPos ));
+        if ( shapeItem && dynamic_cast< Item* >( shapeItem ))
+        {
+          InteractionManager::hoverEnterEvent( shapeItem, nullptr );
+        }
+
       }
     }
   }
 
   void InteractionManager::mouseReleaseEvent( QGraphicsItem* item_,
-                                              QMouseEvent* /*event*/ )
+    const QMouseEvent* /*event*/ )
   {
-
-    if( item_ && _item )
+    if( _item )
     {
-      auto parentItem = item_->parentItem( );
-      while ( parentItem )
+      if( _movingLayout )
       {
-        auto selectableItem = dynamic_cast< SelectableItem*>( item_ );
-        if (selectableItem)
-          break;
-        item_ = parentItem;
-        parentItem = item_->parentItem( );
+        _movingLayout->stopMoveActualRepresentation();
+        _movingLayout = nullptr;
       }
-
-      if ( _item == item_ )
+      else if( item_ )
       {
-        // Selection event
-        if ( _buttons & Qt::LeftButton )
+        auto parentItem = item_->parentItem( );
+        while ( parentItem )
         {
-          auto item = dynamic_cast< Item* >( item_ );
-
-          auto selectableItem = dynamic_cast< SelectableItem* >( item );
+          auto selectableItem = dynamic_cast< SelectableItem*>( item_ );
           if ( selectableItem )
+            break;
+          item_ = parentItem;
+          parentItem = item_->parentItem( );
+        }
+
+        if ( _item == item_ )
+        {
+          // Selection event
+          if ( _buttons & Qt::LeftButton )
           {
-            const auto& repsToEntities =
-              RepresentationCreatorManager::repsToEntities( );
-            if ( repsToEntities.find( item->parentRep( )) !=
-                 repsToEntities.end( ))
+            auto item = dynamic_cast< Item* >( item_ );
+
+            auto selectableItem = dynamic_cast< SelectableItem* >( item );
+            if ( selectableItem )
             {
-              const auto entities = repsToEntities.at( item->parentRep( ));
-              if ( selectableItem->partiallySelected( ))
-                selectableItem->setSelected( );
-              else
-                selectableItem->toggleSelected( );
+              const auto& repsToEntities =
+                RepresentationCreatorManager::repsToEntities( );
+              if ( repsToEntities.find( item->parentRep( )) !=
+                 repsToEntities.end( ))
+              {
+                const auto entities = repsToEntities.at( item->parentRep( ));
+                if ( selectableItem->partiallySelected( ))
+                {
+                  selectableItem->setSelected( );
+                }
+                else
+                {
+                  selectableItem->toggleSelected( );
+                }
 
 // std::cout << "-------- Selecting entities "
 //           << entities.size( ) << std::endl;
-              for ( const auto& entity : entities )
+                for( const auto& entity : entities )
               {
 // std::cout << "-------- " << entity->entityGid( ) << std::endl;
 // std::cout << "-- ShiFT gid: "
 //           << int( entity->entityGid( )) << std::endl;
 
-                if ( selectableItem->selected( ))
-                {
-                  SelectionManager::setSelectedState(
-                    entity, SelectedState::SELECTED );
-                }
-                else
-                {
-                  SelectionManager::setSelectedState(
-                    entity, SelectedState::UNSELECTED );
-                }
-
-                auto entityState = SelectionManager::getSelectedState( entity );
-                // auto entityGid = ( *entities.begin( ))->entityGid( );
-                auto entityGid = entity->entityGid( );
-
-                const auto& allEntities = DataManager::entities( );
-                const auto& relationships = allEntities.relationships( );
-                const auto& relChildOf =
-                  *( relationships.at( "isChildOf" )->asOneToOne( ));
-                const auto& relParentOf =
-                  *( relationships.at( "isParentOf" )->asOneToN( ));
-                const auto& relSubEntityOf =
-                  *( relationships.at( "isSubEntityOf" )->asOneToOne( ));
-                const auto& relSuperEntityOf =
-                  *( relationships.at( "isSuperEntityOf" )->asOneToN( ));
-                const auto& relAGroupOf =
-                  *( relationships.at( "isAGroupOf" )->asOneToN( ));
-
-                if ( relSubEntityOf.count( entityGid ) > 0 )
-                {
-                  std::unordered_set< unsigned int > parentIds;
-                  if ( relAGroupOf.count( entityGid ) > 0 )
+                  if ( selectableItem->selected( ))
                   {
-                    const auto& groupedIds = relAGroupOf.at( entityGid );
-                    // std::cout << " -- Parent of: ";
-                    // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
-                    for ( auto const& groupedId : groupedIds )
-                    {
-                      SelectionManager::setSelectedState(
-                        allEntities.at( groupedId.first ), entityState );
-                      // Save unique parent set for updating only once per parent
-                      if ( relChildOf.count( groupedId.first ) > 0 )
-                        parentIds.insert( relChildOf.at(
-                                            groupedId.first ).entity );
-                    }
-                    _updateSelectedStateOfSubEntities(
-                      allEntities, relSuperEntityOf, relAGroupOf,
-                      relSubEntityOf.at( entityGid ).entity );
-                    std::unordered_set< unsigned int > uniqueParentChildIds;
-                    for ( auto const& parentId : parentIds )
-                    {
-                      uniqueParentChildIds.insert(
-                        relParentOf.at( parentId ).begin( )->first );
-                    }
-                    // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
-                    for ( auto const& uniqueParentChildId : uniqueParentChildIds )
-                    {
-                      _propagateSelectedStateToParent(
-                        allEntities, relChildOf, relParentOf,
-                        relSuperEntityOf, relAGroupOf,
-                        uniqueParentChildId, entityState );
-                    }
+                    SelectionManager::setSelectedState(
+                      entity, SelectedState::SELECTED );
                   }
-                } // if subentity
-                else
-                {
-                  if ( relSuperEntityOf.count( entityGid ) > 0 )
+                  else
                   {
-                    const auto& subEntities =
-                      relSuperEntityOf.at( entityGid );
-                    for ( const auto& subEntity : subEntities )
-                      SelectionManager::setSelectedState(
-                        allEntities.at( subEntity.first ), entityState );
+                    SelectionManager::setSelectedState(
+                      entity, SelectedState::UNSELECTED );
                   }
 
-                  // std::cout << "Propagate to children of " << entityGid << std::endl;
-                  _propagateSelectedStateToChilds(
-                    allEntities, relParentOf, relSuperEntityOf,
-                    entityGid, entityState );
+                  auto entityState = SelectionManager::getSelectedState( entity );
+                  // auto entityGid = ( *entities.begin( ))->entityGid( );
+                  auto entityGid = entity->entityGid( );
 
-                  _propagateSelectedStateToParent(
-                    allEntities, relChildOf, relParentOf,
-                    relSuperEntityOf, relAGroupOf,
-                    entityGid, entityState );
-                  //std::cout << std::endl;
+                  const auto& allEntities = DataManager::entities( );
+                  const auto& relationships = allEntities.relationships( );
+                  const auto& relChildOf =
+                    *( relationships.at( "isChildOf" )->asOneToOne( ));
+                  const auto& relParentOf =
+                    *( relationships.at( "isParentOf" )->asOneToN( ));
+                  const auto& relSubEntityOf =
+                    *( relationships.at( "isSubEntityOf" )->asOneToOne( ));
+                  const auto& relSuperEntityOf =
+                    *( relationships.at( "isSuperEntityOf" )->asOneToN( ));
+                  const auto& relAGroupOf =
+                    *( relationships.at( "isAGroupOf" )->asOneToN( ));
+
+                  if ( relSubEntityOf.count( entityGid ) > 0 )
+                  {
+                    std::unordered_set< unsigned int > parentIds;
+                    if ( relAGroupOf.count( entityGid ) > 0 )
+                    {
+                      const auto& groupedIds = relAGroupOf.at( entityGid );
+                      // std::cout << " -- Parent of: ";
+                      // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
+                      for( auto const& groupedId : groupedIds )
+                      {
+                        SelectionManager::setSelectedState(
+                          allEntities.at( groupedId.first ), entityState );
+                        // Save unique parent set for updating only once per parent
+                        if ( relChildOf.count( groupedId.first ) > 0 )
+                          parentIds.insert( relChildOf.at(
+                          groupedId.first ).entity );
+                      }
+                      _updateSelectedStateOfSubEntities(
+                        allEntities, relSuperEntityOf, relAGroupOf,
+                        relSubEntityOf.at( entityGid ).entity );
+                      std::unordered_set< unsigned int > uniqueParentChildIds;
+                      for ( auto const& parentId : parentIds )
+                      {
+                        uniqueParentChildIds.insert(
+                          relParentOf.at( parentId ).begin( )->first );
+                      }
+                      // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
+                      for ( auto const& uniqueParentChildId : uniqueParentChildIds )
+                      {
+                        _propagateSelectedStateToParent(
+                          allEntities, relChildOf, relParentOf,
+                          relSuperEntityOf, relAGroupOf,
+                          uniqueParentChildId, entityState );
+                      }
+                    }
+                  } // if subentity
+                  else
+                  {
+                    if ( relSuperEntityOf.count( entityGid ) > 0 )
+                    {
+                      const auto& subEntities =
+                        relSuperEntityOf.at( entityGid );
+                      for ( const auto& subEntity : subEntities )
+                        SelectionManager::setSelectedState(
+                          allEntities.at( subEntity.first ), entityState );
+                    }
+
+                    // std::cout << "Propagate to children of " << entityGid << std::endl;
+                    _propagateSelectedStateToChilds(
+                      allEntities, relParentOf, relSuperEntityOf,
+                      entityGid, entityState );
+
+                    _propagateSelectedStateToParent(
+                      allEntities, relChildOf, relParentOf,
+                      relSuperEntityOf, relAGroupOf,
+                      entityGid, entityState );
+                    //std::cout << std::endl;
+                  }
+                  //LayoutManager::updateAllScenesSelection( );
+                  PaneManager::updateSelection( );
                 }
-                //LayoutManager::updateAllScenesSelection( );
-                PaneManager::updateSelection( );
+              }
+              else
+              {
+                Loggers::get( )->log( "item without entity",
+                  LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+                return;
               }
             }
-            else
-            {
-              Loggers::get( )->log( "item without entity",
-                LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-              return;
-            }
-          }
 
-          // Publish selection
-          std::vector< unsigned int > ids;
-          SelectionManager::selectableEntitiesIds( ids );
+            // Publish selection
+            std::vector< unsigned int > ids;
+            SelectionManager::selectableEntitiesIds( ids );
 
-          if ( Config::autoPublishSelection( ))
-            ZeroEQManager::publishSelection( ids );
-          if ( Config::autoPublishFocusOnSelection( ))
-            ZeroEQManager::publishFocusOnSelection( ids );
-        } // selection event
-      }
-      else
-      {
-        // drag and drop
-        if ( _buttons & Qt::LeftButton )
+            if ( Config::autoPublishSelection( ))
+              ZeroEQManager::publishSelection( ids );
+            if ( Config::autoPublishFocusOnSelection( ))
+              ZeroEQManager::publishFocusOnSelection( ids );
+          } // selection event
+        }
+        else
         {
-          auto originItem = dynamic_cast< Item* >( _item );
-          auto destinationItem = dynamic_cast< Item* >( item_ );
-
-          if ( destinationItem )
+          // drag and drop
+          if ( _buttons & Qt::LeftButton )
           {
-            const auto& repsToEntities =
-              RepresentationCreatorManager::repsToEntities( );
-            if (( repsToEntities.find( originItem->parentRep( )) !=
-                  repsToEntities.end( )) &&
-                ( repsToEntities.find( destinationItem->parentRep( )) !=
-                  repsToEntities.end( )))
-            {
-              const auto originEntity =
-                *( repsToEntities.at( originItem->parentRep( )).begin( ));
-              const auto destinationEntity =
-                *( repsToEntities.at( destinationItem->parentRep( )).begin( ));
+            auto originItem = dynamic_cast< Item* >( _item );
+            auto destinationItem = dynamic_cast< Item* >( item_ );
 
-              createConnectionRelationship( originEntity, destinationEntity );
+            if ( destinationItem )
+            {
+              const auto& repsToEntities =
+                RepresentationCreatorManager::repsToEntities( );
+              if ( ( repsToEntities.find( originItem->parentRep( )) !=
+                    repsToEntities.end( )) &&
+                  ( repsToEntities.find( destinationItem->parentRep( )) !=
+                    repsToEntities.end( )))
+              {
+                const auto originEntity =
+                  *( repsToEntities.at( originItem->parentRep( )).begin( ));
+                const auto destinationEntity = *( repsToEntities.at(
+                  destinationItem->parentRep( )).begin( ));
+
+                createConnectionRelationship( originEntity, destinationEntity );
+              }
             }
           }
         }
       }
     }
-
     if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+    {
       _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+      _tmpConnectionLine.reset( nullptr );
+    }
 
     _item = nullptr;
     _buttons = nullptr;
@@ -1149,7 +1200,7 @@ namespace nslib
     unsigned int entityIdx = 0;
     if( commonParent_ <= 0 )
     {
-      for( const auto& type : entitiesTypes_.entitiesTypes( ) )
+      for( const auto& type : entitiesTypes_.entitiesTypes( ))
       {
         if( !( std::get< shift::EntitiesTypes::IS_SUBENTITY >( type )
           || std::get< shift::EntitiesTypes::IS_NOT_HIERARCHY >( type )))

@@ -57,15 +57,19 @@ namespace nslib
     void ConnectionArrowItem::createArrow( const QPointF& origin,
                                            const QPointF& dest )
     {
-      _arrowOrigin = origin;
-      _arrowDest = dest;
+      float itemInvScale =
+        1.0f / static_cast< float >( this->scale( ));
+
+      _arrowOrigin = itemInvScale * origin;
+      _arrowDest = itemInvScale * dest;
+
 
       QPolygonF arrowShape;
 
-      float arrowWidth = 3 * nslib::Config::scale( );
-      float arrowLength = 3 * nslib::Config::scale( );
+      float arrowWidth = 3 * itemInvScale * nslib::Config::scale( );
+      float arrowLength = arrowWidth;
 
-      QLineF auxLine( origin, dest );
+      QLineF auxLine( _arrowOrigin, _arrowDest );
 
       auto lengthInv = 1.0f / auxLine.length( );
 

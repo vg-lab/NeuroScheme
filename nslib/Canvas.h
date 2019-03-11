@@ -104,6 +104,8 @@ namespace nslib
     const TProperties& properties( void ) { return _properties; }
     void refreshProperties( void );
 
+    void repsScale( qreal repsScale_ );
+    qreal repsScale ( void ) const;
 
 protected:
     GraphicsView* _graphicsView;
@@ -115,6 +117,8 @@ protected:
     shift::Entities _entities;
     shift::Entities _sceneEntities;
     TProperties _properties;
+
+    qreal _repsScale;
 
   public slots:
     void layoutChanged( int );

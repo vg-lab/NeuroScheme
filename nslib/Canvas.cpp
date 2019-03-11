@@ -45,10 +45,7 @@ namespace nslib
         dynamic_cast< Canvas* >( this->parentWidget( )));
 
     auto item = itemAt( event_->pos( ));
-    if ( item )
-      InteractionManager::mousePressEvent( item, event_ );
-    else
-      InteractionManager::mousePressEvent( nullptr, event_ );
+    InteractionManager::mousePressEvent( this, item, event_ );
 
     QGraphicsView::mousePressEvent( event_ );
   }
@@ -56,10 +53,7 @@ namespace nslib
   void GraphicsView::mouseReleaseEvent( QMouseEvent* event_ )
   {
     auto item = itemAt( event_->pos( ));
-    if ( item )
-      InteractionManager::mouseReleaseEvent( item, event_ );
-    else
-      InteractionManager::mouseReleaseEvent( nullptr, event_ );
+    InteractionManager::mouseReleaseEvent( item, event_ );
 
     QGraphicsView::mouseReleaseEvent( event_ );
   }
@@ -113,6 +107,7 @@ namespace nslib
     : _graphicsView( new GraphicsView( parent_ ))
     , _graphicsScene( new GraphicsScene )
     , _activeLayoutIndex( -1 )
+    , _repsScale( 1.0f )
   {
     _graphicsScene->setParent( this );
     _graphicsView->setScene( _graphicsScene );
@@ -145,9 +140,9 @@ namespace nslib
   void Canvas::connectLayoutSelector( void )
   {
     connect( this->layouts( ).layoutSelector( ),
-             SIGNAL( currentIndexChanged( int )),
-             this,
-             SLOT( layoutChanged( int )));
+      SIGNAL( currentIndexChanged( int )),
+      this,
+      SLOT( layoutChanged( int )));
 
   }
 
@@ -258,22 +253,34 @@ namespace nslib
 
   void Canvas::layoutChanged( int index )
   {
-    if ( index == -1 )
+    if ( index <= Layout::TLayoutIndexes::UNDEFINED )
     {
-      Loggers::get( )->log( "Trying to change to a layout with -1 index",
-                            LOG_LEVEL_WARNING );
+      Loggers::get( )->log( "Trying to change to a layout with negative index",
+        LOG_LEVEL_WARNING );
 
       return;
     }
+    if ( index == _activeLayoutIndex )
+    {
+      Loggers::get( )->log( "Trying to change to a layout already in use",
+        LOG_LEVEL_WARNING );
+      return;
+    }
     Loggers::get( )->log( "Layout changed to " + std::to_string( index ),
-                         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+      LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     if ( _layouts.getLayout( index ))
     {
       _activeLayoutIndex = index;
-      _layouts.getLayout( index )->optionsWidget( );
+      auto actualLayout = _layouts.getLayout( index );
+      actualLayout->optionsWidget( );
+      _layouts.layoutSelector( )->setCurrentIndex( index );
       auto layout_ = PaneManager::layout( );
       if ( layout_ )
       {
+        if( _activeLayoutIndex == Layout::TLayoutIndexes::FREE )
+        {
+          dynamic_cast< FreeLayout* >( actualLayout )->init( );
+        }
         auto item = layout_->itemAtPosition( 2, 0 );
         if ( item )
         {
@@ -297,11 +304,11 @@ namespace nslib
       }
       else
         Loggers::get( )->log( "Null pane layout",
-                             LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
     }
     else
       Loggers::get( )->log( "Null layout with index" + std::to_string( index ),
-                           LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
+        LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
 
   }
 
@@ -328,7 +335,7 @@ namespace nslib
   void Canvas::setEntities( shift::Entities& entities_)
   {
     _sceneEntities = _entities = entities_;
-    if ( Config::_showNoHierarchyEntities( ))
+    if ( Config::showNoHierarchyEntities( ))
     {
       _entities.addEntities( DataManager::noHierarchyEntities( ));
     }
@@ -479,6 +486,16 @@ namespace nslib
       _sceneEntities.removeIfContains( entity_ );
     }
     _entities.removeIfContains( entity_ );
+  }
+
+  qreal Canvas::repsScale( ) const
+  {
+    return _repsScale;
+  }
+
+  void Canvas::repsScale( qreal repsScale_ )
+  {
+    _repsScale = repsScale_;
   }
 
 } // namespace nslib

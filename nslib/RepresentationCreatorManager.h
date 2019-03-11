@@ -24,7 +24,10 @@
 
 #include <nslib/api.h>
 #include <shift/shift.h>
+#include <nslib/layouts/FreeLayout.h>
 #include "Canvas.h"
+#include "PaneManager.h"
+#include "Config.h"
 // #include "domains/domains.h"
 
 namespace nslib
@@ -59,22 +62,18 @@ namespace nslib
     static const shift::TRepsToEntities& repsToEntities(
         unsigned int repCreatorId = 0 );
 
-    static void clearEntitiesToReps( unsigned int repCreatorId = 0 )
-    {
-      //_repCreators[ repCreatorId ]->clear( );
-      for ( auto& repPair : _repsToEntities[ repCreatorId ] )
-          delete repPair.first;
-      _entitiesToReps[ repCreatorId ].clear( );
-      _repsToEntities[ repCreatorId ].clear( );
-      _gidsToEntitiesReps[ repCreatorId ].clear( );
-    }
+    static void clearEntitiesToReps( unsigned int repCreatorId = 0 );
 
-    static void clearRelationshipsCache( unsigned int repCreatorId = 0 )
-    {
-      for ( auto& relPair : _relatedEntitiesReps[ repCreatorId ] )
-          delete std::get< 0 >( relPair.second );
-      _relatedEntitiesReps[ repCreatorId ].clear( );
-    }
+    static void clearEntitiesCache( unsigned int repCreatorId = 0,
+      const bool freeLayoutInUse = false );
+
+    static void clearRelationshipsCache( unsigned int repCreatorId = 0 );
+
+    static void updateEntitiyRepresentations(
+      const shift::Entity* entity_,
+      std::set< shift::Representation* > entityReps_,
+      unsigned int repCreatorId = 0,
+      const bool freeLayoutInUse_ = false );
 
     static const shift::TRelatedEntitiesReps& relatedEntities(
         unsigned int repCreatorID = 0 );

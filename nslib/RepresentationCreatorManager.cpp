@@ -79,14 +79,14 @@ namespace nslib
     bool linkRepsToObjs,
     unsigned int repCreatorId )
   {
-    //TODO check if exists
+    //Check if exists performed in the repCreators
     if ( _repCreators.count( repCreatorId ) == 1 )
       _repCreators[ repCreatorId ]->create( entities, representations,
-                                            _entitiesToReps[ repCreatorId ],
-                                            _repsToEntities[ repCreatorId ],
-                                            _gidsToEntitiesReps[ repCreatorId ],
-                                            linkEntitiesToReps,
-                                            linkRepsToObjs );
+        _entitiesToReps[ repCreatorId ],
+        _repsToEntities[ repCreatorId ],
+        _gidsToEntitiesReps[ repCreatorId ],
+        linkEntitiesToReps,
+        linkRepsToObjs );
   }
 
 
@@ -154,5 +154,97 @@ namespace nslib
           if ( qGraphicsRep )
             qGraphicsRep->deleteItem( &canvas->scene( ));
         }
+  }
+
+  void RepresentationCreatorManager::updateEntitiyRepresentations(
+    const shift::Entity* entity_,
+    std::set< shift::Representation* > entityReps_,
+    unsigned int repCreatorId,
+    const bool freeLayoutInUse_)
+  {
+    shift::RepresentationCreator* creatorRep_ =
+      RepresentationCreatorManager::getCreator( repCreatorId );
+    for ( shift::Representation* rep : entityReps_ )
+    {
+      creatorRep_->updateRepresentation( entity_, rep );
+      auto graphicsItemRep =
+        dynamic_cast< QGraphicsItemRepresentation* >( rep );
+      for( auto canvas : PaneManager::panes( ))
+      {
+        auto canvasReps = canvas->reps( );
+        if ( std::find( canvasReps.begin( ), canvasReps.end( ), rep )
+          != canvasReps.end( ))
+        {
+          auto item = graphicsItemRep->item( &canvas->scene( ));
+          canvas->scene( ).removeItem( item );
+          if( freeLayoutInUse_ )
+          {
+            auto pos = item->pos( );
+            graphicsItemRep->deleteItem( &canvas->scene( ));
+            auto newItem = graphicsItemRep->item( &canvas->scene( ));
+            canvas->scene( ).addItem( newItem );
+            newItem->setScale( canvas->repsScale( ));
+            newItem->setPos( pos );
+          }
+          else
+          {
+            graphicsItemRep->deleteItem( &canvas->scene( ));
+          }
+        }
+      }
+    }
+  }
+
+  void RepresentationCreatorManager::clearEntitiesToReps(
+    unsigned int repCreatorId )
+  {
+    //_repCreators[ repCreatorId ]->clear( );
+    for ( auto& repPair : _repsToEntities[ repCreatorId ] )
+      delete repPair.first;
+    _entitiesToReps[ repCreatorId ].clear( );
+    _repsToEntities[ repCreatorId ].clear( );
+    _gidsToEntitiesReps[ repCreatorId ].clear( );
+  }
+
+  void RepresentationCreatorManager::clearEntitiesCache(
+    unsigned int repCreatorId,
+    const bool freeLayoutInUse )
+  {
+    if ( freeLayoutInUse )
+    {
+      auto entitiesToReps =
+        RepresentationCreatorManager::entitiesToReps( repCreatorId );
+      for(const auto entityReps : entitiesToReps )
+      {
+        RepresentationCreatorManager::updateEntitiyRepresentations(
+          entityReps.first, entityReps.second, repCreatorId, freeLayoutInUse );
+      }
+    }
+    else
+    {
+      RepresentationCreatorManager::clearEntitiesToReps( repCreatorId );
+    }
+  }
+
+  void RepresentationCreatorManager::clearRelationshipsCache(
+    unsigned int repCreatorId )
+  {
+    if( Config::showConnectivity( ))
+    {
+      for( const auto& pane : PaneManager::panes( ))
+      {
+        if( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE )
+        {
+          FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
+            pane->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+          freeLayout->removeRelationshipsReps( );
+        }
+      }
+    }
+    for ( auto& relPair : _relatedEntitiesReps[ repCreatorId ] )
+    {
+      delete std::get< 0 >( relPair.second );
+    }
+    _relatedEntitiesReps[ repCreatorId ].clear( );
   }
 }

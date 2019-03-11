@@ -131,22 +131,22 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
-           this, SLOT( toggleShowConnectivity( )));
+    this, SLOT( toggleShowConnectivity( )));
 
   connect( _ui->actionShowNoHierarchyEntities, SIGNAL( triggered( )),
-           this, SLOT( toggleShowNoHierarchyEntities( )));
+    this, SLOT( toggleShowNoHierarchyEntities( )));
 
   connect( _ui->actionSplitHorizontally, SIGNAL( triggered( )),
-           this, SLOT( duplicateActivePane( )));
+    this, SLOT( duplicateActivePane( )));
 
   connect( _ui->actionSplitVertically, SIGNAL( triggered( )),
-           this, SLOT( duplicateActivePane( )));
+    this, SLOT( duplicateActivePane( )));
 
   connect( _ui->actionKillPane, SIGNAL( triggered( )),
-           this, SLOT( killActivePane( )));
+    this, SLOT( killActivePane( )));
 
   connect( _ui->actionHome, SIGNAL( triggered( )),
-           this, SLOT( home( )));
+    this, SLOT( home( )));
 
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
@@ -160,33 +160,33 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   nslib::Loggers::get( )->log( "Creating first pane",
                                nslib::LOG_LEVEL_VERBOSE );
   auto canvas = nslib::PaneManager::newPane( );
-  canvas->activeLayoutIndex( 0 );
-  canvas->setSizePolicy( QSizePolicy::Expanding,
-                         QSizePolicy::Expanding );
+  canvas->activeLayoutIndex( nslib::Layout::TLayoutIndexes::GRID );
+  canvas->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
   canvas->addLayout( new nslib::GridLayout( ));
   canvas->addLayout( new nslib::CameraBasedLayout( ));
   canvas->addLayout( new nslib::ScatterPlotLayout( ));
   canvas->addLayout( new nslib::CircularLayout( ));
+  canvas->addLayout( new nslib::FreeLayout( statusBar( )));
 
   // Layouts dock
   {
     _layoutsDock = new QDockWidget( );
     this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-                         _layoutsDock, Qt::Vertical);
+      _layoutsDock, Qt::Vertical);
     _layoutsDock->setMinimumSize( 300, 300 );
     _layoutsDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-                                 QSizePolicy::Expanding );
+      QSizePolicy::Expanding );
     _layoutsDock->setFeatures( QDockWidget::DockWidgetClosable |
-                               QDockWidget::DockWidgetMovable |
-                               QDockWidget::DockWidgetFloatable );
+      QDockWidget::DockWidgetMovable |
+      QDockWidget::DockWidgetFloatable );
 
     _layoutsDock->setWindowTitle( QString( "Layouts" ));
     _layoutsDock->close( );
     _ui->actionLayouts->setChecked( false );
     connect( _layoutsDock->toggleViewAction( ), SIGNAL( toggled( bool )),
-             _ui->actionLayouts, SLOT( setChecked( bool )));
+      _ui->actionLayouts, SLOT( setChecked( bool )));
     connect( _ui->actionLayouts, SIGNAL( triggered( )),
-             this, SLOT( updateLayoutsDock( )));
+      this, SLOT( updateLayoutsDock( )));
 
     QWidget* dockWidget = new QWidget( );
     QGridLayout* layoutsConfigLayout = new QGridLayout( dockWidget );
@@ -667,7 +667,7 @@ void MainWindow::toggleShowConnectivity( void )
 
 void MainWindow::toggleShowNoHierarchyEntities( void )
 {
-  nslib::Config::_showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
+  nslib::Config::showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
 
   for ( auto canvas : nslib::PaneManager::panes( ))
   {

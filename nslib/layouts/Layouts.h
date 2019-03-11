@@ -41,7 +41,7 @@ namespace nslib
     {
       _layouts[ _nextLayoutIdx ] = layout;
       _layoutSelector->insertItem( _nextLayoutIdx,
-                                   QString( layout->name( ).c_str( )));
+        QString( layout->name( ).c_str( )));
       ++_nextLayoutIdx;
     }
 

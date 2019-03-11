@@ -82,10 +82,16 @@ namespace nslib
     void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
       bool isGrid_, QPointF glyphCenter_ )
     {
+      float itemInvScale = 1.0f
+        / static_cast< float >( this->scale( ));
+
+      auto glyphCenter = itemInvScale * glyphCenter_;
+
       //Recalculates static data when relevant changes have been made
-      if( glyphRadius_ != glyphRadius )
+      auto newGlyphRadius = glyphRadius_ * itemInvScale;
+      if( newGlyphRadius != glyphRadius )
       {
-        glyphRadius = glyphRadius_;
+        glyphRadius = newGlyphRadius;
         AutoConnectionArrowItem::recalcArcData( );
       }
 
@@ -99,8 +105,8 @@ namespace nslib
       {
         //Fixes arrow position to the point furthest from the canvas centre
         relativeAngle = atanf(
-          float( glyphCenter_.y( ) / glyphCenter_.x( )));
-        if( glyphCenter_.x( ) < 0 )
+          float( glyphCenter.y( ) / glyphCenter.x( )));
+        if( glyphCenter.x( ) < 0 )
         {
           relativeAngle += M_PI_Float;
         }
@@ -108,8 +114,8 @@ namespace nslib
 
       //Arrow arc center
       QPointF arcCenter = QPointF(
-        glyphCenter_.x( ) + dist * cosf( relativeAngle ),
-        glyphCenter_.y( ) + dist * sinf( relativeAngle ));
+        glyphCenter.x( ) + dist * cosf( relativeAngle ),
+        glyphCenter.y( ) + dist * sinf( relativeAngle ));
 
       //Angle where the arrow arc will start
       relativeAngle = startAngle + M_PI_Float - relativeAngle;
@@ -146,7 +152,7 @@ namespace nslib
       //Draws the back of the arrow
       if( arcDegrees < M_PI_x2 )
       {
-        QPointF relativeDir = _arrowOrigin - glyphCenter_;
+        QPointF relativeDir = _arrowOrigin - glyphCenter;
 
         Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ));
         vector.normalize( );

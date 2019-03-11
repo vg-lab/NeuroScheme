@@ -96,12 +96,18 @@ namespace nslib
     TEntityEditWidgetAction _updateAction;
 
     bool _isNew;
+    bool _isNewOrDuplicated;
+    bool _isEditing;
     bool _addToScene;
     bool _updateAddToScene;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;
     static bool _checkUniquenessChecked;
+
+    void updateRelatedEntities( shift::EntitiesWithRelationships& dataEntities_,
+      shift::RelationshipOneToOne& relChildOf_,
+      bool freeLayoutInUse_, shift::Entity* entity_ ) const;
   };
 }
 
