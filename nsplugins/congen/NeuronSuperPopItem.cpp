@@ -25,15 +25,6 @@
 #include <QPen>
 #include <nslib/Config.h>
 
-#define POSX0 0.0f              // Precomputed value for cos(270)
-#define POSY0 -1.0f             // Precomputed value for sin(270)
-
-#define POSX1 -0.86602540378f   // Precomputed value for cos(150)
-#define POSY1 0.5f              // Precomputed value for sin(150)
-
-#define POSX2 0.86602540378f    // Precomputed value for cos(30)
-#define POSY2 0.5f              // Precomputed value for sin(30)
-
 namespace nslib
 {
   namespace congen
@@ -42,7 +33,7 @@ namespace nslib
     const float NeuronSuperPopItem::maxCircle = 0.7f;
     const float NeuronSuperPopItem::rangeCircle = maxCircle - minCircle;
 
-    NeuronSuperPopItem::NeuronSuperPopItem( const NeuronSuperPopRep& neuronRep,
+    NeuronSuperPopItem::NeuronSuperPopItem( const NeuronSuperPopRep& entityRep,
       unsigned int size, bool interactive_ )
     {
       setInteractive( interactive_ );
@@ -55,7 +46,7 @@ namespace nslib
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = neuronRep.getProperty( "color" ).value< Color >( );
+      const Color& bgColor = entityRep.getProperty( "color" ).value< Color >( );
       auto circleItem = new QGraphicsEllipseItem( this );
       float circleItemSize = size * 0.9f;
       float halfcircleItemSize = - 0.5f * circleItemSize;
@@ -72,14 +63,14 @@ namespace nslib
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      int numCircles = neuronRep.getProperty( "num circles" )
+      int numCircles = entityRep.getProperty( "num circles" )
         .value< unsigned int >( );
 
       float circleSeparation =
-        neuronRep.getProperty("circles separation").value< float >( );
+        entityRep.getProperty("circles separation").value< float >( );
       float colorSeparation =
-          neuronRep.getProperty("circles color separation").value< float >( );
-      scoop::SequentialColorMap colorMap = neuronRep
+          entityRep.getProperty("circles color separation").value< float >( );
+      scoop::SequentialColorMap colorMap = entityRep
         .getProperty("circles color map").value< scoop::SequentialColorMap >( );
 
       float realCircleSeparation = circleSeparation * size;
@@ -111,7 +102,7 @@ namespace nslib
       auto barFill = new QGraphicsRectItem(
         halfBarWidth, halfBarHeight,
         roundf(barWidth *
-        neuronRep.getProperty( "line perc" ).value< float >( )),
+        entityRep.getProperty( "line perc" ).value< float >( )),
         barHeight);
       barFill->setPen( Qt::NoPen );
       barFill->setBrush( QColor( bgColor ));
@@ -120,7 +111,7 @@ namespace nslib
       if ( nslib::Config::showEntitiesName( ))
       {
         auto text = new QGraphicsTextItem( QString::fromStdString(
-          neuronRep.getProperty( "Entity name" ).value<std::string>( )));
+          entityRep.getProperty( "Entity name" ).value<std::string>( )));
         text->setPos( -0.32f * text->boundingRect( ).width( ),
           -0.32f * text->boundingRect( ).height( ));
         text->setDefaultTextColor( QColor::fromRgb( 0, 0, 0, 255 ));
@@ -129,7 +120,7 @@ namespace nslib
       }
 
 
-      this->_parentRep = &( const_cast< NeuronSuperPopRep& >( neuronRep ));
+      this->_parentRep = &( const_cast< NeuronSuperPopRep& >( entityRep ));
     }
 
     void NeuronSuperPopItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )

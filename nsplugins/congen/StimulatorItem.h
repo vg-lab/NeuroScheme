@@ -49,7 +49,7 @@ namespace nslib
 
     public:
 
-      StimulatorItem( const StimulatorRep& stimulatorRep,
+      StimulatorItem( const StimulatorRep& entityRep,
         unsigned int size = 100, bool interactive = true );
 
       virtual ~StimulatorItem( void ) {}

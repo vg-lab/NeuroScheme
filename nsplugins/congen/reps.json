@@ -12,6 +12,10 @@
                     "type": "Color"
                 },
                 {
+                    "name": "Entity name",
+                    "type": "std::string"
+                },
+                {
                     "name": "line perc",
                     "type": "float"
                 }
@@ -64,6 +68,10 @@
                 {
                     "name": "color",
                     "type": "Color"
+                },
+                {
+                    "name": "Entity name",
+                    "type": "std::string"
                 },
                 {
                     "name": "line perc",
