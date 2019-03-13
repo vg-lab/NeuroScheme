@@ -33,6 +33,9 @@ namespace nslib
   {
   public:
     GridLayout( void );
+    void padding( float paddingX, float paddingY );
+    float paddingX( void ) const;
+    float paddingY( void ) const;
     // void displayItems( QGraphicsScene* _scene,
     //                    const shift::Representations& reps );
   protected:

@@ -57,6 +57,16 @@ namespace nslib
       SLOT( refreshCanvas( )));
   }
 
+  void CircularLayout::radius( float radius)
+  {
+    _lineEditRadius->setValue( radius );
+  }
+
+  float CircularLayout::radius( ) const
+  {
+    return _lineEditRadius->value( );
+  }
+
   void CircularLayout::_arrangeItems( const shift::Representations& reps,
     bool animate, const shift::Representations& postFilterReps )
   {
@@ -260,7 +270,9 @@ namespace nslib
 
   Layout* CircularLayout::clone( void ) const
   {
-    return new CircularLayout( );
+    CircularLayout* layout = new CircularLayout( );
+    layout->radius(this->radius( ));
+    return layout;
   }
 
 }

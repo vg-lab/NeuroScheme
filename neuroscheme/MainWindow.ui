@@ -236,7 +236,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/showNoHierarchyEntities.svg</normaloff>:/icons/showNoHierarchyEntities.svg</iconset>
+     <normaloff>:/icons/showEntitiesName.svg</normaloff>:/icons/showEntitiesName.svg</iconset>
    </property>
    <property name="text">
     <string>Show &amp;entities name</string>

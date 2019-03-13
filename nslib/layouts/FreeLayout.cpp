@@ -125,6 +125,7 @@ namespace nslib
       true, true );
 
     shift::Representations removeReps;
+    shift::Representations updateReps;
     for( const auto& oldRep : _entitiesReps )
     {
       if( std::find( representations.begin( ), representations.end( ),
@@ -132,9 +133,24 @@ namespace nslib
       {
         removeReps.push_back( oldRep );
       }
+      else
+      {
+        updateReps.push_back( oldRep );
+      }
     }
     _removeRepresentations( removeReps );
-    _addRepresentations( representations, true );
+    shift::Representations newReps;
+    for( const auto& newRep : representations )
+    {
+      if( std::find( updateReps.begin( ), updateReps.end( ),
+        newRep ) == updateReps.end( ))
+      {
+        newReps.push_back( newRep );
+      }
+    }
+
+    _addRepresentations( newReps, true );
+    //_addRepresentations( updateReps, true );
     _entitiesReps = representations;
 
     removeRelationshipsReps( );
@@ -147,13 +163,18 @@ namespace nslib
         newRepresentations, "aggregatedConnectsTo", true );
       _relationshipReps = newRepresentations;
       _addRepresentations( _relationshipReps, false );
-
       OpConfig opConfig( &_canvas->scene( ), false, _isGrid );
       for ( auto& relationshipRep : _relationshipReps )
       {
         relationshipRep->preRender( &opConfig );
       }
     }
+  }
+
+  void FreeLayout::refresh( bool animate )
+  {
+    //init( );
+    display( _canvas->allEntities( ), _canvas->reps( ), animate );
   }
 
   void FreeLayout::_addRepresentations( const shift::Representations& reps,

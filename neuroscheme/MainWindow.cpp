@@ -699,7 +699,7 @@ void MainWindow::toggleShowEntitiesName( void )
   }
   for ( auto canvas : nslib::PaneManager::panes( ))
   {
-    canvas->displayEntities( canvas->sceneEntities( ), false, false );
+    canvas->displayEntities( false, false );
   }
 
 }

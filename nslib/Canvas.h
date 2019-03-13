@@ -96,7 +96,7 @@ namespace nslib
     void displayEntities( bool animate, bool refreshProperties );
     void setEntities( shift::Entities& entities_ );
 //    void displayReps( shift::Representations&, bool animate );
-    Canvas* clone( void ) const;
+    Canvas* clone( void );
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );
     shift::Entities& allEntities( void ) { return _entities; }

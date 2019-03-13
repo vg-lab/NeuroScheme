@@ -162,6 +162,11 @@ namespace nslib
     unsigned int repCreatorId,
     const bool freeLayoutInUse_)
   {
+    std::vector<QGraphicsScene*> scenes;
+    for( auto canvas : PaneManager::panes( ))
+    {
+      scenes.push_back(&canvas->scene( ));
+    }
     shift::RepresentationCreator* creatorRep_ =
       RepresentationCreatorManager::getCreator( repCreatorId );
     for ( shift::Representation* rep : entityReps_ )
@@ -169,28 +174,45 @@ namespace nslib
       creatorRep_->updateRepresentation( entity_, rep );
       auto graphicsItemRep =
         dynamic_cast< QGraphicsItemRepresentation* >( rep );
-      for( auto canvas : PaneManager::panes( ))
+      auto graphicsItems = graphicsItemRep->items( );
+      if( freeLayoutInUse_ )
       {
-        auto canvasReps = canvas->reps( );
-        if ( std::find( canvasReps.begin( ), canvasReps.end( ), rep )
-          != canvasReps.end( ))
+        for( auto itemIt : graphicsItems )
         {
-          auto item = graphicsItemRep->item( &canvas->scene( ));
-          canvas->scene( ).removeItem( item );
-          if( freeLayoutInUse_ )
+          auto item = itemIt.second;
+          auto scene = itemIt.first;
+          if ( item && scene )
           {
-            auto pos = item->pos( );
-            graphicsItemRep->deleteItem( &canvas->scene( ));
-            auto newItem = graphicsItemRep->item( &canvas->scene( ));
-            canvas->scene( ).addItem( newItem );
-            newItem->setScale( canvas->repsScale( ));
-            newItem->setPos( pos );
-          }
-          else
-          {
-            graphicsItemRep->deleteItem( &canvas->scene( ));
+            if( std::find( scenes.begin( ), scenes.end( ), scene ) ==
+              scenes.end( ))
+            {
+              graphicsItemRep->items( ).erase( scene );
+            }
+            else
+            {
+              auto items = scene->items( );
+              auto pos = item->pos( );
+              auto scale = item->scale( );
+              if( items.contains( item ))
+              {
+                graphicsItemRep->deleteItem( scene );
+                auto newItem = graphicsItemRep->item( scene );
+                scene->removeItem( item );
+                scene->addItem( newItem );
+                newItem->setScale( scale );
+                newItem->setPos( pos );
+              }
+              else
+              {
+                graphicsItemRep->deleteItem( scene );
+              }
+            }
           }
         }
+      }
+      else
+      {
+        graphicsItemRep->clearItems( );
       }
     }
   }

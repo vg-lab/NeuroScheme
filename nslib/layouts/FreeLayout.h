@@ -38,6 +38,8 @@ namespace nslib
     void startMoveRepresentation( QGraphicsItem* item_,
       const QPointF clickPos_ );
 
+    void refresh( bool animate ) override;
+
     void stopMoveActualRepresentation( void );
 
     void init( void );

@@ -213,14 +213,12 @@ namespace nslib
     //                                                         relationshipReps,
     //                                                         "connectsTo" );
 
-    if ( !animate )
-    {
-      _clearScene( );
-      if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
-        _addRepresentations( preFilterRepresentations );
-      else
-        _addRepresentations( representations );
-    }
+    _clearScene( );
+    if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
+      _addRepresentations( preFilterRepresentations );
+    else
+      _addRepresentations( representations );
+
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
