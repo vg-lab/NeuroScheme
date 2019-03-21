@@ -151,6 +151,13 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionHome, SIGNAL( triggered( )),
     this, SLOT( home( )));
 
+  _ui->actionShowNoHierarchyEntities->setChecked( true );
+  _ui->actionShowEntitiesName->setChecked( true );
+  _ui->actionShowConnectivity->setChecked( true );
+  nslib::Config::showNoHierarchyEntities( true );
+  nslib::Config::showEntitiesName( true );
+  nslib::Config::showConnectivity( true );
+
   QSplitter* widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );

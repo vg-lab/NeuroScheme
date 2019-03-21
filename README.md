@@ -136,6 +136,9 @@ options regarding layouts, filtering and sorting capabilities.
 Clicking in the toolbar "drawer" icon a side panel is shown containing the
 options regarding stored selections.
 
+**Note:** The "free movement layout" and the "multi-panel" are still in early
+development and may cause some bugs.
+
 #### Key modifiers
 
 * Moving items. By holding ```shift``` key while clicking over an item and moving

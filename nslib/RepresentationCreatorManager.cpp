@@ -195,9 +195,9 @@ namespace nslib
               auto scale = item->scale( );
               if( items.contains( item ))
               {
+                scene->removeItem( item );
                 graphicsItemRep->deleteItem( scene );
                 auto newItem = graphicsItemRep->item( scene );
-                scene->removeItem( item );
                 scene->addItem( newItem );
                 newItem->setScale( scale );
                 newItem->setPos( pos );
