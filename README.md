@@ -1,8 +1,12 @@
+<img src="neuroscheme/icons/ns_icon.png"  width="50" height="50">
+
 # NeuroScheme
+
+![NeuroScheme screenshots](doc/screenshots/ns_screenshots.png)
 
 ## Introduction
 
-NeuroScheme is a tool for navigating, exploring and interacting with
+NeuroScheme is a tool for navigating, exploring, creating and interacting with
 NeuroScience data using abstract, schematic or expressive representations.
 
 ## Dependencies
@@ -21,8 +25,8 @@ NeuroScience data using abstract, schematic or expressive representations.
     * (TODO) gmrvlex: enables sending focus messages
     * (TODO) Deflect: enables streaming the main window of the app
 
-(1) Automatically download and build
-(2) Automatically download and build uncommenting .gitsubprojects entry
+* (1) Automatically downloaded and build
+* (2) Automatically downloaded and build uncommenting .gitsubprojects entry
 
 In order to check which optional dependencies have been used the following
 command can be used:
@@ -34,14 +38,29 @@ command can be used:
 
 ## Building
 
-NeuroScheme has been successfully built and used on Ubuntu 16.04/17.04, Mac OSX
+NeuroScheme has been successfully built and used on Ubuntu 16.04/18.04, Mac OSX
 Yosemite/Sierra and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
 enough to build it just with the required dependencies.
 
 ```bash
-git clone --recursive https://gitlab.gmrv.es/nsviz/NeuroScheme.git
+git clone --recursive https://github.com/gmrvvis/NeuroScheme
 mkdir NeuroScheme/build && cd NeuroScheme/build
 cmake .. -DCLONE_SUBPROJECTS=ON -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+## Updating
+
+If you have already built NeuroScheme and want to update to the latest available
+version, after pulling the repository and before building, you will have to
+update the automatically downloaded dependencies. This can be done just running
+```make rebase```
+
+```bash
+cd neuroscheme_source_dir
+git pull
+cd build
+make rebase
 make
 ```
 
@@ -55,12 +74,21 @@ following:
 ./bin/NeuroScheme --help
 ```
 
-NeuroScheme accepts different domains (in example, cortex and congen domains)
+NeuroScheme accepts different domains (for example, cortex and congen domains)
 which can be selected when GUI is started or via the "-d" parameter. Each domain
-can have each own specific parameters, which can be displayed with --help
+can have its own specific parameters, which can be displayed with ```--help```
 argument.
 
 ### Loading and exporting data
+
+#### All domains
+
+All domains can import from and export to a custom JSON format, accessible via a
+menu or using CLI arguments (only for importing).
+
+```bash
+./bin/NeuroScheme -d domain --json /path/to/file.json
+```
 
 #### Cortex domain
 
@@ -75,18 +103,23 @@ try to visualize a very simple scene by running:
 
 #### Congen domain
 
-Congen domain allows importing and exporting data to NeuroML.
+
+For congen domain you can try to visualize a very simple example scene by
+running:
+
+```bash
+./bin/NeuroScheme -d cortex -xml ../doc/examples/congen-example.json
+```
+
+Congen domain also allows importing and exporting data to NeuroML. Please note
+that exporting to NeuroML removes the hierarchy. In case you want to keep the
+created hierarchy please export it to JSON as explained previously.
+
+Importing and exporting to NeuroML operations are available through the GUI menu
+and also importing is available through CLI arguments:
 
 ```bash
 ./bin/NeuroScheme -d congen -x /path/to/neuroML.xml
-```
-
-#### All domains
-
-All domains have an importer and exporter to our custom JSON format.
-
-```bash
-./bin/NeuroScheme -d domain --json /path/to/file.json
 ```
 
 ### Interacting with data
@@ -97,15 +130,26 @@ the proper option (if available in the specific dataset). The new visualization
 can be shown in the same panel or in a new one (horizontal or vertical pane
 splitting can be selected under "Panes" menu).
 
-Clicking in the toolbar "gear" icon a side panel is shown containing the options
-regarding layouts, filtering and sorting capabilities.
+When clicking in the toolbar "gear" icon a side panel is shown containing the
+options regarding layouts, filtering and sorting capabilities.
 
 Clicking in the toolbar "drawer" icon a side panel is shown containing the
 options regarding stored selections.
 
+#### Key modifiers
+
+* Moving items. By holding ```shift``` key while clicking over an item and moving
+  the mouse, NeuroScheme automatically changes the layout to "free movement
+  layout".
+
+* Inspecting items. By holding ```ctrl``` key while passing the mouse over an
+  item, the inspector is opened (or updated in case it was already opened)
+  showing the attributes of the item and also allowing to edit and save them.
+
+
 ### Creating data
 
-The creating feature is still in early development stage. If you want to try it
+The creating feature is still in a development stage. If you want to try it
 out you can start with a clear canvas or load a dataset as specified before. To
 create entities you can click on the background of the canvas, select the type
 of entity and define its properties in the side panel. To edit or duplicate an
