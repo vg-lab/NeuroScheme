@@ -56,17 +56,17 @@ namespace nslib
     _scaleSlider->setValue( 20 );
 
     layout_->addWidget( _scaleLabel, 0, 0, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _scaleSlider, 0, 1, 1, 2,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _xLabel, 1, 0, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _propertyXSelector, 1, 1, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _yLabel, 2, 0, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _propertyYSelector, 2, 1, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
 
     connect( _propertyXSelector, SIGNAL( currentIndexChanged( int )),
              this, SLOT( _propertiesChanged( )));

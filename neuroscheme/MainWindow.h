@@ -103,7 +103,8 @@ protected:
   QString _lastOpenedFileName;
 
 private:
-
+  const unsigned int minDockSizeX;
+  const unsigned int minDockSizeY;
   Ui::MainWindow* _ui;
 
 }; // class MainWindow

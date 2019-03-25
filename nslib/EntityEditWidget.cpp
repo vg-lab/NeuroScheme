@@ -66,8 +66,8 @@ namespace nslib
     , _entityUpdateTimer( new QTimer( this ))
   {
     _gridLayout->setAlignment( Qt::AlignTop );
+    _gridLayout->setColumnStretch( 0, 1 );
     _gridLayout->setColumnStretch( 1, 1 );
-    _gridLayout->setColumnMinimumWidth( 1, 150 );
 
     _titleLabel->setStyleSheet( "font-weight:bold" );
 
@@ -168,7 +168,6 @@ namespace nslib
       {
         if( _isNewOrDuplicated )
         {
-          _separation->setVisible( true );
           _numEntitiesLabel->setVisible( true );
           _numNewEntities->setText( "1" );
           _numNewEntities->setVisible( true );
@@ -191,7 +190,6 @@ namespace nslib
         else
         {
           _eraseButton->setVisible( true );
-          _separation->setVisible( false );
           _numEntitiesLabel->setVisible( false );
           _numNewEntities->setVisible( false );
           _validationButton->setText( tr( "Save" ));
@@ -463,68 +461,20 @@ namespace nslib
       }
     }
 
-    updateRelatedEntities( dataEntities, relChildOf, freeLayoutInUse,
-      _entity );
-
-
-  }
-
-  void EntityEditWidget::updateRelatedEntities(
-    shift::EntitiesWithRelationships& dataEntities_,
-    shift::RelationshipOneToOne& relChildOf_, bool freeLayoutInUse_,
-    shift::Entity* entity_ ) const
-  {
-    shift::Entities updatedEntities;
-    updatedEntities.add( entity_ );
-    auto parentID = relChildOf_[ entity_->entityGid( ) ].entity;
+    shift::Entities updatedEntities_;
+    updatedEntities_.add( _entity );
+    auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
     while( parentID > 0 )
     {
-      const auto parent = dataEntities_.at( parentID );
+      const auto parent = dataEntities.at( parentID );
       parent->autoUpdateProperties( );
-      updatedEntities.add( parent );
-      parentID = relChildOf_[ parentID ].entity;
+      updatedEntities_.add( parent );
+      parentID = relChildOf[ parentID ].entity;
     }
-
-
-    for ( const auto& creatorPair : RepresentationCreatorManager::creators( ))
+    for (auto& creator : RepresentationCreatorManager::creators( ))
     {
-      bool representationUpdated = false;
-      for (const auto updatedEntity : updatedEntities.vector( ))
-      {
-        representationUpdated =
-          creatorPair.second->entityUpdatedOrCreated( updatedEntity );
-      }
-      if( representationUpdated )
-      {
-        RepresentationCreatorManager::clearEntitiesCache(
-          creatorPair.first, freeLayoutInUse_ );
-      }
-      else if ( _isEditing || ( _isNewOrDuplicated && _parentEntity ))
-      {
-        auto entitiesToReps =
-          RepresentationCreatorManager::entitiesToReps( creatorPair.first );
-        if ( !_isEditing )
-        {
-          updatedEntities.remove( entity_ );
-        }
-        for( const auto& entity : updatedEntities.vector( ))
-        {
-          const auto entityReps = entitiesToReps.find( entity );
-          if( entityReps == entitiesToReps.end( ))
-          {
-            Loggers::get( )->log(
-              "Not found the representation of the edited entity.",
-              LOG_LEVEL_WARNING );
-          }
-          else
-          {
-            RepresentationCreatorManager::updateEntitiyRepresentations( entity,
-              entityReps->second, creatorPair.first, freeLayoutInUse_ );
-          }
-        }
-      }
-      RepresentationCreatorManager::clearRelationshipsCache(
-        creatorPair.first );
+      RepresentationCreatorManager::updateEntities( updatedEntities_,
+        creator.first, freeLayoutInUse );
     }
 
     for ( auto pane : PaneManager::panes( ))

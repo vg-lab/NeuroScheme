@@ -234,5 +234,10 @@ namespace nslib
       }
     }
 
+    bool ConnectionArrowItem::connectionRep( void ) const
+    {
+      return true;
+    }
+
   } // namespace congen
 } // namespace nslib

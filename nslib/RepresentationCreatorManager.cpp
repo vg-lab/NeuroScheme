@@ -22,6 +22,7 @@
 #include "RepresentationCreatorManager.h"
 #include "reps/QGraphicsItemRepresentation.h"
 #include "DataManager.h"
+#include "Loggers.h"
 
 namespace nslib
 {
@@ -214,6 +215,69 @@ namespace nslib
       {
         graphicsItemRep->clearItems( );
       }
+    }
+  }
+
+  void RepresentationCreatorManager::updateEntities(
+    const shift::Entities& updatedEntities_,
+    const unsigned int repCreatorId,
+    const bool freeLayoutInUse_ )
+  {
+    bool representationUpdated = false;
+    auto creator = RepresentationCreatorManager::getCreator( repCreatorId );
+    for (const auto updatedEntity : updatedEntities_.vector( ))
+    {
+      representationUpdated = creator->entityUpdatedOrCreated( updatedEntity )
+        || representationUpdated;
+    }
+    if( representationUpdated )
+    {
+      RepresentationCreatorManager::clearEntitiesCache(
+        repCreatorId, freeLayoutInUse_ );
+    }
+    else
+    {
+      auto entitiesToReps =
+        RepresentationCreatorManager::entitiesToReps( repCreatorId);
+      for( const auto& entity : updatedEntities_.vector( ))
+      {
+        const auto entityReps = entitiesToReps.find( entity );
+        if( entityReps == entitiesToReps.end( ))
+        {
+          Loggers::get( )->log(
+            "Not found the representation of the edited entity.",
+             LOG_LEVEL_WARNING );
+        }
+        else
+        {
+          RepresentationCreatorManager::updateEntitiyRepresentations( entity,
+            entityReps->second, repCreatorId, freeLayoutInUse_ );
+        }
+      }
+    }
+    RepresentationCreatorManager::clearRelationshipsCache( repCreatorId );
+  }
+
+  void RepresentationCreatorManager::removeEntity(
+    shift::Entity* entity, unsigned int repCreatorId )
+  {
+    auto repsToEntities = _repsToEntities[ repCreatorId ];
+    auto entitiesToReps = _entitiesToReps[ repCreatorId ];
+    auto entityReps = entitiesToReps.find(entity);
+    if ( entityReps != entitiesToReps.end( ))
+    {
+      for ( const auto rep : entityReps->second )
+      {
+        repsToEntities.erase( rep );
+      }
+      entitiesToReps.erase( entity );
+    }
+    auto gidToReps = _gidsToEntitiesReps[ repCreatorId ];
+
+    auto entityGid = entity->entityGid( );
+    if (gidToReps.find( entityGid ) != gidToReps.end( ))
+    {
+      gidToReps.erase( entityGid );
     }
   }
 

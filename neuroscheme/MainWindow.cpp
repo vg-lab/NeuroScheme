@@ -51,6 +51,8 @@
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
+  , minDockSizeX(305u)
+  , minDockSizeY(25u)
   , _ui( new Ui::MainWindow )
 {
   ( void ) zeroEQ;
@@ -183,7 +185,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     _layoutsDock = new QDockWidget( );
     this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
       _layoutsDock, Qt::Vertical);
-    _layoutsDock->setMinimumSize( 300, 300 );
+    _layoutsDock->setMinimumSize( minDockSizeX, minDockSizeY );
     _layoutsDock->setSizePolicy( QSizePolicy::MinimumExpanding,
       QSizePolicy::Expanding );
     _layoutsDock->setFeatures( QDockWidget::DockWidgetClosable |
@@ -212,25 +214,23 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   // Stored selections dock
   {
     _storedSelections.dock = new QDockWidget( );
+    _storedSelections.dock->setMinimumSize( minDockSizeX, minDockSizeY );
     _storedSelections.dock->setWindowTitle( QString( "Stored selections" ));
     _storedSelections.dock->setSizePolicy( QSizePolicy::MinimumExpanding,
-                                           QSizePolicy::MinimumExpanding );
+      QSizePolicy::MinimumExpanding );
 
     _storedSelections.dock->setFeatures( QDockWidget::DockWidgetClosable |
-                                         QDockWidget::DockWidgetMovable |
-                                         QDockWidget::DockWidgetFloatable);
+      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-                         _storedSelections.dock,
-                         Qt::Vertical );
+      _storedSelections.dock, Qt::Vertical );
 
     _storedSelections.dock->close( );
     _ui->actionStoredSelections->setChecked( false );
     connect( _storedSelections.dock->toggleViewAction( ),
-             SIGNAL( toggled( bool )),
-             _ui->actionStoredSelections,
-             SLOT( setChecked( bool )));
+      SIGNAL( toggled( bool )), _ui->actionStoredSelections,
+      SLOT( setChecked( bool )));
     connect( _ui->actionStoredSelections, SIGNAL( triggered( )),
-             this, SLOT( updateStoredSelectionsDock( )));
+      this, SLOT( updateStoredSelectionsDock( )));
 
 
     QWidget* dockWidget = new QWidget( );
@@ -253,8 +253,8 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     _storedSelections.table->verticalHeader( )->setVisible( false );
 
     connect( _storedSelections.table->horizontalHeader( ),
-             SIGNAL( sectionClicked( int )), this,
-             SLOT( sortStoredSelectionsTable( int )));
+      SIGNAL( sectionClicked( int )), this,
+      SLOT( sortStoredSelectionsTable( int )));
 
     _storedSelections.table->setEditTriggers(
       QAbstractItemView::NoEditTriggers );
@@ -263,27 +263,29 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     _storedSelections.table->setSelectionMode(
       QAbstractItemView::SingleSelection );
 
-    selectionLayout->addWidget( _storedSelections.table, 0, 0, 1, 4 );
+    selectionLayout->addWidget( _storedSelections.table, 0, 0, 1, 2 );
 
     QPushButton* saveButton = new QPushButton( "Save selection" );
     saveButton->setToolTip( QString( "Saves the current selection" ));
-    selectionLayout->addWidget( saveButton, 1, 0, 1, 2 );
+    selectionLayout->addWidget( saveButton, 1, 0 );
 
     connect( saveButton, SIGNAL(clicked()), this, SLOT( storeSelection( ) ));
 
     QPushButton* restoreButton = new QPushButton( " Restore selection" );
     restoreButton->setToolTip( QString ( "Restores the selection to current" ));
-    selectionLayout->addWidget( restoreButton, 1, 2, 1, 2);
+    selectionLayout->addWidget( restoreButton, 1, 1 );
 
     connect( restoreButton, SIGNAL( clicked( )),
              this, SLOT( restoreSelection( )));
 
     QPushButton* deleteButton = new QPushButton( "Delete selected" );
     deleteButton->setToolTip( QString( "Deletes the selected selection"));
-    selectionLayout->addWidget( deleteButton, 2, 1, 1, 2 );
+    selectionLayout->addWidget( deleteButton, 2, 0, 1, 2 );
 
+    selectionLayout->setColumnStretch( 0, 1 );
+    selectionLayout->setColumnStretch( 1, 1 );
     connect( deleteButton, SIGNAL( clicked( )), this,
-             SLOT( deleteStoredSelection( )));
+      SLOT( deleteStoredSelection( )));
 
     _storedSelections.dock->setWidget( dockWidget );
     _storedSelections.dock->close( );
@@ -292,6 +294,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 
   {
     _entityEditDock = new QDockWidget;
+    _entityEditDock->setMinimumSize( minDockSizeX, minDockSizeY );
     nslib::EntityEditWidget::parentDock( _entityEditDock );
     _entityEditDock->setWindowTitle( QString( "Entity Inspector" ));
     _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
@@ -307,6 +310,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 
   {
     _connectionEditDock = new QDockWidget;
+    _connectionEditDock->setMinimumSize( minDockSizeX, minDockSizeY );
     nslib::ConnectionRelationshipEditWidget::parentDock( _connectionEditDock );
     _connectionEditDock->setWindowTitle( QString( "Connection Inspector" ));
     _connectionEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
@@ -321,6 +325,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   }
   {
     _connectionListDock = new QDockWidget;
+    _connectionListDock->setMinimumSize( minDockSizeX, minDockSizeY );
     nslib::EntityConnectionListWidget::parentDock( _connectionListDock );
     _connectionListDock->setWindowTitle( QString( "Entity Connections List" ));
     _connectionListDock->setSizePolicy( QSizePolicy::MinimumExpanding,

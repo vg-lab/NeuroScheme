@@ -66,37 +66,37 @@ namespace nslib
 
     auto row = 0;
     layout_->addWidget( _propertiesSelector, row, 0, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _addFilterButton, row, 1, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
 
     layout_->addWidget( _useOpacityLabel, ++row, 0, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
     layout_->addWidget( _useOpacityCheckBox, row, 1, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
     layout_->addWidget( _opacitySlider, ++row, 0, 1, 2 );
 
     layout_->addWidget( _autoFilterLabel, ++row, 0, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
     layout_->addWidget( _autoFilterCheckBox, row, 1, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
     layout_->addWidget( _filterButton, ++row, 0, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
 
     connect( _addFilterButton, SIGNAL( pressed( )),
-             this, SLOT( addedFilterProperty( )));
+      this, SLOT( addedFilterProperty( )));
 
     connect( _autoFilterCheckBox, SIGNAL( pressed( )),
-             this, SLOT( _autoFilterCheckBoxChanged( )));
+      this, SLOT( _autoFilterCheckBoxChanged( )));
 
     connect( _useOpacityCheckBox, SIGNAL( clicked( )),
-             this, SLOT( _useOpacityCheckBoxChanged( )));
+      this, SLOT( _useOpacityCheckBoxChanged( )));
 
     connect( _filterButton, SIGNAL( pressed( )),
-             this, SLOT( refreshParentLayout( )));
+      this, SLOT( refreshParentLayout( )));
 
     connect( _opacitySlider, SIGNAL( valueChanged( int )),
-             this, SLOT( refreshParentLayout( )));
+      this, SLOT( refreshParentLayout( )));
 
   }
 

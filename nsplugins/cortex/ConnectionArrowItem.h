@@ -66,7 +66,7 @@ namespace nslib
 
       QPropertyAnimation& lineAnim( void ) { return _lineAnim; }
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) override
       {
         auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
         if ( rep )
@@ -91,7 +91,7 @@ namespace nslib
         _arrowOriItem->setBrush( QBrush( color_ ));
       }
 
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override
       {
         auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
         if ( rep )
@@ -105,6 +105,11 @@ namespace nslib
         this->setPen( QPen( QBrush( color ), _arrowThickness ));
         _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
         _arrowOriItem->setBrush( QBrush( color ));
+      }
+
+      virtual bool connectionRep( void ) const override
+      {
+        return true;
       }
 
       static QColor color;
