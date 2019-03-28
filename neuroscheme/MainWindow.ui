@@ -221,10 +221,10 @@
      <normaloff>:/icons/showNoHierarchyEntities.svg</normaloff>:/icons/showNoHierarchyEntities.svg</iconset>
    </property>
    <property name="text">
-    <string>Show &amp;no hierarchy entities</string>
+    <string>Show &amp;non-hierarchical entities</string>
    </property>
    <property name="toolTip">
-    <string>Show no hierarchy entities</string>
+    <string>Show non-hierarchical entities</string>
    </property>
    <property name="shortcut">
     <string>Alt+I</string>
