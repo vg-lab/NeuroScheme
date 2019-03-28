@@ -44,7 +44,8 @@ namespace nslib
     : QWidget ( parentWidget_ )
     , _originEntity( nullptr )
     , _destEntity( nullptr )
-    , _labelRel( new QLabel )
+    , _labelTitleRel( new QLabel )
+    , _labelEntitiesRel( new QLabel )
     , _autoCloseCheck( new QCheckBox( ))
     , _validationButton( new QPushButton )
     , _eraseButton( new QPushButton( QString( tr( "Delete" ))))
@@ -54,12 +55,18 @@ namespace nslib
   {
   unsigned int numProp = 0u;
   _gridLayout->setAlignment( Qt::AlignTop );
+  _gridLayout->setColumnStretch( 0, 1 );
   _gridLayout->setColumnStretch( 1, 1 );
-  _gridLayout->setColumnMinimumWidth( 1, 150 );
-  _labelRel->setStyleSheet( "font-weight:bold" );
-  _gridLayout->addWidget( _labelRel, numProp, 0, 1, 0 );
+  _labelTitleRel->setStyleSheet( "font-weight:bold" );
+  _labelEntitiesRel->setStyleSheet( "font-weight:bold" );
+  _gridLayout->addWidget( _labelTitleRel, numProp, 0, 1, 0 );
+  _gridLayout->addWidget( _labelEntitiesRel, ++numProp, 0, 1, 0 );
 
   _gridLayout->addLayout(_gridPropertiesLayout, ++numProp, 0, 1, 2 );
+
+  auto separation = new QFrame( );
+  separation->setFrameShape( QFrame::HLine );
+  _gridLayout->addWidget( separation, ++numProp, 0, 1, 2 );
 
   _gridLayout->addWidget( _cancelButton, ++numProp, 0 );
 
@@ -125,7 +132,6 @@ namespace nslib
         .value<std::string>( );
       const auto destName = _destEntity->getProperty( "Entity name" )
         .value<std::string>( );
-      QString relationName;
       if( _isAggregated )
       {
         auto& relAggregatedConnectsTo = *( DataManager::entities( )
@@ -140,7 +146,8 @@ namespace nslib
           cancelDialog( );
           return;
         }
-        relationName = tr( "Editing Aggregated Relationship Parameters: " );
+        _labelTitleRel->setText(
+          tr( "Editing Aggregated Relationship Parameters: " ));
         _isNew = false;
       }
       else
@@ -152,7 +159,7 @@ namespace nslib
         if( _propObject )
         {
           _isNew = false;
-          relationName = tr( "Creating Relationship Parameters: " );
+          _labelTitleRel->setText( tr( "Editing Relationship Parameters: " ));
         }
         else
         {
@@ -163,12 +170,12 @@ namespace nslib
           _propObject->setProperty( "Name",
             "R:" + originName + "-" + destName );
           _isNew = true;
-          relationName = tr( "Editing Relationship Parameters: " );
+          _labelTitleRel->setText( tr( "Creating Relationship Parameters: " ));
         }
       }
       assert( _propObject );
-      _labelRel->setText( relationName
-        + QString::fromStdString( originName + " - " + destName ));
+      _labelEntitiesRel->setText(
+        QString::fromStdString( originName + " - " + destName ));
 
       unsigned int numProp = 0u;
       QLayoutItem* item;

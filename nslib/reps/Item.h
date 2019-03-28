@@ -56,6 +56,11 @@ namespace nslib
       _parentRep = parentRep_;
     }
 
+    virtual bool connectionRep( void ) const
+    {
+      return false;
+    }
+
     QPropertyAnimation& posAnim( ) { return _posAnim; }
     QPropertyAnimation& scaleAnim( ) { return _scaleAnim; }
   protected:

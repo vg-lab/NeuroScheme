@@ -74,7 +74,8 @@ namespace nslib
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
     bool _isNew;
-    QLabel* _labelRel;
+    QLabel* _labelTitleRel;
+    QLabel* _labelEntitiesRel;
     QCheckBox* _autoCloseCheck;
     QPushButton* _validationButton;
     QPushButton* _eraseButton;

@@ -60,7 +60,10 @@ namespace nslib
     {
       auto it = _items.find( scene_ );
       if ( it != _items.end( ))
+      {
+        _items.erase(it);
         delete it->second;
+      }
     }
 
     const std::map< QGraphicsScene*, QGraphicsItem* >& items( void ) const

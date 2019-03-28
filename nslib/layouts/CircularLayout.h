@@ -33,6 +33,8 @@ namespace nslib
   {
   public:
     CircularLayout( void );
+    void radius( float radius );
+    float radius( void ) const;
 
   protected:
     void _arrangeItems( const shift::Representations& reps,

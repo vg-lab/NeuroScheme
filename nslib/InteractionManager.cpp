@@ -605,7 +605,8 @@ namespace nslib
       {
         const auto& initPoint = _tmpConnectionLine->line( ).p1( );
         _tmpConnectionLine->setLine( QLineF( initPoint, newPos ));
-        if ( shapeItem && dynamic_cast< Item* >( shapeItem ))
+        auto item = dynamic_cast< Item* >( shapeItem );
+        if ( shapeItem && item && !item->connectionRep( ))
         {
           InteractionManager::hoverEnterEvent( shapeItem, nullptr );
         }
@@ -1186,6 +1187,7 @@ namespace nslib
     {
       pane->removeEntity( entity_ );
     }
+    RepresentationCreatorManager::removeEntity( entity_ );
     delete entity_;
   }
 

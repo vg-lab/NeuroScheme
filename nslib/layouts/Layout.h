@@ -108,7 +108,7 @@ namespace nslib
 
     LayoutOptionsWidget* optionsWidget( void );
 
-    void refresh( bool animate = true );
+    virtual void refresh( bool animate = true );
 
     virtual void display( shift::Entities& entities,
                           shift::Representations& representations,

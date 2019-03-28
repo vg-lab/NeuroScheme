@@ -28,6 +28,8 @@
 #include "RepresentationCreatorManager.h"
 #include "reps/Item.h"
 #include <QHBoxLayout>
+#include <nslib/layouts/GridLayout.h>
+#include <nslib/layouts/CircularLayout.h>
 
 namespace nslib
 {
@@ -132,10 +134,22 @@ namespace nslib
 
   Canvas::~Canvas( void )
   {
-    if ( _graphicsView ) delete _graphicsView;
-    if ( _graphicsScene ) delete _graphicsScene;
+    if ( _graphicsView )
+    {
+      delete _graphicsView;
+    }
+    if ( _graphicsScene )
+    {
+      for( auto rep : _reps )
+      {
+        auto graphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( rep );
+        graphicsItemRep->deleteItem( _graphicsScene );
+        graphicsItemRep->items( ).erase( _graphicsScene );
+      }
+      delete _graphicsScene;
+    }
   }
-
 
   void Canvas::connectLayoutSelector( void )
   {
@@ -263,7 +277,7 @@ namespace nslib
     if ( index == _activeLayoutIndex )
     {
       Loggers::get( )->log( "Trying to change to a layout already in use",
-        LOG_LEVEL_WARNING );
+        LOG_LEVEL_VERBOSE );
       return;
     }
     Loggers::get( )->log( "Layout changed to " + std::to_string( index ),
@@ -297,7 +311,7 @@ namespace nslib
         }
 
         layout_->addWidget( _layouts.getLayout( index )->optionsWidget( ),
-                            2, 0 );
+          2, 0 );
         displayEntities( true, false );
         _layouts.getLayout( index )->optionsWidget( )->show( );
 
@@ -356,13 +370,14 @@ namespace nslib
     layout_->canvas( this );
   }
 
-  Canvas* Canvas::clone( void ) const
+  Canvas* Canvas::clone( void )
   {
     auto canvas = new Canvas( );
-    canvas->_properties = _properties;
-    canvas->_reps = _reps;
-    canvas->_entities = _entities;
-    canvas->_sceneEntities = _sceneEntities;
+    canvas->_properties = this->_properties;
+    canvas->_reps = this->_reps;
+    canvas->_entities = this->_entities;
+    canvas->_sceneEntities = this->_sceneEntities;
+    canvas->_repsScale = this->_repsScale;
     assert( canvas->scene( ).views( ).size( ) != 0 );
     for ( auto layout_ : _layouts.map( ))
     {
@@ -371,7 +386,40 @@ namespace nslib
       canvas->addLayout( newLayout );
     }
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
-    canvas->displayEntities( false, true );
+    switch ( this->_activeLayoutIndex )
+    {
+      case Layout::TLayoutIndexes::FREE:
+      {
+        FreeLayout* origFreeLayout = dynamic_cast< FreeLayout* >(
+          this->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+        FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
+          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+        freeLayout->init( );
+        bool moveNewEntities = origFreeLayout->moveNewEntitiesChecked( );
+        freeLayout->moveNewEntitiesChecked( false );
+        for( shift::Representation* rep : this->_reps )
+        {
+          auto graphicsItemRep =
+            dynamic_cast< QGraphicsItemRepresentation* >( rep );
+          if( graphicsItemRep )
+          {
+            auto oldItem = graphicsItemRep->item( &this->scene( ));
+            auto item = graphicsItemRep->item( &canvas->scene( ));
+            canvas->scene( ).addItem( item );
+            item->setScale( canvas->_repsScale );
+            item->setPos( oldItem->pos( ));
+          }
+        }
+        canvas->displayEntities( false, true );
+        freeLayout->moveNewEntitiesChecked( moveNewEntities );
+      }
+        break;
+      default:
+      {
+        canvas->displayEntities( false, true );
+      }
+        break;
+    }
     canvas->layouts( ).layoutSelector( )->setCurrentIndex(
       this->_activeLayoutIndex );
     canvas->connectLayoutSelector( );

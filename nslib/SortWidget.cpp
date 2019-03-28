@@ -50,9 +50,9 @@ namespace nslib
     _sortButton->setIcon( addIcon );
 
     layout_->addWidget( _propertiesSelector, 0, 0, 1, 1,
-                        Qt::AlignCenter | Qt::AlignLeft );
+      Qt::AlignCenter | Qt::AlignLeft );
     layout_->addWidget( _sortButton, 0, 1, 1, 2,
-                        Qt::AlignLeft );
+      Qt::AlignLeft );
 
     connect( _sortButton, SIGNAL( pressed( )),
              this, SLOT( addedSortProperty( )));

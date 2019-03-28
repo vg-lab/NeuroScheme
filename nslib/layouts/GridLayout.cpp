@@ -66,6 +66,22 @@ namespace nslib
 
   }
 
+  void GridLayout::padding( float paddingX, float paddingY )
+  {
+    _lineEditPaddingX->setValue( paddingX );
+    _lineEditPaddingY->setValue( paddingY );
+  }
+
+  float GridLayout::paddingX( ) const
+  {
+    return _lineEditPaddingX->value( );
+  }
+
+  float GridLayout::paddingY( ) const
+  {
+    return _lineEditPaddingY->value( );
+  }
+
   void GridLayout::_arrangeItems( const shift::Representations& reps,
     bool animate, const shift::Representations& postFilterReps )
   {
@@ -245,7 +261,9 @@ namespace nslib
 
   Layout* GridLayout::clone( void ) const
   {
-    return new GridLayout( );
+    GridLayout* layout = new GridLayout( );
+    layout->padding(this->paddingX( ),this->paddingY( ));
+    return layout;
   }
 
 }

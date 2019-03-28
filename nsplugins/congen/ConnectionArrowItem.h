@@ -68,15 +68,17 @@ namespace nslib
 
       QPropertyAnimation& lineAnim( void );
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
       virtual void hoverEnter( void );
 
       virtual void highlight( scoop::Color color_ );
 
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
       virtual void hoverLeave( void );
+
+      virtual bool connectionRep( void ) const override;
 
       static QColor color;
       static QColor hoverColor;

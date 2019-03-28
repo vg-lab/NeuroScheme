@@ -75,6 +75,14 @@ namespace nslib
       unsigned int repCreatorId = 0,
       const bool freeLayoutInUse_ = false );
 
+    static void updateEntities(
+      const shift::Entities& updatedEntities_,
+      const unsigned int repCreatorId = 0,
+      const bool freeLayoutInUse_ = false );
+
+    static void removeEntity(
+        shift::Entity* entity, unsigned int repCreatorId = 0 );
+
     static const shift::TRelatedEntitiesReps& relatedEntities(
         unsigned int repCreatorID = 0 );
 

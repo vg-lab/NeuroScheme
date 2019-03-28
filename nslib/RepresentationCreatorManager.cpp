@@ -22,6 +22,7 @@
 #include "RepresentationCreatorManager.h"
 #include "reps/QGraphicsItemRepresentation.h"
 #include "DataManager.h"
+#include "Loggers.h"
 
 namespace nslib
 {
@@ -162,6 +163,11 @@ namespace nslib
     unsigned int repCreatorId,
     const bool freeLayoutInUse_)
   {
+    std::vector<QGraphicsScene*> scenes;
+    for( auto canvas : PaneManager::panes( ))
+    {
+      scenes.push_back(&canvas->scene( ));
+    }
     shift::RepresentationCreator* creatorRep_ =
       RepresentationCreatorManager::getCreator( repCreatorId );
     for ( shift::Representation* rep : entityReps_ )
@@ -169,29 +175,109 @@ namespace nslib
       creatorRep_->updateRepresentation( entity_, rep );
       auto graphicsItemRep =
         dynamic_cast< QGraphicsItemRepresentation* >( rep );
-      for( auto canvas : PaneManager::panes( ))
+      auto graphicsItems = graphicsItemRep->items( );
+      if( freeLayoutInUse_ )
       {
-        auto canvasReps = canvas->reps( );
-        if ( std::find( canvasReps.begin( ), canvasReps.end( ), rep )
-          != canvasReps.end( ))
+        for( auto itemIt : graphicsItems )
         {
-          auto item = graphicsItemRep->item( &canvas->scene( ));
-          canvas->scene( ).removeItem( item );
-          if( freeLayoutInUse_ )
+          auto item = itemIt.second;
+          auto scene = itemIt.first;
+          if ( item && scene )
           {
-            auto pos = item->pos( );
-            graphicsItemRep->deleteItem( &canvas->scene( ));
-            auto newItem = graphicsItemRep->item( &canvas->scene( ));
-            canvas->scene( ).addItem( newItem );
-            newItem->setScale( canvas->repsScale( ));
-            newItem->setPos( pos );
-          }
-          else
-          {
-            graphicsItemRep->deleteItem( &canvas->scene( ));
+            if( std::find( scenes.begin( ), scenes.end( ), scene ) ==
+              scenes.end( ))
+            {
+              graphicsItemRep->items( ).erase( scene );
+            }
+            else
+            {
+              auto items = scene->items( );
+              auto pos = item->pos( );
+              auto scale = item->scale( );
+              if( items.contains( item ))
+              {
+                scene->removeItem( item );
+                graphicsItemRep->deleteItem( scene );
+                auto newItem = graphicsItemRep->item( scene );
+                scene->addItem( newItem );
+                newItem->setScale( scale );
+                newItem->setPos( pos );
+              }
+              else
+              {
+                graphicsItemRep->deleteItem( scene );
+              }
+            }
           }
         }
       }
+      else
+      {
+        graphicsItemRep->clearItems( );
+      }
+    }
+  }
+
+  void RepresentationCreatorManager::updateEntities(
+    const shift::Entities& updatedEntities_,
+    const unsigned int repCreatorId,
+    const bool freeLayoutInUse_ )
+  {
+    bool representationUpdated = false;
+    auto creator = RepresentationCreatorManager::getCreator( repCreatorId );
+    for (const auto updatedEntity : updatedEntities_.vector( ))
+    {
+      representationUpdated = creator->entityUpdatedOrCreated( updatedEntity )
+        || representationUpdated;
+    }
+    if( representationUpdated )
+    {
+      RepresentationCreatorManager::clearEntitiesCache(
+        repCreatorId, freeLayoutInUse_ );
+    }
+    else
+    {
+      auto entitiesToReps =
+        RepresentationCreatorManager::entitiesToReps( repCreatorId);
+      for( const auto& entity : updatedEntities_.vector( ))
+      {
+        const auto entityReps = entitiesToReps.find( entity );
+        if( entityReps == entitiesToReps.end( ))
+        {
+          Loggers::get( )->log(
+            "Not found the representation of the edited entity.",
+             LOG_LEVEL_WARNING );
+        }
+        else
+        {
+          RepresentationCreatorManager::updateEntitiyRepresentations( entity,
+            entityReps->second, repCreatorId, freeLayoutInUse_ );
+        }
+      }
+    }
+    RepresentationCreatorManager::clearRelationshipsCache( repCreatorId );
+  }
+
+  void RepresentationCreatorManager::removeEntity(
+    shift::Entity* entity, unsigned int repCreatorId )
+  {
+    auto repsToEntities = _repsToEntities[ repCreatorId ];
+    auto entitiesToReps = _entitiesToReps[ repCreatorId ];
+    auto entityReps = entitiesToReps.find(entity);
+    if ( entityReps != entitiesToReps.end( ))
+    {
+      for ( const auto rep : entityReps->second )
+      {
+        repsToEntities.erase( rep );
+      }
+      entitiesToReps.erase( entity );
+    }
+    auto gidToReps = _gidsToEntitiesReps[ repCreatorId ];
+
+    auto entityGid = entity->entityGid( );
+    if (gidToReps.find( entityGid ) != gidToReps.end( ))
+    {
+      gidToReps.erase( entityGid );
     }
   }
 

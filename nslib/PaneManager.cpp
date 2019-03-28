@@ -216,9 +216,7 @@ namespace nslib
        auto paneIt = std::find( _panes.begin( ), _panes.end( ), orig );
        _panes.erase( paneIt );
        delete orig;
-       delete parentSplitter;
-       _activePane = sibling;
-
+      activePane( sibling );
     }
   }
 
