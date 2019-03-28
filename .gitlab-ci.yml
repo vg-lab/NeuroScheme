@@ -64,6 +64,24 @@ Ubuntu-Subproject-master:
  tags:
   - ubuntu
 
+OSX-Optional-Deps-master:
+ stage: build
+ script:
+  - date
+  - hostname
+  - uname -a
+  - export GITHUB_DMGAPP_REPO="git@github.com:gmrvvis/apps"
+  - module load Qt-5.9.1
+  - export BUILD_OPTIONALS_SUBPROJECTS=1
+  - export CMAKE_EXTRA_ARGS="-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DLibJpegTurbo_INCLUDE_DIR=/usr/local/opt/jpeg-turbo/include -DLibJpegTurbo_LIBRARY=/usr/local/opt/jpeg-turbo/lib/libturbojpeg.dylib -DCLONE_SUBPROJECTS=ON"
+  - export BUILD_GENERATOR="Ninja"
+  - export CMAKE_OSX_ARCHITECTURES=x86_64
+  - bash .gitlab-ci.sh
+ only:
+  - master
+ tags:
+  - osx-sierra
+
 OSX-Optional-Deps:
  stage: build
  script:
@@ -76,8 +94,11 @@ OSX-Optional-Deps:
   - export BUILD_GENERATOR="Ninja"
   - export CMAKE_OSX_ARCHITECTURES=x86_64
   - bash .gitlab-ci.sh
+ except:
+  - master
  tags:
   - osx-sierra
+
 
 OSX-Subproject:
  stage: build
@@ -100,11 +121,26 @@ Win7-Subproject-vs14:
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
   - set BUILD_GENERATOR=Visual Studio 14 Win64
-  - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON
+  - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON -DWITH_NO_CONSOLE=ON
   - set GENERATOR_EXTRA_OPTIONS=
   - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
-  - set PATH=%PATH%;"c:\Program Files\Git\bin"
+  except:
+  - master
   tags:
   - win7
-  except:
-  - tags
+
+Win7-Subproject-vs14-master:
+  stage: build
+  script:
+  - set GITHUB_WINAPP_REPO=git@github.com:gmrvvis/apps
+  - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
+  - call %ENVFILESDIR%\Qt-5.9-vs14.bat
+  - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
+  - set BUILD_GENERATOR=Visual Studio 14 Win64
+  - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON -DWITH_NO_CONSOLE=ON
+  - set GENERATOR_EXTRA_OPTIONS=
+  - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
+  only:
+  - master
+  tags:
+  - win7
