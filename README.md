@@ -35,8 +35,13 @@ command can be used:
 ./NeuroScheme --version
 ```
 
+## Download binary packages
 
-## Building
+There are binaries for x64 architecture for GNU/Linux, MS Windows and MacOSX
+available for download in
+[http://github.com/gmrvvis/apps](http://github.com/gmrvvis/apps)
+
+## Building from source
 
 NeuroScheme has been successfully built and used on Ubuntu 16.04/18.04, Mac OSX
 Yosemite/Sierra and Windows 7/8/10 Visual Studio 2015 Win64. The following steps should be
@@ -105,7 +110,7 @@ try to visualize a very simple scene by running:
 
 
 For congen domain you can try to visualize a very simple example scene by
-running:
+running.
 
 ```bash
 ./bin/NeuroScheme -d cortex -xml ../doc/examples/congen-example.json
@@ -116,7 +121,7 @@ that exporting to NeuroML removes the hierarchy. In case you want to keep the
 created hierarchy please export it to JSON as explained previously.
 
 Importing and exporting to NeuroML operations are available through the GUI menu
-and also importing is available through CLI arguments:
+and also importing is available through CLI arguments.
 
 ```bash
 ./bin/NeuroScheme -d congen -x /path/to/neuroML.xml

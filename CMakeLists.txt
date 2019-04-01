@@ -1,7 +1,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #   NeuroScheme
-#   2015-2017 (c) GMRV / URJC / UPM
+#   2015-2019 (c) GMRV / URJC / UPM
 #   gmrv@gmrv.es
 #   www.gmrv.es
 #

@@ -345,7 +345,7 @@ void MainWindow::selectDomain( void )
   // Active domain
   auto domainArg = nslib::Config::isArgumentDefined( { "--domain", "-d"} );
 
-  QStringList availableDomains( { "cortex", "congen" } );
+  QStringList availableDomains( { "congen", "cortex" } );
   QString domainSelected = availableDomains.first( );
 
   // If not domain via CLI, then ask via GUI dialog
@@ -655,7 +655,7 @@ void MainWindow::aboutDialog( void )
     "GMRV / URJC / UPM"
     "<br><a href='https://gmrv.es/gmrvvis'>https://gmrv.es/gmrvvis</a>"
     //"<br><a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
-    "<br>(C) 2016-2017<br><br>"
+    "<br>(c) 2015-2019<br><br>"
     "<a href='https://gmrv.es/gmrvvis'><img src=':/icons/logoGMRV.png'/></a>"
     "&nbsp;&nbsp;&nbsp;&nbsp;"
     "<a href='https://www.urjc.es'><img src=':/icons/logoURJC.png' /></a>"

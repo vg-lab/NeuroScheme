@@ -2,6 +2,29 @@
 
 ## git master
 
+## version 0.3
+
+* [!86] Release 0.3 preparation.
+* [!87] Circulat Layout now supports a single entity.
+* [!85] Added Windows and OSX CI bundle creation and upload.
+* [!84] Added buildbot creation of an AppImage and its upload to GitHub.
+* [!82] Improved README.
+* [!81] Update NeuronPop and Stimulator icons. Bump ShiFT.
+* [!78] New icons for congen domain.
+* [!76] Added a free movement layout.
+* [!74] Added entities outside hierarchy. Fixed bugs. Bump dependencies.
+* [!79] Changed LICENSE file to LGPLv3 to match license on source and header files.
+* [!77] Added push to github in .gitlab-ci.yml.
+* [!72] Aggregated connections.
+* [!73] Updated nsol tag, brion tag and common submodule tag.
+* [!71] Added .json extension in exportToJSON method.
+* [!70] Import/export the scene from/to JSON.
+* [!68] Congen parent relationship.
+* [!69] Fixed typo on stats data loading process for cortex domain.
+* [!67] Fixed bug in cortex establishing parent relationships.
+* [!66] Bump Brion and ShiFT.
+* [!65] Uniqueness support for entity and relationship names.
+
 ## version 0.2
 
 * [!64] Updated Changelog and version. Release 0.2 preparation
