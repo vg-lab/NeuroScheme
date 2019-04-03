@@ -68,8 +68,7 @@ namespace nslib
     for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
-        dynamic_cast< nslib::QGraphicsItemRepresentation* >(
-          representation );
+        dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
       if ( !graphicsItemRep )
       {
         std::cerr << "Item null" << std::endl;
@@ -87,47 +86,47 @@ namespace nslib
 
           const auto entities = repsToEntities.at( representation );
           if ( entities.size( ) < 1 )
+          {
             Loggers::get( )->log( "No entities associated to representation",
-                                 LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-          auto center =
-            DomainManager::getActiveDomain( )->entity3DPosition(
-              *entities.begin( ));
+              LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          }
+          auto center = DomainManager::getActiveDomain( )->entity3DPosition(
+            *entities.begin( ));
 
           Vector4f pos = viewMatrix * center;
           const float distance = pos.norm( );
           bool behindCamera = pos.z( ) > 0;
-          pos = _projectionMatrix * pos;
-          pos /= pos.w( );
-          pos[0] = pos[0] * float( sceneWidth ) * 0.5f;
-          pos[1] = pos[1] * float( sceneHeight ) * 0.5f;
-
-          auto x = pos[0];
-          auto y = pos[1];
-
-          auto scale = 250.0f / distance;
-          auto zValue = -distance;
-
 
 //#define ANIM_DURATION 1200
 
-          if ( obj && animate )
+          if ( behindCamera || distance == 0.0f)
           {
-            if ( behindCamera )
+            graphicsItem->setScale( 0.000001f );
+          }
+          else
+          {
+            pos = _projectionMatrix * pos;
+            auto posW = pos.w( );
+            if ( posW == 0.0f )
             {
-              graphicsItem->setScale( 0.000001f );
+              posW = 2.0f;
             }
             else
+            {
+              posW = posW + posW;
+            }
+            auto x = pos[0] * float( sceneWidth ) / posW;
+            auto y = pos[1] * float( sceneHeight ) / posW;
+
+            auto scale = 250.0f / distance;
+            auto zValue = -distance;
+
+            if ( obj && animate )
             {
               graphicsItem->setZValue( zValue );
               animateItem( graphicsItem, scale, QPoint( x, y ));
             }
-          }
-          else // not animation
-          {
-            if ( behindCamera )
-            {
-              graphicsItem->setScale( 0.000001f );
-            } else
+            else // not animation
             {
               graphicsItem->setZValue( zValue );
               graphicsItem->setPos( x, y );

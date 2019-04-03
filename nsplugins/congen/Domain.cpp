@@ -63,7 +63,7 @@ namespace nslib
 
             QIcon iconLoad;
             iconLoad.addFile( QStringLiteral( ":/icons/open.svg" ),
-                              QSize( ), QIcon::Normal, QIcon::Off );
+              QSize( ), QIcon::Normal, QIcon::Off );
             _actionLoadNeuroML->setIcon( iconLoad );
 
           }

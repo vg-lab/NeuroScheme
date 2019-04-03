@@ -51,7 +51,8 @@
                 },
                 {
                     "name": "Position3D",
-                    "type": "Eigen::Vector4f"
+                    "type": "Eigen::Vector4f",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Layer",
