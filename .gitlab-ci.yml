@@ -10,11 +10,11 @@ Ubuntu-Optional-Deps:
   - export BUILD_GENERATOR="Ninja"
   - bash .gitlab-ci.sh
  except:
-  - master
+  - tags
  tags:
   - ubuntu
 
-Ubuntu-Optional-Deps-master:
+Ubuntu-Optional-Deps-master-tags:
  stage: build
  script:
   - export APPIMAGE_REPO="gitlabci@gmrv.es:apps"
@@ -25,7 +25,9 @@ Ubuntu-Optional-Deps-master:
   - export BUILD_GENERATOR="Ninja"
   - bash .gitlab-ci.sh
  only:
-  - master
+  - tags
+ except:
+  - branches
  tags:
   - ubuntu
 
@@ -52,7 +54,7 @@ Ubuntu-Subproject-master:
  tags:
   - ubuntu
 
-OSX-Optional-Deps-master:
+OSX-Optional-Deps-master-tags:
  stage: build
  script:
   - export DMGAPP_REPO="gitlabci@gmrv.es:apps"
@@ -63,7 +65,9 @@ OSX-Optional-Deps-master:
   - export CMAKE_OSX_ARCHITECTURES=x86_64
   - bash .gitlab-ci.sh
  only:
-  - master
+  - tags
+ except:
+  - branches
  tags:
   - osx-sierra
 
@@ -77,10 +81,9 @@ OSX-Optional-Deps:
   - export CMAKE_OSX_ARCHITECTURES=x86_64
   - bash .gitlab-ci.sh
  except:
-  - master
+  - tags
  tags:
   - osx-sierra
-
 
 OSX-Subproject:
  stage: build
@@ -104,13 +107,13 @@ Win7-Subproject-vs14:
   - set GENERATOR_EXTRA_OPTIONS=
   - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
   except:
-  - master
+  - tags
   tags:
   - win7
 
-Win7-Subproject-vs14-master:
-  stage: build
-  script:
+Win7-Subproject-vs14-master-tags:
+ stage: build
+ script:
   - set WINAPP_REPO=gitlabci@gmrv.es:apps
   - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
@@ -119,7 +122,9 @@ Win7-Subproject-vs14-master:
   - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON -DWITH_NO_CONSOLE=ON
   - set GENERATOR_EXTRA_OPTIONS=
   - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
-  only:
-  - master
-  tags:
+ only:
+  - tags
+ except:
+  - branches
+ tags:
   - win7
