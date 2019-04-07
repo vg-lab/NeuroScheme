@@ -31,6 +31,24 @@ Ubuntu-Optional-Deps-master-tags:
  tags:
   - ubuntu
 
+Ubuntu-Optional-Deps-master:
+ stage: build
+ script:
+  - export APP_VERSION="git-master"
+  - export APPIMAGE_REPO="gitlabci@gmrv.es:apps"
+  - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
+  - export CMAKE_EXTRA_TARGETS="install"
+  - export BUILD_OPTIONALS_SUBPROJECTS=1
+  - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON"
+  - export BUILD_GENERATOR="Ninja"
+  - bash .gitlab-ci.sh
+ only:
+  - master
+ except:
+  - tags
+ tags:
+  - ubuntu
+
 Ubuntu-Subproject:
  stage: build
  script:
@@ -68,6 +86,24 @@ OSX-Optional-Deps-master-tags:
   - tags
  except:
   - branches
+ tags:
+  - osx-sierra
+
+OSX-Optional-Deps-master:
+ stage: build
+ script:
+  - export APP_VERSION="git-master"
+  - export DMGAPP_REPO="gitlabci@gmrv.es:apps"
+  - module load Qt-5.9.1
+  - export BUILD_OPTIONALS_SUBPROJECTS=1
+  - export CMAKE_EXTRA_ARGS="-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DLibJpegTurbo_INCLUDE_DIR=/usr/local/opt/jpeg-turbo/include -DLibJpegTurbo_LIBRARY=/usr/local/opt/jpeg-turbo/lib/libturbojpeg.dylib -DCLONE_SUBPROJECTS=ON"
+  - export BUILD_GENERATOR="Ninja"
+  - export CMAKE_OSX_ARCHITECTURES=x86_64
+  - bash .gitlab-ci.sh
+ only:
+  - master
+ except:
+  - tags
  tags:
   - osx-sierra
 
@@ -126,5 +162,24 @@ Win7-Subproject-vs14-master-tags:
   - tags
  except:
   - branches
+ tags:
+  - win7
+
+Win7-Subproject-vs14-master:
+ stage: build
+ script:
+  - set APP_VERSION=git-master
+  - set WINAPP_REPO=gitlabci@gmrv.es:apps
+  - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
+  - call %ENVFILESDIR%\Qt-5.9-vs14.bat
+  - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
+  - set BUILD_GENERATOR=Visual Studio 14 Win64
+  - set CMAKE_EXTRA_ARGS=-DCLONE_SUBPROJECTS=ON -DWITH_NO_CONSOLE=ON
+  - set GENERATOR_EXTRA_OPTIONS=
+  - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
+ only:
+  - master
+ except:
+  - tags
  tags:
   - win7
