@@ -39,9 +39,11 @@ namespace nslib
       public:
 
       ConnectionArrowRep( shift::Representation* originRep_,
-         shift::Representation* destRep_ );
+         shift::Representation* destRep_, const bool isAggregated_ );
 
       ConnectionArrowRep( const ConnectionArrowRep& );
+
+      virtual Qt::PenStyle lineStyle( void ) const;
 
       virtual ~ConnectionArrowRep( void ) { }
 
@@ -62,6 +64,8 @@ namespace nslib
       protected:
       shift::Representation* _originRep;
       shift::Representation* _destRep;
+      bool _isAggregated;
+      Qt::PenStyle _lineStyle;
     };
   } // namespace congen
 } // namespace nslib

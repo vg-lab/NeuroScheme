@@ -101,6 +101,8 @@ namespace nslib
       QPointF _arrowDest;
 
       QPropertyAnimation _lineAnim;
+      Qt::PenStyle _lineStyle;
+      QPen _actualPen;
 
     };
   } // namespace congen

@@ -31,7 +31,7 @@ namespace nslib
 
     AutoConnectionArrowRep::AutoConnectionArrowRep(
       shift::Representation* Rep_ )
-      : ConnectionArrowRep( Rep_, Rep_ )
+      : ConnectionArrowRep( Rep_, Rep_, false )
     {
     }
 

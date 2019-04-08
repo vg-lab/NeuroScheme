@@ -319,7 +319,7 @@ namespace nslib
             else
             {
               relationRep = new ConnectionArrowRep( srcEntityRep->second.second,
-                otherRep->second.second );
+                otherRep->second.second, false );
             }
             const std::unordered_multimap< shift::EntityGid,
               shift::RelationshipProperties* >& relMMap =
@@ -440,7 +440,7 @@ namespace nslib
             else
             {
               relationRep = new ConnectionArrowRep(
-                srcEntityRep->second.second, otherRep->second.second );
+                srcEntityRep->second.second, otherRep->second.second, true );
             }
 
             shift::RelationshipProperties* relationProperties =

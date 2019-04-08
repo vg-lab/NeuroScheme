@@ -85,9 +85,9 @@ namespace nslib
     rels.push_back( std::make_tuple(
       &relConnectedBy, scoop::Color( 255, 204, 0 ), true, false ));
     rels.push_back( std::make_tuple(
-      &relAgrConnectedBy, scoop::Color( 186, 155, 0 ), true, true ));
+      &relAgrConnectedBy, scoop::Color( 255, 204, 0 ), true, true ));
     rels.push_back( std::make_tuple(
-      &relAgrConnectsTo, scoop::Color( 0, 102, 175 ), false, true ));
+      &relAgrConnectsTo, scoop::Color( 0, 204, 255 ), false, true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
