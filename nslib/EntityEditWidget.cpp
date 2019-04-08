@@ -40,8 +40,6 @@
 #include <shift/Relationship.h>
 #include <nslib/reps/QGraphicsItemRepresentation.h>
 
-//TODO: Add realtion of parent of to entities
-
 namespace nslib
 {
   QDockWidget* EntityEditWidget::_parentDock = nullptr;

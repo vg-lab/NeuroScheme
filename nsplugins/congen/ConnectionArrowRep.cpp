@@ -20,10 +20,12 @@
  *
  */
 #include "ConnectionArrowItem.h"
+#include "ConnectionArrowRep.h"
 
 #include <nslib/Color.h>
 
 #include <QVector2D>
+#include <nslib/RepresentationCreatorManager.h>
 
 namespace nslib
 {
@@ -227,6 +229,24 @@ namespace nslib
     Qt::PenStyle ConnectionArrowRep::lineStyle( void ) const
     {
       return _lineStyle;
+    }
+
+    void ConnectionArrowRep::editConnectionWidget( void )
+    {
+      const auto& repsToEntities =
+        RepresentationCreatorManager::repsToEntities( );
+      const auto& originIt = repsToEntities.find( _originRep );
+      const auto& destIt = repsToEntities.find( _destRep );
+      const auto& repsEntitiesEnd = repsToEntities.end( );
+      if ( originIt != repsEntitiesEnd && destIt != repsEntitiesEnd )
+      {
+        const auto& origEntities = originIt->second;
+        const auto& destEntities = destIt->second;
+        const auto origEntity = *origEntities.begin( );
+        const auto destEntity = *destEntities.begin( );
+        InteractionManager::createConnectionRelationship(
+          origEntity, destEntity );
+      }
     }
 
   } // namespace congen

@@ -34,6 +34,7 @@
 #include <shift/shift.h>
 #include <QDockWidget>
 #include <QGridLayout>
+#include <QTimer>
 
 namespace nslib
 {
@@ -63,6 +64,7 @@ namespace nslib
     void breakDialog( void );
     void refreshSubproperties( void );
     void toggleAutoClose( void );
+    void refreshEntities( void );
 
   private:
     typedef enum { COMBO, LINE_EDIT } TWidgetType;
@@ -70,6 +72,9 @@ namespace nslib
 
     shift::Entity* _originEntity;
     shift::Entity* _destEntity;
+    shift::Entity* _updateOriginEntity;
+    shift::Entity* _updateDestEntity;
+    TConnectionType _updateConnectionType;
     bool _isAggregated;
     std::vector< std::tuple< TWidgetType, QLabel*, QWidget* >> _propParamCont;
     shift::RelationshipProperties* _propObject;
@@ -83,6 +88,7 @@ namespace nslib
     QGridLayout* _gridLayout;
     QGridLayout* _gridPropertiesLayout;
 
+    QTimer* _connectionUpdateTimer;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

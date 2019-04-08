@@ -56,6 +56,8 @@ namespace nslib
 
       void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
+      virtual void editConnectionWidget( void );
+
       virtual void highlight(
         const scoop::Color& color = scoop::Color( 255, 0, 0 ));
 
