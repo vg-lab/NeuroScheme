@@ -182,6 +182,7 @@ namespace nslib
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );
     _panes.insert( canvas );
+    activePane( canvas );
     canvas->show( );
 
     return canvas;

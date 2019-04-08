@@ -73,6 +73,8 @@ namespace nslib
     {
     }
 
+    virtual std::string& domainName( void );
+
   protected:
     std::vector< std::string > _exportRelations;
     std::vector< bool > _exportAggregatedRelations;

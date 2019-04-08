@@ -30,6 +30,8 @@
 #include <QHBoxLayout>
 #include <nslib/layouts/GridLayout.h>
 #include <nslib/layouts/CircularLayout.h>
+#include <nslib/layouts/CameraBasedLayout.h>
+#include <nslib/layouts/ScatterPlotLayout.h>
 
 namespace nslib
 {
@@ -127,9 +129,20 @@ namespace nslib
     _graphicsView->resize( this->size( ));
     QHBoxLayout* layout_ = new QHBoxLayout;
     layout_->addWidget( _graphicsView );
-    this->setLayout( layout_ );
+    this->QWidget::setLayout( layout_ );
     this->leaveEvent( nullptr );
     this->setObjectName( "pane" );
+
+    this->activeLayoutIndex( Layout::TLayoutIndexes::GRID );
+    this->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+
+    this->setLayout( Layout::TLayoutIndexes::GRID, new GridLayout( ));
+    this->setLayout( Layout::TLayoutIndexes::CAMERA, new CameraBasedLayout( ),
+      DomainManager::getActiveDomain( )->domainName( ) == "congen" );
+    this->setLayout( Layout::TLayoutIndexes::SCATTER, new ScatterPlotLayout( ));
+    this->setLayout( Layout::TLayoutIndexes::CIRCULAR, new CircularLayout( ));
+    this->setLayout( Layout::TLayoutIndexes::FREE,
+      new FreeLayout( InteractionManager::statusBar( )));
   }
 
   Canvas::~Canvas( void )
@@ -362,11 +375,12 @@ namespace nslib
     displayEntities( animate, refreshProperties_ );
   }
 
-  void Canvas::addLayout( Layout* layout_ )
+  void Canvas::setLayout(
+    unsigned int layoutIndex_, Layout* layout_, bool disabled_ )
   {
     Loggers::get( )->log( "Add layout", LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-    _layouts.addLayout( layout_ );
+    _layouts.setLayout( layoutIndex_, layout_, disabled_ );
     layout_->canvas( this );
   }
 
@@ -379,12 +393,7 @@ namespace nslib
     canvas->_sceneEntities = this->_sceneEntities;
     canvas->_repsScale = this->_repsScale;
     assert( canvas->scene( ).views( ).size( ) != 0 );
-    for ( auto layout_ : _layouts.map( ))
-    {
-      auto newLayout = layout_.second->clone( );
-      newLayout->refreshWidgetsProperties( _properties );
-      canvas->addLayout( newLayout );
-    }
+
     canvas->activeLayoutIndex( this->_activeLayoutIndex );
     switch ( this->_activeLayoutIndex )
     {
@@ -412,6 +421,25 @@ namespace nslib
         }
         canvas->displayEntities( false, true );
         freeLayout->moveNewEntitiesChecked( moveNewEntities );
+      }
+        break;
+      case Layout::TLayoutIndexes::CIRCULAR:
+      {
+        CircularLayout* origCricularLayout = dynamic_cast< CircularLayout* >(
+          this->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
+        CircularLayout* circularLayout = dynamic_cast< CircularLayout* >(
+          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
+        circularLayout->radius( origCricularLayout->radius( ));
+      }
+        break;
+      case Layout::TLayoutIndexes::GRID:
+      {
+        GridLayout* origGridLayout = dynamic_cast< GridLayout* >(
+          this->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
+        GridLayout* gridLayout = dynamic_cast< GridLayout* >(
+          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
+        gridLayout->padding( origGridLayout->paddingX( ),
+          origGridLayout->paddingY( ));
       }
         break;
       default:
