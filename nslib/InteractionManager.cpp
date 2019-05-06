@@ -54,6 +54,7 @@ namespace nslib
     InteractionManager::lastShapeItemHoveredOnMouseMove = nullptr;
   EntityConnectionListWidget* InteractionManager::_entityConnectListWidget =
       nullptr;
+  QStatusBar* InteractionManager::_statusBar = nullptr;
 
   void InteractionManager::start( )
   {
@@ -1237,4 +1238,13 @@ namespace nslib
     return entityIdx;
   }
 
+  QStatusBar* InteractionManager::statusBar( void )
+  {
+    return _statusBar;
+  }
+
+  void InteractionManager::statusBar( QStatusBar* statusBar_ )
+  {
+    _statusBar = statusBar_;
+  }
 } // namespace nslib

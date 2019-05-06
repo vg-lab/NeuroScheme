@@ -118,11 +118,11 @@ namespace nslib
 
     bool doFiltering =
       _filterWidget &&
-      _filterWidget->filterSetConfig( ).filters( ).size( ) > 0;
+      !_filterWidget->filterSetConfig( ).filters( ).empty( );
 
     bool doSorting =
       _sortWidget &&
-      _sortWidget->sortConfig( ).properties( ).size( ) > 0;
+      !_sortWidget->sortConfig( ).properties( ).empty( );
 
     fires::Objects objects;
     shift::Representations preFilterRepresentations;
@@ -433,7 +433,7 @@ namespace nslib
           const auto entities = repsToEntities.at( item->parentRep( ));
           // Check only the first entity, this might not be ok
           // TODO check this
-          if ( entities.size( ) > 0 )
+          if ( !entities.empty( ))
           {
             const auto& entity = *entities.begin( );
             auto shapeItem =

@@ -25,6 +25,7 @@
 #include "Layout.h"
 #include <QComboBox>
 #include <map>
+#include <QtGui/QStandardItemModel>
 
 namespace nslib
 {
@@ -33,16 +34,20 @@ namespace nslib
   {
   public:
     Layouts( )
-      : _nextLayoutIdx( 0 )
-      , _layoutSelector( new QComboBox )
+      : _layoutSelector( new QComboBox )
     {
     }
-    void addLayout( Layout* layout )
+    void setLayout(
+      unsigned int layoutIndex, Layout* layout, bool disabled = false )
     {
-      _layouts[ _nextLayoutIdx ] = layout;
-      _layoutSelector->insertItem( _nextLayoutIdx,
+      _layouts[ layoutIndex ] = layout;
+      _layoutSelector->insertItem( layoutIndex,
         QString( layout->name( ).c_str( )));
-      ++_nextLayoutIdx;
+      QStandardItemModel* selectorModel =
+        qobject_cast< QStandardItemModel* >( _layoutSelector->model( ));
+      QStandardItem *item = selectorModel->item( layoutIndex );
+      item->setFlags( disabled ? item->flags() & ~Qt::ItemIsEnabled
+       : item->flags( ) | Qt::ItemIsEnabled );
     }
 
     QComboBox* layoutSelector( void )
@@ -53,16 +58,26 @@ namespace nslib
     Layout* getLayout( unsigned int index )
     {
       if ( _layouts.find( index ) == _layouts.end( ))
+      {
         return nullptr;
-      return _layouts[ index ];
+      }
+      else
+      {
+        return _layouts[ index ];
+      }
     }
 
     std::map< unsigned int, Layout* >& map( void )
-    { return _layouts; };
+    {
+      return _layouts;
+    };
+
     const std::map< unsigned int, Layout* >& map( void ) const
-    { return _layouts; };
+    {
+      return _layouts;
+    };
+
   protected:
-    unsigned int _nextLayoutIdx;
     std::map< unsigned int, Layout* > _layouts;
     QComboBox* _layoutSelector;
   };

@@ -165,20 +165,28 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
                          QSizePolicy::Expanding );
   this->setCentralWidget( widget );
 
+  nslib::InteractionManager::statusBar( statusBar( ));
 
   nslib::PaneManager::splitter( widget );
 
+  this->setWindowTitle( "NeuroScheme" );
+  this->selectDomain( );
+
   // First pane
   nslib::Loggers::get( )->log( "Creating first pane",
-                               nslib::LOG_LEVEL_VERBOSE );
+    nslib::LOG_LEVEL_VERBOSE );
   auto canvas = nslib::PaneManager::newPane( );
-  canvas->activeLayoutIndex( nslib::Layout::TLayoutIndexes::GRID );
-  canvas->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
-  canvas->addLayout( new nslib::GridLayout( ));
-  canvas->addLayout( new nslib::CameraBasedLayout( ));
-  canvas->addLayout( new nslib::ScatterPlotLayout( ));
-  canvas->addLayout( new nslib::CircularLayout( ));
-  canvas->addLayout( new nslib::FreeLayout( statusBar( )));
+
+  canvas->displayEntities(
+    nslib::DataManager::rootEntities( ), false, true );
+
+  auto fileJSON = nslib::Config::isArgumentDefined( { "--json" } );
+  if ( !fileJSON.empty( ))
+  {
+    auto filePath = nslib::Config::inputArgs( )[ fileJSON ][0] ;
+    std::ifstream inputfile( filePath );
+    nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
+  }
 
   // Layouts dock
   {
@@ -276,7 +284,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     selectionLayout->addWidget( restoreButton, 1, 1 );
 
     connect( restoreButton, SIGNAL( clicked( )),
-             this, SLOT( restoreSelection( )));
+      this, SLOT( restoreSelection( )));
 
     QPushButton* deleteButton = new QPushButton( "Delete selected" );
     deleteButton->setToolTip( QString( "Deletes the selected selection"));
@@ -386,25 +394,12 @@ void MainWindow::selectDomain( void )
 
   this->setWindowTitle( this->windowTitle( ) + " (" + domainSelected + ")" );
 
-  auto canvas = nslib::PaneManager::activePane( );
-  canvas->displayEntities(
-    nslib::DataManager::rootEntities( ), false, true );
-  nslib::PaneManager::panes( ).insert( canvas );
-
   if ( domain )
   {
     domain->createGUI( this, _ui->menubar );
-
-    auto fileJSON = nslib::Config::isArgumentDefined( { "--json" } );
-    if ( !fileJSON.empty( ))
-    {
-    auto filePath = nslib::Config::inputArgs( )[ fileJSON ][0] ;
-      std::ifstream inputfile( filePath );
-      nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
-    }
   }
 
-  resizeEvent( 0 );
+  resizeEvent( nullptr );
 } // MainWindow::selectDomain
 
 MainWindow::~MainWindow( void )

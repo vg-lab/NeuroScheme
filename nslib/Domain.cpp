@@ -35,6 +35,11 @@ namespace nslib
   {
   }
 
+  std::string& Domain::domainName( void )
+  {
+    return _domainName;
+  }
+
   DataLoader* Domain::dataLoader( void )
   {
     return _dataLoader;

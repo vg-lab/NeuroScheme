@@ -108,6 +108,10 @@ namespace nslib
 
     static void deleteEntity( shift::EntityGid entityGid_ );
 
+    static void statusBar( QStatusBar* statusBar_ );
+
+    static QStatusBar* statusBar( void );
+
   protected:
 
     static void basicDeleteEntity( shift::Entity* entity_,
@@ -168,6 +172,7 @@ namespace nslib
     static Qt::MouseButtons _buttons;
     static std::unique_ptr< TemporalConnectionLine > _tmpConnectionLine;
     static QAbstractGraphicsShapeItem* lastShapeItemHoveredOnMouseMove;
+    static QStatusBar* _statusBar;
   };
 }
 
