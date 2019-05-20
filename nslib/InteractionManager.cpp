@@ -71,15 +71,23 @@ namespace nslib
       relationships( )[ "connectsTo" ]->asOneToN( ));
     auto& relConnectedBy = *( DataManager::entities( ).
       relationships( )[ "connectedBy" ]->asOneToN( ));
+    auto& relAgrConnectedBy = *( DataManager::entities( ).
+      relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+    auto& relAgrConnectsTo = *( DataManager::entities( ).
+      relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
 
-    // Third parameter indicates if the relationship has to be inverted
-    enum { HLC_RELATIONSHIP = 0, HLC_COLOR = 1, HLC_INVERT = 2 };
-    std::vector< std::tuple< shift::RelationshipOneToN*, scoop::Color, bool >> rels;
+    std::vector< std::tuple< shift::Relationship*, scoop::Color, bool, bool >>
+      rels;
+
     rels.reserve( 4 );
     rels.push_back( std::make_tuple(
-      &relConnectsTo, scoop::Color( 0, 204, 255 ), false ));
+      &relConnectsTo, scoop::Color( 0, 204, 255 ), false, false ));
     rels.push_back( std::make_tuple(
-      &relConnectedBy, scoop::Color( 255, 204, 0 ), true ));
+      &relConnectedBy, scoop::Color( 255, 204, 0 ), true, false ));
+    rels.push_back( std::make_tuple(
+      &relAgrConnectedBy, scoop::Color( 255, 204, 0 ), true, true ));
+    rels.push_back( std::make_tuple(
+      &relAgrConnectsTo, scoop::Color( 0, 204, 255 ), false, true ));
 
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
@@ -97,30 +105,68 @@ namespace nslib
         auto entityGid = ( *entities->second.begin( ))->entityGid( );
         for ( const auto& relPair : rels )
         {
-          auto& rel = *( std::get< HLC_RELATIONSHIP >( relPair ));
-          auto& connectingEntities = rel[ entityGid ];
-          for ( auto& connectingEntity : connectingEntities )
+          std::vector< unsigned  int > connectingEntitiesGID;
+          if ( std::get< HiglightRelationPair::HLC_AGGREGATED >( relPair ))
           {
-            const auto& relationRep = relatedEntities.find(
-              ( std::get< HLC_INVERT >( relPair ) ?
-                std::make_pair( connectingEntity.first, entityGid ) :
-                std::make_pair( entityGid, connectingEntity.first )));
-            if ( relationRep != relatedEntities.end( ))
+            const auto& rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
+              ( relPair )->asAggregatedOneToN( )->mapAggregatedRels( );
+
+            auto connectingEntities = rel.find( entityGid );
+            if ( connectingEntities != rel.end( ))
             {
-              shift::Representation* rep = std::get< 0 >( relationRep->second );
-              auto* connRep = dynamic_cast< ConnectivityRep* >( rep );
-              if ( connRep )
+              for( const auto& connectingEntity : *connectingEntities->second )
               {
-                if ( highlight )
-                  connRep->highlight( std::get< HLC_COLOR >( relPair ));
-                else
-                  connRep->unHighlight( );
+                highlightConnection( highlight, relatedEntities,
+                  entityGid, relPair, connectingEntity.first );}
+            }
+          }
+          else
+          {
+            const auto rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
+              ( relPair )->asOneToN( );
+
+            auto connectingEntities = rel->find( entityGid );
+            if ( connectingEntities != rel->end( ))
+            {
+              for ( const auto& connectingEntity : connectingEntities->second )
+              {
+                highlightConnection( highlight, relatedEntities,
+                  entityGid, relPair, connectingEntity.first );
               }
             }
-          } // for all connectinf entities
+          }
         }
       }
     }
+  }
+
+  void InteractionManager::highlightConnection( const bool highlight,
+    const shift::TRelatedEntitiesReps& relatedEntities,
+    const unsigned int& entityGid,
+    const std::tuple<shift::Relationship*, scoop::Color, bool, bool>& relPair,
+    const unsigned int connectingEntityGID )
+  {
+    const auto& relationRep = relatedEntities.find(
+      ( std::get< HiglightRelationPair::HLC_INVERT >( relPair ) ?
+      std::make_pair( connectingEntityGID, entityGid ) :
+      std::make_pair( entityGid, connectingEntityGID )));
+    if ( relationRep != relatedEntities.end( ))
+      {
+        shift::Representation* rep = std::get< 0 >( relationRep->second );
+        auto* connRep = dynamic_cast< ConnectivityRep* >( rep );
+        if ( connRep )
+        {
+          if ( highlight )
+          {
+            connRep->highlight(
+              std::get<HiglightRelationPair::HLC_COLOR>( relPair ));
+          }
+          else
+          {
+            connRep->unHighlight( );
+          }
+        }
+      }
   }
 
   void InteractionManager::hoverEnterEvent(

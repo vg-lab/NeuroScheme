@@ -31,15 +31,23 @@ namespace nslib
   {
 
     ConnectionArrowRep::ConnectionArrowRep( shift::Representation* originRep_,
-      shift::Representation* destRep_ )
-      : shiftgen::ConnectionArrowRep( ), _originRep( originRep_ ),
-        _destRep( destRep_ )
+      shift::Representation* destRep_, const bool isAggregated_ )
+      : shiftgen::ConnectionArrowRep( )
+      , _originRep( originRep_ )
+      , _destRep( destRep_ )
+      , _isAggregated( isAggregated_ )
+      , _lineStyle( _isAggregated ?
+        Qt::PenStyle::DotLine : Qt::PenStyle::SolidLine )
     {
     }
 
     ConnectionArrowRep::ConnectionArrowRep( const ConnectionArrowRep& other )
-      : shiftgen::ConnectionArrowRep( other ), _originRep( other._originRep ),
-        _destRep( other._destRep )
+      : shiftgen::ConnectionArrowRep( other )
+      , _originRep( other._originRep )
+      , _destRep( other._destRep )
+      , _isAggregated( other._isAggregated )
+      , _lineStyle( _isAggregated ?
+        Qt::PenStyle::DotLine : Qt::PenStyle::SolidLine )
     {
     }
 
@@ -212,7 +220,14 @@ namespace nslib
     }
 
     void ConnectionArrowRep::unHighlight( void )
-    { hoverLeaveEvent( nullptr ); }
+    {
+      hoverLeaveEvent( nullptr );
+    }
+
+    Qt::PenStyle ConnectionArrowRep::lineStyle( void ) const
+    {
+      return _lineStyle;
+    }
 
   } // namespace congen
 } // namespace nslib

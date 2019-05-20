@@ -113,6 +113,12 @@ namespace nslib
     static QStatusBar* statusBar( void );
 
   protected:
+    enum HiglightRelationPair
+    { HLC_RELATIONSHIP = 0,
+      HLC_COLOR = 1,
+      HLC_INVERT = 2,
+      HLC_AGGREGATED = 3
+    };
 
     static void basicDeleteEntity( shift::Entity* entity_,
       shift::Entities& dataEntities_, shift::RelationshipOneToN& relConnectsTo_,
@@ -162,6 +168,12 @@ namespace nslib
       unsigned int entityGid,
       bool& allGroupedSelected,
       bool& noGroupedSelected );
+
+    static void highlightConnection( const bool highlight,
+      const shift::TRelatedEntitiesReps& relatedEntities,
+      const unsigned int& entityGid,
+      const std::tuple<shift::Relationship*, QColor, bool, bool>& relPair,
+      const unsigned int connectingEntityGID );
 
     static QMenu* _contextMenu;
     static nslib::FreeLayout* _movingLayout;
