@@ -107,10 +107,12 @@ namespace nslib
         if ( item )
         {
           auto& entity = *( repsToEntities.at( representation ).begin( ));
-          auto xVal = fires::PropertyManager::getPropertyCaster( xProp )->toInt(
-            entity->getProperty( xProp ));
-          auto yVal = fires::PropertyManager::getPropertyCaster( yProp )->toInt(
-            entity->getProperty( yProp ));
+          auto xVal = entity->hasProperty( xProp ) ?
+            fires::PropertyManager::getPropertyCaster( xProp )->toInt(
+            entity->getProperty( xProp )) : 0;
+          auto yVal = entity->hasProperty( yProp ) ?
+            fires::PropertyManager::getPropertyCaster( yProp )->toInt(
+            entity->getProperty( yProp )) : 0;
 
           qreal posX = xMapper.map( xVal );
           qreal posY = - yMapper.map( yVal );
