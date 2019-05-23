@@ -27,7 +27,7 @@
 #include <nslib/reps/InteractiveItem.h>
 #include <nslib/reps/Item.h>
 #include <nslib/reps/SelectableItem.h>
-#include "NeuronPopRep.h"
+#include "CongenPopRep.h"
 #include <QGraphicsEllipseItem>
 
 namespace nslib
@@ -35,7 +35,7 @@ namespace nslib
   namespace congen
   {
 
-    class NeuronPopItem
+    class CongenPopItem
       : public QObject
       , public QGraphicsEllipseItem
       , public nslib::Item
@@ -48,10 +48,10 @@ namespace nslib
 
     public:
 
-      NeuronPopItem( const NeuronPopRep& entityRep,
+      CongenPopItem( const CongenPopRep& entityRep,
         unsigned int size = 100, bool interactive = true );
 
-      virtual ~NeuronPopItem( void ) {}
+      virtual ~CongenPopItem( void ) {}
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 

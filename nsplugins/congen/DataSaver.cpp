@@ -25,7 +25,6 @@
 
 #include <nslib/DataManager.h>
 
-#include "NeuronPopItem.h"
 #include "DataSaver.h"
 #include <shift_NeuronPop.h>
 #include <shift_Stimulator.h>

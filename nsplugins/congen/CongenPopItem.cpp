@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "StimulatorItem.h"
+#include "CongenPopItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
 #include <nslib/Config.h>
@@ -29,7 +29,7 @@ namespace nslib
 {
   namespace congen
   {
-    StimulatorItem::StimulatorItem( const StimulatorRep& entityRep,
+    CongenPopItem::CongenPopItem( const CongenPopRep& entityRep,
       unsigned int size, bool interactive_ )
     {
       setInteractive( interactive_ );
@@ -91,10 +91,10 @@ namespace nslib
         text->setParentItem( this );
       }
 
-      this->_parentRep = &( const_cast< StimulatorRep& >( entityRep ));
+      this->_parentRep = &( const_cast< CongenPopRep& >( entityRep ));
     }
 
-    void StimulatorItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    void CongenPopItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
       {
@@ -114,7 +114,7 @@ namespace nslib
         InteractionManager::highlightConnectivity( this );
       }
     }
-    void StimulatorItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    void CongenPopItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
       {
@@ -136,7 +136,7 @@ namespace nslib
       }
     }
 
-    void StimulatorItem::contextMenuEvent(
+    void CongenPopItem::contextMenuEvent(
       QGraphicsSceneContextMenuEvent* event_ )
     {
       if ( _interactive )

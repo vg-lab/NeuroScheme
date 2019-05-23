@@ -2,7 +2,6 @@
  * Copyright (c) 2016 GMRV/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
- *          Iago Calvo <i.calvol@alumnos.urjc.es>
  *
  * This file is part of NeuroScheme
  *
@@ -20,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "StimulatorRep.h"
-#include "StimulatorItem.h"
+#include "CongenPopRep.h"
+#include "CongenPopItem.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
@@ -31,28 +30,28 @@ namespace nslib
   namespace congen
   {
 
-    StimulatorRep::StimulatorRep( void )
-      : shiftgen::StimulatorRep( )
+    CongenPopRep::CongenPopRep( void )
+      : shiftgen::CongenPopRep( )
     {
     }
 
-    StimulatorRep::StimulatorRep( const StimulatorRep& other )
-      : shiftgen::StimulatorRep( other )
+    CongenPopRep::CongenPopRep( const CongenPopRep& other )
+      : shiftgen::CongenPopRep( other )
     {
     }
 
-    StimulatorRep::StimulatorRep( const shiftgen::StimulatorRep& other )
-      : shiftgen::StimulatorRep( other )
+    CongenPopRep::CongenPopRep( const shiftgen::CongenPopRep& other )
+      : shiftgen::CongenPopRep( other )
     {
     }
 
 
-    QGraphicsItem* StimulatorRep::item( QGraphicsScene* scene, bool create )
+    QGraphicsItem* CongenPopRep::item( QGraphicsScene* scene, bool create )
     {
       if ( create && ( _items.find( scene ) == _items.end( )) &&
            !_items[ scene ] )
       {
-        _items[ scene ] = new StimulatorItem( *this );
+        _items[ scene ] = new CongenPopItem( *this );
       }
       return _items.at( scene );
     }

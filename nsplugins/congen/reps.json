@@ -3,27 +3,6 @@
     "namespace": "nslib::congen::shiftgen",
     "entities": [
         {
-            "name": "NeuronPopRep",
-            "includes" : [ "<nslib/Color.h>" ],
-            "namespace": "nslib::congen::shiftgen",
-            "properties": [
-                {
-                    "name": "color",
-                    "type": "Color"
-                },
-                {
-                    "name": "Entity name",
-                    "type": "std::string"
-                },
-                {
-                    "name": "line perc",
-                    "type": "float"
-                }
-
-            ],
-            "types": [ ]
-        },
-        {
             "name": "NeuronSuperPopRep",
             "includes" : [ "<nslib/Color.h>" ],
             "namespace": "nslib::congen::shiftgen",
@@ -61,7 +40,7 @@
             "types": [ ]
         },
         {
-            "name": "StimulatorRep",
+            "name": "CongenPopRep",
             "includes" : [ "<nslib/Color.h>" ],
             "namespace": "nslib::congen::shiftgen",
             "properties": [

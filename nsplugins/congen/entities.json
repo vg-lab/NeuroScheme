@@ -121,9 +121,9 @@
                     "flags": [ "EDITABLE" ]
                 },
                 {
-                  "name": "Stimulator type",
-                  "type": "TStimulatorType",
-                  "flags": [ "EDITABLE" ]
+                    "name": "Stimulator type",
+                    "type": "TStimulatorType",
+                    "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Pulse input Delay",
@@ -171,22 +171,95 @@
                         "undefined generator"
                     ]
                 },
-              {
-                "class": "enum",
-                "name": "TStimulatorType",
-                "values": [
-                  "Pulse input",
-                  "Random stim"
-                ]
-              },
-              {
-                  "class": "enum",
-                  "name": "TSynapticMechanism",
-                  "values": [
-                    "DoubExpSynA",
-                    "undefined"
-                  ]
-              }
+                {
+                    "class": "enum",
+                    "name": "TStimulatorType",
+                    "values": [
+                        "Pulse input",
+                        "Random stim"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TSynapticMechanism",
+                    "values": [
+                        "DoubExpSynA",
+                        "undefined"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Receptor",
+            "namespace": "nslib::congen::shiftgen",
+            "includes" : [],
+            "flags" : [ "noHierarchy" ],
+            "properties": [
+                {
+                    "name": "Entity name",
+                    "type": "std::string",
+                    "flags": [ "UNIQUE", "EDITABLE" ]
+                },
+                {
+                    "name": "Receptor model",
+                    "type": "TReceptorModel",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Data series",
+                    "type": "TReceptorData",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Subchart",
+                    "type": "TReceptorSubchart",
+                    "flags": [ "EDITABLE" ]
+                },
+                {
+                    "name": "Record from",
+                    "type": "TReceptorRecord",
+                    "flags": [ "EDITABLE" ],
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Receptor model", "parentValue": "Multimeter" } ]
+                }
+            ],
+            "types": [
+                {
+                    "class": "enum",
+                    "name": "TReceptorModel",
+                    "values": [
+                        "Multimeter",
+                        "Spike detector",
+                        "Voltmeter"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TReceptorData",
+                    "values": [
+                        "Overlap",
+                        "Stack"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TReceptorSubchart",
+                    "values": [
+                        "No subchart",
+                        "Averaged values",
+                        "Histogram of values"
+                    ]
+                },
+                {
+                    "class": "enum",
+                    "name": "TReceptorRecord",
+                    "values": [
+                        "Total excitatory synaptic current",
+                        "Total inhibitory synaptic current",
+                        "Membrane potential",
+                        "Weight incoming excitatory spikes",
+                        "Weight incoming inhibitory spikes"
+                    ]
+                }
             ]
         },
         {
@@ -490,6 +563,7 @@
             "constraints":
             [
                 { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
+                { "srcEntity": "NeuronPop", "dstEntity": "Receptor" },
                 { "srcEntity": "Stimulator", "dstEntity": "NeuronPop" }
             ],
             "flags": [ ],
