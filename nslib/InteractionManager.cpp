@@ -345,14 +345,16 @@ namespace nslib
             editEntity = _contextMenu->addAction( "Edit" );
             deleteEntity = _contextMenu->addAction( "Delete" );
             dupEntity = _contextMenu->addAction( "Duplicate" );
-              if(shift::RelationshipPropertiesTypes::isConstrained(
-                "ConnectedTo", entity->typeName( ),entity->typeName( )))
-              {
-                autoEntity = _contextMenu->addAction( "Add Auto Connection" );
-              }
+            if ( shift::RelationshipPropertiesTypes::isConstrained(
+              "ConnectedTo", entity->typeName( ),entity->typeName( )))
+            {
+              autoEntity = _contextMenu->addAction( "Add Auto Connection" );
             }
+          }
           if ( editEntity || dupEntity || autoEntity || deleteEntity )
+          {
             _contextMenu->addSeparator( );
+          }
 
           bool childAction = false;
 
@@ -579,11 +581,17 @@ namespace nslib
       }
     }
 
+    tmpConnectionLineRemove( );
+
+  }
+
+  void InteractionManager::tmpConnectionLineRemove( )
+  {
     if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
     {
       _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
+      _tmpConnectionLine.reset( nullptr );
     }
-
   } // context menu
 
 
@@ -657,7 +665,6 @@ namespace nslib
         {
           InteractionManager::hoverEnterEvent( shapeItem, nullptr );
         }
-
       }
     }
   }
@@ -854,11 +861,8 @@ namespace nslib
         }
       }
     }
-    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
-    {
-      _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
-      _tmpConnectionLine.reset( nullptr );
-    }
+
+    tmpConnectionLineRemove( );
 
     _item = nullptr;
     _buttons = nullptr;
@@ -1293,4 +1297,10 @@ namespace nslib
   {
     _statusBar = statusBar_;
   }
+
+  QMenu* InteractionManager::contextMenu( )
+  {
+    return _contextMenu;
+  }
+
 } // namespace nslib

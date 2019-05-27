@@ -112,6 +112,10 @@ namespace nslib
 
     static QStatusBar* statusBar( void );
 
+    static QMenu* contextMenu( void );
+
+    static void tmpConnectionLineRemove( );
+
   protected:
     enum HiglightRelationPair
     { HLC_RELATIONSHIP = 0,

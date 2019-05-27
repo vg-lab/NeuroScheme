@@ -56,7 +56,9 @@ namespace nslib
 
       public:
 
-      ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep );
+      ConnectionArrowItem(
+        const ConnectionArrowRep& connectionArrowRep,
+        const bool interactive_ = true );
 
       virtual ~ConnectionArrowItem( void );
 
@@ -79,6 +81,9 @@ namespace nslib
       virtual void hoverLeave( void );
 
       virtual bool connectionRep( void ) const override;
+
+      virtual void contextMenuEvent(
+        QGraphicsSceneContextMenuEvent* event_ ) override;
 
       static QColor color;
       static QColor hoverColor;

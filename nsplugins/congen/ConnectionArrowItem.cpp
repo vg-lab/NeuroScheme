@@ -40,7 +40,8 @@ namespace nslib
     QColor ConnectionArrowItem::hoverColor = QColor( 255, 100, 100, 255 );
 
     ConnectionArrowItem::ConnectionArrowItem(
-      const ConnectionArrowRep& connectionArrowRep )
+      const ConnectionArrowRep& connectionArrowRep,
+      const bool interactive_ )
       : QObject( )
       , QGraphicsPathItem( )
       , nslib::Item( )
@@ -52,6 +53,11 @@ namespace nslib
       , _actualPen( QPen( QBrush( color ),
           _arrowThickness, _lineStyle, Qt::RoundCap, Qt::RoundJoin ))
     {
+      setInteractive( interactive_ );
+      if ( interactive_ )
+      {
+        this->setAcceptHoverEvents( true );
+      }
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
       _actualPen.setCosmetic( true );
@@ -182,11 +188,38 @@ namespace nslib
     void ConnectionArrowItem::hoverEnterEvent(
       QGraphicsSceneHoverEvent* event_ )
     {
-      auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
-      if( rep )
+      if ( _interactive )
       {
-        rep->hoverEnterEvent( event_ );
+        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+        if( rep )
+        {
+          rep->hoverEnterEvent( event_ );
+          if ( event_ && event_->modifiers( ).testFlag( Qt::ControlModifier ))
+          {
+            rep->editConnectionWidget( );
+          }
+        }
       }
+    }
+
+    void ConnectionArrowItem::contextMenuEvent(
+        QGraphicsSceneContextMenuEvent* event_ )
+    {
+      if ( _interactive )
+      {
+        auto contextMenu = InteractionManager::contextMenu( );
+        contextMenu->clear( );
+        auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
+        if( rep )
+        {
+          QAction* editRel = contextMenu->addAction( "Edit Relationship" );
+          QAction* selectedAction = contextMenu->exec( event_->screenPos( ));
+          if( editRel == selectedAction )          {
+            rep->editConnectionWidget( );
+          }
+        }
+      }
+      InteractionManager::tmpConnectionLineRemove( );
     }
 
     void ConnectionArrowItem::hoverEnter( void )
