@@ -25,8 +25,8 @@
 #include <nslib/mappers/VariableMapper.h>
 #include <scoop/scoop.h>
 #include <shift_NeuronPop.h>
-#include <shift_Stimulator.h>
-#include <shift_Receptor.h>
+#include <shift_Input.h>
+#include <shift_Output.h>
 
 #include <unordered_map>
 #include <set>
@@ -102,9 +102,9 @@ namespace nslib
       MapperFloatToFloat _neuronsToPercentage;
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
-      scoop::CategoricalColorMap< shiftgen::Stimulator::TStimulatorType >
+      scoop::CategoricalColorMap< shiftgen::Input::TInputType >
         _stimulatorModelColorMap;
-      scoop::CategoricalColorMap< shiftgen::Receptor::TReceptorModel >
+      scoop::CategoricalColorMap< shiftgen::Output::TOutputModel >
         _receptorModelColorMap;
       scoop::SequentialColorMap _superPopLevelColorMap;
       scoop::Color _superPopColor;
@@ -115,10 +115,10 @@ namespace nslib
       void updateSuperPopRep( const shift::Entity* entity_,
         shift::Representation* entityRep_ );
 
-      void updateStimulatorRep( const shift::Entity* entity_,
+      void updateInputRep( const shift::Entity* entity_,
         shift::Representation* entityRep_ );
 
-      void updateReceptorRep( const shift::Entity* entity_,
+      void updateOutputRep( const shift::Entity* entity_,
         shift::Representation* entityRep_ );
 };
 

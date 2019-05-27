@@ -100,7 +100,7 @@
             "types": []
         },
         {
-            "name": "Stimulator",
+            "name": "Input",
             "namespace": "nslib::congen::shiftgen",
             "includes" : [],
             "flags" : [ "noHierarchy" ],
@@ -116,50 +116,50 @@
                     "flags": [ "EDITABLE" ]
                 },
                 {
-                    "name": "Stimulator model",
-                    "type": "TStimulatorModel",
+                    "name": "Input model",
+                    "type": "TInputModel",
                     "flags": [ "EDITABLE" ]
                 },
                 {
-                    "name": "Stimulator type",
-                    "type": "TStimulatorType",
+                    "name": "Input type",
+                    "type": "TInputType",
                     "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Pulse input Delay",
                     "type": "float",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Input type", "parentValue": "Pulse input" } ]
                 },
                 {
                     "name": "Pulse input Duration",
                     "type": "float",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Input type", "parentValue": "Pulse input" } ]
                 },
                 {
                     "name": "Pulse input Amplitude",
                     "type": "float",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Pulse input" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Input type", "parentValue": "Pulse input" } ]
                 },
                 {
                     "name": "Random stim Frequency",
                     "type": "uint",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Random stim" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Input type", "parentValue": "Random stim" } ]
                 },
                 {
                     "name": "Random stim synaptic mechanism",
                     "type": "TSynapticMechanism",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Stimulator type", "parentValue": "Random stim" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Input type", "parentValue": "Random stim" } ]
                 }
             ],
             "types": [
                 {
                     "class": "enum",
-                    "name": "TStimulatorModel",
+                    "name": "TInputModel",
                     "values": [
                         "AC generator",
                         "DC generator",
@@ -173,7 +173,7 @@
                 },
                 {
                     "class": "enum",
-                    "name": "TStimulatorType",
+                    "name": "TInputType",
                     "values": [
                         "Pulse input",
                         "Random stim"
@@ -190,7 +190,7 @@
             ]
         },
         {
-            "name": "Receptor",
+            "name": "Output",
             "namespace": "nslib::congen::shiftgen",
             "includes" : [],
             "flags" : [ "noHierarchy" ],
@@ -201,31 +201,31 @@
                     "flags": [ "UNIQUE", "EDITABLE" ]
                 },
                 {
-                    "name": "Receptor model",
-                    "type": "TReceptorModel",
+                    "name": "Output model",
+                    "type": "TOutputModel",
                     "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Data series",
-                    "type": "TReceptorData",
+                    "type": "TOutputData",
                     "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Subchart",
-                    "type": "TReceptorSubchart",
+                    "type": "TOutputSubchart",
                     "flags": [ "EDITABLE" ]
                 },
                 {
                     "name": "Record from",
-                    "type": "TReceptorRecord",
+                    "type": "TOutputRecord",
                     "flags": [ "EDITABLE" ],
-                    "constraints" : [ { "type": "subproperty", "parentProperty": "Receptor model", "parentValue": "Multimeter" } ]
+                    "constraints" : [ { "type": "subproperty", "parentProperty": "Output model", "parentValue": "Multimeter" } ]
                 }
             ],
             "types": [
                 {
                     "class": "enum",
-                    "name": "TReceptorModel",
+                    "name": "TOutputModel",
                     "values": [
                         "Multimeter",
                         "Spike detector",
@@ -234,7 +234,7 @@
                 },
                 {
                     "class": "enum",
-                    "name": "TReceptorData",
+                    "name": "TOutputData",
                     "values": [
                         "Overlap",
                         "Stack"
@@ -242,7 +242,7 @@
                 },
                 {
                     "class": "enum",
-                    "name": "TReceptorSubchart",
+                    "name": "TOutputSubchart",
                     "values": [
                         "No subchart",
                         "Averaged values",
@@ -251,7 +251,7 @@
                 },
                 {
                     "class": "enum",
-                    "name": "TReceptorRecord",
+                    "name": "TOutputRecord",
                     "values": [
                         "Total excitatory synaptic current",
                         "Total inhibitory synaptic current",
@@ -563,8 +563,8 @@
             "constraints":
             [
                 { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
-                { "srcEntity": "NeuronPop", "dstEntity": "Receptor" },
-                { "srcEntity": "Stimulator", "dstEntity": "NeuronPop" }
+                { "srcEntity": "NeuronPop", "dstEntity": "Output" },
+                { "srcEntity": "Input", "dstEntity": "NeuronPop" }
             ],
             "flags": [ ],
             "properties": [ ],
@@ -585,7 +585,7 @@
             "constraints":
             [
                 { "srcEntity": "NeuronPop", "dstEntity": "NeuronPop" },
-                { "srcEntity": "NeuronPop", "dstEntity": "Stimulator" }
+                { "srcEntity": "NeuronPop", "dstEntity": "Input" }
             ],
             "flags": [ ],
             "properties": [ ],

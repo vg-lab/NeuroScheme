@@ -296,16 +296,16 @@ namespace nslib
       auto attributes = xml.attributes( );
       std::string popName;
       unsigned int popSize = 0u;
-      shiftgen::Stimulator::TStimulatorModel model =
-        shiftgen::Stimulator::TStimulatorModel::undefined_generator;
-      shiftgen::Stimulator::TStimulatorType type =
-        shiftgen::Stimulator::TStimulatorType::Pulse_input;
+      shiftgen::Input::TInputModel model =
+        shiftgen::Input::TInputModel::undefined_generator;
+      shiftgen::Input::TInputType type =
+        shiftgen::Input::TInputType::Pulse_input;
       float delay = 0.0f;
       float duration = 0.0f;
       float amplitude = 0.0f;
       unsigned int frequency = 0u;
-      shiftgen::Stimulator::TSynapticMechanism synaptic_mechanism =
-        shiftgen::Stimulator::TSynapticMechanism::undefined;
+      shiftgen::Input::TSynapticMechanism synaptic_mechanism =
+        shiftgen::Input::TSynapticMechanism::undefined;
 
       if( attributes.hasAttribute( "name" ))
       {
@@ -332,8 +332,7 @@ namespace nslib
       }
       else if ( xml.name( ) == "random_stim" )
       {
-        type =
-            shiftgen::Stimulator::TStimulatorType::Random_stim;
+        type = shiftgen::Input::TInputType::Random_stim;
         attributes = xml.attributes( );
         if( attributes.hasAttribute( "frequency" ))
         {
@@ -345,7 +344,7 @@ namespace nslib
               .value( "synaptic_mechanism" ).toString( ).toStdString( );
           if( synapticMechanism == "DoubExpSynA" ){
             synaptic_mechanism =
-              shiftgen::Stimulator::TSynapticMechanism::DoubExpSynA;
+              shiftgen::Input::TSynapticMechanism::DoubExpSynA;
           }
         }
         xml.skipCurrentElement( ); // random_stim
@@ -358,9 +357,8 @@ namespace nslib
       auto& relAggregatedConnectedBy = *( dataEntities
         .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-      shift::Entity* stimulator =
-        new shiftgen::Stimulator( popName, popSize, model, type, delay,
-        duration, amplitude, frequency, synaptic_mechanism );
+      shift::Entity* stimulator = new shiftgen::Input( popName, popSize, model,
+        type, delay, duration, amplitude, frequency, synaptic_mechanism );
 
       dataEntities.add( stimulator );
       noHierarchyEntities.add( stimulator );
