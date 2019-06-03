@@ -45,9 +45,9 @@ namespace nslib
 
       /**
        *
-       * Creates a new AutoConnectionArrowRep from a NeuronPopRep
+       * Creates a new AutoConnectionArrowRep from a CongenPopRep
        *
-       * @param Rep_ NeuronPopRep to which an AutoConnectionArrowRep
+       * @param Rep_ CongenPopRep to which an AutoConnectionArrowRep
        * will be attached
        */
       AutoConnectionArrowRep( shift::Representation* Rep_ );

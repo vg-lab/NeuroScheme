@@ -24,22 +24,22 @@
 
 #include <nslib/reps/QGraphicsItemRepresentation.h>
 #include <shift/shift.h>
-#include <shift_NeuronPopRep.h>
+#include <shift_CongenPopRep.h>
 
 namespace nslib
 {
   namespace congen
   {
-    class NeuronPopRep
-      : public shiftgen::NeuronPopRep
+    class CongenPopRep
+      : public shiftgen::CongenPopRep
       , public QGraphicsItemRepresentation
     {
     public:
 
-      NeuronPopRep( void );
-      NeuronPopRep( const NeuronPopRep& );
-      NeuronPopRep( const shiftgen::NeuronPopRep& );
-      virtual ~NeuronPopRep( void ) {}
+      CongenPopRep( void );
+      CongenPopRep( const CongenPopRep& );
+      CongenPopRep( const shiftgen::CongenPopRep& );
+      virtual ~CongenPopRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
         bool create = true );
 

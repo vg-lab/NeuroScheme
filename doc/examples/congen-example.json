@@ -686,7 +686,7 @@
         }
     },
     {
-      "EntityType": "Stimulator",
+      "EntityType": "Input",
       "RootEntity": "f",
       "EntityGID": "1031",
       "EntityData":
@@ -702,11 +702,11 @@
               "value": "0"
             },
             {
-              "label": "Stimulator model",
+              "label": "Input model",
               "value": "Spike generator"
             },
             {
-              "label": "Stimulator type",
+              "label": "Input type",
               "value": "Pulse input"
             },
             {
@@ -733,7 +733,7 @@
         }
     },
     {
-      "EntityType": "Stimulator",
+      "EntityType": "Input",
       "RootEntity": "f",
       "EntityGID": "1032",
       "EntityData":
@@ -749,11 +749,11 @@
               "value": "0"
             },
             {
-              "label": "Stimulator model",
+              "label": "Input model",
               "value": "Poisson generator"
             },
             {
-              "label": "Stimulator type",
+              "label": "Input type",
               "value": "Random stim"
             },
             {

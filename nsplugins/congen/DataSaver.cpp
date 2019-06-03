@@ -25,10 +25,9 @@
 
 #include <nslib/DataManager.h>
 
-#include "NeuronPopItem.h"
 #include "DataSaver.h"
 #include <shift_NeuronPop.h>
-#include <shift_Stimulator.h>
+#include <shift_Input.h>
 
 namespace nslib
 {
@@ -71,7 +70,7 @@ namespace nslib
 
         for ( const auto& entity : DataManager::noHierarchyEntities( ).vector( ))
         {
-          if ( dynamic_cast< shiftgen::Stimulator* >( entity ))
+          if ( dynamic_cast< shiftgen::Input* >( entity ))
           {
             shift::Entities connectedEntities;
             connectedEntities.addRelatedEntitiesOneToN( relConnectsTo, entity,
@@ -79,9 +78,9 @@ namespace nslib
             entitiesGids.push_back( entity->entityGid( ));
             exporter_->addInput( QString::fromStdString( entity->getProperty(
               "Entity name" ).value<std::string>( )),
-              entity->getProperty( "Stimulator type" )
-              .value< shiftgen::Stimulator::TStimulatorType >( ) ==
-              shiftgen::Stimulator::TStimulatorType::Random_stim,
+              entity->getProperty( "Input type" )
+              .value< shiftgen::Input::TInputType >( ) ==
+              shiftgen::Input::TInputType::Random_stim,
               QString::number( entity->getProperty( "Pulse input Delay" ).
               value<float>( )),QString::number( entity->getProperty(
               "Pulse input Duration" ). value<float>( )), QString::number(
