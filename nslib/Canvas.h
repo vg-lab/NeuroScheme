@@ -48,6 +48,9 @@ namespace nslib
   protected:
     virtual void wheelEvent( QWheelEvent* event_ ) override;
 
+    const static double scaleFactor;
+    const static double scaleFactorInv;
+
   }; // class GraphicsView
 
   class GraphicsScene : public QGraphicsScene

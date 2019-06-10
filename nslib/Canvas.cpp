@@ -36,6 +36,9 @@
 namespace nslib
 {
 
+  const double GraphicsView::scaleFactor = 1.04;
+  const double GraphicsView::scaleFactorInv = 1.0 / 1.04;
+
   GraphicsView::GraphicsView( QWidget* parent_ )
     : QGraphicsView( parent_ )
   {
@@ -83,13 +86,16 @@ namespace nslib
     if ( delta > 0 )
     {
       // Zoom in
-      scale(scaleFactor, scaleFactor);
+      this->scale( scaleFactor, scaleFactor );
     }
     else if ( delta < 0 )
     {
       // Zooming out
-      this->scale( 1.0f / scaleFactor, 1.0f / scaleFactor );
+      this->scale( scaleFactorInv, scaleFactorInv );
     }
+
+    auto sceneRect = this->scene( )->itemsBoundingRect( );
+    this->setSceneRect( sceneRect );
 
     // Don't call superclass handler here
     // as wheel is normally used for moving scrollbars

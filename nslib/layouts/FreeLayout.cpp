@@ -64,8 +64,19 @@ namespace nslib
 
   void FreeLayout::stopMoveActualRepresentation( void )
   {
+    auto itemSize = _movedItem->boundingRect( );
+    auto itemsBoundingRect = _canvas->scene( ).itemsBoundingRect( );
+
+    itemsBoundingRect.moveBottomLeft( QPoint(
+      ( int ) std::min( itemSize.left( ), itemsBoundingRect.left( )),
+      ( int ) std::min( itemSize.bottom( ), itemsBoundingRect.bottom( ))));
+
+    itemsBoundingRect.moveTopRight( QPoint(
+      ( int ) std::max( itemSize.right( ), itemsBoundingRect.right( )),
+      ( int ) std::max( itemSize.top( ), itemsBoundingRect.top( ))));
+
     _movedItem = nullptr;
-    _statusBar->showMessage( "",5 );
+    _statusBar->showMessage( "", 5 );
   }
 
   void FreeLayout::startMoveRepresentation( QGraphicsItem* item_,
