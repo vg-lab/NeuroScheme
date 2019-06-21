@@ -29,6 +29,8 @@
 #include <nslib/reps/SelectableItem.h>
 #include "CongenPopRep.h"
 #include <QGraphicsEllipseItem>
+#include <nslib/ItemText.h>
+
 
 namespace nslib
 {
@@ -51,7 +53,7 @@ namespace nslib
       CongenPopItem( const CongenPopRep& entityRep,
         unsigned int size = 100, bool interactive = true );
 
-      virtual ~CongenPopItem( void ) {}
+      virtual ~CongenPopItem( void );
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 
@@ -67,7 +69,7 @@ namespace nslib
 
 
     protected:
-
+      ItemText* _itemText;
 
     };
 

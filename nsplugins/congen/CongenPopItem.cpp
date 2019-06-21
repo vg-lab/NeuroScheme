@@ -31,6 +31,7 @@ namespace nslib
   {
     CongenPopItem::CongenPopItem( const CongenPopRep& entityRep,
       unsigned int size, bool interactive_ )
+      :_itemText( nullptr )
     {
       setInteractive( interactive_ );
       if ( interactive_ )
@@ -82,16 +83,11 @@ namespace nslib
 
       if ( nslib::Config::showEntitiesName( ))
       {
-        auto text = new QGraphicsTextItem( QString::fromStdString(
-          entityRep.getProperty( "Entity name" ).value<std::string>( )));
-        text->setPos( -0.32f * text->boundingRect( ).width( ),
-          -0.32f * text->boundingRect( ).height( ));
-        text->setDefaultTextColor( QColor::fromRgb( 0, 0, 0, 255 ));
-        text->setScale( 0.64f );
-        text->setParentItem( this );
+        _itemText = new ItemText( QString::fromStdString(
+          entityRep.getProperty( "Entity name" ).value<std::string>( )), this );
       }
 
-      this->_parentRep = &( const_cast< CongenPopRep& >( entityRep ));
+      _parentRep = &( const_cast< CongenPopRep& >( entityRep ));
     }
 
     void CongenPopItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
@@ -143,6 +139,11 @@ namespace nslib
       {
         InteractionManager::contextMenuEvent( this, event_ );
       }
+    }
+
+    CongenPopItem::~CongenPopItem( void )
+    {
+      delete _itemText;
     }
 
   } // namespace congen

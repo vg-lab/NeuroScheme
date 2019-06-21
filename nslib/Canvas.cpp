@@ -80,7 +80,6 @@ namespace nslib
     setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
 
     // Scale the view / do the zoom
-    double scaleFactor = 1.05;
     int delta = event_->angleDelta( ).y( );
 
     if ( delta > 0 )
