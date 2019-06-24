@@ -19,6 +19,7 @@ set( NSLIB_PUBLIC_HEADERS
   error.h
   FilterWidget.h
   InteractionManager.h
+  ItemText.h
   Loggers.h
   PaneManager.h
   RepresentationCreatorManager.h
@@ -58,6 +59,7 @@ set( NSLIB_SOURCES
   EntityEditWidget.cpp
   FilterWidget.cpp
   InteractionManager.cpp
+  ItemText.cpp
   Loggers.cpp
   PaneManager.cpp
   RepresentationCreatorManager.cpp

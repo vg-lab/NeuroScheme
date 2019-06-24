@@ -30,6 +30,7 @@
 #include <nslib/reps/SelectableItem.h>
 #include "NeuronSuperPopRep.h"
 #include <QGraphicsEllipseItem>
+#include <nslib/ItemText.h>
 
 namespace nslib
 {
@@ -52,7 +53,7 @@ namespace nslib
       NeuronSuperPopItem( const NeuronSuperPopRep& entityRep,
         unsigned int size = 100, bool interactive = true );
 
-      virtual ~NeuronSuperPopItem( void ) {}
+      virtual ~NeuronSuperPopItem( void );
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 
@@ -70,6 +71,9 @@ namespace nslib
       static const float minCircle;
       static const float maxCircle;
       static const float rangeCircle;
+
+      protected:
+      ItemText* _itemText;
 
     };
 
