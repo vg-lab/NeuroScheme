@@ -48,6 +48,7 @@
 #include <QDateTime>
 #include <QLabel>
 #include <QFileDialog>
+#include <QHeaderView>
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )

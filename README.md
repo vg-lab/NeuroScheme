@@ -39,7 +39,7 @@ command can be used:
 
 There are binaries for x64 architecture for GNU/Linux, MS Windows and MacOSX
 available for download in
-[http://github.com/gmrvvis/apps](http://github.com/gmrvvis/apps)
+[http://gmrv.es/gmrvvis/apps/NeuroScheme/](http://gmrv.es/gmrvvis/apps/NeuroScheme/)
 
 ## Building from source
 
