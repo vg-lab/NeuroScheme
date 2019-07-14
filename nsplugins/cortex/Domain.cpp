@@ -21,6 +21,7 @@
  */
 
 #include "Domain.h"
+#include "Eigen4VectorCaster.h"
 #include "Neuron.h"
 #include <shift/RelationshipProperties.h>
 #include <nslib/RepresentationCreatorManager.h>
@@ -315,13 +316,13 @@ namespace nslib
     {
       assert( dynamic_cast< Neuron* >( entity ));
       return dynamic_cast< Neuron* >( entity )->
-        getProperty( "gid" ).value< uint >( );
+        getPropertyValue<uint>( "gid", 0u );
     }
 
     const Vector4f Domain::entity3DPosition ( shift::Entity* entity ) const
     {
       // std::cout << entity->getProperty( "Position3D" ).type( ) << std::endl;
-      return entity->getProperty( "Position3D" ).value< Vector4f >( );
+      return entity->getPropertyValue< Vector4f >( "Position3D", Vector4f( ));
     }
 
     void Domain::usageMessage( void )

@@ -128,7 +128,7 @@ namespace nslib
 
   void NeuronAggregationItem::_createNeuronAggregationItem(
     QGraphicsScene* scene_,
-    const NeuronRep& meanNeuron,
+    const NeuronRep* meanNeuron,
     const Layers& layers,
     const NeuronTypeAggregations& neuronTypeAggs,
     const QPainterPath& path_,
@@ -157,7 +157,7 @@ namespace nslib
 
     auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize, false );
     // To avoid destruction of parent which is not dynamically allocated
-    _meanNeuronItem->parentRep( nullptr );
+    //_meanNeuronItem->parentRep( nullptr );
 
     _meanNeuronItem->setParentItem( nrCont );
 
@@ -222,9 +222,9 @@ namespace nslib
                 ( layerHeight + layerPadding ));
 
       const float& percPyr =
-        layers[ layer ]->getProperty( "leftPerc" ).value< float >( );
+        layers[ layer ]->getPropertyValue< float >( "leftPerc", .0f );
       const float& percInter =
-        layers[ layer ]->getProperty( "rightPerc" ).value< float >( );
+        layers[ layer ]->getPropertyValue< float >( "rightPerc", .0f );
 
       auto layerRep = dynamic_cast< LayerRep* >( layers[ layer ] );
       assert( layerRep );
@@ -392,5 +392,46 @@ namespace nslib
     _collapsed = false;
   }
 
-} // namespace cortex
+  void NeuronAggregationItem::hoverEnterEvent(
+    QGraphicsSceneHoverEvent* event_ )
+    {
+      auto qGraphicsItemRep =
+        dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+      if ( qGraphicsItemRep )
+        for ( auto& item : qGraphicsItemRep->items( ))
+        {
+          auto qAbstractGraphicItem =
+            dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+          if ( qAbstractGraphicItem )
+          {
+            InteractionManager::hoverEnterEvent(
+              qAbstractGraphicItem, event_ );
+          }
+        }
+    }
+
+    void NeuronAggregationItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      auto qGraphicsItemRep =
+        dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+      if ( qGraphicsItemRep )
+      {
+        for( auto& item : qGraphicsItemRep->items( ))
+        {
+          auto qAbstractGraphicItem =
+            dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+          if( qAbstractGraphicItem )
+          {
+            InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
+          }
+        }
+      }
+    }
+
+      void NeuronAggregationItem::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+      {
+        InteractionManager::contextMenuEvent( this, event_ );
+      }
+
+  } // namespace cortex
 } // namespace nslib

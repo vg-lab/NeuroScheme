@@ -60,10 +60,10 @@ namespace nslib
 
 
     static void hoverEnterEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneHoverEvent* event );
+      QGraphicsSceneHoverEvent* event );
 
     static void hoverLeaveEvent( QAbstractGraphicsShapeItem* item,
-                                 QGraphicsSceneHoverEvent* event );
+      QGraphicsSceneHoverEvent* event );
 
     static void contextMenuEvent( QAbstractGraphicsShapeItem* item,
                                   QGraphicsSceneContextMenuEvent* event );
@@ -139,10 +139,10 @@ namespace nslib
       shift::RelationshipOneToN& relAPartOf_);
 
     static unsigned int addCreateEntitiesContextMenu(
-      int commonParent_,
+      int selectedId_,
       const shift::EntitiesTypes& entitiesTypes_,
       shift::Entities& dataEntities_,
-      shift::Entity*& parentEntity_,
+      shift::Entity*& selectedEntity_,
       std::unordered_map< QAction*, unsigned int >& actionToIdx_,
       std::vector< std::string >*& childrenTypes_,
       const bool addParentTypes_,

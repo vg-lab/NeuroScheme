@@ -24,6 +24,7 @@
 
 #include "MiniColumnRep.h"
 #include "NeuronAggregationItem.h"
+#include <nslib/ItemText.h>
 
 namespace nslib
 {
@@ -41,7 +42,10 @@ namespace nslib
                       QGraphicsScene* scene,
                       unsigned int size = 300 );
 
-      virtual ~MiniColumnItem( void ) {}
+      virtual ~MiniColumnItem( void );
+
+    protected:
+      ItemText* _itemText;
 
     };
   }

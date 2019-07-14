@@ -30,52 +30,6 @@ namespace nslib
   namespace cortex
   {
 
-    class Eigen4VectorCaster : public fires::PropertyCaster
-    {
-    public:
-
-      virtual ~Eigen4VectorCaster( void )
-      {
-      }
-
-
-      int toInt( const fires::Property&, TIntRounding  ) override
-      {
-        return 0;
-      };
-      std::string toString( const fires::Property& prop) override
-      {
-        Eigen::Vector4f vector = prop.value< Eigen::Vector4f >( );
-
-        float array[] = {vector[ 0 ], vector[ 1 ], vector[ 2 ], vector[ 3 ]};
-        auto space = std::string( " " );
-        return std::to_string( array[ 0 ] ) + space + std::to_string( array[ 1 ] ) + space + std::to_string( array[ 2 ] )
-               + space + std::to_string( array[ 3 ] );
-      };
-      void fromString(
-        fires::Property& property, const std::string& value_ ) override
-      {
-        float x = 0.0f;
-        float y = 0.0f;
-        float z = 0.0f;
-        float w = 0.0f;
-
-        int nItemsRead = sscanf( value_.c_str( ),"%f %f %f %f\n", &x, &y, &z, &w);
-        if( 4 != nItemsRead )
-        {
-          Loggers::get( )->log( "ERROR: Cast to eigen::Vector4f failed",
-            LOG_LEVEL_WARNING );
-        }
-        Eigen::Vector4f vector( x, y, z, w);
-        property.set( vector );
-      };
-
-      std::vector< std::string > categories( void ) override
-      {
-        return std::vector< std::string >( );
-      }
-    };
-
     class DomainGUI : QObject
     {
       Q_OBJECT;
@@ -101,13 +55,6 @@ namespace nslib
     public:
 
       Domain( void );
-
-      virtual ~Domain( void )
-      {
-        delete this->_dataLoader;
-        delete this->_entitiesTypes;
-        delete this->_relationshipPropertiesTypes;
-      }
 
       bool isSelectableEntity( shift::Entity* entity ) const override;
       unsigned int selectableEntityId( shift::Entity* entity ) const override;

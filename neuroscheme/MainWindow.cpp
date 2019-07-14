@@ -363,9 +363,8 @@ void MainWindow::selectDomain( void )
   // If not domain via CLI, then ask via GUI dialog
   if ( domainArg.empty( ))
   {
-    domainSelected =
-      QInputDialog::getItem( this, "Select domain", "Domain name:",
-                             availableDomains,  0, false );
+    domainSelected = QInputDialog::getItem(
+      this, "Select domain", "Domain name:", availableDomains,  0, false );
   }
   else
     domainSelected =
@@ -390,7 +389,7 @@ void MainWindow::selectDomain( void )
   else
   {
     QString msg( "domain \"" + domainSelected + "\" unknown. "
-                 "Valid values are: " );
+      "Valid values are: " );
     msg += availableDomains.join(", ");
     nslib::Loggers::get( )->log( msg.toStdString( ), nslib::LOG_LEVEL_ERROR );
     exit( -1 );
@@ -459,7 +458,7 @@ void MainWindow::storeSelection( void )
   if ( nslib::SelectionManager::activeSelectionSize( ) == 0 )
   {
     nslib::Loggers::get( )->log( "Tried to store an empty selection ",
-                                 nslib::LOG_LEVEL_VERBOSE );
+      nslib::LOG_LEVEL_VERBOSE );
     return;
   }
 
@@ -502,10 +501,10 @@ void MainWindow::storeSelection( void )
 
     unsigned int row = _storedSelections.table->row( it->second );
     _storedSelections.table->item(
-        row, TTableColumns::COLUMN_COUNT )->setText( selectedEntities );
+      row, TTableColumns::COLUMN_COUNT )->setText( selectedEntities );
 
     _storedSelections.table->item(
-        row, TTableColumns::COLUMN_DATETIME )->setText( date );
+      row, TTableColumns::COLUMN_DATETIME )->setText( date );
 
   }
   else
@@ -522,10 +521,10 @@ void MainWindow::storeSelection( void )
       make_pair( label.toStdString( ), labelItem ));
 
     _storedSelections.table->setItem( row, TTableColumns::COLUMN_COUNT,
-                                      new QTableWidgetItem( selectedEntities ));
+      new QTableWidgetItem( selectedEntities ));
 
     _storedSelections.table->setItem( row, TTableColumns::COLUMN_DATETIME,
-                                      new QTableWidgetItem( date ));
+      new QTableWidgetItem( date ));
   }
 // #ifdef NEUROSCHEME_USE_ZEROEQ
 //   updateCellSetOperationSelections( );

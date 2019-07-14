@@ -212,7 +212,7 @@ namespace nslib
 
   void InteractionManager::hoverLeaveEvent(
     QAbstractGraphicsShapeItem* item,
-    QGraphicsSceneHoverEvent* /* event */ )
+    QGraphicsSceneHoverEvent* /*event*/ )
   {
     if ( lastShapeItemHoveredOnMouseMove &&
       item == lastShapeItemHoveredOnMouseMove )
@@ -586,7 +586,6 @@ namespace nslib
           LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
       }
     }
-
     tmpConnectionLineRemove( );
 
   }
@@ -1252,17 +1251,17 @@ namespace nslib
   }
 
   unsigned int InteractionManager::addCreateEntitiesContextMenu(
-    const int commonParent_,
+    const int selectedId_,
     const shift::EntitiesTypes& entitiesTypes_,
     shift::Entities& dataEntities_,
-    shift::Entity*& parentEntity_,
+    shift::Entity*& selectedEntity_,
     std::unordered_map< QAction*, unsigned int >& actionToIdx_,
     std::vector< std::string >*& newEntitiesTypes_,
     const bool addParentTypes_,
     std::vector< bool >*& isParentEntity_ )
   {
     unsigned int entityIdx = 0;
-    if( commonParent_ <= 0 )
+    if( selectedId_ <= 0 )
     {
       for( const auto& type : entitiesTypes_.entitiesTypes( ))
       {
@@ -1280,12 +1279,13 @@ namespace nslib
     }
     else
     {
-      parentEntity_ = dataEntities_.at( commonParent_ );
+      selectedEntity_ = dataEntities_.at( selectedId_ );
+      const auto selectedEntityType = selectedEntity_->typeName( );
 
       shift::RelationshipPropertiesTypes::rel_constr_range typesNames;
       typesNames =
         shift::RelationshipPropertiesTypes::constraints( "ParentOf",
-        parentEntity_->typeName( ));
+          selectedEntityType );
       QAction* action = nullptr;
       for( auto childTypeName = typesNames.first;
         childTypeName != typesNames.second; ++childTypeName )
@@ -1303,18 +1303,28 @@ namespace nslib
         {
           _contextMenu->addSeparator( );
         }
-
         typesNames = shift::RelationshipPropertiesTypes::constraints(
-            "ChildOf", parentEntity_->typeName( ));
+          "ChildOf", selectedEntityType );
+        auto& relChildOf = *( DataManager::entities( ).relationships( )
+          [ "isChildOf" ]->asOneToOne( ));
+        const auto parentIt = relChildOf.find( selectedId_ );
+        const auto parentType =
+          ( parentIt != relChildOf.end( ) && parentIt->second.entity != 0 )
+          ? dataEntities_.at( parentIt->second.entity )->typeName( ) : "";
+
         for( auto parentTypeName = typesNames.first;
           parentTypeName != typesNames.second; ++parentTypeName )
         {
-          action = _contextMenu->addAction(
-            QString( "Add " ) + QString::fromStdString(
-            parentTypeName->second ) + QString( " as parent" ));
-          actionToIdx_[ action ] = entityIdx++;
-          newEntitiesTypes_->push_back( parentTypeName->second );
-          isParentEntity_->push_back( true );
+          if ( parentType == "" || shift::RelationshipPropertiesTypes::
+            isConstrained( "ChildOf", parentTypeName->second, parentType ))
+          {
+            action = _contextMenu->addAction(
+              QString( "Add " ) + QString::fromStdString(
+              parentTypeName->second ) + QString( " as parent" ));
+            actionToIdx_[ action ] = entityIdx++;
+            newEntitiesTypes_->push_back( parentTypeName->second );
+            isParentEntity_->push_back( true );
+          }
         }
       }
 

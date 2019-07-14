@@ -72,14 +72,14 @@ namespace nslib
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        shift::RelationshipOneToN* relations ) override;
+        shift::RelationshipOneToN* relations ) final;
 
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        shift::RelationshipAggregatedOneToN* relatedElements ) override ;
+        shift::RelationshipAggregatedOneToN* relatedElements ) final;
 
       void reset( void ) final;
 

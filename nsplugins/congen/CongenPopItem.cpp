@@ -43,7 +43,7 @@ namespace nslib
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = entityRep.getProperty( "color" ).value< Color >( );
+      const Color& bgColor = entityRep.getPropertyValue< Color >( "color" );
       auto circleItem = new QGraphicsEllipseItem( this );
       float circleItemSize = size * 0.9f;
       float halfcircleItemSize = - 0.5f * circleItemSize;
@@ -75,16 +75,16 @@ namespace nslib
       auto barFill = new QGraphicsRectItem(
         halfBarWidth, halfBarHeight,
         roundf(barWidth *
-        entityRep.getProperty( "line perc" ).value< float >( )),
-        barHeight);
+        entityRep.getPropertyValue< float >( "line perc", .0f )),
+        barHeight );
       barFill->setPen( Qt::NoPen );
       barFill->setBrush( QColor( bgColor ));
       barFill->setParentItem( bar );
 
       if ( Config::showEntitiesName( ))
       {
-        _itemText = new ItemText( QString::fromStdString(
-          entityRep.getProperty( "Entity name" ).value<std::string>( )), this );
+        _itemText = new ItemText( QString::fromStdString( entityRep
+          .getPropertyValue<std::string>( "Entity name", " " )), this );
       }
 
       _parentRep = &( const_cast< CongenPopRep& >( entityRep ));

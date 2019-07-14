@@ -61,13 +61,6 @@ namespace nslib
 
       Domain( void );
 
-      virtual ~Domain( void )
-      {
-        delete _dataLoader;
-        delete this->_entitiesTypes;
-        delete this->_relationshipPropertiesTypes;
-      }
-
       bool isSelectableEntity( shift::Entity* entity ) const override ;
       unsigned int selectableEntityId( shift::Entity* entity ) const override;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const override;

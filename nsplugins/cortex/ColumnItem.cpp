@@ -24,6 +24,7 @@
 #include "ColumnItem.h"
 #include "NeuronItem.h"
 #include <QPen>
+#include <nslib/Config.h>
 
 namespace nslib
 {
@@ -34,16 +35,15 @@ namespace nslib
                             QGraphicsScene* scene_,
                             unsigned int size )
       : NeuronAggregationItem( )
+      , _itemText( nullptr )
     {
 
-      const NeuronRep& meanNeuron =
-        columnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
+      const NeuronRep* meanNeuron = new NeuronRep(
+        columnRep.getPropertyValue< NeuronRep >( "meanNeuron" ));
       const auto& layers =
-        columnRep.getProperty( "layers" ).value< ColumnRep::Layers >( );
-      const auto& neuronAggReps =
-        columnRep.getProperty( "neuronTypeAggregations" ).
-        value< ColumnRep::NeuronTypeAggregations >( );
-
+        columnRep.getPropertyValue< ColumnRep::Layers >( "layers" );
+      const auto& neuronAggReps = columnRep.getPropertyValue
+        < ColumnRep::NeuronTypeAggregations >( "neuronTypeAggregations" );
       // Create the polygon for the basic column icon
       QPainterPath path_;
       QPolygon poly;
@@ -69,8 +69,20 @@ namespace nslib
         QColor( 114, 188, 196 ),
         size );
 
+      if ( Config::showEntitiesName( ))
+      {
+        _itemText = new ItemText( QString::fromStdString( columnRep
+          .getPropertyValue< std::string >( "Entity name", "" )), this,
+          0.4f, 1.0f );
+      }
+
       this->_parentRep = &( const_cast< ColumnRep& >( columnRep ));
       //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
+    }
+
+    ColumnItem::~ColumnItem( void )
+    {
+      delete _itemText;
     }
 
   } // namespace cortex

@@ -345,10 +345,10 @@ namespace nslib
           _isAggregated = false;
         }
       }
-      const auto originName = _updateOriginEntity->getProperty( "Entity name" )
-        .value<std::string>( );
-      const auto destName = _updateDestEntity->getProperty( "Entity name" )
-        .value<std::string>( );
+      const std::string originName = _updateOriginEntity
+        ->getPropertyValue< std::string >( "Entity name", " " );
+      const std::string destName = _updateDestEntity
+        ->getPropertyValue< std::string >( "Entity name", " " );
       if( _isAggregated )
       {
         auto& relAggregatedConnectsTo = *( DataManager::entities( )

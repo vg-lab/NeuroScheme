@@ -57,21 +57,21 @@ namespace nslib
         shift::TRepsToEntities& repsToEntities,
         shift::TGidToEntitiesReps& gidsToEntitiesReps,
         bool linkEntitiesToReps = false,
-        bool linkRepsToObjs = false ) override;
+        bool linkRepsToObjs = false ) final;
 
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        shift::RelationshipAggregatedOneToN* relatedElements ) override ;
+        shift::RelationshipAggregatedOneToN* relatedElements ) final;
 
       void generateRelations(
         const shift::Entities& entities,
         const shift::TGidToEntitiesReps& gidsToEntitiesReps,
         shift::TRelatedEntitiesReps& relatedEntitiesReps,
         shift::Representations& relatedEntities,
-        shift::RelationshipOneToN* relatedElements ) override;
+        shift::RelationshipOneToN* relatedElements ) final;
 
       void setMaximums(
         float maxNeuronSomaVolume_,

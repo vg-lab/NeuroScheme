@@ -155,7 +155,7 @@ namespace nslib
   {
     _entity = entity_;
     _entityNameLabel->setText(QString::fromStdString( "Connections of entity: "
-      + _entity->getProperty( "Entity name" ).value< std::string >( )));
+      + _entity->getPropertyValue< std::string >( "Entity name", " ")));
     _aggregatedConnectedByTable->setTableData(
       aggregatedConnectedByMap_, _entity, _allPropsChecked );
     _aggregatedConnectsToTable->setTableData(

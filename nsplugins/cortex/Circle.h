@@ -19,37 +19,34 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIBCORTEX__COLUMN_ITEM__
-#define __NSLIBCORTEX__COLUMN_ITEM__
+#ifndef __NSLIBCORTEX__CIRCLE__
+#define __NSLIBCORTEX__CIRCLE__
 
-#include <nslib/ItemText.h>
-#include "ColumnRep.h"
-#include "NeuronAggregationItem.h"
+#include <nslib/reps/SelectableItem.h>
+#include <nslib/reps/Item.h>
+#include <shift/Representation.h>
 
 namespace nslib
 {
   namespace cortex
   {
-
-
-    class ColumnItem
-      : public NeuronAggregationItem
+    class Circle
+      : public QGraphicsEllipseItem
+      , public SelectableItem
+      , public Item
     {
+      public:
+      Circle( QGraphicsItem* parent_ );
 
-    public:
+      shift::Representation* parentRep( void ) const final;
 
-      ColumnItem( const ColumnRep& columnRep,
-                  QGraphicsScene* scene,
-                  unsigned int size = 300 );
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 
-      virtual ~ColumnItem( void );
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
 
-    protected:
-      ItemText* _itemText;
+      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
     };
-
-  } // namespace cortex
-} // namespace nslib
-
-#endif
+  }
+}
+#endif //__NSLIBCORTEX__CIRCLE__

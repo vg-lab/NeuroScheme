@@ -64,7 +64,7 @@ namespace nslib
       : ConnectionArrowItem( autoConnectionArrowRep )
     {
       _arrowThickness = 1.3f *
-        autoConnectionArrowRep.getProperty( "width" ).value< unsigned int >( );
+        autoConnectionArrowRep.getPropertyValue< unsigned int >( "width" , 1u );
     }
 
     const QLineF& AutoConnectionArrowItem::line( void )

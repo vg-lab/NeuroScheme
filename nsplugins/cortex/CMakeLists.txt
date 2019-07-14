@@ -82,6 +82,10 @@ set( NSLIBCORTEX_SOURCES
   NeuronRep.cpp
   NeuronItem.cpp
   RepresentationCreator.cpp
+  Circle.cpp
+  Triangle.cpp
+  Eigen4VectorCaster.cpp
+  LayerItem.cpp
   )
 
 set( NSLIBCORTEX_HEADERS
@@ -102,6 +106,10 @@ set( NSLIBCORTEX_HEADERS
   NeuronRep.h
   NeuronItem.h
   RepresentationCreator.h
+  Circle.h
+  Triangle.h
+  Eigen4VectorCaster.h
+  LayerItem.h
   )
 
 include_directories( ${SHIFT_GENERATED_DIR} )

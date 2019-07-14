@@ -175,16 +175,16 @@
                     "class": "enum",
                     "name": "TInputType",
                     "values": [
-                        "Pulse input",
-                        "Random stim"
+                      "Pulse input",
+                      "Random stim"
                     ]
                 },
                 {
                     "class": "enum",
                     "name": "TSynapticMechanism",
                     "values": [
-                        "DoubExpSynA",
-                        "undefined"
+                      "DoubExpSynA",
+                      "undefined"
                     ]
                 }
             ]

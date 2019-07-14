@@ -52,12 +52,11 @@ namespace nslib
            {
              entitiesGids.push_back( entity->entityGid( ));
              exporter_->addPopulation( "http://morphml.org/networkml/schema",
-               QString::fromStdString( entity->getProperty(
-               "Entity name" ).value<std::string>( )),
-               QString::fromStdString( caster->toString(
+               QString::fromStdString( entity->getPropertyValue< std::string >(
+               "Entity name", " " )), QString::fromStdString( caster->toString(
                entity->getProperty( "Neuron model" ))),
-               QString::number( entity->getProperty(
-               "Nb of neurons" ).value<unsigned int>( )),
+               QString::number( entity->getPropertyValue< unsigned int >(
+               "Nb of neurons", 0u )),
                "0", "0", "0", "0", "0", "0" );
            }
         }
@@ -76,19 +75,19 @@ namespace nslib
             connectedEntities.addRelatedEntitiesOneToN( relConnectsTo, entity,
               DataManager::entities( ), 1 );
             entitiesGids.push_back( entity->entityGid( ));
-            exporter_->addInput( QString::fromStdString( entity->getProperty(
-              "Entity name" ).value<std::string>( )),
-              entity->getProperty( "Input type" )
-              .value< shiftgen::Input::TInputType >( ) ==
+            exporter_->addInput( QString::fromStdString( entity->getPropertyValue< std::string >(
+              "Entity name", " " )), entity->getPropertyValue
+              < shiftgen::Input::TInputType >( "Stimulator type",
+              shiftgen::Input::TInputType::Random_stim ) ==
               shiftgen::Input::TInputType::Random_stim,
-              QString::number( entity->getProperty( "Pulse input Delay" ).
-              value<float>( )),QString::number( entity->getProperty(
-              "Pulse input Duration" ). value<float>( )), QString::number(
-              entity->getProperty( "Pulse input Amplitude" ).value<float>( )),
-              QString::number( entity->getProperty( "Random stim Frequency" )
-                .value< unsigned int >( )),QString::fromStdString( caster->toString(
-                entity->getProperty( "Random stim synaptic mechanism" ))),
-                connectedEntities );
+              QString::number( entity->getPropertyValue< float >
+              ( "Pulse input Delay", .0f )), QString::number( entity->
+              getPropertyValue< float >( "Pulse input Duration", .0f )),
+              QString::number( entity->getPropertyValue< float >
+              ( "Pulse input Amplitude", .0f )), QString::number( entity->
+              getPropertyValue< unsigned int >( "Random stim Frequency", 0u )),
+              QString::fromStdString( caster->toString( entity-> getProperty
+              ( "Random stim synaptic mechanism" ))), connectedEntities );
           }
         }
 
@@ -112,11 +111,11 @@ namespace nslib
           params[ "units" ] = "Physiological Units";
           params[ "xmlns" ] = "http://morphml.org/networkml/schema";
           params[ "source" ] = DataManager::entities( ).map( ).find(
-            relIt->first)->second->getProperty(
-            "Entity name" ).value< std::string >( );
+            relIt->first)->second->getPropertyValue< std::string >(
+            "Entity name", " " );
           params[ "target" ] = DataManager::entities( ).map( ).find(
-            relPropIt->first)->second->getProperty(
-            "Entity name" ).value< std::string >( );
+            relPropIt->first)->second->getPropertyValue< std::string >(
+            "Entity name", " " );
           params[ "name" ] = relPropIt->second->getProperty(
             "Name" ).value< std::string >( );
           params[ "synapse_type" ] = "StaticSynapse";

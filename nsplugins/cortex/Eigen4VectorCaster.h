@@ -19,37 +19,35 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIBCORTEX__COLUMN_ITEM__
-#define __NSLIBCORTEX__COLUMN_ITEM__
+#ifndef __NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__
+#define __NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__
 
-#include <nslib/ItemText.h>
-#include "ColumnRep.h"
-#include "NeuronAggregationItem.h"
+#include <fires/Property/PropertyCaster.h>
 
 namespace nslib
 {
   namespace cortex
   {
-
-
-    class ColumnItem
-      : public NeuronAggregationItem
+    class Eigen4VectorCaster : public fires::PropertyCaster
     {
+      public:
 
-    public:
+      virtual ~Eigen4VectorCaster( void )
+      {
+      }
 
-      ColumnItem( const ColumnRep& columnRep,
-                  QGraphicsScene* scene,
-                  unsigned int size = 300 );
 
-      virtual ~ColumnItem( void );
+      int toInt( const fires::Property&, TIntRounding ) override;
 
-    protected:
-      ItemText* _itemText;
+      std::string toString( const fires::Property& prop ) override;
 
+      void fromString( fires::Property& property,
+        const std::string& value_ ) override;
+
+      std::vector <std::string> categories( void ) override;
     };
+  }
+}
 
-  } // namespace cortex
-} // namespace nslib
 
-#endif
+#endif //__NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__
