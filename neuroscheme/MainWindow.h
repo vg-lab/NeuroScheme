@@ -91,6 +91,7 @@ public slots:
   void quit( void );
   void exportToJSON( void );
   void importFromJSON( void );
+  void cleanScene( void );
 
 protected:
 

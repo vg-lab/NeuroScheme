@@ -38,14 +38,11 @@ namespace nslib
   public:
 
     static shift::EntitiesWithRelationships& entities( void );
-    static shift::Entities& rootEntities( void )
-    {
-      return _rootEntities;
-    }
-    static shift::Entities& noHierarchyEntities( void )
-    {
-      return _noHierarchyEntities;
-    }
+    static shift::Entities& rootEntities( void );
+    static shift::Entities& noHierarchyEntities( void );
+
+    static void reset( void );
+
     static void loadBlueConfig( const std::string& blueConfig,
       const std::string& targetLabel,  const bool loadMorphologies,
       const std::string& csvNeuronStatsFileName,

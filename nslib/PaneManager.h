@@ -42,15 +42,8 @@ namespace nslib
     static TPanes& panes( void );
     static QGridLayout* layout( void );
     static void layout( QGridLayout* );
-    static void updateSelection( void )
-    {
-      for ( auto canvas : _panes )
-      {
-        canvas->layouts( ).getLayout(
-          canvas->activeLayoutIndex( ))->updateSelection( );
-      }
-    }
-
+    static void updateSelection( void );
+    static bool freeLayoutInUse( void );
     typedef enum
     {
       HORIZONTAL,

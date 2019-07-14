@@ -395,12 +395,7 @@ namespace nslib
 
     bool DataLoader::loadNeuroML( const std::string& fileName )
     {
-      auto& entities = DataManager::entities( );
-      auto& rootEntities = DataManager::rootEntities( );
-      DataManager::noHierarchyEntities( ).clear( );
-      fires::PropertyManager::clear( );
-      entities.clear( );
-      rootEntities.clear( );
+      DataManager::reset( );
       float maxAbsoluteWeight = 0.0f;
       unsigned int maxNeuronsPerPopulation = 0;
 

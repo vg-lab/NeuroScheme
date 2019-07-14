@@ -334,4 +334,21 @@ namespace nslib
     }
     _relatedEntitiesReps[ repCreatorId ].clear( );
   }
+
+  void RepresentationCreatorManager::clearCaches( )
+  {
+    const bool freeLayoutInUse = PaneManager::freeLayoutInUse( );
+    for ( const auto& creatorPair : _repCreators )
+    {
+      clearEntitiesCache( creatorPair.first, freeLayoutInUse );
+      clearRelationshipsCache( creatorPair.first );
+    }
+  }
+  void RepresentationCreatorManager::clearMaximums( )
+  {
+    for ( const auto& creatorPair : _repCreators )
+    {
+      creatorPair.second->reset( );
+    }
+  }
 }

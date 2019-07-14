@@ -221,6 +221,16 @@ namespace nslib
     }
   }
 
+  void PaneManager::updateSelection( void )
+  {
+    for ( auto canvas : _panes )
+    {
+      canvas->layouts( ).getLayout(
+          canvas->activeLayoutIndex( ))->updateSelection( );
+    }
+  }
+
+
   void PaneManager::killActivePane( void )
   {
     killPane( _activePane );
@@ -253,6 +263,18 @@ namespace nslib
       }
       lastMatrixClock = std::chrono::system_clock::now( );
     }
+  }
+
+  bool PaneManager::freeLayoutInUse( void )
+  {
+    for( const auto& pane : PaneManager::panes( ))
+    {
+      if( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE )
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
 

@@ -75,6 +75,9 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
            this, SLOT( importFromJSON( )));
 
+  connect( _ui->actionCleanScene, SIGNAL( triggered( )),
+           this, SLOT( cleanScene( )));
+
   connect( _ui->actionJSONExporter, SIGNAL( triggered( )),
            this, SLOT( exportToJSON( )));
 
@@ -438,9 +441,13 @@ void MainWindow::updateStoredSelectionsDock( void )
 void MainWindow::updateLayoutsDock( void )
 {
   if ( _ui->actionLayouts->isChecked( ))
+  {
     _layoutsDock->show( );
+  }
   else
+  {
     _layoutsDock->close( );
+  }
 
   resizeEvent( nullptr );
 }
@@ -524,7 +531,6 @@ void MainWindow::storeSelection( void )
 //   updateCellSetOperationSelections( );
 // #endif
 }
-
 
 void MainWindow::restoreSelection( void )
 {
@@ -661,7 +667,6 @@ void MainWindow::aboutDialog( void )
   QMessageBox::about(this, tr( "About NeuroScheme" ), msj );
 }
 
-
 void MainWindow::toggleShowConnectivity( void )
 {
 
@@ -691,27 +696,13 @@ void MainWindow::toggleShowNoHierarchyEntities( void )
 void MainWindow::toggleShowEntitiesName( void )
 {
   nslib::Config::showEntitiesName( _ui->actionShowEntitiesName->isChecked( ));
-
-  bool freeLayoutInUse = false;
-  for( const auto& pane : nslib::PaneManager::panes( ))
-  {
-    freeLayoutInUse = freeLayoutInUse ||
-      ( pane->activeLayoutIndex( ) == nslib::Layout::TLayoutIndexes::FREE );
-  }
-  for ( const auto& creatorPair : nslib::RepresentationCreatorManager::creators( ))
-  {
-    nslib::RepresentationCreatorManager::clearEntitiesCache(
-      creatorPair.first, freeLayoutInUse );
-    nslib::RepresentationCreatorManager::clearRelationshipsCache(
-      creatorPair.first );
-  }
+  nslib::RepresentationCreatorManager::clearCaches( );
   for ( auto canvas : nslib::PaneManager::panes( ))
   {
     canvas->displayEntities( false, false );
   }
 
 }
-
 
 // void MainWindow::saveScene( void )
 // {
@@ -816,6 +807,21 @@ void MainWindow::importFromJSON( void )
     auto fileName = path.toStdString( );
 
     std::ifstream inputfile( fileName );
+    nslib::DataManager::reset( );
+    nslib::RepresentationCreatorManager::clearCaches( );
+    nslib::RepresentationCreatorManager::clearMaximums( );
     nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
+  }
+}
+
+void MainWindow::cleanScene( void )
+{
+  nslib::DataManager::reset( );
+  nslib::RepresentationCreatorManager::clearCaches( );
+  nslib::RepresentationCreatorManager::clearMaximums( );
+  for( auto canvas : nslib::PaneManager::panes( ))
+  {
+    canvas->displayEntities(
+      nslib::DataManager::rootEntities( ), false, true );
   }
 }

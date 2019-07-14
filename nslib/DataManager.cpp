@@ -44,6 +44,16 @@ namespace nslib
     // return _entities;
   }
 
+  shift::Entities& DataManager::rootEntities( void )
+  {
+    return _rootEntities;
+  }
+
+  shift::Entities& DataManager::noHierarchyEntities( void )
+  {
+    return _noHierarchyEntities;
+  }
+
 #ifdef NEUROSCHEME_USE_NSOL
   std::string NeuronMorphologyToLabel(
     nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat )
@@ -222,6 +232,19 @@ namespace nslib
       LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
 #endif
+  }
+
+  void DataManager::reset( void )
+  {
+    _noHierarchyEntities.clear( );
+    auto& entities = DataManager::entities( );
+    for( auto& relation : entities.relationships( ))
+    {
+      relation.second->clearRelations( );
+    }
+    entities.clear( );
+    _rootEntities.clear( );
+    shift::Entity::shiftEntityGid( 0 );
   }
 
 

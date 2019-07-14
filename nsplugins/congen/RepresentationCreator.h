@@ -30,13 +30,15 @@
 
 #include <unordered_map>
 #include <set>
+#include <nslibcongen/api.h>
 
 namespace nslib
 {
   namespace congen
   {
 
-    class RepresentationCreator : public shift::RepresentationCreator
+    class NSLIBCONGEN_API RepresentationCreator
+        : public shift::RepresentationCreator
     {
     public:
 
@@ -79,6 +81,8 @@ namespace nslib
         shift::Representations& relatedEntities,
         shift::RelationshipAggregatedOneToN* relatedElements ) override ;
 
+      void reset( void ) final;
+
 #define TripleKey( x, y, z ) std::make_pair( x, std::make_pair( y, z ))
 
       bool entityUpdatedOrCreated( const shift::Entity* entity ) final;
@@ -103,9 +107,9 @@ namespace nslib
       scoop::CategoricalColorMap< shiftgen::NeuronPop::TNeuronModel >
         _neuronModelColorMap;
       scoop::CategoricalColorMap< shiftgen::Input::TInputType >
-        _stimulatorModelColorMap;
+        _inputModelColorMap;
       scoop::CategoricalColorMap< shiftgen::Output::TOutputModel >
-        _receptorModelColorMap;
+        _outputModelColorMap;
       scoop::SequentialColorMap _superPopLevelColorMap;
       scoop::Color _superPopColor;
 
@@ -125,4 +129,4 @@ namespace nslib
   } // namespace congen
 } // namespace nslib
 
-#endif // __NSLIB__REPRESENTATION_CREATOR__
+#endif //__NSPLUGINS_CONGEN__REPRESENTATION_CREATOR__
