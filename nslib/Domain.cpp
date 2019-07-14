@@ -60,27 +60,34 @@ namespace nslib
     bool minimizeStream )  const
   {
     auto entities = DataManager::entities( ).vector( );
-    SHIFT_CHECK_THROW( !entities.empty( ),
-      "ERROR: Exporting scene without entities." );
+    if ( entities.empty( ))
+    {
+      Loggers::get( )->log( "ERROR: Exporting scene without entities.",
+        LOG_LEVEL_WARNING );
+    }
     auto relationsSize = _exportRelations.size( );
-    SHIFT_CHECK_THROW( relationsSize == _exportAggregatedRelations.size( ),
-      "ERROR: Not concordance between export relations size." );
+    if ( relationsSize != _exportAggregatedRelations.size( ))
+    {
+      Loggers::get( )->log( "Not concordance between export relations size.",
+        LOG_LEVEL_WARNING );
+    }
 
     std::string domainLabel;
     std::string entitiesLabel;
     std::string maximumsLabel;
     std::string layoutLabel;
     std::string continueBracket;
-    std::string relationshipsLabel;
+    std::string relationsLabel;
 
     if ( minimizeStream )
     {
       domainLabel = "{\"domain\":\"";
       maximumsLabel = "\",\"maximums\":{";
-      layoutLabel = "\"},\"layout\":{";
+      layoutLabel = "},\"layout\":{";
       entitiesLabel = "},\"entities\":[";
       continueBracket = "},";
-      relationshipsLabel =  "}],\"relationships\":[";
+      relationsLabel = entities.empty( ) ? "],\"relationships\":["
+        : "}],\"relationships\":[";
     }
     else
     {
@@ -89,7 +96,8 @@ namespace nslib
       layoutLabel = "  },\n  \"layout\": {\n";
       entitiesLabel = "  },\n  \"entities\": [\n";
       continueBracket = "\n    },\n";
-      relationshipsLabel =  "    }\n  ],\n  \"relationships\": [\n";
+      relationsLabel = entities.empty( ) ? "  ],\n  \"relationships\": [\n"
+        : "    }\n  ],\n  \"relationships\": [\n";
 
     }
 
@@ -103,7 +111,7 @@ namespace nslib
     outputStream << entitiesLabel;
     exportEntitiesJSON( outputStream, minimizeStream );
 
-    outputStream << relationshipsLabel;
+    outputStream << relationsLabel;
 
     if ( !_exportRelations.empty( ) )
     {
@@ -143,7 +151,7 @@ namespace nslib
     }
   }
 
-  void Domain::importJSON( std::istream& inputStream )
+  void Domain::importJSON( std::istream& inputStream, const bool replaceGIDs )
   {
     boost::property_tree::ptree root;
     try
@@ -152,15 +160,25 @@ namespace nslib
     }
     catch ( std::exception const& ex )
     {
-      SHIFT_THROW( "ERROR: reading JSON: " + std::string( ex.what( )));
+      Loggers::get( )->log( "ERROR: reading JSON: " + std::string( ex.what( )),
+        LOG_LEVEL_ERROR );
+      return;
     };
 
-    SHIFT_CHECK_THROW( !root.empty( ),"ERROR: empty JSON file" );
+    if ( root.empty( ))
+    {
+      Loggers::get( )->log( "ERROR: empty JSON file",
+        LOG_LEVEL_WARNING );
+      return;
+    }
     try
     {
       std::string domainValue = root.get< std::string >( "domain" );
-      SHIFT_CHECK_THROW( domainValue == _domainName, "ERROR parsing object:"
-         "the domain must specify a " + _domainName + " domain." );
+      if( domainValue != _domainName )
+      {
+        Loggers::get( )->log( "ERROR parsing object: the domain must specify a "
+          + _domainName + " domain.", LOG_LEVEL_ERROR );
+      }
     }
     catch ( std::exception const& ex )
     {
@@ -185,7 +203,7 @@ namespace nslib
     try
     {
       boost::property_tree::ptree entities = root.get_child( "entities" );
-      importEntititiesJSON( entities, oldGIDToEntity );
+      importEntititiesJSON( entities, oldGIDToEntity, replaceGIDs );
     }
     catch ( std::exception const& ex )
     {
@@ -354,12 +372,13 @@ namespace nslib
   }
 
   void Domain::importEntityJSON( const boost::property_tree::ptree& entityJSON,
-    shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID )
+    shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID,
+    const bool replaceGIDs )
   {
     try
     {
       std::string entityType = entityJSON.get< std::string >( "EntityType" );
-      entity = ( *_entitiesTypes ).getEntityObject( entityType )->create( );
+      entity = _entitiesTypes->getEntityObject( entityType )->create( );
     }
     catch ( std::exception const& ex )
     {
@@ -380,6 +399,11 @@ namespace nslib
     try
     {
       entityGID = entityJSON.get< unsigned int >( "EntityGID" );
+      if ( replaceGIDs )
+      {
+        entity->entityGid( entityGID );
+        shift::Entity::shiftEntityGid( entityGID, true );
+      }
     }
     catch ( std::exception const& ex )
     {
@@ -445,8 +469,13 @@ namespace nslib
     {
       unsigned int origGID = relation.get< unsigned int >( "Source" );
       auto search = oldGIDToEntity->find( origGID );
-      SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
-        "ERROR: old origGID doesn't exist");
+      if( search == oldGIDToEntity->end( ))
+      {
+        Loggers::get( )->log( "ERROR: old origGID doesn't exist",
+          LOG_LEVEL_ERROR );
+        origEntity = destEntity = nullptr;
+        return;
+        }
       origEntity = search->second;
     }
     catch ( std::exception const& ex )
@@ -459,21 +488,30 @@ namespace nslib
     {
       unsigned int destGID = relation.get< unsigned int >( "Dest");
       auto search = oldGIDToEntity->find( destGID );
-      SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
-        "ERROR: old destGID doesn't exist");
+      if( search == oldGIDToEntity->end( ))
+      {
+        Loggers::get( )->log( "ERROR: old destGID doesn't exist",
+          LOG_LEVEL_ERROR );
+        origEntity = destEntity = nullptr;
+        return;
+      }
       destEntity = search->second;
     }
     catch ( std::exception const& ex )
     {
+      origEntity = destEntity = nullptr;
       Loggers::get( )->log( "ERROR: getting Dest from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
+      return;
     };
-    if( checkConstrained )
+    if( checkConstrained && !shift::RelationshipPropertiesTypes::isConstrained(
+        relationName, origEntity->typeName( ), destEntity->typeName( )) )
     {
-      SHIFT_CHECK_THROW( shift::RelationshipPropertiesTypes::isConstrained(
-        relationName, origEntity->typeName( ), destEntity->typeName( )),
-        "ERROR: relation: " + relationName + " not supported between: " +
-        origEntity->typeName( ) +" - " + destEntity->typeName( ));
+      Loggers::get( )->log( "ERROR: relation: " + relationName +
+        " not supported between: " + origEntity->typeName( ) +" - " +
+        destEntity->typeName( ), LOG_LEVEL_ERROR );
+      origEntity = destEntity = nullptr;
+      return;
     }
   }
 
@@ -493,24 +531,26 @@ namespace nslib
 
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ConnectedTo", true );
-
-      boost::property_tree::ptree firesData;
-      try
+      if ( origEntity != nullptr && destEntity != nullptr )
       {
-        firesData = relation.second.get_child( "RelationData" );
+        boost::property_tree::ptree firesData;
+        try
+        {
+          firesData = relation.second.get_child( "RelationData" );
+        }
+        catch( std::exception& ex )
+        {
+          Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
+            + std::string( ex.what( )), LOG_LEVEL_WARNING );
+        }
+        shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
+          ->getRelationshipProperties( "connectsTo" )->create( );
+        propObject->deserialize( firesData );
+        shift::Relationship::EstablishAndAggregate(
+          relAggregatedConnectsTo,relAggregatedConnectedBy,
+          DataManager::entities( ), origEntity, destEntity, propObject,
+          propObject, false );
       }
-      catch( std::exception& ex )
-      {
-        Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
-          + std::string( ex.what( )), LOG_LEVEL_WARNING );
-      }
-      shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
-        ->getRelationshipProperties( "connectsTo" )->create( );
-      propObject->deserialize( firesData );
-      shift::Relationship::EstablishAndAggregate(
-        relAggregatedConnectsTo,relAggregatedConnectedBy,
-        DataManager::entities( ), origEntity, destEntity, propObject,
-        propObject, false );
     }
   }
 
@@ -540,14 +580,16 @@ namespace nslib
 
   void Domain::importEntititiesJSON(
     const boost::property_tree::ptree& entities,
-    std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
+    std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity,
+    const bool replaceGIDs )
   {
     for ( const auto& entityJSON : entities )
     {
       shift::Entity* entity ;
       bool isRootEntity;
       unsigned int oldGID;
-      importEntityJSON( entityJSON.second, entity, isRootEntity, oldGID );
+      importEntityJSON( entityJSON.second, entity, isRootEntity,
+        oldGID, replaceGIDs );
       oldGIDToEntity->insert( std::make_pair( oldGID, entity ));
       DataManager::entities( ).add( entity );
       if( entity->isNotHierarchy( ))
@@ -623,21 +665,25 @@ namespace nslib
 
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, name, false );
-      boost::property_tree::ptree firesData;
-      try
+
+      if ( origEntity != nullptr && destEntity != nullptr )
       {
-        firesData = relation.second.get_child( "RelationData" );
+        boost::property_tree::ptree firesData;
+        try
+        {
+          firesData = relation.second.get_child( "RelationData" );
+        }
+        catch( std::exception& ex )
+        {
+          Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
+            + std::string( ex.what( )), LOG_LEVEL_WARNING );
+        }
+        shift::RelationshipProperties* propObject =
+          relAggregatedOneToN.getRelationProperties( origEntity->entityGid( ),
+          destEntity->entityGid( ));
+        propObject->deserialize( firesData );
+        propObject->autoUpdateProperties( );
       }
-      catch( std::exception& ex )
-      {
-        Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
-          + std::string( ex.what( )), LOG_LEVEL_WARNING );
-      }
-      shift::RelationshipProperties* propObject =
-        relAggregatedOneToN.getRelationProperties(origEntity->entityGid( ),
-        destEntity->entityGid( ));
-      propObject->deserialize( firesData );
-      propObject->autoUpdateProperties( );
     }
   }
 
@@ -785,66 +831,76 @@ namespace nslib
       freeLayout->moveNewEntitiesChecked( false );
       for ( auto entityJSON : entities )
       {
-        shift::Entity* entity;
+        shift::Entity* entity = nullptr;
         try
         {
           auto entiyGID = entityJSON.second.get<int>( "EntityGID" );
           auto search = oldGIDToEntity->find( entiyGID );
-          SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
-            "ERROR: old scene EntityGID doesn't exist" );
-          entity = search->second;
-        }
-        catch( std::exception const& ex )
-        {
-          SHIFT_THROW( "ERROR: getting scene EntityGID from JSON: "
-            + std::string( ex.what( )));
-        };
-        float posx = 0.0f;
-        float posy = 0.0f;
-        try
-        {
-          posx = entityJSON.second.get<float>( "PosX" );
-        }
-        catch( std::exception const& ex )
-        {
-          Loggers::get( )->log(
-            "ERROR: getting entity pos x from JSON: "
-            + std::string( ex.what( )), LOG_LEVEL_WARNING );
-        };
-        try
-        {
-          posy = entityJSON.second.get<float>( "PosY" );
-        }
-        catch( std::exception const& ex )
-        {
-          Loggers::get( )->log(
-            "ERROR: getting entity pos y from JSON: "
-            + std::string( ex.what( )), LOG_LEVEL_WARNING );
-        };
-        entitiesNewScene.add( entity );
-        shift::Entities loadEntity;
-        loadEntity.add( entity );
-        shift::Representations loadRep;
-        RepresentationCreatorManager::create(loadEntity,loadRep,true,true);
-        if( loadRep.empty( ))
-        {
-          Loggers::get( )->log(
-            "ERROR: Unable to create entity representation for: "
-            + std::to_string( entity->entityGid( )), LOG_LEVEL_WARNING );
-        }
-        else
-        {
-          auto graphicsItemRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( loadRep.at( 0 ));
-          if ( graphicsItemRep)
+          if ( search == oldGIDToEntity->end( ))
           {
-            auto item = graphicsItemRep->item( &canvas->scene( ));
-            item->setPos(posx, posy );
+            Loggers::get( )->log( "ERROR: old scene EntityGID doesn't exist",
+              LOG_LEVEL_ERROR );
           }
           else
           {
-            Loggers::get( )->log( "GraphicsItemRep not found",
-              LOG_LEVEL_WARNING );
+            entity = search->second;
+          }
+        }
+        catch( std::exception const& ex )
+        {
+          entity = nullptr;
+          Loggers::get( )->log( "ERROR: getting scene EntityGID from JSON: "
+            + std::string( ex.what( )), LOG_LEVEL_ERROR );
+        };
+        if ( entity )
+        {
+          float posx = 0.0f;
+          float posy = 0.0f;
+          try
+          {
+            posx = entityJSON.second.get<float>( "PosX" );
+          }
+          catch( std::exception const& ex )
+          {
+            Loggers::get( )->log(
+              "ERROR: getting entity pos x from JSON: "
+              + std::string( ex.what( )), LOG_LEVEL_WARNING );
+          };
+          try
+          {
+            posy = entityJSON.second.get<float>( "PosY" );
+          }
+          catch( std::exception const& ex )
+          {
+            Loggers::get( )->log(
+              "ERROR: getting entity pos y from JSON: "
+              + std::string( ex.what( )), LOG_LEVEL_WARNING );
+          };
+          entitiesNewScene.add( entity );
+          shift::Entities loadEntity;
+          loadEntity.add( entity );
+          shift::Representations loadRep;
+          RepresentationCreatorManager::create(loadEntity,loadRep,true,true);
+          if( loadRep.empty( ))
+          {
+            Loggers::get( )->log(
+              "ERROR: Unable to create entity representation for: "
+              + std::to_string( entity->entityGid( )), LOG_LEVEL_WARNING );
+          }
+          else
+          {
+            auto graphicsItemRep =
+              dynamic_cast< QGraphicsItemRepresentation* >( loadRep.at( 0 ));
+            if ( graphicsItemRep)
+            {
+              auto item = graphicsItemRep->item( &canvas->scene( ));
+              item->setPos(posx, posy );
+            }
+            else
+            {
+              Loggers::get( )->log( "GraphicsItemRep not found",
+                LOG_LEVEL_WARNING );
+            }
           }
         }
       }
@@ -859,18 +915,24 @@ namespace nslib
         {
           auto entiyGID = entityJSON.second.get<int>( "" );
           auto search = oldGIDToEntity->find( entiyGID );
-          SHIFT_CHECK_THROW( search != oldGIDToEntity->end( ),
-            "ERROR: old scene EntityGID doesn't exist" );
-          shift::Entity* entity = search->second;
-          entitiesNewScene.add( entity );
+          if( search == oldGIDToEntity->end( ))
+          {
+            Loggers::get( )->log( "ERROR: old scene EntityGID doesn't exist",
+              LOG_LEVEL_ERROR );
+          }
+          else
+          {
+            shift::Entity* entity = search->second;
+            entitiesNewScene.add( entity );
+          }
         }
         catch( std::exception const& ex )
         {
-          SHIFT_THROW( "ERROR: getting scene EntityGID from JSON: "
-            + std::string( ex.what( )));
+          Loggers::get( )->log( "ERROR: getting scene EntityGID from JSON: "
+            + std::string( ex.what( )), LOG_LEVEL_ERROR );
         };
       }
-      canvas->displayEntities(entitiesNewScene, false, true );
+      canvas->displayEntities( entitiesNewScene, false, true );
     }
   }
 

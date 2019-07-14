@@ -55,9 +55,17 @@ namespace nslib
       void fromString(
         fires::Property& property, const std::string& value_ ) override
       {
-        float x, y, z, w;
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        float w = 0.0f;
+
         int nItemsRead = sscanf( value_.c_str( ),"%f %f %f %f\n", &x, &y, &z, &w);
-        SHIFT_CHECK_THROW( 3 != nItemsRead, "ERROR: Cast to eigen::Vector4f failed" )
+        if( 4 != nItemsRead )
+        {
+          Loggers::get( )->log( "ERROR: Cast to eigen::Vector4f failed",
+            LOG_LEVEL_WARNING );
+        }
         Eigen::Vector4f vector( x, y, z, w);
         property.set( vector );
       };

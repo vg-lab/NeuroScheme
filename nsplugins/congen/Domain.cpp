@@ -23,6 +23,7 @@
 #include "DataLoader.h"
 #include "Domain.h"
 #include "RepresentationCreator.h"
+#include <nslibcongen/api.h>
 #include <nslib/DataManager.h>
 #include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>

@@ -19,11 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__REPRESENTATION_CREATOR__
-#define __NSLIB__REPRESENTATION_CREATOR__
+#ifndef __NSPLUGINS_CORTEX__REPRESENTATION_CREATOR__
+#define __NSPLUGINS_CORTEX__REPRESENTATION_CREATOR__
 #include <shift/shift.h>
 #include <nslib/mappers/VariableMapper.h>
 #include <scoop/scoop.h>
+#include <nslibcortex/api.h>
 
 #include <unordered_map>
 #include <set>
@@ -36,7 +37,8 @@ namespace nslib
     class LayerRep;
     class NeuronTypeAggregationRep;
 
-    class RepresentationCreator : public shift::RepresentationCreator
+    class NSLIBCORTEX_API RepresentationCreator
+        : public shift::RepresentationCreator
     {
     public:
       RepresentationCreator( void );
@@ -81,11 +83,8 @@ namespace nslib
         unsigned int maxNeuronsPerMiniColumn_,
         unsigned int maxConnectionsPerEntity_ );
 
-      virtual void clear( void ) final
-      {
-        _layersMap.clear( );
-        _neuronTypeAggsMap.clear( );
-      }
+      virtual void clear( void ) final;
+      virtual void reset( void ) final;
 
       bool entityUpdatedOrCreated( const shift::Entity* entity ) final;
 
@@ -189,4 +188,4 @@ namespace nslib
   } // namespace cortex
 } // namespace nslib
 
-#endif // __NSLIB__REPRESENTATION_CREATOR__
+#endif // __NSPLUGINS_CORTEX__REPRESENTATION_CREATOR__

@@ -126,20 +126,20 @@ namespace nslib
       .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
       .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+
+    const auto originGid = _originEntity->entityGid( );
+    const auto destGid = _destEntity->entityGid( );
     if( _isNew )
     {
       shift::Relationship::EstablishAndAggregate( relAggregatedConnectsTo,
         relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
         _destEntity, _propObject, _propObject );
-      InteractionManager::updateEntityConnectionList(_originEntity->entityGid( ),
-        _destEntity->entityGid( ));
+      InteractionManager::updateEntityConnectionList( originGid, destGid );
       checkClose( );
     }
     else
     {
       InteractionManager::refreshEntityConnectionList( );
-      const auto originGid = _originEntity->entityGid( );
-      const auto destGid = _destEntity->entityGid( );
       relAggregatedConnectsTo.updateDependentRelations( originGid, destGid );
       relAggregatedConnectedBy.updateDependentRelations( destGid, originGid );
       if( _autoCloseCheck->isChecked( ) )

@@ -35,6 +35,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QtWidgets/QGridLayout>
+#include <nslibcortex/api.h>
 
 namespace nslib
 {
@@ -264,12 +265,12 @@ namespace nslib
         true };
       this->_domainName = "cortex";
       this->_dataLoader = new DataLoader;
-      this->_entitiesTypes = new nslib::cortex::shiftgen::EntitiesTypes;
+      this->_entitiesTypes = new cortex::shiftgen::EntitiesTypes( );
       this->_relationshipPropertiesTypes =
-        new nslib::cortex::shiftgen::RelationshipPropertiesTypes( );
-      auto repCreator = new RepresentationCreator( );
-      nslib::RepresentationCreatorManager::addCreator( repCreator );
-      auto& _entities = nslib::DataManager::entities( );
+        new cortex::shiftgen::RelationshipPropertiesTypes( );
+      auto repCreator = new cortex::RepresentationCreator( );
+      RepresentationCreatorManager::addCreator( repCreator );
+      auto& _entities = DataManager::entities( );
       //fires::PropertyManager::clear( );
       _entities.clear( );
 
@@ -382,9 +383,11 @@ namespace nslib
 
         importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "GroupOf", true );
-
-        shift::Relationship::Establish( relGroupOf, relGroupBy,
-          origEntity, destEntity );
+        if ( origEntity != nullptr && destEntity != nullptr )
+        {
+          shift::Relationship::Establish( relGroupOf, relGroupBy,
+            origEntity, destEntity );
+        }
       }
 
     }
@@ -407,8 +410,11 @@ namespace nslib
         importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "SuperEntityOf", true );
 
-        shift::Relationship::Establish( relSuperEntity, relSubEntity,
-          origEntity, destEntity );
+        if ( origEntity != nullptr && destEntity != nullptr )
+        {
+          shift::Relationship::Establish( relSuperEntity, relSubEntity,
+            origEntity, destEntity );
+        }
       }
     }
 
@@ -449,8 +455,8 @@ namespace nslib
         maxConnsPerEntityLabel = "\",\n    \"maxConnectionsPerEntity\": \"";
         closeQuotationsLabel = "\"\n";
       }
-      auto repCreator = ( RepresentationCreator* )
-        nslib::RepresentationCreatorManager::getCreator( );
+      auto repCreator = ( cortex::RepresentationCreator* )
+        RepresentationCreatorManager::getCreator( );
 
       outputStream << maxNeuronSomaVolumeLabel
         << repCreator->maxNeuronSomaVolume( ) << maxNeuronSomaAreaLabel
@@ -466,8 +472,8 @@ namespace nslib
     void Domain::importMaximumsJSON(
       const boost::property_tree::ptree& maximums )
     {
-      auto repCreator = ( RepresentationCreator* )
-        nslib::RepresentationCreatorManager::getCreator( );
+      auto repCreator = ( cortex::RepresentationCreator* )
+        RepresentationCreatorManager::getCreator( );
 
       try
       {
