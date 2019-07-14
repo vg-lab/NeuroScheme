@@ -130,11 +130,13 @@ namespace nslib
 
   void EntityEditWidget::updateEntity( shift::Entity* entity_,
     TEntityEditWidgetAction action_,
-    shift::Entity* parentEntity_, bool addToScene_ )
+    shift::Entity* parentOrChildEntity_, const bool changeParent_,
+    const bool addToScene_ )
   {
-    _updateParentEntity = parentEntity_;
+    _updateParentOrChildEntity = parentOrChildEntity_;
     _updateAction = action_;
     _updateAddToScene = addToScene_;
+    _updateChangeParent = changeParent_;
     _updateEntity = entity_;
   }
 
@@ -142,7 +144,8 @@ namespace nslib
   {
     if( _updateEntity )
     {
-      _parentEntity = _updateParentEntity;
+      _parentOrChildEntity = _updateParentOrChildEntity;
+      _changeParent = _updateChangeParent;
       _action = _updateAction;
       _addToScene = _updateAddToScene;
       _entity = _updateEntity;
@@ -166,9 +169,17 @@ namespace nslib
       {
         if( _isNewOrDuplicated )
         {
-          _numEntitiesLabel->setVisible( true );
           _numNewEntities->setText( "1" );
-          _numNewEntities->setVisible( true );
+          if ( _changeParent )
+          {
+            _numEntitiesLabel->setVisible( false );
+            _numNewEntities->setVisible( false );
+          }
+          else
+          {
+            _numEntitiesLabel->setVisible( true );
+            _numNewEntities->setVisible( true );
+          }
 
           if( _isNew )
           {
@@ -276,12 +287,6 @@ namespace nslib
     auto& dataEntities = DataManager::entities( );
     auto& dataRelations = dataEntities.relationships( );
     auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
-    bool freeLayoutInUse = false;
-    for( const auto& pane : PaneManager::panes( ))
-    {
-      freeLayoutInUse = freeLayoutInUse ||
-        ( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE );
-    }
 
     if ( _isNewOrDuplicated )
     {
@@ -367,8 +372,8 @@ namespace nslib
                   if ( caster->toString( entity->getProperty( label )) == pStr )
                   {
                     errorMessages.push_back(QString( "Property '" ) +
-                       QString::fromStdString( label ) +
-                       QString( "' is repeated" ));
+                      QString::fromStdString( label ) +
+                      QString( "' is repeated" ));
                     saveNewPropValue = false;
                     break;
                   }
@@ -437,19 +442,33 @@ namespace nslib
         {
           if ( _addToScene )
           {
-            PaneManager::activePane( )->addEntity( _entity );
+            auto activePane = PaneManager::activePane( );
+            activePane->addEntity( _entity );
+            if ( _changeParent )
+            {
+              activePane->removeEntity( _parentOrChildEntity, false );
+            }
           }
-          if ( _parentEntity )
+          auto& relParentOf = *( dataRelations[ "isParentOf" ]->asOneToN( ));
+          if ( _parentOrChildEntity )
           {
-            auto& relParentOf = *( dataRelations[ "isParentOf" ]->asOneToN( ));
-            auto& relAggregatedConnectsTo = *( dataRelations
-              [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-            auto& relAggregatedConnectedBy = *( dataRelations
-              [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
+            if ( _changeParent )
+            {
+              auto& relAggregatedConnectsTo =*( dataRelations
+                [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
+              auto relAggregatedConnectedBy =*( dataRelations
+                [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
-            shift::Relationship::EstablishWithHierarchy( relParentOf,
-              relChildOf, relAggregatedConnectsTo, relAggregatedConnectedBy,
-              _parentEntity, _entity );
+              shift::Relationship::ChangeEntityParent( relParentOf,
+                relChildOf, relAggregatedConnectsTo, relAggregatedConnectedBy,
+                _parentOrChildEntity,  _entity,  dataEntities,
+                DataManager::rootEntities( ));
+            }
+            else
+            {
+              shift::Relationship::Establish( relParentOf, relChildOf,
+                _parentOrChildEntity, _entity );
+            }
           }
           else
           {
@@ -459,21 +478,8 @@ namespace nslib
       }
     }
 
-    shift::Entities updatedEntities_;
-    updatedEntities_.add( _entity );
-    auto parentID = relChildOf[ _entity->entityGid( ) ].entity;
-    while( parentID > 0 )
-    {
-      const auto parent = dataEntities.at( parentID );
-      parent->autoUpdateProperties( );
-      updatedEntities_.add( parent );
-      parentID = relChildOf[ parentID ].entity;
-    }
-    for (auto& creator : RepresentationCreatorManager::creators( ))
-    {
-      RepresentationCreatorManager::updateEntities( updatedEntities_,
-        creator.first, freeLayoutInUse );
-    }
+    InteractionManager::updateEntityParents( _entity );
+
 
     for ( auto pane : PaneManager::panes( ))
     {

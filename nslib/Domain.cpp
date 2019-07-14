@@ -523,10 +523,6 @@ namespace nslib
       .relationships( )[ "isParentOf" ]->asOneToN( ));
     auto& relChildOf = *( DataManager::entities( )
       .relationships( )[ "isChildOf" ]->asOneToOne( ));
-    auto& relAggregatedConnectsTo = *(entities
-      .relationships( )[ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-    auto& relAggregatedConnectedBy = *( entities
-      .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
     for ( const auto& relation : relations )
     {
@@ -534,9 +530,11 @@ namespace nslib
       shift::Entity* destEntity;
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ParentOf", true );
-      shift::Relationship::EstablishWithHierarchy( relParentOf, relChildOf,
-        relAggregatedConnectsTo, relAggregatedConnectedBy,
-        origEntity, destEntity );
+      if ( origEntity != nullptr && destEntity != nullptr )
+      {
+        shift::Relationship::Establish( relParentOf, relChildOf,
+          origEntity, destEntity );
+      }
     }
   }
 

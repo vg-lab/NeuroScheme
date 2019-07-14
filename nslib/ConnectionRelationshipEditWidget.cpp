@@ -231,15 +231,16 @@ namespace nslib
     auto& relAggregatedConnectedBy = *( DataManager::entities( )
         .relationships( )[ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
     shift::Relationship::BreakAnAggregatedRelation( relAggregatedConnectsTo,
-      relAggregatedConnectedBy, DataManager::entities( ), _originEntity,
-      _destEntity );
+      relAggregatedConnectedBy, _originEntity, _destEntity );
+
+    const auto origGid = _originEntity->entityGid( );
+    const auto destGid = _destEntity->entityGid( );
 
     for ( auto pane : PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
     }
-    InteractionManager::updateEntityConnectionList(_originEntity->entityGid( ),
-      _destEntity->entityGid( ));
+    InteractionManager::updateEntityConnectionList( origGid, destGid );
     checkClose( );
   }
 
