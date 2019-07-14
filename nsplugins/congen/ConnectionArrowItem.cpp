@@ -83,101 +83,103 @@ namespace nslib
     void ConnectionArrowItem::createArrow( const QPointF& origin,
       const QPointF& dest )
     {
-      float itemInvScale =
-        1.0f / static_cast< float >( this->scale( ));
-
-      _arrowOrigin = itemInvScale * origin;
-      _arrowDest = itemInvScale * dest;
-
-      QPolygonF arrowShape;
-
-      float arrowWidth = 6.0f * itemInvScale * nslib::Config::scale( );
-      float arrowLength = 3.0f * itemInvScale * nslib::Config::scale( );
-
-      QLineF auxLine( _arrowOrigin, _arrowDest );
-
-      auto lengthInv = 1.0f / auxLine.length( );
-
-      double angle = ::acos( auxLine.dx( ) * lengthInv );
-      if( auxLine.dy( ) >= 0 )
-      {
-        angle = M_PI_x2 - angle;
-      }
-
-      QPointF arrowInit = auxLine.pointAt(
-        1.0f - ( arrowLength * lengthInv ));
-      QPointF arrowP1 = arrowInit -
-        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-          cos( angle + M_PI_3 ) * arrowWidth );
-      QPointF arrowP2 = arrowInit -
-        QPointF( sin( angle + M_PI_067 ) * arrowWidth,
-          cos( angle + M_PI_067 ) * arrowWidth );
-
-      QPointF arrowI1 = _arrowOrigin -
-        QPointF( sin( angle + M_PI_Float ) * arrowWidth,
-          cos( angle + M_PI_Float ) * arrowWidth );
-      QPointF arrowI2 = _arrowOrigin +
-        QPointF( sin( angle - M_PI_Float ) * arrowWidth,
-          cos( angle - M_PI_Float ) * arrowWidth );
-
-      float size = arrowLength;
-
-      /*
-      if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
-      _arrowOriItem = new QGraphicsEllipseItem( );
-      _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
-                              origin.y( ) - size * 0.5f,
-                              size,
-                              size );
-
-      _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( brushColor ));
-      _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-      _arrowOriItem->setParentItem( this );
-       */
-
-      arrowShape.clear( );
-
-      if( this->_parentRep->getProperty( "head" ).
-        value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
-        shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
-      {
-        _arrowCircleEnd = new QGraphicsEllipseItem( );
-        _arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
-          dest.y( ) - size * 0.5f, size, size );
-
-        _arrowCircleEnd->setPen( _actualPen );
-        _arrowCircleEnd->setParentItem( this );
-
-        arrowShape << arrowI1
-                   << arrowI2
-                   << auxLine.p1( )
-                   << auxLine.p2( )
-                   << auxLine.p1( );
-      }
-      else
-      {
-        arrowShape << arrowI1
-                   << arrowI2
-                   << auxLine.p1( )
-                   << arrowInit
-                   << arrowP1
-                   << auxLine.p2( )
-                   << arrowP2
-                   << arrowInit
-                   << auxLine.p1( );
-      }
-
       auto painterPath = QPainterPath( );
-      painterPath.moveTo( _arrowDest );
-      painterPath.addPolygon( arrowShape );
+      if ( origin != dest )
+      {
+        float itemInvScale =
+          1.0f / static_cast< float >( this->scale( ));
 
-      _actualPen.setColor( color );
-      _actualPen.setCosmetic( true );
-      this->setPen( _actualPen );
-      this->setBrush( color );
+        _arrowOrigin = itemInvScale * origin;
+        _arrowDest = itemInvScale * dest;
+
+        QPolygonF arrowShape;
+
+        float arrowWidth = 6.0f * itemInvScale * nslib::Config::scale( );
+        float arrowLength = 3.0f * itemInvScale * nslib::Config::scale( );
+
+        QLineF auxLine( _arrowOrigin, _arrowDest );
+
+        auto lengthInv = 1.0f / auxLine.length( );
+
+        double angle = ::acos( auxLine.dx( ) * lengthInv );
+        if( auxLine.dy( ) >= 0 )
+        {
+          angle = M_PI_x2 - angle;
+        }
+
+        QPointF arrowInit = auxLine.pointAt(
+          1.0f - ( arrowLength * lengthInv ));
+        QPointF arrowP1 = arrowInit -
+          QPointF( sin( angle + M_PI_3 ) * arrowWidth,
+            cos( angle + M_PI_3 ) * arrowWidth );
+        QPointF arrowP2 = arrowInit -
+          QPointF( sin( angle + M_PI_067 ) * arrowWidth,
+            cos( angle + M_PI_067 ) * arrowWidth );
+
+        QPointF arrowI1 = _arrowOrigin -
+          QPointF( sin( angle + M_PI_Float ) * arrowWidth,
+            cos( angle + M_PI_Float ) * arrowWidth );
+        QPointF arrowI2 = _arrowOrigin +
+          QPointF( sin( angle - M_PI_Float ) * arrowWidth,
+            cos( angle - M_PI_Float ) * arrowWidth );
+
+        float size = arrowLength;
+
+        /*
+        if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
+        _arrowOriItem = new QGraphicsEllipseItem( );
+        _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
+                                origin.y( ) - size * 0.5f,
+                                size,
+                                size );
+        _arrowOriItem->setPen( Qt::NoPen );
+        _arrowOriItem->setBrush( QBrush( brushColor ));
+        _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowOriItem->setParentItem( this );
+         */
+
+        arrowShape.clear( );
+
+        if( this->_parentRep->getProperty( "head" ).
+          value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
+          shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
+        {
+          _arrowCircleEnd = new QGraphicsEllipseItem( );
+          _arrowCircleEnd->setRect( dest.x( ) - size * 0.5f,
+            dest.y( ) - size * 0.5f, size, size );
+
+          _arrowCircleEnd->setPen( _actualPen );
+          _arrowCircleEnd->setParentItem( this );
+
+          arrowShape << arrowI1
+                     << arrowI2
+                     << auxLine.p1( )
+                     << auxLine.p2( )
+                     << auxLine.p1( );
+        }
+        else
+        {
+          arrowShape << arrowI1
+                     << arrowI2
+                     << auxLine.p1( )
+                     << arrowInit
+                     << arrowP1
+                     << auxLine.p2( )
+                     << arrowP2
+                     << arrowInit
+                     << auxLine.p1( );
+        }
+
+        painterPath.moveTo( _arrowDest );
+        painterPath.addPolygon( arrowShape );
+        _actualPen.setColor( color );
+        _actualPen.setCosmetic( true );
+        this->setPen( _actualPen );
+        this->setBrush( color );
+        this->setZValue( -100.0f );
+      }
       this->setPath( painterPath );
-      this->setZValue( -100.0f );
+
     }
 
     QPropertyAnimation& ConnectionArrowItem::lineAnim( void )

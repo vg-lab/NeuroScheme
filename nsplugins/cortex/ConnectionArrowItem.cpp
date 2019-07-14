@@ -55,67 +55,64 @@ namespace nslib
     }
 
     void ConnectionArrowItem::createArrow( const QPointF& origin,
-                                           const QPointF& dest )
+      const QPointF& dest )
     {
-      float itemInvScale =
-        1.0f / static_cast< float >( this->scale( ));
-
-      _arrowOrigin = itemInvScale * origin;
-      _arrowDest = itemInvScale * dest;
-
-
       QPolygonF arrowShape;
-
-      float arrowWidth = 3 * itemInvScale * nslib::Config::scale( );
-      float arrowLength = arrowWidth;
-
-      QLineF auxLine( _arrowOrigin, _arrowDest );
-
-      auto lengthInv = 1.0f / auxLine.length( );
-
-      double angle = ::acos( auxLine.dx( ) * lengthInv );
-      if ( auxLine.dy( ) >= 0 )
-    	  angle = ( M_PI * 2.0 ) - angle;
-
-      QPointF arrowInit = auxLine.pointAt(
-        1.0f - (arrowLength * lengthInv ));
-      QPointF arrowP1 = arrowInit -
-        QPointF( sin( angle + M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI_3 ) * arrowWidth );
-      QPointF arrowP2 = arrowInit -
-        QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
-                 cos( angle + M_PI - M_PI_3 ) * arrowWidth );
-
-      float size = arrowLength;
-
-
-      if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
-      _arrowOriItem = new QGraphicsEllipseItem( );
-      _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
-                              origin.y( ) - size * 0.5f,
-                              size,
-                              size );
-
-      _arrowOriItem->setPen( Qt::NoPen );
-      _arrowOriItem->setBrush( QBrush( color ));
-      _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-      _arrowOriItem->setParentItem( this );
-
       arrowShape.clear( );
+      if ( origin != dest )
+      {
+        float itemInvScale =
+          1.0f / static_cast< float >( this->scale( ));
 
-      arrowShape  << auxLine.p1( )
-                  << arrowInit
-                  << arrowP1
-                  << auxLine.p2( )
-                  << arrowP2
-                  << arrowInit;
+        _arrowOrigin = itemInvScale * origin;
+        _arrowDest = itemInvScale * dest;
 
-      this->setBrush( QBrush( color ));
-      // this->setPen( QPen( color ));
-      this->setPen( QPen( QBrush( color ), _arrowThickness ));
+        float arrowWidth = 3 * itemInvScale * nslib::Config::scale( );
+        float arrowLength = arrowWidth;
+
+        QLineF auxLine( _arrowOrigin, _arrowDest );
+
+        auto lengthInv = 1.0f / auxLine.length( );
+
+        double angle = ::acos( auxLine.dx( ) * lengthInv );
+        if ( auxLine.dy( ) >= 0 )
+      	  angle = ( M_PI * 2.0 ) - angle;
+
+        QPointF arrowInit = auxLine.pointAt(
+          1.0f - (arrowLength * lengthInv ));
+        QPointF arrowP1 = arrowInit -
+          QPointF( sin( angle + M_PI_3 ) * arrowWidth,
+          cos( angle + M_PI_3 ) * arrowWidth );
+        QPointF arrowP2 = arrowInit -
+          QPointF( sin(angle + M_PI - M_PI_3 ) * arrowWidth,
+          cos( angle + M_PI - M_PI_3 ) * arrowWidth );
+
+        float size = arrowLength;
+
+
+        if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
+        _arrowOriItem = new QGraphicsEllipseItem( );
+        _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
+          origin.y( ) - size * 0.5f, size, size );
+
+        _arrowOriItem->setPen( Qt::NoPen );
+        _arrowOriItem->setBrush( QBrush( color ));
+        _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
+        _arrowOriItem->setParentItem( this );
+
+        arrowShape  << auxLine.p1( )
+                    << arrowInit
+                    << arrowP1
+                    << auxLine.p2( )
+                    << arrowP2
+                    << arrowInit;
+
+        this->setBrush( QBrush( color ));
+        // this->setPen( QPen( color ));
+        this->setPen( QPen( QBrush( color ), _arrowThickness ));
+        this->setZValue( -100.0f );
+      }
       this->setPolygon( arrowShape );
-      this->setZValue( -100.0f );
-
     }
   }
 }
