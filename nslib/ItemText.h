@@ -23,18 +23,21 @@
 #define __NSLIB_ITEM_TEXT__
 
 #include <nslib/api.h>
-#include <QtWidgets/QGraphicsTextItem>
+#include <QString>
+#include <QColor>
+#include <QGraphicsSimpleTextItem>
 
 
 namespace nslib
 {
   class NSLIB_API ItemText :
-      public QGraphicsTextItem
+    public QGraphicsSimpleTextItem
   {
-    Q_OBJECT
     public:
-    ItemText( QString sting, QGraphicsItem* item_,
-      float maxHeight_ = 0.2, float maxWidth_ = 0.95 );
+    ItemText( const QString& sting, QGraphicsItem* item_,
+      const float maxHeight_ = 0.15, const float maxWidth_ = 0.90,
+      const QColor colorBrush_ = QColor::fromRgb( 5, 5, 5, 255 ),
+      const QColor colorPen_ = QColor::fromRgb( 245, 245, 245, 255 ));
   };
 }
 #endif

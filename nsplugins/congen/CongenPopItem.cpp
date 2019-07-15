@@ -81,7 +81,7 @@ namespace nslib
       barFill->setBrush( QColor( bgColor ));
       barFill->setParentItem( bar );
 
-      if ( nslib::Config::showEntitiesName( ))
+      if ( Config::showEntitiesName( ))
       {
         _itemText = new ItemText( QString::fromStdString(
           entityRep.getProperty( "Entity name" ).value<std::string>( )), this );

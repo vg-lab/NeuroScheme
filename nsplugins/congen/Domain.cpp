@@ -23,6 +23,7 @@
 #include "DataLoader.h"
 #include "Domain.h"
 #include "RepresentationCreator.h"
+#include <nslibcongen/api.h>
 #include <nslib/DataManager.h>
 #include <nslib/PaneManager.h>
 #include <nslib/RepresentationCreatorManager.h>
@@ -47,18 +48,20 @@ namespace nslib
           if ( action->text( ) == "&File" && menu )
           {
             _actionLoadNeuroML.reset( new QAction( "&Load NeuroML", menu ));
-            menu->insertAction( menu->actions( ).last( ), _actionLoadNeuroML.get( ));
+            menu->insertAction( menu->actions( ).last( ),
+              _actionLoadNeuroML.get( ));
             connect( _actionLoadNeuroML.get( ), SIGNAL( triggered( )),
                      this, SLOT( loadNeuroML( )));
 
             _actionSaveNeuroML.reset( new QAction( "&Save NeuroML", menu ));
-            menu->insertAction( menu->actions( ).last( ), _actionSaveNeuroML.get( ));
+            menu->insertAction( menu->actions( ).last( ),
+              _actionSaveNeuroML.get( ));
             connect( _actionSaveNeuroML.get( ), SIGNAL( triggered( )),
-                     this, SLOT( saveNeuroML( )));
+              this, SLOT( saveNeuroML( )));
 
             QIcon iconSave;
             iconSave.addFile( QStringLiteral( ":/icons/save.svg" ),
-                              QSize( ), QIcon::Normal, QIcon::Off );
+              QSize( ), QIcon::Normal, QIcon::Off );
             _actionSaveNeuroML->setIcon( iconSave );
 
             QIcon iconLoad;
@@ -83,24 +86,24 @@ namespace nslib
         auto fileName = path.toStdString( );
 
         Loggers::get( )->log( "Loading blue config",
-          nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+          LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-        nslib::congen::DataLoader::loadNeuroML( fileName );
+        congen::DataLoader::loadNeuroML( fileName );
 
         // DataLoader::createEntitiesFromNsolColumns(
-        //   nslib::DataManager::nsolDataSet( ).columns( ),
-        //   nslib::DataManager::nsolDataSet( ).circuit( ));
+        //   DataManager::nsolDataSet( ).columns( ),
+        //   DataManager::nsolDataSet( ).circuit( ));
 
-        auto canvas = nslib::PaneManager::activePane( );
+        auto canvas = PaneManager::activePane( );
         canvas->displayEntities(
-          nslib::DataManager::rootEntities( ), false, true );
-        nslib::PaneManager::panes( ).insert( canvas );
+          DataManager::rootEntities( ), false, true );
+        PaneManager::panes( ).insert( canvas );
       }
     };
 
     void DomainGUI::saveNeuroML( void )
     {
-      nslib::congen::DataSaver::saveXmlScene( _mw );
+      congen::DataSaver::saveXmlScene( _mw );
     };
 
     using NeuronPop = shiftgen::NeuronPop;
@@ -112,12 +115,12 @@ namespace nslib
       this->_exportAggregatedRelations = { false, false, true, true };
       this->_domainName = "congen";
       this->_dataLoader = new DataLoader;
-      this->_entitiesTypes = new nslib::congen::shiftgen::EntitiesTypes;
+      this->_entitiesTypes = new congen::shiftgen::EntitiesTypes( );
       this->_relationshipPropertiesTypes =
-        new nslib::congen::shiftgen::RelationshipPropertiesTypes( );
-      auto repCreator = new RepresentationCreator( );
-      nslib::RepresentationCreatorManager::addCreator( repCreator );
-      auto& _entities = nslib::DataManager::entities( );
+        new congen::shiftgen::RelationshipPropertiesTypes( );
+      auto repCreator = new congen::RepresentationCreator( );
+      RepresentationCreatorManager::addCreator( repCreator );
+      auto& _entities = DataManager::entities( );
       //fires::PropertyManager::clear( );
       _entities.clear( );
 
@@ -214,7 +217,7 @@ namespace nslib
         closeQuotationsLabel = "\"\n";
       }
       auto repCreator = ( RepresentationCreator* )
-        nslib::RepresentationCreatorManager::getCreator( );
+        RepresentationCreatorManager::getCreator( );
       outputStream << maxWeightLabel << repCreator->maxAbsoluteWeight( )
         << maxNbNeuronsLabel << repCreator->maxNeuronsPerPopulation( )
         << maxSuperPopLevelsLabel << repCreator->maxLevelsPerSuperPop( )
@@ -224,7 +227,7 @@ namespace nslib
     void Domain::importMaximumsJSON( const boost::property_tree::ptree& maximums )
     {
       auto repCreator = ( RepresentationCreator* )
-        nslib::RepresentationCreatorManager::getCreator( );
+        RepresentationCreatorManager::getCreator( );
 
       try
       {

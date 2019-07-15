@@ -50,8 +50,8 @@ namespace nslib
     shift::Entity* entity( );
 
     void updateEntity( shift::Entity* entity_, TEntityEditWidgetAction action_,
-      shift::Entity* parentEntity_= nullptr,
-      bool addToScene_ = true );
+      shift::Entity* parentOrChildEntity_= nullptr,
+      const bool changeParent_ = false, const bool addToScene_ = true );
 
     ~EntityEditWidget( void );
 
@@ -87,8 +87,9 @@ namespace nslib
 
     shift::Entity* _entity;
     shift::Entity* _updateEntity;
-    shift::Entity* _parentEntity;
-    shift::Entity* _updateParentEntity;
+    shift::Entity* _parentOrChildEntity;
+    shift::Entity* _updateParentOrChildEntity;
+
 
     QTimer* _entityUpdateTimer;
 
@@ -100,6 +101,8 @@ namespace nslib
     bool _isEditing;
     bool _addToScene;
     bool _updateAddToScene;
+    bool _changeParent;
+    bool _updateChangeParent;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

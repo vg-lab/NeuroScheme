@@ -255,7 +255,8 @@ namespace nslib
       auto domain = DomainManager::getActiveDomain( );
       if ( domain )
       {
-        shift::EntitiesTypes domainEntitiesTypes = domain->entitiesTypes( );
+        const shift::EntitiesTypes domainEntitiesTypes =
+          domain->entitiesTypes( );
 
         //Detect scene parent
         auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
@@ -276,12 +277,13 @@ namespace nslib
             }
           }
         }
-        auto childrenTypes = new std::vector< std::string >;
+        auto menuEntitiesTypes = new std::vector< std::string >;
+        auto isParentEntity = new std::vector< bool >;
         std::unordered_map< QAction*, unsigned int > actionToIdx;
         shift::Entity* parentEntity = nullptr;
         unsigned int entityIdx = addCreateEntitiesContextMenu(
           commonParent, domainEntitiesTypes, dataEntities, parentEntity,
-          actionToIdx, childrenTypes );
+          actionToIdx, menuEntitiesTypes, false, isParentEntity );
         const bool notHierarchyInDomain =
           !domainEntitiesTypes.notHierarchyTypes( ).empty( );
         if ( entityIdx != 0 && notHierarchyInDomain )
@@ -296,7 +298,7 @@ namespace nslib
               std::get< shift::EntitiesTypes::ENTITY_NAME >( type );
             QAction* action = _contextMenu->addAction(
               QString( "Add " ) + QString::fromStdString( childType ));
-            childrenTypes->push_back( childType );
+            menuEntitiesTypes->push_back( childType );
             actionToIdx[ action ] = entityIdx++;
           }
         }
@@ -304,9 +306,9 @@ namespace nslib
         if ( selectedAction )
         {
           createOrEditEntity(  domainEntitiesTypes.getEntityObject(
-            childrenTypes->at( actionToIdx[ selectedAction ] )),
+            menuEntitiesTypes->at( actionToIdx[ selectedAction ] )),
             EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
-            parentEntity );
+            parentEntity, false );
         }
       } // if ( domain )
     }
@@ -361,7 +363,8 @@ namespace nslib
           std::unordered_map< QAction*, unsigned int > actionToIdx;
           auto domain = DomainManager::getActiveDomain( );
           shift::EntitiesTypes domainEntitiesTypes;
-          auto childrenTypes = new std::vector< std::string >;
+          auto newEntitiesTypes = new std::vector< std::string >;
+          auto isParentEntity = new std::vector< bool >;
           if ( domain )
           {
             domainEntitiesTypes = domain->entitiesTypes( );
@@ -369,7 +372,7 @@ namespace nslib
             int commonParent = (int ) entityGid;
             childAction = addCreateEntitiesContextMenu( commonParent,
               domainEntitiesTypes, dataEntities, parentEntity,
-              actionToIdx, childrenTypes ) != 0;
+              actionToIdx, newEntitiesTypes, true, isParentEntity ) != 0;
             if ( childAction )
             {
               _contextMenu->addSeparator( );
@@ -560,10 +563,13 @@ namespace nslib
             }
             else if ( selectedAction && childAction )
             {
-             createOrEditEntity( domainEntitiesTypes.getEntityObject(
-               childrenTypes->at( actionToIdx[ selectedAction ] )),
-               EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
-               entity, false );
+              auto selectedEntity = actionToIdx[ selectedAction ];
+              auto createAsParent = isParentEntity->at( selectedEntity );
+              auto entityType = domainEntitiesTypes.getEntityObject(
+               newEntitiesTypes->at( selectedEntity ));
+              createOrEditEntity( entityType,
+                EntityEditWidget::TEntityEditWidgetAction::NEW_ENTITY,
+                entity, createAsParent, createAsParent );
             }
           }
         }
@@ -587,7 +593,8 @@ namespace nslib
 
   void InteractionManager::tmpConnectionLineRemove( )
   {
-    if ( _tmpConnectionLine && _tmpConnectionLine->scene( ))
+    if ( _tmpConnectionLine && _tmpConnectionLine.get( )
+      && _tmpConnectionLine->scene( ))
     {
       _tmpConnectionLine->scene( )->removeItem( _tmpConnectionLine.get( ));
       _tmpConnectionLine.reset( nullptr );
@@ -1029,9 +1036,11 @@ namespace nslib
 
   void InteractionManager::createOrEditEntity( shift::Entity* entity_,
     EntityEditWidget::TEntityEditWidgetAction action_,
-    shift::Entity* parentEntity_, bool addToScene_ )
+    shift::Entity* parentEntity_, const bool changeParent_,
+    const bool addToScene_)
   {
-   _entityEditWidget->updateEntity( entity_, action_, parentEntity_, addToScene_ );
+   _entityEditWidget->updateEntity( entity_, action_, parentEntity_,
+     changeParent_, addToScene_ );
   }
 
   void InteractionManager::updateEntityConnectionList(
@@ -1100,7 +1109,7 @@ namespace nslib
           parentEntity, entity );
         //All dependent aggregateds will be break so they wont be reclaculated.
       }
-      else
+      else if ( !entity->isNotHierarchy( ))
       {
         DataManager::rootEntities( ).remove( entity );
       }
@@ -1172,7 +1181,7 @@ namespace nslib
       for( auto connectEntity : connectedEntites.vector( ))
       {
         shift::Relationship::BreakAnAggregatedRelation(
-          relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
+          relAggregatedConnectsTo_, relAggregatedConnectBy_,
           entity_, connectEntity );
       }
       connectedEntites.clear( );
@@ -1181,7 +1190,7 @@ namespace nslib
       for( auto connectEntity : connectedEntites.vector( ))
       {
         shift::Relationship::BreakAnAggregatedRelation(
-          relAggregatedConnectsTo_, relAggregatedConnectBy_, dataEntities_,
+          relAggregatedConnectsTo_, relAggregatedConnectBy_,
           connectEntity, entity_ );
       }
       connectedEntites.clear( );
@@ -1244,11 +1253,13 @@ namespace nslib
 
   unsigned int InteractionManager::addCreateEntitiesContextMenu(
     const int commonParent_,
-    shift::EntitiesTypes& entitiesTypes_,
+    const shift::EntitiesTypes& entitiesTypes_,
     shift::Entities& dataEntities_,
     shift::Entity*& parentEntity_,
     std::unordered_map< QAction*, unsigned int >& actionToIdx_,
-    std::vector< std::string >*& childrenTypes_)
+    std::vector< std::string >*& newEntitiesTypes_,
+    const bool addParentTypes_,
+    std::vector< bool >*& isParentEntity_ )
   {
     unsigned int entityIdx = 0;
     if( commonParent_ <= 0 )
@@ -1262,7 +1273,7 @@ namespace nslib
             std::get< shift::EntitiesTypes::ENTITY_NAME >( type );
           QAction* action = _contextMenu->addAction(
             QString( "Add " ) + QString::fromStdString( childType ) );
-          childrenTypes_->push_back( childType );
+          newEntitiesTypes_->push_back( childType );
           actionToIdx_[ action ] = entityIdx++;
         }
       }
@@ -1271,19 +1282,42 @@ namespace nslib
     {
       parentEntity_ = dataEntities_.at( commonParent_ );
 
-      shift::RelationshipPropertiesTypes::rel_constr_range childrenTypesNames;
-      childrenTypesNames =
+      shift::RelationshipPropertiesTypes::rel_constr_range typesNames;
+      typesNames =
         shift::RelationshipPropertiesTypes::constraints( "ParentOf",
         parentEntity_->typeName( ));
-      for( auto childTypeName = childrenTypesNames.first;
-        childTypeName != childrenTypesNames.second; ++childTypeName )
+      QAction* action = nullptr;
+      for( auto childTypeName = typesNames.first;
+        childTypeName != typesNames.second; ++childTypeName )
       {
-        QAction* action = _contextMenu->addAction(
+        action = _contextMenu->addAction(
           QString( "Add " ) + QString::fromStdString(
           childTypeName->second ) + QString( " as child" ));
         actionToIdx_[ action ] = entityIdx++;
-        childrenTypes_->push_back( childTypeName->second );
+        newEntitiesTypes_->push_back( childTypeName->second );
+        isParentEntity_->push_back( false );
       }
+      if ( addParentTypes_ )
+      {
+        if ( action )
+        {
+          _contextMenu->addSeparator( );
+        }
+
+        typesNames = shift::RelationshipPropertiesTypes::constraints(
+            "ChildOf", parentEntity_->typeName( ));
+        for( auto parentTypeName = typesNames.first;
+          parentTypeName != typesNames.second; ++parentTypeName )
+        {
+          action = _contextMenu->addAction(
+            QString( "Add " ) + QString::fromStdString(
+            parentTypeName->second ) + QString( " as parent" ));
+          actionToIdx_[ action ] = entityIdx++;
+          newEntitiesTypes_->push_back( parentTypeName->second );
+          isParentEntity_->push_back( true );
+        }
+      }
+
     }
     return entityIdx;
   }
@@ -1301,6 +1335,29 @@ namespace nslib
   QMenu* InteractionManager::contextMenu( )
   {
     return _contextMenu;
+  }
+
+  void InteractionManager::updateEntityParents( shift::Entity* entity_ )
+  {
+    const bool freeLayoutInUse = PaneManager::freeLayoutInUse( );
+    auto& dataEntities = DataManager::entities( );
+    auto& dataRelations = dataEntities.relationships( );
+    auto& relChildOf = *( dataRelations[ "isChildOf" ]->asOneToOne( ));
+    shift::Entities updatedEntities_;
+    updatedEntities_.add( entity_ );
+    auto parentID = relChildOf[ entity_->entityGid( ) ].entity;
+    while( parentID > 0 )
+    {
+      const auto parent = dataEntities.at( parentID );
+      parent->autoUpdateProperties( );
+      updatedEntities_.add( parent );
+      parentID = relChildOf[ parentID ].entity;
+    }
+    for (auto& creator : RepresentationCreatorManager::creators( ))
+    {
+      RepresentationCreatorManager::updateEntities( updatedEntities_,
+        creator.first, freeLayoutInUse );
+    }
   }
 
 } // namespace nslib

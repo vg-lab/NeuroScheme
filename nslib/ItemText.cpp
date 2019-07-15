@@ -20,27 +20,35 @@
  *
  */
 #include "ItemText.h"
+#include <QBrush>
+#include <QPen>
 
 
 namespace nslib
 {
 
 
-  ItemText::ItemText( QString string, QGraphicsItem* item_, float maxHeight_,
-    float maxWidth_ )
-    : QGraphicsTextItem( string )
+  ItemText::ItemText( const QString& string, QGraphicsItem* item_,
+    const float maxHeight_, const float maxWidth_, const QColor colorBrush_,
+    const QColor colorPen_ )
+    : QGraphicsSimpleTextItem( string )
   {
-    auto boundingRect = this->boundingRect( );
-    auto height = boundingRect.height( );
-    auto width = boundingRect.width( );
-    auto itemBounding = item_->boundingRect( );
-    auto scale = std::min( maxHeight_ * itemBounding.height() / height,
-      maxWidth_ * itemBounding.width( ) / width);
-    auto halfScale = -0.5f * scale;
-    this->setPos(  halfScale * width, halfScale * height );
-    this->setScale( scale );
-    this->setDefaultTextColor( QColor::fromRgb( 0, 0, 0, 255 ));
-    this->setParentItem( item_ );
+    if( !string.isEmpty( ))
+    {
+      const auto boundingRect = this->boundingRect( );
+      const auto height = boundingRect.height( );
+      const auto width = boundingRect.width( );
+      const auto itemBounding = item_->boundingRect( );
+      const auto scale = std::min( maxHeight_ * itemBounding.height( ) / height,
+        maxWidth_ * itemBounding.width( ) / width );
+      const auto halfScale = -0.5f * scale;
+      this->setPos( halfScale * width, halfScale * height );
+      this->setScale( scale );
+      this->setBrush( colorBrush_ );
+      this->setPen( QPen( colorPen_, 0.5f ));
+//      this->setDefaultTextColor( colorBrush_ );
+      this->setParentItem( item_ );
+    }
   }
 
 }

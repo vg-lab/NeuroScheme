@@ -1,6 +1,7 @@
 <RCC>
   <qresource>
     <file>icons/open.svg</file>
+    <file>icons/delete.svg</file>
     <file>icons/autopublishselection.svg</file>
     <file>icons/save.svg</file>
     <file>icons/publishselection.svg</file>

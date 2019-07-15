@@ -44,7 +44,7 @@ namespace nslib
       : _maxNeuronsPerPopulation( 1 )
       , _maxLevelsPerSuperPop( 1 )
       , _maxAbsoluteWeight( 0.1f )
-      , _superPopSeparation( 1.0f / (_maxLevelsPerSuperPop + 1 ))
+      , _superPopSeparation( 0.5f )//1.0f / float( _maxLevelsPerSuperPop + 1 ))
       , _superPopLevelSeparation( NeuronSuperPopItem::rangeCircle
           * _superPopSeparation)
       , _nbConnectionsToWidth( 0, _maxAbsoluteWeight, 1.0f, 5.0f )
@@ -60,20 +60,20 @@ namespace nslib
         shiftgen::NeuronPop::TNeuronModel::undefined,
         scoop::Color( "#ea9999" ));
 
-      _stimulatorModelColorMap.setColor(
+      _inputModelColorMap.setColor(
         shiftgen::Input::TInputType::Pulse_input,
         scoop::Color( "#ddf231" ));
-      _stimulatorModelColorMap.setColor(
+      _inputModelColorMap.setColor(
         shiftgen::Input::TInputType::Random_stim,
         scoop::Color( "#f9f190" ));
 
-      _receptorModelColorMap.setColor(
+      _outputModelColorMap.setColor(
         shiftgen::Output::TOutputModel::Multimeter,
         scoop::Color( "#d7b5fc" ));
-      _receptorModelColorMap.setColor(
+      _outputModelColorMap.setColor(
         shiftgen::Output::TOutputModel::Voltmeter,
         scoop::Color( "#b075f0" ));
-      _receptorModelColorMap.setColor(
+      _outputModelColorMap.setColor(
         shiftgen::Output::TOutputModel::Spike_detector,
         scoop::Color( "#4c1c7c" ));
 
@@ -191,14 +191,14 @@ namespace nslib
       if( entity_->hasProperty( "Input model" ))
       {
         entityRep_->setProperty(
-          "color", _stimulatorModelColorMap.getColor(
+          "color", _inputModelColorMap.getColor(
           entity_->getProperty( "Input type" )
           .value< shiftgen::Input::TInputType >( )));
       }
       else
       {
         entityRep_->setProperty( "color",
-          _stimulatorModelColorMap.getColor(
+          _inputModelColorMap.getColor(
           shiftgen::Input::Random_stim ));
       }
       if ( entity_->hasProperty( "Nb of neurons" ))
@@ -230,13 +230,13 @@ namespace nslib
     {
       if( entity_->hasProperty( "Output model" ))
       {
-        entityRep_->setProperty( "color", _receptorModelColorMap.getColor(
+        entityRep_->setProperty( "color", _outputModelColorMap.getColor(
           entity_->getProperty( "Output model" )
           .value< shiftgen::Output::TOutputModel >( )));
       }
       else
       {
-        entityRep_->setProperty( "color", _receptorModelColorMap.getColor(
+        entityRep_->setProperty( "color", _outputModelColorMap.getColor(
           shiftgen::Output::Multimeter ));
       }
       if ( entity_->hasProperty( "Entity name" ))
@@ -670,10 +670,9 @@ namespace nslib
       if ( !compare || maxLevelsPerSuperPop_ > _maxLevelsPerSuperPop )
       {
         _maxLevelsPerSuperPop = maxLevelsPerSuperPop_;
-        _superPopSeparation = 1.0f / ( _maxLevelsPerSuperPop + 1 );
+        _superPopSeparation = 1.0f / float( _maxLevelsPerSuperPop + 1 );
         _superPopLevelSeparation = NeuronSuperPopItem::rangeCircle
           * _superPopSeparation;
-          ;
       }
     }
 
@@ -692,6 +691,12 @@ namespace nslib
       return _maxLevelsPerSuperPop;
     }
 
+    void RepresentationCreator::reset( void )
+    {
+      maxNeuronsPerPopulation( 1 );
+      maxLevelsPerSuperPop( 1 );
+      maxAbsoluteWeight( 0.1f );
+    }
 
 
   } // namespace congen

@@ -67,7 +67,8 @@ namespace nslib
     virtual void exportJSON( std::ostream& outputStream,
       bool minimizeStream = false ) const;
 
-    virtual void importJSON( std::istream& inputStream );
+    virtual void importJSON( std::istream& inputStream,
+      const bool replaceGIDs = false );
 
     virtual void createGUI( QMainWindow* /* mw */, QMenuBar* /* menubar */ )
     {
@@ -86,8 +87,9 @@ namespace nslib
     virtual void exportRelationTypeToJSON( const std::string& relationName,
       std::ostream& outputStream, bool minimizeStream, bool aggregated ) const;
 
-    virtual void importEntityJSON( const boost::property_tree::ptree& entityJSON,
-      shift::Entity*& entity, bool& isRootEntity, unsigned int& entityGID );
+    virtual void importEntityJSON(
+      const boost::property_tree::ptree& entityJSON, shift::Entity*& entity,
+      bool& isRootEntity, unsigned int& entityGID, const bool replaceGIDs );
 
     virtual void importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
@@ -117,7 +119,8 @@ namespace nslib
 
     virtual void importEntititiesJSON(
       const boost::property_tree::ptree& entities,
-      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
+      std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity,
+      const bool replaceGIDs );
 
     virtual void exportEntitiesJSON( std::ostream& outputStream,
       bool minimizeStream ) const;

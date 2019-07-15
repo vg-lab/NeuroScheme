@@ -96,8 +96,8 @@ namespace nslib
 
     static void createOrEditEntity(
       shift::Entity* entity_, EntityEditWidget::TEntityEditWidgetAction action_,
-      shift::Entity* parentEntity_= nullptr,
-      bool addToScene_ = true );
+      shift::Entity* parentEntity_= nullptr, const bool changeParent_ = false,
+      const bool addToScene_ = true );
 
     static void queryChildrenSelectedState(
       const shift::Entities& entities,
@@ -116,7 +116,9 @@ namespace nslib
 
     static void tmpConnectionLineRemove( );
 
-  protected:
+    static void updateEntityParents( shift::Entity* entity_ );
+
+    protected:
     enum HiglightRelationPair
     { HLC_RELATIONSHIP = 0,
       HLC_COLOR = 1,
@@ -138,11 +140,13 @@ namespace nslib
 
     static unsigned int addCreateEntitiesContextMenu(
       int commonParent_,
-      shift::EntitiesTypes& entitiesTypes_,
+      const shift::EntitiesTypes& entitiesTypes_,
       shift::Entities& dataEntities_,
       shift::Entity*& parentEntity_,
       std::unordered_map< QAction*, unsigned int >& actionToIdx_,
-      std::vector< std::string >*& childrenTypes_);
+      std::vector< std::string >*& childrenTypes_,
+      const bool addParentTypes_,
+      std::vector< bool >*& isParentEntity_ );
 
     static void _propagateSelectedStateToChilds(
       const shift::Entities& entities,

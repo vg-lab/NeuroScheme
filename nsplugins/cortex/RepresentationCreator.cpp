@@ -876,6 +876,18 @@ namespace nslib
         return false;
       }
     }
+    void RepresentationCreator::reset( void )
+    {
+      clear( );
+      setMaximums( 0.1f, 0.1f, 0.1f, 0.1f, 1u, 1u, 1u, 1u );
+    }
+
+    void RepresentationCreator::clear( void )
+    {
+      _layersMap.clear( );
+      _neuronTypeAggsMap.clear( );
+    }
+
 
     float RepresentationCreator::maxNeuronSomaVolume( void ) const
     {

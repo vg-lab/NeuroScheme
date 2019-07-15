@@ -41,15 +41,15 @@ namespace nslib
       TCreatorsMap;
 
     static void addCreator( shift::RepresentationCreator* repCreator,
-                            unsigned int repCreatorId = 0 );
+      unsigned int repCreatorId = 0 );
 
     static void create( const shift::Entities& entities,
-                        shift::Representations& representations,
-                        // TEntitiesToReps& entitiesToReps,
-                        // TRepsToEntities& repsToEntities,
-                        bool linkEntitiesToReps = false,
-                        bool linkRepsToObjs = false,
-                        unsigned int repCreatorId = 0 );
+      shift::Representations& representations,
+      // TEntitiesToReps& entitiesToReps,
+      // TRepsToEntities& repsToEntities,
+      bool linkEntitiesToReps = false,
+      bool linkRepsToObjs = false,
+      unsigned int repCreatorId = 0 );
 
     static void generateRelations( const shift::Entities& entities,
       shift::Representations& representations,
@@ -57,10 +57,10 @@ namespace nslib
       unsigned int repCreatorId = 0 );
 
     static const shift::TEntitiesToReps& entitiesToReps(
-        unsigned int repCreatorId = 0 );
+      unsigned int repCreatorId = 0 );
 
     static const shift::TRepsToEntities& repsToEntities(
-        unsigned int repCreatorId = 0 );
+      unsigned int repCreatorId = 0 );
 
     static void clearEntitiesToReps( unsigned int repCreatorId = 0 );
 
@@ -68,6 +68,9 @@ namespace nslib
       const bool freeLayoutInUse = false );
 
     static void clearRelationshipsCache( unsigned int repCreatorId = 0 );
+
+    static void clearCaches( void );
+    static void clearMaximums( void );
 
     static void updateEntitiyRepresentations(
       const shift::Entity* entity_,
@@ -81,13 +84,13 @@ namespace nslib
       const bool freeLayoutInUse_ = false );
 
     static void removeEntity(
-        shift::Entity* entity, unsigned int repCreatorId = 0 );
+      shift::Entity* entity, unsigned int repCreatorId = 0 );
 
     static const shift::TRelatedEntitiesReps& relatedEntities(
-        unsigned int repCreatorID = 0 );
+      unsigned int repCreatorID = 0 );
 
     static const shift::TGidToEntitiesReps& gidsToEntitiesReps(
-        unsigned int repCreatorID = 0 );
+      unsigned int repCreatorID = 0 );
 
     static void deleteItemsOfCanvas( Canvas* canvas );
 

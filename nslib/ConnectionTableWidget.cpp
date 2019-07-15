@@ -502,7 +502,7 @@ namespace nslib
             {
               shift::Relationship::BreakAnAggregatedRelation(
                 relAggregatedConnectsTo, relAggregatedConnectedBy,
-                DataManager::entities( ), entity, connectedEntity );
+                entity, connectedEntity );
               InteractionManager::updateConnectionRelationship( entity,
                 connectedEntity );
             }
@@ -510,7 +510,7 @@ namespace nslib
             {
               shift::Relationship::BreakAnAggregatedRelation(
                 relAggregatedConnectsTo, relAggregatedConnectedBy,
-                DataManager::entities( ), connectedEntity, entity );
+                connectedEntity, entity );
               InteractionManager::updateConnectionRelationship( connectedEntity,
                 entity );
             }

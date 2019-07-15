@@ -130,7 +130,6 @@ namespace nslib
   public slots:
     void refreshCanvas( void );
 
-
   protected:
     void _drawCorners( );
     void _clearScene( );
