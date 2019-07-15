@@ -310,7 +310,7 @@ namespace nslib
     {
       RepresentationCreatorManager::clearEntitiesToReps( repCreatorId );
     }
-    RepresentationCreatorManager::getCreator(repCreatorId)->clear( );
+    RepresentationCreatorManager::getCreator( repCreatorId )->clear( );
   }
 
   void RepresentationCreatorManager::clearRelationshipsCache(

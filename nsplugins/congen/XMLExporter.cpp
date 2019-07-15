@@ -245,7 +245,7 @@ namespace nslib
         {
           QDomElement target = addElement( domDoc, input, "target" );
           target.setAttribute( "population", QString::fromStdString(
-            entity->getProperty( "Entity name" ).value< std::string >( )));
+            entity->getPropertyValue<std::string>( "Entity name", " " )));
           QDomElement sites = addElement( domDoc, target, "sites" );
           sites.setAttribute( "size", "1" );
           QDomElement site = addElement( domDoc, sites, "site");

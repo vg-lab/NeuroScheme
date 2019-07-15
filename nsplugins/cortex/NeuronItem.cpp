@@ -22,14 +22,16 @@
 #include "NeuronItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
+#include <nslib/Config.h>
 
 namespace nslib
 {
   namespace cortex
   {
-    NeuronItem::NeuronItem( const NeuronRep& neuronRep,
+    NeuronItem::NeuronItem( const NeuronRep* neuronRep,
                             unsigned int size,
                             bool interactive_ )
+    : _itemText( nullptr )
     {
       setInteractive( interactive_ );
       if ( interactive_ )
@@ -45,11 +47,11 @@ namespace nslib
                       size_2 * 2 , size_2 * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = neuronRep.getProperty( "bg" ).value< Color >( );
+      const Color& bgColor = neuronRep->getPropertyValue< Color >( "bg" );
       const NeuronRep::TSymbol& symbol =
-        neuronRep.getProperty( "symbol" ).value< NeuronRep::TSymbol >( );
+        neuronRep->getPropertyValue< NeuronRep::TSymbol >( "symbol" );
       const NeuronRep::Rings rings =
-        neuronRep.getProperty( "rings" ).value< NeuronRep::Rings >( );
+        neuronRep->getPropertyValue< NeuronRep::Rings >( "rings" );
 
       auto somaItem = new QGraphicsEllipseItem( );
       somaItem->setRect( - int( size ) / 2,
@@ -77,17 +79,76 @@ namespace nslib
             size / 2 + ( ringItemPadding + ringItemsWidth ) * ringCount,
             size / 2 + ( ringItemPadding + ringItemsWidth ) * ringCount,
             ringItemsWidth,
-            ring.getProperty( "angle" ).value< int >( ),
-            ring.getProperty( "color" ).value< Color >( ));
+            ring.getPropertyValue< int >( "angle" ),
+            ring.getPropertyValue< Color >( "color" ));
 
         ringItem->setParentItem( this );
         ringItem->setPen( Qt::NoPen );
         ringItem->setZValue( -1 );
 
-        ringCount++;
+        ++ringCount;
       }
 
-      this->_parentRep = &( const_cast< NeuronRep& >( neuronRep ));
+      if ( Config::showEntitiesName( ))
+      {
+        _itemText = new ItemText( QString::fromStdString( neuronRep
+          ->getPropertyValue< std::string >( "Entity name", "" )), this,
+          0.25f, 0.65f, QColor::fromRgb( 245, 245, 245, 255 ),
+         QColor::fromRgb( 5, 5, 5, 255 ) );
+      }
+
+      _parentRep = const_cast< NeuronRep* >( neuronRep );
+    }
+
+    void NeuronItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      if ( _interactive )
+      {
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+            {
+              InteractionManager::hoverEnterEvent(
+                qAbstractGraphicItem, event_ );
+            }
+          }
+        InteractionManager::highlightConnectivity( this );
+      }
+    }
+
+    void NeuronItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    {
+      if ( _interactive )
+      {
+        auto qGraphicsItemRep =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( qGraphicsItemRep )
+          for ( auto& item : qGraphicsItemRep->items( ))
+          {
+            auto qAbstractGraphicItem =
+              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
+            if ( qAbstractGraphicItem )
+            {
+              InteractionManager::hoverLeaveEvent( qAbstractGraphicItem,
+                event_ );
+            }
+          }
+        InteractionManager::highlightConnectivity( this, false );
+
+      }
+    }
+
+    void NeuronItem::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+    {
+      if ( _interactive )
+      {
+        InteractionManager::contextMenuEvent( this, event_ );
+      }
     }
 
     QGraphicsItem* NeuronItem::_createSymbolItem( NeuronRep::TSymbol symbol,
@@ -136,6 +197,11 @@ namespace nslib
       }
 
       return symbolItem;
+    }
+
+    NeuronItem::~NeuronItem( void )
+    {
+      delete _itemText;
     }
 
   } // namespace cortex

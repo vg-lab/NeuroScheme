@@ -19,64 +19,56 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef __NSLIB__NEURON_TYPE_AGGREGATION_ITEM__
-#define __NSLIB__NEURON_TYPE_AGGREGATION_ITEM__
+#ifndef __NSLIBCORTEX__LAYER_ITEM__
+#define __NSLIBCORTEX__LAYER_ITEM__
 
-#include <nslib/Color.h>
-#include <nslib/InteractionManager.h>
-#include <nslib/reps/CollapsableItem.h>
 #include <nslib/reps/Item.h>
+#include <nslib/reps/SelectableItem.h>
 #include <nslib/reps/InteractiveItem.h>
-#include "ColumnRep.h"
+#include <nslib/InteractionManager.h>
 #include "LayerRep.h"
-#include "NeuronRep.h"
-#include "NeuronTypeAggregationRep.h"
-#include <shift_NeuronAggregationRep.h>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsSceneMouseEvent>
-#include <QPropertyAnimation>
 
 namespace nslib
 {
-
   namespace cortex
   {
-    class NeuronTypeAggregationItem
-      : public QGraphicsPathItem
-      , public nslib::Item
-      , public nslib::SelectableItem
-      , public nslib::InteractiveItem
+    class LayerItem
+      : public QObject
+      , public QGraphicsPathItem
+      , public ::nslib::Item
+      , public ::nslib::SelectableItem
+      , public ::nslib::InteractiveItem
     {
+      Q_OBJECT
+      Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
-    public:
+      public:
 
-      NeuronTypeAggregationItem( const NeuronTypeAggregationRep& layerRep  );
 
-      void create( unsigned int size = 50 );
+      LayerItem( const LayerRep& layerRep );
 
-      QAbstractGraphicsShapeItem* symbolItem( void );
+      void create( unsigned int layer_, QGraphicsItem *parent_,
+        const QPoint& pLayerUL, const QPoint& pLayerUM, const QPoint& pLayerUR,
+        unsigned int layerHeight, unsigned int numNeuronsHeight, float percPyr,
+        float percInter, const QBrush& brush_ );
 
-      virtual ~NeuronTypeAggregationItem( void ) {}
+      unsigned int& layer( void );
+      virtual ~LayerItem( void ) {}
 
       virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
+
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
+
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
-    public slots:
-
+      public slots:
       void disable( void );
 
-    protected:
-      //unsigned int _layer;
-      QAbstractGraphicsShapeItem* _symbolItem;
-
+      protected:
+      unsigned int _layer;
     };
+  }
+}
 
 
-  } // namespace cortex
-
-} // namespace nslib
-
-#endif
+#endif //__NSLIBCORTEX__LAYER_ITEM__

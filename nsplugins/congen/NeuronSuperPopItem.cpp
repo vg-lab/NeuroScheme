@@ -47,7 +47,7 @@ namespace nslib
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
-      const Color& bgColor = entityRep.getProperty( "color" ).value< Color >( );
+      const Color& bgColor = entityRep.getPropertyValue< Color >( "color" );
       auto circleItem = new QGraphicsEllipseItem( this );
       float circleItemSize = size * 0.9f;
       float halfcircleItemSize = - 0.5f * circleItemSize;
@@ -64,15 +64,15 @@ namespace nslib
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      int numCircles = entityRep.getProperty( "num circles" )
-        .value< unsigned int >( );
+      int numCircles = entityRep.getPropertyValue< unsigned int >
+        ( "num circles", 0u );
 
       float circleSeparation =
-        entityRep.getProperty("circles separation").value< float >( );
+        entityRep.getPropertyValue<float>("circles separation", .0f );
       float colorSeparation =
-          entityRep.getProperty("circles color separation").value< float >( );
+          entityRep.getPropertyValue<float>("circles color separation", .0f );
       scoop::SequentialColorMap colorMap = entityRep
-        .getProperty("circles color map").value< scoop::SequentialColorMap >( );
+        .getPropertyValue< scoop::SequentialColorMap >("circles color map");
 
       float realCircleSeparation = circleSeparation * size;
       float circleSizeInner2 = circleItemSizeInner;
@@ -103,7 +103,7 @@ namespace nslib
       auto barFill = new QGraphicsRectItem(
         halfBarWidth, halfBarHeight,
         roundf(barWidth *
-        entityRep.getProperty( "line perc" ).value< float >( )),
+        entityRep.getPropertyValue< float >( "line perc", .0f )),
         barHeight);
       barFill->setPen( Qt::NoPen );
       barFill->setBrush( QColor( bgColor ));
@@ -111,8 +111,8 @@ namespace nslib
 
       if ( nslib::Config::showEntitiesName( ))
       {
-        _itemText = new ItemText( QString::fromStdString(
-          entityRep.getProperty( "Entity name" ).value<std::string>( )), this );
+        _itemText = new ItemText( QString::fromStdString( entityRep
+          .getPropertyValue<std::string>( "Entity name", " " )), this );
       }
 
 

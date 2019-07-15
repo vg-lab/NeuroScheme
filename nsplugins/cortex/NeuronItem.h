@@ -29,6 +29,7 @@
 #include <nslib/reps/SelectableItem.h>
 #include "NeuronRep.h"
 #include <QGraphicsEllipseItem>
+#include <nslib/ItemText.h>
 
 namespace nslib
 {
@@ -48,63 +49,24 @@ namespace nslib
 
     public:
 
-      NeuronItem( const NeuronRep& neuronRep,
+      NeuronItem( const NeuronRep* neuronRep,
                   unsigned int size = 100,
                   bool interactive = true );
 
-      virtual ~NeuronItem( void ) {}
+      virtual ~NeuronItem( void );
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        if ( _interactive )
-        {
-          auto qGraphicsItemRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-          if ( qGraphicsItemRep )
-            for ( auto& item : qGraphicsItemRep->items( ))
-            {
-              auto qAbstractGraphicItem =
-                dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-              if ( qAbstractGraphicItem )
-                InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
-            }
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
 
-          InteractionManager::highlightConnectivity( this );
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
 
-        }
-      }
-
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        if ( _interactive )
-        {
-          auto qGraphicsItemRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-          if ( qGraphicsItemRep )
-            for ( auto& item : qGraphicsItemRep->items( ))
-            {
-              auto qAbstractGraphicItem =
-                dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-              if ( qAbstractGraphicItem )
-                InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
-            }
-          InteractionManager::highlightConnectivity( this, false );
-
-        }
-      }
-
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
-      {
-        if ( _interactive )
-          InteractionManager::contextMenuEvent( this, event_ );
-      }
+      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
 
     protected:
 
       QGraphicsItem* _createSymbolItem( NeuronRep::TSymbol symbol,
-                                        unsigned int size = 100 );
-
+        unsigned int size = 100 );
+      ItemText* _itemText;
     };
 
 

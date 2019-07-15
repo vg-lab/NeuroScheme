@@ -424,7 +424,6 @@ namespace nslib
           shift::Relationship::Establish( relSuperEntityOf, relSubEntityOf,
             _entity, subentity );
           dataEntities.add( subentity );
-          PaneManager::activePane( )->addEntity( subentity );
         }
 
         if( _entity->isNotHierarchy( ))
@@ -456,7 +455,7 @@ namespace nslib
             {
               auto& relAggregatedConnectsTo =*( dataRelations
                 [ "aggregatedConnectsTo" ]->asAggregatedOneToN( ));
-              auto relAggregatedConnectedBy =*( dataRelations
+              auto& relAggregatedConnectedBy =*( dataRelations
                 [ "aggregatedConnectedBy" ]->asAggregatedOneToN( ));
 
               shift::Relationship::ChangeEntityParent( relParentOf,
@@ -479,7 +478,6 @@ namespace nslib
     }
 
     InteractionManager::updateEntityParents( _entity );
-
 
     for ( auto pane : PaneManager::panes( ))
     {

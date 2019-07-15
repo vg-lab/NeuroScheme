@@ -21,6 +21,8 @@
  */
 #include "NeuronTypeAggregationItem.h"
 #include "NeuronItem.h"
+#include "Triangle.h"
+#include "Circle.h"
 #include <nslib/reps/CollapseButtonItem.h>
 #include <nslib/error.h>
 #include <QPen>
@@ -39,94 +41,12 @@ namespace nslib
       this->_parentRep = &( const_cast< NeuronTypeAggregationRep& >( parentRep_ ));
     }
 
-    class Triangle
-      : public QGraphicsPolygonItem
-      , public SelectableItem
-      , public Item
-    {
-    public:
-      Triangle( QPolygonF polygon_, QGraphicsItem* parent_ )
-        : QGraphicsPolygonItem( polygon_, parent_ )
-      {
-        setAcceptHoverEvents( true );
-        setFlags( QGraphicsItem::ItemIsPanel );
-      }
-      shift::Representation* parentRep( void ) const final
-      {
-        return dynamic_cast< Item* >(this ->parentItem( ))->parentRep( );
-      }
-
-      void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) final
-      {
-        InteractionManager::hoverEnterEvent( this, event_ );
-        // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-        // event_ );
-      }
-
-      void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) final
-      {
-        InteractionManager::hoverLeaveEvent( this, event_ );
-        // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-        // event_ );
-      }
-
-      void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ ) final
-      {
-        InteractionManager::contextMenuEvent(
-          dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-          event_ );
-      }
-
-    };
-
-    class Circle
-      : public QGraphicsEllipseItem
-      , public SelectableItem
-      , public Item
-
-    {
-    public:
-      Circle( QGraphicsItem* parent_ )
-        : QGraphicsEllipseItem( parent_ )
-      {
-        setAcceptHoverEvents( true );
-        setFlags( QGraphicsItem::ItemIsPanel );
-      }
-
-      shift::Representation* parentRep( void ) const final
-      {
-        return dynamic_cast< Item* >(this ->parentItem( ))->parentRep( );
-      }
-
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        InteractionManager::hoverEnterEvent( this, event_ );
-        // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-        // event_ );
-      }
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        InteractionManager::hoverLeaveEvent( this, event_ );
-        // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-        // event_ );
-      }
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
-      {
-        InteractionManager::contextMenuEvent(
-          dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-          event_ );
-      }
-
-    };
-
     void NeuronTypeAggregationItem::create( unsigned int size )
     {
-      const auto& symbol =
-        this->_parentRep->getProperty( "symbol" ).value<
-          NeuronTypeAggregationRep::TSymbol >( );
       QPolygonF triangle;
       QGraphicsEllipseItem* ellipseItem;
-      switch ( symbol )
+      switch ( this->_parentRep->getPropertyValue
+        < NeuronTypeAggregationRep::TSymbol >( "symbol" ))
       {
       case NeuronTypeAggregationRep::TRIANGLE:
         // std::cout << "NeuronTypeAggregationItem::TRIANGLE" << std::endl;
@@ -150,6 +70,32 @@ namespace nslib
       }
     }
 
+    QAbstractGraphicsShapeItem* NeuronTypeAggregationItem::symbolItem( void )
+    {
+      return _symbolItem;
+    }
+
+    void NeuronTypeAggregationItem::hoverEnterEvent(
+      QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverEnterEvent( this, event_ );
+    }
+    void NeuronTypeAggregationItem::hoverLeaveEvent(
+      QGraphicsSceneHoverEvent* event_ )
+    {
+      InteractionManager::hoverLeaveEvent( this, event_ );
+    }
+    void NeuronTypeAggregationItem::contextMenuEvent(
+      QGraphicsSceneContextMenuEvent* event_ )
+    {
+      InteractionManager::contextMenuEvent( this, event_ );
+    }
+
+    void NeuronTypeAggregationItem::disable( void )
+    {
+      this->setEnabled( false );
+      this->setVisible( false );
+    }
 
   } // namespace cortex
 } // namespace nslib

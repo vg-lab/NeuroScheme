@@ -30,6 +30,7 @@
 #include "ColumnRep.h"
 #include "LayerRep.h"
 #include "NeuronRep.h"
+#include "LayerItem.h"
 #include <shift_NeuronAggregationRep.h>
 #include <QPainterPath>
 #include <QGraphicsPathItem>
@@ -44,79 +45,6 @@ namespace nslib
     using Layers = shiftgen::NeuronAggregationRep::Layers;
     using NeuronTypeAggregations =
       shiftgen::NeuronAggregationRep::NeuronTypeAggregations;
-
-    class LayerItem
-      : public QObject
-      , public QGraphicsPathItem
-      , public ::nslib::Item
-      , public ::nslib::SelectableItem
-      , public ::nslib::InteractiveItem
-    {
-      Q_OBJECT
-      Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
-
-    public:
-
-
-      LayerItem( const LayerRep& layerRep );
-
-      void create( unsigned int layer_,
-                   QGraphicsItem *parent_,
-                   const QPoint& pLayerUL,
-                   const QPoint& pLayerUM,
-                   const QPoint& pLayerUR,
-                   unsigned int layerHeight,
-                   unsigned int numNeuronsHeight,
-                   float percPyr,
-                   float percInter,
-                   const QBrush& brush_ );
-      unsigned int& layer( void );
-      virtual ~LayerItem( void ) {}
-
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto qGraphicsItemRep =
-          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-        if ( qGraphicsItemRep )
-          for ( auto& item : qGraphicsItemRep->items( ))
-          {
-            auto qAbstractGraphicItem =
-              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-            if ( qAbstractGraphicItem )
-              InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
-          }
-      }
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto qGraphicsItemRep =
-          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-        if ( qGraphicsItemRep )
-          for ( auto& item : qGraphicsItemRep->items( ))
-          {
-            auto qAbstractGraphicItem =
-              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-            if ( qAbstractGraphicItem )
-              InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
-          }
-      }
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
-      {
-        InteractionManager::contextMenuEvent( this, event_ );
-      }
-
-    public slots:
-
-      void disable( void )
-      {
-        this->setEnabled( false );
-        this->setVisible( false );
-      }
-
-    protected:
-      unsigned int _layer;
-    };
-
-
 
     class NeuronAggregationItem
       : public QObject
@@ -138,48 +66,23 @@ namespace nslib
       }
 
 
-      virtual ~NeuronAggregationItem( void ) {}
+      virtual ~NeuronAggregationItem( void ) {
+      }
 
       void collapse( bool anim = true );
       void uncollapse( bool anim = true );
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto qGraphicsItemRep =
-          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-        if ( qGraphicsItemRep )
-          for ( auto& item : qGraphicsItemRep->items( ))
-          {
-            auto qAbstractGraphicItem =
-              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-            if ( qAbstractGraphicItem )
-              InteractionManager::hoverEnterEvent( qAbstractGraphicItem, event_ );
-          }
-      }
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
-      {
-        auto qGraphicsItemRep =
-          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-        if ( qGraphicsItemRep )
-          for ( auto& item : qGraphicsItemRep->items( ))
-          {
-            auto qAbstractGraphicItem =
-              dynamic_cast< QAbstractGraphicsShapeItem* >( item.second );
-            if ( qAbstractGraphicItem )
-              InteractionManager::hoverLeaveEvent( qAbstractGraphicItem, event_ );
-          }
-      }
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
-      {
-        InteractionManager::contextMenuEvent( this, event_ );
-      }
+      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
+      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
+
+      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
 
     protected:
 
       void _createNeuronAggregationItem(
         QGraphicsScene* scene,
-        const NeuronRep& meanNeuron,
+        const NeuronRep* meanNeuron,
         const Layers& layers,
         const NeuronTypeAggregations& neuronTypeAggs,
         const QPainterPath& path,

@@ -31,8 +31,16 @@
 namespace nslib
 {
   Domain::Domain( void )
-    : _dataLoader( nullptr ), _entitiesTypes( nullptr )
+    : _dataLoader( nullptr )
+    , _entitiesTypes( nullptr )
   {
+  }
+
+  Domain::~Domain( void )
+  {
+    delete this->_dataLoader;
+    delete this->_entitiesTypes;
+    delete this->_relationshipPropertiesTypes;
   }
 
   std::string& Domain::domainName( void )

@@ -51,7 +51,7 @@ namespace nslib
       if ( create && ( _items.find( scene ) == _items.end( )) &&
            !_items[ scene ] )
       {
-        _items[ scene ] = new NeuronItem( *this );
+        _items[ scene ] = new NeuronItem( this );
       }
       return _items.at( scene );
     }

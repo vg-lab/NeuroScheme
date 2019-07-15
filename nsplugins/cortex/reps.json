@@ -24,6 +24,10 @@
             "namespace": "nslib::cortex::shiftgen",
             "properties": [
                 {
+                    "name": "Entity name",
+                    "type": "std::string"
+                },
+                {
                     "name": "bg",
                     "type": "Color"
                 },
@@ -93,6 +97,10 @@
             "name": "NeuronAggregationRep",
             "namespace": "nslib::cortex::shiftgen",
             "properties": [
+                {
+                    "name": "Entity name",
+                    "type": "std::string"
+                },
                 {
                     "name": "layers",
                     "type": "Layers"

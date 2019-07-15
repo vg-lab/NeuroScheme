@@ -42,10 +42,13 @@ namespace nslib
     }
     virtual ~Item( void )
     {
-      auto parentRep_ =
-        dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
-      if ( parentRep_ )
-        parentRep_->clearItems( );
+     if ( _parentRep )
+      {
+        auto* parentRep_ =
+          dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
+        if ( parentRep_ )
+          parentRep_->clearItems( );
+      }
     }
     virtual shift::Representation* parentRep( void ) const
     {

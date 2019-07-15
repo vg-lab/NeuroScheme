@@ -207,10 +207,10 @@ namespace nslib
         Loggers::get( )->log( "Expected properties.", LOG_LEVEL_WARNING );
       }
       const LayersMapKey layerKey = correctProperties ? QuadKey(
-        entity_->getProperty( "Parent gid" ).value< unsigned int >( ),
-        entity_->getProperty( "Parent Id" ).value< unsigned int >( ),
-        entity_->getProperty( "Parent Type" ).value< Layer::TLayerParentType >( ),
-        entity_->getProperty( "Layer" ).value< unsigned int >( ))
+        entity_->getPropertyValue< unsigned int >( "Parent gid", 0u ),
+        entity_->getPropertyValue< unsigned int >( "Parent Id", 0u ),
+        entity_->getPropertyValue< Layer::TLayerParentType >( "Parent Type" ),
+        entity_->getPropertyValue< unsigned int >( "Layer", 0u ))
         : QuadKey( 0u, 0u, 0u, 0u );
       auto layerPair = _layersMap.find( layerKey );
       if ( layerPair == _layersMap.end( ))
@@ -242,12 +242,12 @@ namespace nslib
         Loggers::get( )->log( "Expected properties.", LOG_LEVEL_WARNING );
       }
       NeuronTypeAggsMapKey neuronTypeAggKey = correctProperties ? PentaKey(
-        entity_->getProperty( "Parent gid" ).value< unsigned int >( ),
-        entity_->getProperty( "Parent Id" ).value< unsigned int >( ),
-        entity_->getProperty( "Parent Type" ).value< Layer::TLayerParentType >( ),
-        entity_->getProperty( "Layer" ).value< unsigned int >( ),
-        uint( entity_->getProperty( "Morpho Type" ).value<
-        Neuron::TMorphologicalType >( )))
+        entity_->getPropertyValue< unsigned int >( "Parent gid", 0u ),
+        entity_->getPropertyValue< unsigned int >( "Parent Id", 0u ),
+        entity_->getPropertyValue< Layer::TLayerParentType >( "Parent Type" ),
+        entity_->getPropertyValue< unsigned int >( "Layer", 0u ),
+        uint( entity_->getPropertyValue
+        < Neuron::TMorphologicalType >( "Morpho Type" )))
         : PentaKey( 0u, 0u, 0u, 0u, 0u );
 
       auto neuronTypeAggPair = _neuronTypeAggsMap.find( neuronTypeAggKey );
@@ -273,124 +273,68 @@ namespace nslib
       //   << fires::PropertyManager::getPropertyCaster(
       //     "morphoType" )->toString(
       //     neuron->getProperty( "morphoType" )) << std::endl;
-      if ( entity_->hasProperty( "Morpho Type" ))
+
+      switch ( entity_->getPropertyValue< Neuron::TMorphologicalType >(
+        "Morpho Type", Neuron::UNDEFINED_MORPHOLOGICAL_TYPE ))
       {
-        switch ( entity_->getProperty( "Morpho Type" ).
-          value< Neuron::TMorphologicalType >( ))
-        {
-          case Neuron::UNDEFINED_MORPHOLOGICAL_TYPE:
-            entityRep_->setProperty( "symbol", NeuronRep::NO_SYMBOL );
-            break;
-          case Neuron::INTERNEURON:
-            entityRep_->setProperty( "symbol", NeuronRep::CIRCLE );
-            break;
-          case Neuron::PYRAMIDAL:
-            entityRep_->setProperty( "symbol", NeuronRep::TRIANGLE );
-            break;
-          default:
-            Loggers::get( )->log( "Unexpected value of Morpho Type.",
-              LOG_LEVEL_WARNING );
-            break;
-        }
+        case Neuron::UNDEFINED_MORPHOLOGICAL_TYPE:
+          entityRep_->setProperty( "symbol", NeuronRep::NO_SYMBOL );
+          break;
+        case Neuron::INTERNEURON:
+          entityRep_->setProperty( "symbol", NeuronRep::CIRCLE );
+          break;
+        case Neuron::PYRAMIDAL:
+          entityRep_->setProperty( "symbol", NeuronRep::TRIANGLE );
+          break;
+        default:
+          Loggers::get( )->log( "Unexpected value of Morpho Type.",
+            LOG_LEVEL_WARNING );
+          break;
       }
-      else
+
+      switch ( entity_->getPropertyValue< Neuron::TFunctionalType >(
+        "Funct Type", Neuron::UNDEFINED_FUNCTIONAL_TYPE ))
       {
-        entityRep_->setProperty( "symbol", NeuronRep::NO_SYMBOL );
-        Loggers::get( )->log( "Expected propery Morpho Type.",
-          LOG_LEVEL_WARNING );
-      }
-      if( entity_->hasProperty( "Funct Type" ))
-      {
-        switch ( entity_->getProperty(
-          "Funct Type" ).value< Neuron::TFunctionalType >( ))
-        {
-          case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
-            entityRep_->setProperty( "bg", Color( 100, 100, 100 ));
-            break;
-          case Neuron::INHIBITORY:
-            entityRep_->setProperty( "bg", Color( 200, 100, 100 ));
-            break;
-          case Neuron::EXCITATORY:
-            entityRep_->setProperty( "bg", Color( 100, 100, 200 ));
-            break;
-          default:
-            Loggers::get( )->log( "Unexpected value of Funct Type.",
-              LOG_LEVEL_WARNING );
-            break;
-        }
-      }
-      else
-      {
-        Loggers::get( )->log( "Expected property Funct Type.",
-          LOG_LEVEL_WARNING );
-        entityRep_->setProperty( "bg", Color( 100, 100, 100 ));
+        case Neuron::UNDEFINED_FUNCTIONAL_TYPE:
+          entityRep_->setProperty( "bg", Color( 100, 100, 100 ));
+          break;
+        case Neuron::INHIBITORY:
+          entityRep_->setProperty( "bg", Color( 200, 100, 100 ));
+          break;
+        case Neuron::EXCITATORY:
+          entityRep_->setProperty( "bg", Color( 100, 100, 200 ));
+          break;
+        default:
+          Loggers::get( )->log( "Unexpected value of Funct Type.",
+            LOG_LEVEL_WARNING );
+          break;
       }
 
       NeuronRep::Rings rings;
 
       shiftgen::Ring somaRing;
-      if ( entity_->hasProperty( "Soma Surface" ))
-      {
-        somaRing.setProperty( "angle",
-          int( roundf( _somaAreaToAngle.map(
-          entity_->getProperty( "Soma Surface" ).value< float >( )))));
-      }
-      else
-      {
-        Loggers::get( )->log( "Expected property Soma Surface.",
-          LOG_LEVEL_WARNING );
-        somaRing.setProperty( "angle",
-          int( roundf( _somaAreaToAngle.map( 0.0f ))));
-      }
+      somaRing.setProperty( "angle", int( roundf( _somaAreaToAngle.map(
+        entity_->getPropertyValue< float >( "Soma Surface", .0f )))));
       // greenMapper.value( ) =
       //   neuron->getProperty( "Soma Volume" ).value< float >( );
       // somaRing.setProperty( "color", greenMapper.map( ));
 
-      if ( entity_->hasProperty( "Soma Volume" ))
-      {
-        somaRing.setProperty( "color",
-          _greenMapper.getColor(
-          entity_->getProperty( "Soma Volume" ).value< float >( )));
-      }
-      else
-      {
-        Loggers::get( )->log( "Expected property Soma Volume.",
-          LOG_LEVEL_WARNING );
-        somaRing.setProperty( "color", _greenMapper.getColor( 0.0f ));
-      }
+      somaRing.setProperty( "color", _greenMapper.getColor(
+        entity_->getPropertyValue< float >( "Soma Volume", .0f )));
       rings.push_back( somaRing );
 
       shiftgen::Ring dendRing;
-      if ( entity_->hasProperty( "Dendritic Surface" ))
-      {
-        dendRing.setProperty( "angle",
-          int( roundf( _dendAreaToAngle.map(
-          entity_->getProperty( "Dendritic Surface" ).value< float >( )))));
-      }
-      else
-      {
-        Loggers::get( )->log( "Expected property Dendritic Surface.",
-                              LOG_LEVEL_WARNING );
-        dendRing.setProperty( "angle",
-          int( roundf( _dendAreaToAngle.map( 0.0f ))));
-      }
+      dendRing.setProperty( "angle", int( roundf( _dendAreaToAngle.map(
+        entity_->getPropertyValue< float >( "Dendritic Surface", .0f )))));
       // _redMapper.value( ) =
       //   neuron->getProperty( "Dendritic Volume" ).value< float >( );
       // dendRing.setProperty( "color", _redMapper.map( ));
 
-      if ( entity_->hasProperty( "Dendritic Volume" ))
-      {
-        dendRing.setProperty( "color",
-          _redMapper.getColor(
-          entity_->getProperty( "Dendritic Volume" ).value< float >( )));
-      }
-      else
-      {
-        Loggers::get( )->log( "Expected property Dendritic Volume.",
-          LOG_LEVEL_WARNING );
-        dendRing.setProperty( "color", _redMapper.getColor( 0.0f ));
-      }
+      dendRing.setProperty( "color", _redMapper.getColor(
+        entity_->getPropertyValue< float >( "Dendritic Volume", .0f )));
       rings.push_back( dendRing );
+      entityRep_->setProperty( "Entity name", entity_->getPropertyValue
+        <std::string>( "Entity name", " " ));
       entityRep_->setProperty( "rings", rings );
     } // create
 
@@ -447,20 +391,9 @@ namespace nslib
             auto relMMapIt = relMMap.find( other->entityGid( ));
             if ( relMMapIt != ( *relatedElements )[ entity->entityGid( ) ].end( ) )
             {
-              if ( relMMapIt->second->hasProperty( "count" ))
-              {
-                relationRep->setProperty(
-                  "width", ( unsigned int ) roundf( _nbConnectionsToWidth.map(
-                  relMMapIt->second->getProperty( "count" )
-                  .value< unsigned int >( ))));
-              }
-              else
-              {
-                relationRep->setProperty( "width",
-                  ( unsigned int ) roundf( _nbConnectionsToWidth.map( 0u )));
-                Loggers::get( )->log("Expected property count.",
-                  LOG_LEVEL_WARNING );
-              }
+              relationRep->setProperty( "width", ( unsigned int )
+              roundf( _nbConnectionsToWidth.map(relMMapIt->second->
+              getPropertyValue< unsigned int >( "count", 0u ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
@@ -532,21 +465,9 @@ namespace nslib
               .relationshipAggregatedProperties.get( );
             if ( relationProperties )
             {
-              if ( relationProperties->hasProperty( "count sum" ))
-              {
-                relationRep->setProperty(
-                  "width", ( unsigned int ) roundf(
-                  _nbConnectionsToWidth.map(
-                  relationProperties->getProperty( "count sum" )
-                  .value< unsigned int >( ))));
-              }
-              else
-              {
-                relationRep->setProperty( "width",
-                  ( unsigned int ) roundf( _nbConnectionsToWidth.map( 0u )));
-                Loggers::get( )->log("Expected property count sum.",
-                  LOG_LEVEL_WARNING );
-              }
+              relationRep->setProperty( "width", ( unsigned int ) roundf(
+                _nbConnectionsToWidth.map( relationProperties->
+                getPropertyValue< unsigned int >( "count sum", 0u ))));
             }
 
             alreadyConnected = relatedEntitiesReps.insert(
@@ -564,10 +485,10 @@ namespace nslib
       shift::Representation* entityRep_,
       unsigned int columnOrMiniColumn )
     {
-      NeuronRep meanNeuronRep;
+      NeuronRep* meanNeuronRep = new NeuronRep( );
 
-      meanNeuronRep.setProperty( "symbol", NeuronRep::NO_SYMBOL );
-      meanNeuronRep.setProperty( "bg", Color( 200, 200, 200 ));
+      meanNeuronRep->setProperty( "symbol", NeuronRep::NO_SYMBOL );
+      meanNeuronRep->setProperty( "bg", Color( 200, 200, 200 ));
 
       shiftgen::NeuronAggregationRep::Rings rings;
 
@@ -576,111 +497,40 @@ namespace nslib
       //   entity->getProperty( "meanSomaVolume" ).value< float >( );
 
       shiftgen::Ring somaRing;
-      if ( entity_->hasProperty( "meanSomaArea" ))
-      {
-        somaRing.setProperty( "angle",
-          int( roundf( _somaAreaToAngle.map(
-          entity_->getProperty( "meanSomaArea" ).value< float >( )))));
-      }
-      else
-      {
-        somaRing.setProperty( "angle",
-          int( roundf( _somaAreaToAngle.map( 0.0f ))));
-        Loggers::get( )->log("Expected property meanSomaArea.",
-          LOG_LEVEL_WARNING );
-      }
+      somaRing.setProperty( "angle", int( roundf( _somaAreaToAngle.map(
+        entity_->getPropertyValue< float >( "meanSomaArea", .0f )))));
       // somaVolumeToColor.value( ) =
       //   entity->getProperty( "meanSomaVolume" ).value< float >( );
       // somaRing.setProperty( "color", somaVolumeToColor.map( ));
-      if ( entity_->hasProperty( "meanSomaVolume" ))
-      {
-        somaRing.setProperty( "color", _redMapper.getColor(
-          entity_->getProperty( "meanSomaVolume" ).value< float >( )));
-      }
-      else
-      {
-        somaRing.setProperty( "color",_redMapper.getColor( 0.0f ));
-        Loggers::get( )->log("Expected property meanSomaVolume.",
-          LOG_LEVEL_WARNING );
-      }
+      somaRing.setProperty( "color", _redMapper.getColor(
+        entity_->getPropertyValue< float >( "meanSomaVolume", .0f )));
       rings.push_back( somaRing );
 
       shiftgen::Ring dendRing;
-      if ( entity_->hasProperty( "meanDendArea" ))
-      {
-        dendRing.setProperty( "angle",
-          int( roundf( _dendAreaToAngle.map(
-          entity_->getProperty( "meanDendArea" ).value< float >( )))));
-      }
-      else
-      {
-        dendRing.setProperty( "angle",
-          int( roundf( _dendAreaToAngle.map( 0.0f ))));
-        Loggers::get( )->log("Expected property meanDendArea.",
-          LOG_LEVEL_WARNING );
-      }
+      dendRing.setProperty( "angle", int( roundf( _dendAreaToAngle.map(
+        entity_->getPropertyValue< float >( "meanDendArea", .0f )))));
       // dendVolumeToColor.value( ) =
       //   entity->getProperty( "meanDendVolume" ).value< float >( );
       // dendRing.setProperty( "color", dendVolumeToColor.map( ));
-      if ( entity_->hasProperty( "meanDendVolume" ))
-      {
-        dendRing.setProperty( "color",
-          _greenMapper.getColor(
-          entity_->getProperty( "meanDendVolume" ).value< float >( )));
-      }
-      else
-      {
-        dendRing.setProperty( "color", _greenMapper.getColor( 0.0f ));
-        Loggers::get( )->log("Expected property meanDendVolume.",
-          LOG_LEVEL_WARNING );
-      }
+      dendRing.setProperty( "color", _greenMapper.getColor(
+        entity_->getPropertyValue< float >( "meanDendVolume", .0f )));
       rings.push_back( dendRing );
 
-      meanNeuronRep.registerProperty( "rings", rings );
+      meanNeuronRep->registerProperty( "rings", rings );
 
-      entityRep_->registerProperty( "meanNeuron", meanNeuronRep );
+      entityRep_->registerProperty( "meanNeuron", *meanNeuronRep );
 
       shiftgen::NeuronAggregationRep::Layers layersReps;
 
       auto layerRep = new LayerRep;
-      if ( entity_->hasProperty( "Num Pyramidals" ))
-      {
-        layerRep->setProperty( "leftPerc",
-          roundf( _neuronsToPercentage.map(
-          entity_->getProperty( "Num Pyramidals" ).value< uint >( ))));
-      }
-      else
-      {
-        layerRep->setProperty( "leftPerc",
-          roundf( _neuronsToPercentage.map( 0u )));
-        Loggers::get( )->log("Expected property Num Pyramidals.",
-          LOG_LEVEL_WARNING );
-      }
+      layerRep->setProperty( "leftPerc", roundf( _neuronsToPercentage.map(
+        entity_->getPropertyValue<uint>( "Num Pyramidals", 0u ))));
 
-      if ( entity_->hasProperty( "Num Interneurons" ))
-      {
-        layerRep->setProperty( "rightPerc",
-          roundf( _neuronsToPercentage.map(
-          entity_->getProperty( "Num Interneurons" ).value< uint >( ))));
-      }
-      else
-      {
-        layerRep->setProperty( "rightPerc",
-          roundf( _neuronsToPercentage.map( 0u )));
-        Loggers::get( )->log("Expected property Num Interneurons.",
-          LOG_LEVEL_WARNING );
-      }
+      layerRep->setProperty( "rightPerc", roundf( _neuronsToPercentage.map(
+        entity_->getPropertyValue<uint>( "Num Interneurons", 0u ))));
       layersReps.push_back( layerRep );
 
-      uint entityID = 0;
-      if ( entity_->hasProperty( "Id" ))
-      {
-        entityID = entity_->getProperty( "Id" ).value< uint >( );
-      }
-      else
-      {
-        Loggers::get( )->log("Expected property Id.", LOG_LEVEL_WARNING );
-      }
+      uint entityID = entity_->getPropertyValue< uint >( "Id", 0u );
 
       unsigned int entityGid = entity_->entityGid( );
       for ( unsigned int layer = 1; layer <= 6; ++layer )
@@ -700,38 +550,13 @@ namespace nslib
 
         layerRep = _layersMap[ layerKey ]; //new LayerRep;
 
-        //layerRep = new LayerRep;
-        std::string layerLabel =
-          std::string( "Num Pyr Layer " ) + std::to_string( layer );
-        if ( entity_->hasProperty( layerLabel ))
-        {
-          layerRep->setProperty( "leftPerc",
-            _columnNeuronsToPercentage.map(
-            entity_->getProperty( layerLabel ).value< uint >( )));
-        }
-        else
-        {
-          layerRep->setProperty( "leftPerc",
-            _columnNeuronsToPercentage.map( 0u ));
-          Loggers::get( )->log( std::string( "Expected property " )
-            + layerLabel, LOG_LEVEL_WARNING );
-        }
+        layerRep->setProperty( "leftPerc", _columnNeuronsToPercentage.map(
+          entity_->getPropertyValue< uint >( std::string( "Num Pyr Layer " )
+          + std::to_string( layer ))));
 
-        layerLabel =
-            std::string( "Num Inter Layer " ) + std::to_string( layer );
-        if ( entity_->hasProperty( layerLabel ))
-        {
-          layerRep->setProperty( "rightPerc",
-            _columnNeuronsToPercentage.map(
-            entity_->getProperty( layerLabel ).value< uint >( )));
-        }
-        else
-        {
-          layerRep->setProperty( "rightPerc",
-            _columnNeuronsToPercentage.map( 0u ));
-          Loggers::get( )->log( std::string( "Expected property " )
-            + layerLabel, LOG_LEVEL_WARNING );
-        }
+        layerRep->setProperty( "rightPerc", _columnNeuronsToPercentage.map(
+          entity_->getPropertyValue< uint >( std::string( "Num Inter Layer " )
+          + std::to_string( layer ), 0u )));
         layersReps.push_back( layerRep );
       }
       entityRep_->registerProperty( "layers", layersReps );
@@ -765,6 +590,8 @@ namespace nslib
           neuronTypeAggsReps.push_back( neuronTypeAggRep );
         }
       }
+      entityRep_->setProperty( "Entity name", entity_->getPropertyValue
+        <std::string>( "Entity name", " " ));
       entityRep_->registerProperty( "neuronTypeAggregations", neuronTypeAggsReps );
     }
 
@@ -775,90 +602,43 @@ namespace nslib
       bool needToClearCache = false;
       if ( dynamic_cast< const Neuron* >( entity ))
       {
-        if( entity->hasProperty( "Soma Volume" ))
+        float newMaxSomaVolume =
+            entity->getPropertyValue< float >( "Soma Volume", .0f );
+        if ( newMaxSomaVolume > _maxNeuronSomaVolume )
         {
-          float newMaxSomaVolume =
-            entity->getProperty( "Soma Volume" ).value< float >( );
-          if ( newMaxSomaVolume > _maxNeuronSomaVolume )
-          {
-            needToClearCache = true;
-            maxNeuronSomaVolume( newMaxSomaVolume, false );
-          }
+          needToClearCache = true;
+          maxNeuronSomaVolume( newMaxSomaVolume, false );
         }
-        else
+
+        float newMaxSomaArea =
+            entity->getPropertyValue< float >( "Soma Surface", .0f );
+        if ( newMaxSomaArea > _maxNeuronSomaArea )
         {
-          Loggers::get( )->log("Expected property Soma Volume.",
-            LOG_LEVEL_WARNING );
+          needToClearCache = true;
+          maxNeuronSomaArea( newMaxSomaArea, false );
         }
-        if( entity->hasProperty( "Soma Surface" ))
+
+        float newMaxDendriticVolume =
+            entity->getPropertyValue< float >( "Dendritic Volume", .0f );
+        if ( newMaxDendriticVolume > _maxNeuronDendsVolume )
         {
-          float newMaxSomaArea =
-              entity->getProperty( "Soma Surface" ).value< float >( );
-          if ( newMaxSomaArea > _maxNeuronSomaArea )
-          {
-            needToClearCache = true;
-            maxNeuronSomaArea( newMaxSomaArea, false );
-          }
+          needToClearCache = true;
+          maxNeuronDendsVolume( newMaxDendriticVolume, false );
         }
-        else
+
+        float newMaxDendsArea =
+            entity->getPropertyValue< float >( "Dendritic Surface", .0f );
+        if ( newMaxDendsArea > _maxNeuronDendsArea )
         {
-          Loggers::get( )->log("Expected property Soma Surface.",
-                               LOG_LEVEL_WARNING );
-        }
-        if( entity->hasProperty( "Dendritic Volume" ))
-        {
-          float newMaxDendriticVolume =
-              entity->getProperty( "Dendritic Volume" ).value< float >( );
-          if ( newMaxDendriticVolume > _maxNeuronDendsVolume )
-          {
-            needToClearCache = true;
-            maxNeuronDendsVolume( newMaxDendriticVolume, false );
-          }
-        }
-        else
-        {
-          Loggers::get( )->log("Expected property Dendritic Volume.",
-                               LOG_LEVEL_WARNING );
-        }
-        if( entity->hasProperty( "Dendritic Surface" ))
-        {
-          float newMaxDendsArea =
-            entity->getProperty( "Dendritic Surface" ).value< float >( );
-          if ( newMaxDendsArea > _maxNeuronDendsArea )
-          {
-            needToClearCache = true;
-            maxNeuronDendsArea( newMaxDendsArea, false );
-          }
-        }
-        else
-        {
-          Loggers::get( )->log("Expected property Dendritic Surface.",
-            LOG_LEVEL_WARNING );
+          needToClearCache = true;
+          maxNeuronDendsArea( newMaxDendsArea, false );
         }
       }
       else if ( dynamic_cast< const Layer* >( entity ))
       {
-        unsigned int newMaxNeurons = 0u;
-        if( entity->hasProperty( "Num Pyramidals" ))
-        {
-          newMaxNeurons = entity->getProperty( "Num Pyramidals" )
-            .value< unsigned int >( );
-        }
-        else
-        {
-          Loggers::get( )->log("Expected property Num Pyramidals.",
-            LOG_LEVEL_WARNING );
-        }
-        if( entity->hasProperty( "Num Interneurons" ))
-        {
-          newMaxNeurons = std::max( newMaxNeurons,
-            entity->getProperty( "Num Interneurons" ).value< unsigned int >( ));
-        }
-        else
-        {
-          Loggers::get( )->log("Expected property Num Interneurons.",
-            LOG_LEVEL_WARNING );
-        }
+        unsigned int newMaxNeurons = std::max(
+            entity->getPropertyValue< unsigned int > ( "Num Pyramidals", 0u ),
+            entity->getPropertyValue< unsigned int >( "Num Interneurons", 0u ));
         if ( newMaxNeurons > _maxNeurons )
         {
           needToClearCache = true;

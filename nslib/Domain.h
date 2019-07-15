@@ -47,9 +47,7 @@ namespace nslib
   public:
     Domain( void );
 
-    virtual ~Domain( void )
-    {
-    }
+    virtual ~Domain( void );
 
     virtual bool isSelectableEntity( shift::Entity* entity ) const = 0;
 

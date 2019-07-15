@@ -61,7 +61,7 @@ namespace nslib
 
     if ( _layoutSpecialProperties )
     {
-      _toolbox->addItem(layoutOptions_, QString("Layout options"));
+      _toolbox->addItem( layoutOptions_, QString("Layout options"));
     }
     if ( _flags & SORT_ENABLED )
     {

@@ -24,6 +24,7 @@
 #include "MiniColumnItem.h"
 #include "NeuronItem.h"
 #include <QPen>
+#include <nslib/Config.h>
 
 namespace nslib
 {
@@ -34,6 +35,7 @@ namespace nslib
                                     QGraphicsScene* scene_,
                                     unsigned int size )
       : NeuronAggregationItem( )
+      , _itemText( nullptr )
     {
       // std::cout << "props: " << miniColumnRep.properties( ).size( ) << std::endl;;
       // for ( const auto p : miniColumnRep.properties( ))
@@ -42,13 +44,12 @@ namespace nslib
       //   miniColumnRep.getProperty( "meanNeuron" ).value< shiftgen::NeuronRep >( );
       // NeuronRep meanNeuron( shiftNeuronRep );
 
-      const NeuronRep& meanNeuron =
-        miniColumnRep.getProperty( "meanNeuron" ).value< NeuronRep >( );
+      const NeuronRep* meanNeuron = new NeuronRep(
+        miniColumnRep.getPropertyValue< NeuronRep >( "meanNeuron" ));
       const auto& layers =
-        miniColumnRep.getProperty( "layers" ).value< MiniColumnRep::Layers >( );
-      const auto& neuronAggReps =
-        miniColumnRep.getProperty( "neuronTypeAggregations" ).
-        value< MiniColumnRep::NeuronTypeAggregations >( );
+        miniColumnRep.getPropertyValue< MiniColumnRep::Layers >( "layers" );
+      const auto& neuronAggReps = miniColumnRep.getPropertyValue
+        < MiniColumnRep::NeuronTypeAggregations >( "neuronTypeAggregations" );
 
       // Create the polygon for the basic column icon
       QPainterPath path_;
@@ -79,7 +80,19 @@ namespace nslib
 
       this->_parentRep = &( const_cast< MiniColumnRep& >( miniColumnRep ));
 
+      if ( Config::showEntitiesName( ))
+      {
+        _itemText = new ItemText( QString::fromStdString( miniColumnRep
+          .getPropertyValue< std::string >( "Entity name", "" )), this,
+          0.4f, 1.0f );
+      }
+
       //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
+    }
+
+    MiniColumnItem::~MiniColumnItem( void )
+    {
+      delete _itemText;
     }
   } // namespace cortex
 } // namespace nslib

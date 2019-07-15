@@ -48,7 +48,7 @@ namespace nslib
       , nslib::InteractiveItem( )
       , _arrowCircleEnd( nullptr )
       ,_arrowThickness( nslib::Config::scale( ) *
-         connectionArrowRep.getProperty( "width" ).value< unsigned int >( ))
+         connectionArrowRep.getPropertyValue< unsigned int >( "width" , 1u ))
       , _lineStyle( connectionArrowRep.lineStyle( ))
       , _actualPen( QPen( QBrush( color ),
           _arrowThickness, _lineStyle, Qt::RoundCap, Qt::RoundJoin ))
@@ -84,10 +84,9 @@ namespace nslib
       const QPointF& dest )
     {
       auto painterPath = QPainterPath( );
-      if ( origin != dest )
+      if ( origin != dest ) //Arrows with same origin and destiny are not drawn.
       {
-        float itemInvScale =
-          1.0f / static_cast< float >( this->scale( ));
+        float itemInvScale = 1.0f / static_cast< float >( this->scale( ));
 
         _arrowOrigin = itemInvScale * origin;
         _arrowDest = itemInvScale * dest;
@@ -101,7 +100,7 @@ namespace nslib
 
         auto lengthInv = 1.0f / auxLine.length( );
 
-        double angle = ::acos( auxLine.dx( ) * lengthInv );
+        double angle = acos( auxLine.dx( ) * lengthInv );
         if( auxLine.dy( ) >= 0 )
         {
           angle = M_PI_x2 - angle;
@@ -125,23 +124,11 @@ namespace nslib
 
         float size = arrowLength;
 
-        /*
-        if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
-        _arrowOriItem = new QGraphicsEllipseItem( );
-        _arrowOriItem->setRect( origin.x( ) - size * 0.5f,
-                                origin.y( ) - size * 0.5f,
-                                size,
-                                size );
-        _arrowOriItem->setPen( Qt::NoPen );
-        _arrowOriItem->setBrush( QBrush( brushColor ));
-        _arrowOriItem->setPen( QPen( QBrush( color ), _arrowThickness ));
-        _arrowOriItem->setParentItem( this );
-         */
-
         arrowShape.clear( );
 
-        if( this->_parentRep->getProperty( "head" ).
-          value< shiftgen::ConnectionArrowRep::TArrowHead >( ) ==
+        if( this->_parentRep->getPropertyValue
+          < shiftgen::ConnectionArrowRep::TArrowHead >( "head",
+          shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE ) ==
           shiftgen::ConnectionArrowRep::TArrowHead::CIRCLE )
         {
           _arrowCircleEnd = new QGraphicsEllipseItem( );
@@ -216,7 +203,8 @@ namespace nslib
         {
           QAction* editRel = contextMenu->addAction( "Edit Relationship" );
           QAction* selectedAction = contextMenu->exec( event_->screenPos( ));
-          if( editRel == selectedAction )          {
+          if( editRel == selectedAction )
+          {
             rep->editConnectionWidget( );
           }
         }
