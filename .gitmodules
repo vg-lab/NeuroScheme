@@ -3,4 +3,4 @@
 	url = https://github.com/Eyescale/CMake
 [submodule "deps/silo"]
 	path = deps/silo
-	url = https://gitlab.gmrv.es/gmrv/silo.git
+	url = https://gitlab.vglab.es/gmrv/silo.git

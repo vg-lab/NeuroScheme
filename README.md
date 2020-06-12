@@ -39,7 +39,7 @@ command can be used:
 
 There are binaries for x64 architecture for GNU/Linux, MS Windows and MacOSX
 available for download in
-[http://gmrv.es/gmrvvis/apps/NeuroScheme/](http://gmrv.es/gmrvvis/apps/NeuroScheme/)
+[http://vglab.es/apps/NeuroScheme/](http://vglab.es/apps/NeuroScheme/)
 
 ## Building from source
 
@@ -48,7 +48,7 @@ Yosemite/Sierra and Windows 7/8/10 Visual Studio 2015 Win64. The following steps
 enough to build it just with the required dependencies.
 
 ```bash
-git clone --recursive https://github.com/gmrvvis/NeuroScheme
+git clone --recursive https://github.com/vg-lab/NeuroScheme
 mkdir NeuroScheme/build && cd NeuroScheme/build
 cmake .. -DCLONE_SUBPROJECTS=ON -DCMAKE_BUILD_TYPE=Release
 make
