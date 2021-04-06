@@ -300,7 +300,7 @@ namespace nslib
     {
       auto entitiesToReps =
         RepresentationCreatorManager::entitiesToReps( repCreatorId );
-      for(const auto entityReps : entitiesToReps )
+      for(const auto& entityReps : entitiesToReps )
       {
         RepresentationCreatorManager::updateEntitiyRepresentations(
           entityReps.first, entityReps.second, repCreatorId, freeLayoutInUse );

@@ -46,7 +46,7 @@ namespace nslib
   ConnectionRelationshipEditWidget*
     InteractionManager::_conRelationshipEditWidget = nullptr;
   QGraphicsItem* InteractionManager::_item = nullptr;
-  Qt::MouseButtons InteractionManager::_buttons = nullptr;
+  Qt::MouseButtons InteractionManager::_buttons = Qt::MouseButtons( );
   std::unique_ptr< TemporalConnectionLine >
     InteractionManager::_tmpConnectionLine =
     std::unique_ptr< TemporalConnectionLine >( nullptr );
@@ -647,7 +647,7 @@ namespace nslib
     else
     {
       _item = nullptr;
-      _buttons = nullptr;
+      _buttons = Qt::MouseButtons( );
     }
   }
 
@@ -871,7 +871,7 @@ namespace nslib
     tmpConnectionLineRemove( );
 
     _item = nullptr;
-    _buttons = nullptr;
+    _buttons = Qt::MouseButtons( );
   }
 
   void InteractionManager::createConnectionRelationship(

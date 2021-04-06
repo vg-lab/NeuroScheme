@@ -586,7 +586,7 @@ void MainWindow::deleteStoredSelection( void )
 
 void MainWindow::sortStoredSelectionsTable( int column )
 {
-  _storedSelections.table->sortByColumn( column );
+  _storedSelections.table->sortByColumn( column, Qt::AscendingOrder );
 }
 
 void MainWindow::killActivePane( void )
