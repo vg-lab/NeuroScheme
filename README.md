@@ -39,7 +39,7 @@ command can be used:
 
 There are binaries for x64 architecture for GNU/Linux, MS Windows and MacOSX
 available for download in
-[http://vglab.es/apps/NeuroScheme/](http://vglab.es/apps/NeuroScheme/)
+[http://vg-lab.es/apps/NeuroScheme/](http://vg-lab.es/apps/NeuroScheme/)
 
 ## Building from source
 

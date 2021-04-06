@@ -1,9 +1,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #   NeuroScheme
-#   2015-2020 (c) VGLAB / GMRV / URJC / UPM
+#   2015-2020 (c) VG-LAB / GMRV / URJC / UPM
 #   gmrv@gmrv.es
-#   www.vglab.es
+#   www.vg-lab.es
 #   www.gmrv.es
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -53,7 +53,7 @@ endif()
 set( NEUROSCHEME_DESCRIPTION "NeuroScheme" )
 set( NEUROSCHEME_MAINTAINER "Pablo Toharia <pablo.toharia@upm.es>")
 set( NEUROSCHEME_LICENSE LGPL)
-set( COMMON_PROJECT_DOMAIN vglab.es )
+set( COMMON_PROJECT_DOMAIN vg-lab.es )
 
 include( Common )
 
