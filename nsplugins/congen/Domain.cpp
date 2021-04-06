@@ -76,9 +76,13 @@ namespace nslib
 
     void DomainGUI::loadNeuroML( void )
     {
-      QString path = QFileDialog::getOpenFileName(
-        _mw, tr( "Open Xml Scene" ), _lastOpenedFileName,
-        tr( "Xml Scene") + " ( *.xml );; " + tr( "All files" )+ " (*)" );
+      const auto title = tr( "Open Xml Scene (NeuroML format)" );
+      const auto options = QFileDialog::Option::DontUseNativeDialog;
+      const auto filters = tr( "NeuroML ( *.xml );; All files (*)");
+      auto selectedFilter = tr("NeuroML ( *.xml )");
+      const auto directory = _lastOpenedFileName.isEmpty() ? QDir::currentPath() : _lastOpenedFileName;
+
+      const auto path = QFileDialog::getOpenFileName(_mw, title, directory, filters, &selectedFilter, options);
 
       if ( !path.isEmpty( ))
       {

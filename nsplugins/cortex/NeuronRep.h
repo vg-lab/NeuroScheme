@@ -45,6 +45,7 @@ namespace nslib
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );
 
+      NeuronRep& operator=(const nslib::cortex::NeuronRep&) = default;
     };
 
 

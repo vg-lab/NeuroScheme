@@ -423,8 +423,10 @@ QString MainWindow::_tableColumnToString( TTableColumns column )
     case TTableColumns::COLUMN_DATETIME:
       return QString( "Date" );
     default:
-      return QString();
+      break;
   }
+
+  return QString();
 }
 
 void MainWindow::updateStoredSelectionsDock( void )
@@ -453,7 +455,6 @@ void MainWindow::updateLayoutsDock( void )
 
 void MainWindow::storeSelection( void )
 {
-
   // In case selection is empty return
   if ( nslib::SelectionManager::activeSelectionSize( ) == 0 )
   {
@@ -473,11 +474,11 @@ void MainWindow::storeSelection( void )
   if ( !ok || label.isEmpty( ))
     return;
 
-  bool updateExistingRow =
+  const bool updateExistingRow =
     nslib::SelectionManager::existsStoredSelection( label.toStdString( ));
 
   nslib::SelectionManager::storeActiveSelection( label.toStdString( ));
-  unsigned int numberOfSelectedEntities =
+  const unsigned int numberOfSelectedEntities =
     nslib::SelectionManager::storedSelectionSize( label.toStdString( ));
 
   // Update counter just in case selection was saved and using the proposed name
@@ -499,7 +500,7 @@ void MainWindow::storeSelection( void )
       return;
     }
 
-    unsigned int row = _storedSelections.table->row( it->second );
+    const unsigned int row = _storedSelections.table->row( it->second );
     _storedSelections.table->item(
       row, TTableColumns::COLUMN_COUNT )->setText( selectedEntities );
 
@@ -509,7 +510,7 @@ void MainWindow::storeSelection( void )
   }
   else
   {
-    unsigned int row = _storedSelections.table->rowCount( );
+    const unsigned int row = _storedSelections.table->rowCount( );
     _storedSelections.table->insertRow( row );
 
     QTableWidgetItem* labelItem = new QTableWidgetItem( label );
@@ -535,11 +536,9 @@ void MainWindow::restoreSelection( void )
 {
   if ( _storedSelections.table->selectedItems( ).size( ) > 0 )
   {
-
-    QString label;
     QTableWidgetItem* firstItem =
       _storedSelections.table->selectedItems( ).at( 0 );
-    label = firstItem->text( );
+    const auto label = firstItem->text( );
 
     nslib::SelectionManager::restoreStoredSelection(
       label.toStdString( ));
@@ -555,17 +554,15 @@ void MainWindow::deleteStoredSelection( void )
 {
   if ( _storedSelections.table->selectedItems( ).size( ) > 0 )
   {
-    QString label;
-    unsigned int row;
     QTableWidgetItem* firstItem =
       _storedSelections.table->selectedItems( ).at( 0 );
-    label = firstItem->text( );
+    const auto label = firstItem->text( );
 
     // Delete selection from storage
     //deleteSelectedSelection( label );
 
     // Remove selection from table
-    row = _storedSelections.table->row( firstItem );
+    const unsigned int row = _storedSelections.table->row( firstItem );
     _storedSelections.table->removeRow( row );
     _storedSelections.tableWidgets.erase( label.toStdString( ));
 
@@ -653,11 +650,11 @@ void MainWindow::aboutDialog( void )
 
     "</li></ul>" +
     "<h4>" + tr( "Developed by:" ) + "</h4>" +
-    "GMRV / URJC / UPM"
-    "<br><a href='https://gmrv.es/gmrvvis'>https://gmrv.es/gmrvvis</a>"
-    //"<br><a href='mailto:gmrv@gmrv.es'>gmrv@gmrv.es</a><br><br>"
-    "<br>(c) 2015-2019<br><br>"
-    "<a href='https://gmrv.es/gmrvvis'><img src=':/icons/logoGMRV.png'/></a>"
+    "VG-Lab / URJC / UPM"
+    "<br><a href='https://vg-lab.es'>https://vg-lab.es</a>"
+    "<br><a href='mailto:dev@vg-lab.es'>dev@vg-lab.es</a><br><br>"
+    "<br>(c) 2015-2021<br><br>"
+    "<a href='https://vg-lab.es'><img src=':/icons/logoVGLAB.png'/></a>"
     "&nbsp;&nbsp;&nbsp;&nbsp;"
     "<a href='https://www.urjc.es'><img src=':/icons/logoURJC.png' /></a>"
     "&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -775,13 +772,17 @@ void MainWindow::quit( void )
 
 void MainWindow::exportToJSON( void )
 {
-  QString path = QFileDialog::getSaveFileName( this, tr( "Save JSON File" ),
-    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
-    + tr( "All files" ) + " (*)" );
+  const auto filter = tr("JSON File ( *.JSON *.json );; All files (*)");
+  auto selectedFilter = tr("JSON File ( *.JSON *.json )");
+  const auto title = tr( "Save JSON File" );
+  const auto directory = _lastOpenedFileName.isEmpty() ? QDir::currentPath() : QFileInfo{_lastOpenedFileName}.path();
+  const auto options = QFileDialog::Option::DontUseNativeDialog;
+
+  auto path = QFileDialog::getSaveFileName( this, title, directory, filter, &selectedFilter , options);
 
   if ( !path.isEmpty( ))
   {
-    _lastOpenedFileName = QFileInfo( path ).path( );
+    _lastOpenedFileName = QFileInfo{path}.path( );
 
     if (!path.endsWith(".json"))
     {
@@ -794,15 +795,18 @@ void MainWindow::exportToJSON( void )
   }
 }
 
-void MainWindow::importFromJSON( void )
+void MainWindow::importFromJSON()
 {
-  QString path = QFileDialog::getOpenFileName( this, tr( "Open JSON File" ),
-    _lastOpenedFileName, tr( "JSON File" ) + " ( *.JSON *.json );; "
-    + tr( "All files" ) + " (*)" );
+  const auto filter = tr("JSON File ( *.JSON *.json );; All files (*)");
+  auto selectedFilter = tr("JSON File ( *.JSON *.json )");
+  const auto title = tr( "Open JSON File" );
+  const auto directory = _lastOpenedFileName.isEmpty() ? QDir::currentPath() : _lastOpenedFileName;
+  const auto options = QFileDialog::Option::DontUseNativeDialog;
+  const auto path = QFileDialog::getOpenFileName( this, title, directory, filter, &selectedFilter, options );
 
   if ( !path.isEmpty( ))
   {
-    _lastOpenedFileName = QFileInfo( path ).path( );
+    _lastOpenedFileName = QFileInfo{path}.path( );
     auto fileName = path.toStdString( );
 
     std::ifstream inputfile( fileName );
