@@ -113,7 +113,7 @@ namespace nslib
 
     bool entityIsOrigin( ) const;
 
-    shift::Entity* connectedEntityAt( int index_ ) const;
+    shift::Entity* connectedEntityAt( const unsigned int index_ ) const;
 
     private:
     ConnectionTableWidget* _tableWidget;

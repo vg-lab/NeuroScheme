@@ -35,10 +35,13 @@ namespace nslib
   {
    void DataSaver::saveXmlScene( QWidget * ptr )
     {
-      QString fileName = QFileDialog::getSaveFileName( ptr,
-         QObject::tr( "Save Scene to NeuroML format" ),"",
-         QObject::tr( "NeuroML" ) + " (*.xml);;"
-         + QObject::tr( "All Files" ) + " (*)" );
+      const auto title = QObject::tr("Save Xml Scene (NeuroML format)");
+      const auto filters = QObject::tr( "NeuroML ( *.xml );; All files (*)");
+      auto selectedFilter = QObject::tr("NeuroML ( *.xml )");
+      const auto options = QFileDialog::Option::DontUseNativeDialog;
+
+      const auto fileName = QFileDialog::getSaveFileName( ptr, title, QDir::currentPath(),
+                                                          filters, &selectedFilter, options);
       if ( fileName != "" )
       {
         XMLExporter* exporter_ = new XMLExporter;

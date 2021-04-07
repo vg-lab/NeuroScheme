@@ -231,8 +231,8 @@ namespace nslib
         }
       }
     }
-    return QVariant( );
 
+    return QVariant( );
   }
 
   QVariant
@@ -336,9 +336,14 @@ namespace nslib
     return _entityIsOrigin;
   }
 
-  shift::Entity* ConnectionsTableModel::connectedEntityAt( int index_ ) const
+  shift::Entity* ConnectionsTableModel::connectedEntityAt( const unsigned int index_ ) const
   {
-    return _entitiesData.at( index_ );
+    if(index_ < _entitiesData.size())
+    {
+      return _entitiesData.at( index_ );
+    }
+
+    return nullptr;
   }
 
   bool ConnectionsTableModel::removeRows( int row_, int count_,
@@ -458,9 +463,11 @@ namespace nslib
         if( clickY > cellY && clickY < cellY + rect.height( )
           && clickX > cellX && clickX < cellX + cellWidth )
         {
-          int rowIndex = index_.row( );
+          unsigned int rowIndex = index_.row( );
           auto entity = _model->entity( );
           auto connectedEntity = _model->connectedEntityAt( rowIndex );
+          if(!connectedEntity) return false;
+
           const bool isAggregated = _model->isAggregated( );
           if( isAggregated || clickX < cellX +
             static_cast< int >( cellWidth * 0.5f ))
