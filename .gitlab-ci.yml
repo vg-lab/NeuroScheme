@@ -11,6 +11,7 @@ Ubuntu-Optional-Deps:
   - bash .gitlab-ci.sh
  except:
   - tags
+  - master
  tags:
   - ubuntu
 
@@ -118,6 +119,7 @@ OSX-Optional-Deps:
   - bash .gitlab-ci.sh
  except:
   - tags
+  - master
  tags:
   - osx-sierra
 
@@ -144,6 +146,7 @@ Win7-Subproject-vs14:
   - '"c:\Program Files\Git\bin\bash.exe" --login  .gitlab-ci.sh'
   except:
   - tags
+  - master
   tags:
   - win7
 
