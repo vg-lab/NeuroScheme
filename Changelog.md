@@ -2,6 +2,25 @@
 
 ## git master
 
+## version 0.4
+
+* [!106] Release 0.4 preparation.
+* [!105] Changed GMRV logo to VG-Lab logo. Added dev
+* [!104] Fix warnings. Bump ShiFT. Added the option to enable nsol from cmake CLI
+* [!103] Changed gmrvvis to vglab.
+* [!95] Cortex bugs
+* [!100] Clean canvas
+* [!99] Connections with same origin and destination are not draw.
+* [!98] Fixes for Qt-5.12 and minor fix in AppImage link in README.md.
+* [!97] Free layout recalculates scene bounding rect.
+* [!96] New no hierarchical entity: Output. Rename stimulator to input
+* [!94] Scatter plot layout use 0 for undefined properties.
+* [!92] Access to edit connection from representations.
+* [!89] Aggregated connections are higlighted with different colors.
+* [!88] Improvements to 3D/Camera Layout
+* [!91] Configure CI to generate git-master app.
+* [!90] Changed build deploy only for master-based tags.
+
 ## version 0.3
 
 * [!86] Release 0.3 preparation.
