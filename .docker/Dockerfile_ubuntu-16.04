@@ -1,0 +1,12 @@
+FROM ubuntu:16.04
+
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends mesa-utils libc6:amd64 libdrm2:amd64 libexpat1:amd64 libffi6:amd64 libfreetype6:amd64 libgcc1:amd64 libgl1-mesa-glx:amd64 libglapi-mesa:amd64 libglib2.0-0:amd64 libgraphite2-3:amd64 libharfbuzz0b:amd64 libice6:amd64 libpcre3:amd64 libsm6:amd64 libstdc++6:amd64 libuuid1:amd64 libx11-6:amd64 libx11-xcb1:amd64 libxau6:amd64 libxcb1:amd64 libxcb-dri2-0:amd64 libxcb-dri3-0:amd64 libxcb-glx0:amd64 libxcb-present0:amd64 libxcb-sync1:amd64 libxdamage1:amd64 libxdmcp6:amd64 libxfixes3:amd64 libxshmfence1:amd64 zlib1g:amd64 libfontconfig1:amd64 xkb-data avahi-daemon avahi-utils libnss-mdns libqt5opengl5 libqt5svg5 libboost-system1.58.0 libboost-regex1.58.0 libboost-serialization1.58.0 libboost-iostreams1.58.0 libzmq5 libhwloc5 libhdf5-cpp-11 libfreeimage3 libglew1.13 freeglut3 libxmu6 libxt6 libglu1-mesa-dev libglu1-mesa  && rm -rf /var/lib/apt/lists/*
+
+COPY avahi-daemon.conf /etc/avahi
+
+COPY install/bin/NeuroScheme /usr/bin/
+COPY install/lib /usr/lib/
+COPY install/include /usr/include/
+COPY install/share /usr/share/
