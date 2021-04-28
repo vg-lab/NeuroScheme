@@ -4,6 +4,11 @@ stages:
 Ubuntu-Optional-Deps:
  stage: build
  script:
+  - module load Qt-5.15.2
+  - export APP_VERSION="dev"
+  - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps.private"
+  - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
+  - export DOCKER_REPO="gitlabci@vg-lab.es:apps.private"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -18,9 +23,10 @@ Ubuntu-Optional-Deps:
 Ubuntu-Optional-Deps-master-tags:
  stage: build
  script:
+  - module load Qt-5.15.2
   - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
   - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
-  - export DOCKER_REPO="gitlabci@gmrv.es:apps"
+  - export DOCKER_REPO="gitlabci@vg-lab.es:apps"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -36,10 +42,11 @@ Ubuntu-Optional-Deps-master-tags:
 Ubuntu-Optional-Deps-master:
  stage: build
  script:
+  - module load Qt-5.15.2
   - export APP_VERSION="git-master"
   - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
   - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
-  - export DOCKER_REPO="gitlabci@gmrv.es:apps"
+  - export DOCKER_REPO="gitlabci@vg-lab.es:apps"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -55,6 +62,7 @@ Ubuntu-Optional-Deps-master:
 Ubuntu-Subproject:
  stage: build
  script:
+  - module load Qt-5.15.2
   - export BUILD_GENERATOR="Ninja"
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - bash .gitlab-ci.sh
@@ -66,6 +74,7 @@ Ubuntu-Subproject:
 Ubuntu-Subproject-master:
  stage: build
  script:
+  - module load Qt-5.15.2
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON"
   - export BUILD_GENERATOR="Ninja"
   - export GITHUB_MIRROR_URL="git@github.com:vg-lab/NeuroScheme"
@@ -114,6 +123,8 @@ OSX-Optional-Deps:
  stage: build
  script:
   - module load Qt-5.9.1
+  - export APP_VERSION="dev"
+  - export DMGAPP_REPO="gitlabci@vg-lab.es:apps.private"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DLibJpegTurbo_INCLUDE_DIR=/usr/local/opt/jpeg-turbo/include -DLibJpegTurbo_LIBRARY=/usr/local/opt/jpeg-turbo/lib/libturbojpeg.dylib -DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
   - export BUILD_GENERATOR="Ninja"
@@ -139,6 +150,8 @@ OSX-Subproject:
 Win7-Subproject-vs14:
   stage: build
   script:
+  - set APP_VERSION=dev
+  - set WINAPP_REPO=gitlabci@vg-lab.es:apps.private
   - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
