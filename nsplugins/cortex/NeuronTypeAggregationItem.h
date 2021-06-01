@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_TYPE_AGGREGATION_ITEM__
 #define __NSLIB__NEURON_TYPE_AGGREGATION_ITEM__
 
@@ -40,7 +41,6 @@
 
 namespace nslib
 {
-
   namespace cortex
   {
     class NeuronTypeAggregationItem
@@ -49,34 +49,27 @@ namespace nslib
       , public nslib::SelectableItem
       , public nslib::InteractiveItem
     {
+      public:
+        NeuronTypeAggregationItem( const NeuronTypeAggregationRep& layerRep  );
 
-    public:
+        void create( const unsigned int size = 50 );
 
-      NeuronTypeAggregationItem( const NeuronTypeAggregationRep& layerRep  );
+        QAbstractGraphicsShapeItem* symbolItem( void );
 
-      void create( unsigned int size = 50 );
+        virtual ~NeuronTypeAggregationItem( void ) {}
 
-      QAbstractGraphicsShapeItem* symbolItem( void );
+        virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
+        virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
+        virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
-      virtual ~NeuronTypeAggregationItem( void ) {}
+      public slots:
+        void disable( void );
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
-
-    public slots:
-
-      void disable( void );
-
-    protected:
-      //unsigned int _layer;
-      QAbstractGraphicsShapeItem* _symbolItem;
-
+      protected:
+        QAbstractGraphicsShapeItem* _symbolItem;
     };
 
-
   } // namespace cortex
-
 } // namespace nslib
 
 #endif

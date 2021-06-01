@@ -40,7 +40,7 @@ namespace nslib
     Q_OBJECT;
   public:
     SortWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
-    ~SortWidget( void );
+    virtual ~SortWidget( void );
     QComboBox* propertiesSelector( void ) { return _propertiesSelector; }
     void clear( );
     fires::SortConfig& sortConfig( ) { return _sortConfig; }

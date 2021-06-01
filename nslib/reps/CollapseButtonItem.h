@@ -28,17 +28,14 @@
 namespace nslib
 {
   class NSLIB_API CollapseButtonItem
-    : public QGraphicsEllipseItem
+  : public QGraphicsEllipseItem
   {
-
-  public:
-    CollapseButtonItem( void );
-    void mousePressEvent( QGraphicsSceneMouseEvent* event );
-    void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
-    void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
-
+    public:
+      CollapseButtonItem( void );
+      void mousePressEvent( QGraphicsSceneMouseEvent* event );
+      void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+      void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
   };
-
 } // namespace nslib
 
 #endif // __NSLIB__COLLAPSE_BUTTON_ITEM__

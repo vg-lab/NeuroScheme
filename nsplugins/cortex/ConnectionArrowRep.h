@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONNECTION_ARROW_REP__
 #define __NSLIB__CONNECTION_ARROW_REP__
 
@@ -37,11 +38,11 @@ namespace nslib
       , public ConnectivityRep
     {
     public:
-
       ConnectionArrowRep( shift::Representation* originRep_,
                           shift::Representation* destRep_ );
       ConnectionArrowRep( const ConnectionArrowRep& );
       virtual ~ConnectionArrowRep( void ) {}
+
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
                            bool create = true );
 
@@ -50,8 +51,8 @@ namespace nslib
       void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
       void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
-      virtual void highlight(
-        const scoop::Color& color = scoop::Color( 255, 0, 0 ));
+      virtual void highlight( const scoop::Color& color = scoop::Color( 255, 0, 0 ));
+
       virtual void unHighlight( void ) final { hoverLeaveEvent( nullptr ); }
 
     protected:

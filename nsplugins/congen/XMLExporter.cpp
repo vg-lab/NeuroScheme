@@ -62,7 +62,7 @@ namespace nslib
 
       node.appendChild( lQDomElement );
 
-      if ( value != "" )
+      if ( !value.isEmpty() )
       {
         QDomText txt = doc.createTextNode( value );
         lQDomElement.appendChild( txt );
@@ -82,6 +82,7 @@ namespace nslib
          *nodePopulations = addElement( domDoc, nodeRoot , "populations" );
          nodePopulations->setAttribute( "xmlns",xmlns );
       }
+
       QDomElement population = addElement( domDoc, *nodePopulations, "population" );
       population.setAttribute( "name", name );
       population.setAttribute( "cell_type", cell_type );
@@ -117,6 +118,7 @@ namespace nslib
         nodeProjections->setAttribute( "xmlns",
             QString::fromStdString( params.at( "xmlns" )));
       }
+
       QDomElement projection = addElement( domDoc, *nodeProjections, "projection" );
       projection.setAttribute( "name",QString::fromStdString( params.at( "name" )));
       projection.setAttribute( "source",QString::fromStdString( params.at( "source" )));
@@ -213,6 +215,7 @@ namespace nslib
         *nodeImpulses = addElement( domDoc, nodeRoot , "inputs" );
         nodeImpulses->setAttribute( "units", "SI Units" );
       }
+
       QDomElement input = addElement( domDoc, *nodeImpulses, "input" );
       input.setAttribute( "name", name );
 
@@ -229,6 +232,7 @@ namespace nslib
         pulse_input.setAttribute( "duration", duration );
         pulse_input.setAttribute( "amplitude", amplitude );
       }
+
       if( connectedEntities.empty( ))
       {
         QDomElement target = addElement( domDoc, input, "target" );
@@ -277,11 +281,9 @@ namespace nslib
       if ( nodeImpulses != nullptr)      delete nodeImpulses;
     }
 
-
     void XMLExporter::exportConGenXML( const std::string& fileName )
     {
-      std::string fileContent = domDoc.toString( ).toStdString( );
-
+      const std::string fileContent = domDoc.toString( ).toStdString( );
       std::string fileTXT = fileName;
 
       QFileInfo fi( QString::fromStdString( fileTXT ));

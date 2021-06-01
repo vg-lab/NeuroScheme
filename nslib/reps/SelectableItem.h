@@ -30,28 +30,31 @@
 
 namespace nslib
 {
-
   class NSLIB_API SelectableItem
   {
-
   public:
 
     SelectableItem( SelectedState selected_ = SelectedState::UNSELECTED )
       : _selected( selected_ )
-      , _hover( false ) { }
+      , _hover( false )
+    {}
 
-    virtual ~SelectableItem( void ) { }
+    virtual ~SelectableItem( void )
+    {}
 
     virtual void select( void )
     { _selected = SelectedState::SELECTED; _updatePen( ); }
+
     virtual void unselect( void )
     { _selected = SelectedState::UNSELECTED; _updatePen( ); }
+
     virtual void setSelected(
       SelectedState selected_ = SelectedState::SELECTED )
     {
       _selected = selected_;
       _updatePen( );
     }
+
     void toggleSelected( void )
     {
       if ( _selected == SelectedState::SELECTED )
@@ -81,18 +84,15 @@ namespace nslib
     static const QPen& hoverUnselectedPen( ) { return _hoverUnselectedPen; };
     static const QPen& selectedPen( ) { return _selectedPen; };
     static const QPen& unselectedPen( ) { return _unselectedPen; };
-    static const QPen& partiallySelectedPen( )
-    { return _partiallySelectedPen; };
+    static const QPen& partiallySelectedPen( ) { return _partiallySelectedPen; };
     static void init( void );
   protected:
 
     void _updatePen( )
     {
-      // std::cout << "update pen1" << std::endl;
       auto item = dynamic_cast< QAbstractGraphicsShapeItem* >( this );
       if ( item )
       {
-        // std::cout << "update pen2" << std::endl;
         switch ( _selected )
         {
         case SelectedState::SELECTED:
@@ -108,6 +108,7 @@ namespace nslib
         }
       }
     }
+
     SelectedState _selected;
     bool _hover;
     static QPen _selectedPen;
@@ -116,7 +117,6 @@ namespace nslib
     static QPen _hoverSelectedPen;
     static QPen _hoverPartiallySelectedPen;
     static QPen _hoverUnselectedPen;
-
   };
 
 } // namespace nslib

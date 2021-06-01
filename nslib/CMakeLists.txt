@@ -33,7 +33,6 @@ set( NSLIB_PUBLIC_HEADERS
   layouts/FreeLayout.h
   layouts/GridLayout.h
   layouts/Layout.h
-  layouts/LayoutManager.h
   layouts/ScatterPlotLayout.h
   mappers/VariableMapper.h
   qxt/qxtspanslider.h

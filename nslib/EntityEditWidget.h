@@ -47,19 +47,19 @@ namespace nslib
     TEntityEditWidgetAction;
 
     EntityEditWidget( QWidget* parentWidget_ = nullptr );
+    virtual ~EntityEditWidget( void )
+    {}
+
     shift::Entity* entity( );
 
     void updateEntity( shift::Entity* entity_, TEntityEditWidgetAction action_,
       shift::Entity* parentOrChildEntity_= nullptr,
       const bool changeParent_ = false, const bool addToScene_ = true );
 
-    ~EntityEditWidget( void );
-
     static void parentDock( QDockWidget* parentDock_ );
     static QDockWidget* parentDock( void );
 
   public slots:
-
     void validateDialog( void );
     void eraseEntity( void );
     void cancelDialog( void );
@@ -89,9 +89,6 @@ namespace nslib
     shift::Entity* _updateEntity;
     shift::Entity* _parentOrChildEntity;
     shift::Entity* _updateParentOrChildEntity;
-
-
-    QTimer* _entityUpdateTimer;
 
     TEntityEditWidgetAction _action;
     TEntityEditWidgetAction _updateAction;

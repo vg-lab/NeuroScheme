@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON__
 #define __NSLIB__NEURON__
 
@@ -33,13 +34,11 @@ namespace nslib
 {
   namespace cortex
   {
-
     using Neuron = shiftgen::Neuron;
     using Column = shiftgen::Column;
     using MiniColumn = shiftgen::MiniColumn;
     using Layer = shiftgen::Layer;
     using NeuronTypeAggregation = shiftgen::NeuronTypeAggregation;
-
   }
 } // namespace nslib
 

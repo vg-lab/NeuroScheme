@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <scoop/scoop.h>
 #include <nslib/mappers/VariableMapper.h>
 #include <nslib/error.h>
@@ -167,12 +168,6 @@ namespace nslib
       nslib::Loggers::get( )->log( "create",
         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
-
-      // scoop::SequentialColorMap neuronTypeColorMapper(
-      //   scoop::ColorPalette::colorBrewerSequential(
-      //     scoop::ColorPalette::ColorBrewerSequential::PuBu, 6 ),
-      //   0.0f, _maxNeuronsPerPopulation );
-
       for ( const auto entity : entities.vector( ))
       {
         if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
@@ -203,6 +198,7 @@ namespace nslib
           entityRep = new CongenPopRep( );
           updateOutputRep( entity, entityRep );
         }
+
         if ( entityRep )
         {
           representations.push_back( entityRep );
@@ -400,7 +396,6 @@ namespace nslib
         }
       }
     } // generateRelations
-
 
     bool RepresentationCreator::entityUpdatedOrCreated( const shift::Entity* entity )
     {

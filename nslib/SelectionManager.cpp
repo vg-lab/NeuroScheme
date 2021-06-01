@@ -27,19 +27,15 @@
 
 namespace nslib
 {
-
   SelectionManager::TSelection SelectionManager::_activeSelection =
     TSelection( );
   SelectionManager::TSelections SelectionManager::_storedSelections =
     TSelections( );
 
-  // unsigned int SelectionManager::_storedSelectionNextId = 0;
-
   void SelectionManager::setSelectedState( shift::Entity* entity,
                                            SelectedState state )
   {
     _activeSelection[ entity ] = state;
-
   }
 
   SelectedState SelectionManager::getSelectedState( shift::Entity* entity )
@@ -48,7 +44,6 @@ namespace nslib
       return SelectedState::UNSELECTED;
     else
       return _activeSelection.at( entity );
-
   }
 
   std::vector< shift::Entity* > SelectionManager::getActiveSelection( void )
@@ -78,7 +73,6 @@ namespace nslib
     const std::string& selectionName )
   {
     _storedSelections[ selectionName ] = _activeSelection;
-//    return _storedSelectionNextId++;
   }
 
   void SelectionManager::restoreStoredSelection(
@@ -86,7 +80,6 @@ namespace nslib
   {
     _activeSelection = _storedSelections[ selectionName ];
   }
-
 
   unsigned int selectionSize( const SelectionManager::TSelection& selection )
   {
@@ -100,8 +93,8 @@ namespace nslib
             statePair.first ) &&
           statePair.second == SelectedState::SELECTED;
       } );
-
   }
+
   unsigned int SelectionManager::activeSelectionSize( void )
   {
     return selectionSize( _activeSelection );
@@ -142,7 +135,6 @@ namespace nslib
         selectableEntitiesIds.push_back(
           domain->selectableEntityId( statePair.first ));
     }
-
   }
 
   void propagateSelectedToChilds(
@@ -159,7 +151,6 @@ namespace nslib
         entities.at( childId.first ), SelectedState::SELECTED );
       propagateSelectedToChilds( entities, relParentOf, childId.first );
     }
-
   }
 
   void SelectionManager::setSelectionFromSelectableEntitiesIds(
@@ -187,20 +178,12 @@ namespace nslib
     std::unordered_set< shift::Entity* > postCheckParentEntities;
     for ( auto entityId : selectableEntitiesIds )
     {
-      // std::cout << "set selected state to "
-      //           << idToEntity[ entityId ] << ":"
-      //           << entityId << ":"
-      //           << idToEntity[ entityId ]->entityGid( ) << ":"
-      //           << std::endl;
       setSelectedState( idToEntity[ entityId ], SelectedState::SELECTED );
       propagateSelectedToChilds( entities, relParentOf,
                                  idToEntity[ entityId ]->entityGid( ));
-      // const auto& children =
-      //   relParentOf[ idToEntity[ entityId ]->entityGid( ) ];
       shift::Entity* entity = idToEntity[ entityId ];
       postCheckParentEntities.insert(
         entities.at( relChildOf[ entity->entityGid( ) ].entity ));
-
     }
 
     // This might get ugly :(
@@ -232,27 +215,15 @@ namespace nslib
              entities.map( ).find( relChildOf[ entityGid ].entity ) !=
              entities.map( ).end( ))
         {
-          // std::cout << entity->entityGid( ) << " child of " <<
-          //   relChildOf[ entity->entityGid( ) ] << std::endl;
-
-        // TODO If partially selected parent is always partially selected which
-        // can be an optimization
-
+          // TODO If partially selected parent is always partially selected which
+          // can be an optimization
           postCheckParentEntities.insert(
             entities.at( relChildOf[ entityGid ].entity ));
         }
       }
     }
 
-    // for ( const auto  entity : entities )
-    // {
-    //   std::cout << entity.second->entityGid( ) << " "
-    //             << int( getSelectedState( entity.second )) << std::endl;
-    // }
-    std::cout << _activeSelection.size( ) << std::endl;
-    // LayoutManager::updateAllScenesSelection( );
     PaneManager::updateSelection( );
   }
-
 
 } // namespace nslib

@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #define _USE_MATH_DEFINES
 
 #include "ConnectionArrowItem.h"
@@ -58,15 +59,12 @@ namespace nslib
       {
         this->setAcceptHoverEvents( true );
       }
+
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
       _actualPen.setCosmetic( true );
 
       this->setAcceptHoverEvents( true );
-    }
-
-    ConnectionArrowItem::~ConnectionArrowItem( void )
-    {
     }
 
     const QLineF& ConnectionArrowItem::line( void )
@@ -86,19 +84,19 @@ namespace nslib
       auto painterPath = QPainterPath( );
       if ( origin != dest ) //Arrows with same origin and destiny are not drawn.
       {
-        float itemInvScale = 1.0f / static_cast< float >( this->scale( ));
+        const float itemInvScale = 1.0f / static_cast<float>( this->scale( ));
 
         _arrowOrigin = itemInvScale * origin;
         _arrowDest = itemInvScale * dest;
 
         QPolygonF arrowShape;
 
-        float arrowWidth = 6.0f * itemInvScale * nslib::Config::scale( );
-        float arrowLength = 3.0f * itemInvScale * nslib::Config::scale( );
+        const float arrowWidth = 6.0f * itemInvScale * nslib::Config::scale( );
+        const float arrowLength = 3.0f * itemInvScale * nslib::Config::scale( );
 
-        QLineF auxLine( _arrowOrigin, _arrowDest );
+        const QLineF auxLine( _arrowOrigin, _arrowDest );
 
-        auto lengthInv = 1.0f / auxLine.length( );
+        const auto lengthInv = 1.0f / auxLine.length( );
 
         double angle = acos( auxLine.dx( ) * lengthInv );
         if( auxLine.dy( ) >= 0 )
@@ -106,23 +104,23 @@ namespace nslib
           angle = M_PI_x2 - angle;
         }
 
-        QPointF arrowInit = auxLine.pointAt(
+        const QPointF arrowInit = auxLine.pointAt(
           1.0f - ( arrowLength * lengthInv ));
-        QPointF arrowP1 = arrowInit -
+        const QPointF arrowP1 = arrowInit -
           QPointF( sin( angle + M_PI_3 ) * arrowWidth,
             cos( angle + M_PI_3 ) * arrowWidth );
-        QPointF arrowP2 = arrowInit -
+        const QPointF arrowP2 = arrowInit -
           QPointF( sin( angle + M_PI_067 ) * arrowWidth,
             cos( angle + M_PI_067 ) * arrowWidth );
 
-        QPointF arrowI1 = _arrowOrigin -
+        const QPointF arrowI1 = _arrowOrigin -
           QPointF( sin( angle + M_PI_Float ) * arrowWidth,
             cos( angle + M_PI_Float ) * arrowWidth );
-        QPointF arrowI2 = _arrowOrigin +
+        const QPointF arrowI2 = _arrowOrigin +
           QPointF( sin( angle - M_PI_Float ) * arrowWidth,
             cos( angle - M_PI_Float ) * arrowWidth );
 
-        float size = arrowLength;
+        const float size = arrowLength;
 
         arrowShape.clear( );
 
@@ -225,7 +223,7 @@ namespace nslib
       }
     }
 
-    void ConnectionArrowItem::highlight( scoop::Color color_ )
+    void ConnectionArrowItem::highlight( const scoop::Color color_ )
     {
       this->setZValue( 100 );
       _actualPen.setColor( color_ );

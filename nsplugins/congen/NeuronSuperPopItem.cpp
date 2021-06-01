@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "NeuronSuperPopItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
@@ -34,7 +35,7 @@ namespace nslib
     const float NeuronSuperPopItem::rangeCircle = maxCircle - minCircle;
 
     NeuronSuperPopItem::NeuronSuperPopItem( const NeuronSuperPopRep& entityRep,
-      unsigned int size, bool interactive_ )
+      const unsigned int size, bool interactive_ )
       : _itemText( nullptr )
     {
       setInteractive( interactive_ );
@@ -43,55 +44,56 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
+      const int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = entityRep.getPropertyValue< Color >( "color" );
       auto circleItem = new QGraphicsEllipseItem( this );
-      float circleItemSize = size * 0.9f;
-      float halfcircleItemSize = - 0.5f * circleItemSize;
+      const float circleItemSize = size * 0.9f;
+      const float halfcircleItemSize = - 0.5f * circleItemSize;
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
       auto circleItemInner = new QGraphicsEllipseItem( this );
-      float circleItemSizeInner = size * maxCircle;
-      float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
+      const float circleItemSizeInner = size * maxCircle;
+      const float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
       circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
         circleItemSizeInner, circleItemSizeInner );
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      int numCircles = entityRep.getPropertyValue< unsigned int >
+      const int numCircles = entityRep.getPropertyValue< unsigned int >
         ( "num circles", 0u );
 
-      float circleSeparation =
+      const float circleSeparation =
         entityRep.getPropertyValue<float>("circles separation", .0f );
-      float colorSeparation =
+      const float colorSeparation =
           entityRep.getPropertyValue<float>("circles color separation", .0f );
       scoop::SequentialColorMap colorMap = entityRep
         .getPropertyValue< scoop::SequentialColorMap >("circles color map");
 
-      float realCircleSeparation = circleSeparation * size;
+      const float realCircleSeparation = circleSeparation * size;
       float circleSizeInner2 = circleItemSizeInner;
       float colorValue = 0.0f;
 
-      for( int i = 0; i < numCircles; ++i ){
+      for( int i = 0; i < numCircles; ++i )
+      {
         auto circleItemInner2 = new QGraphicsEllipseItem( this );
         circleSizeInner2 -= realCircleSeparation;
         colorValue += colorSeparation;
-        float halfcircleItemSizeInner2 = - 0.5f * circleSizeInner2;
+        const float halfcircleItemSizeInner2 = - 0.5f * circleSizeInner2;
         circleItemInner2->setRect( halfcircleItemSizeInner2, halfcircleItemSizeInner2,
           circleSizeInner2, circleSizeInner2 );
         circleItemInner2->setPen( colorMap.getColor( colorValue ));
       }
 
-      float barHeight = size * minCircle;
-      float halfBarHeight = - 0.5f * barHeight;
-      float barWidth = circleItemSizeInner * 1.1f;
-      float halfBarWidth = - 0.5f * barWidth;
+      const float barHeight = size * minCircle;
+      const float halfBarHeight = - 0.5f * barHeight;
+      const float barWidth = circleItemSizeInner * 1.1f;
+      const float halfBarWidth = - 0.5f * barWidth;
 
       auto bar = new QGraphicsRectItem(
         halfBarWidth, halfBarHeight,
@@ -115,7 +117,6 @@ namespace nslib
           .getPropertyValue<std::string>( "Entity name", " " )), this );
       }
 
-
       this->_parentRep = &( const_cast< NeuronSuperPopRep& >( entityRep ));
     }
 
@@ -126,6 +127,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -136,6 +138,8 @@ namespace nslib
                 qAbstractGraphicItem, event_ );
             }
           }
+        }
+
         InteractionManager::highlightConnectivity( this );
       }
     }
@@ -146,6 +150,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -157,6 +162,8 @@ namespace nslib
             }
 
           }
+        }
+
         InteractionManager::highlightConnectivity( this, false );
       }
     }
@@ -172,7 +179,7 @@ namespace nslib
 
     NeuronSuperPopItem::~NeuronSuperPopItem( void )
     {
-      delete _itemText;
+      if(_itemText) delete _itemText;
     }
 
   } // namespace congen

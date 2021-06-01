@@ -29,7 +29,6 @@
 
 namespace nslib
 {
-
   GridLayout::GridLayout( void )
     : Layout( "Grid", Layout::SORT_ENABLED | Layout::FILTER_ENABLED, new QWidget )
     , _lineEditPaddingX( new QDoubleSpinBox )
@@ -63,7 +62,6 @@ namespace nslib
 
     connect( button, SIGNAL( clicked( )), this,
       SLOT( refreshCanvas( )));
-
   }
 
   void GridLayout::padding( float paddingX, float paddingY )
@@ -106,7 +104,6 @@ namespace nslib
         auto item = graphicsItemRep->item( &_canvas->scene( ));
         if ( !item->parentItem( ))
         {
-          // std::cout << "++++++ Arranging " << item << std::endl;
           ++repsToBeArranged;
           if ( doFiltering && useOpacityForFilter )
           {
@@ -116,8 +113,8 @@ namespace nslib
               filteredOutItems.insert( item );
             }
           }
-          //_scene->addItem( item );
-          QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
+
+          const QRectF rect = item->childrenBoundingRect( ) | item->boundingRect( );
 
           if ( rect.width( ) > maxItemWidth )
           {
@@ -128,14 +125,11 @@ namespace nslib
             maxItemHeight = static_cast<unsigned int>( rect.height( ));
           }
         }
-        // else std::cout << "Item with parentItem, skipping" << std::endl;
       }
-    } // for all reps
-    //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
-    // std::cout << "Arranging " << repsToBeArranged << std::endl;
+    }
 
-    const unsigned int marginX = 20;
-    const unsigned int marginY = 20;
+    constexpr unsigned int marginX = 20;
+    constexpr unsigned int marginY = 20;
     const float scalePaddingX = static_cast< float >(
       _lineEditPaddingX->value( )) * 0.01f;
     const float scalePaddingY = static_cast< float >(
@@ -149,7 +143,7 @@ namespace nslib
     int _x = 0;
     int _y = 0;
 
-    float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
+    const float iconAspectRatio = float( maxItemWidth ) / float( maxItemHeight);
 
     QGraphicsView* gv = _canvas->scene( ).views( ).first( );
     float canvasAspectRatio = ( gv->width( ) > gv->height( ))
@@ -177,23 +171,20 @@ namespace nslib
       std::swap( numColumns, numRows );
     }
 
-    // std::cout << "Num rows: " << numRows << " Num cols: " << numColumns << std::endl;
-
-    float scaleX = float( gv->width( ) - 2.0f * marginX ) /
+    const float scaleX = float( gv->width( ) - 2.0f * marginX ) /
       float( numColumns * deltaX );
-    float scaleY = float( gv->height( ) - 2.0f * marginY ) /
+    const float scaleY = float( gv->height( ) - 2.0f * marginY ) /
       float( numRows * deltaY );
-    qreal repsScale = std::min( scaleX, scaleY );
+    const qreal repsScale = std::min( scaleX, scaleY );
 
-    // std::cout << "Scale: " << scaleX << " " << scaleY << " " << scale << std::endl;
-
-    int leftMargin = static_cast< int >( ( ( deltaX * repsScale ) +
+    const int leftMargin = static_cast< int >( ( ( deltaX * repsScale ) +
       ( gv->width( ) - numColumns * deltaX * repsScale )) * 0.5f );
-    int topMargin = static_cast< int >( ( ( deltaY * repsScale ) +
+    const int topMargin = static_cast< int >( ( ( deltaY * repsScale ) +
       ( gv->height( ) - numRows * deltaY * repsScale )) * 0.5f);
 
-    auto opacity = _filterWidget
+    const auto opacity = _filterWidget
       ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
+
     for ( const auto& representation : reps )
     {
       auto graphicsItemRep =
@@ -212,17 +203,15 @@ namespace nslib
         auto obj = dynamic_cast< QObject* >( graphicsItem );
         if ( item )
         {
-          QRectF rect = graphicsItem->childrenBoundingRect( ) |
+          const QRectF rect = graphicsItem->childrenBoundingRect( ) |
             graphicsItem->boundingRect( );
-          qreal posX = _x * deltaX * repsScale - gv->width( ) * 0.5f +
+          const qreal posX = _x * deltaX * repsScale - gv->width( ) * 0.5f +
             leftMargin - repsScale * rect.center( ).x( );
-          qreal posY = _y * deltaY * repsScale - gv->height( ) * 0.5f +
+          const qreal posY = _y * deltaY * repsScale - gv->height( ) * 0.5f +
             topMargin - repsScale * rect.center( ).y( );
 
-          if ( useOpacityForFilter &&
-               filteredOutItems.count( graphicsItem ) == 1 )
+          if ( useOpacityForFilter && filteredOutItems.count( graphicsItem ) == 1 )
           {
-            //std::cout << "opacity " << _filterWidget->opacityValue( ) << std::endl;
             graphicsItem->setOpacity( opacity );
           }
           else
@@ -237,7 +226,6 @@ namespace nslib
             graphicsItem->setPos( posX, posY );
             graphicsItem->setScale( repsScale );
           }
-          // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }
 
@@ -249,15 +237,11 @@ namespace nslib
         _x = 0;
         ++_y;
       }
-
     }
-
   }
 
   void GridLayout::_updateOptionsWidget( void )
-  {
-
-  }
+  {}
 
   Layout* GridLayout::clone( void ) const
   {
@@ -265,5 +249,4 @@ namespace nslib
     layout->padding(this->paddingX( ),this->paddingY( ));
     return layout;
   }
-
 }

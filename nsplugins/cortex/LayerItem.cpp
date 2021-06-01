@@ -19,14 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "LayerItem.h"
 
+#include "LayerItem.h"
 
 namespace nslib
 {
   namespace cortex
   {
-
     void LayerItem::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       auto qGraphicsItemRep =

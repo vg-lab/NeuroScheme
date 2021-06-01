@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_ITEM__
 #define __NSLIB__NEURON_ITEM__
 
@@ -31,12 +32,10 @@
 #include <QGraphicsEllipseItem>
 #include <nslib/ItemText.h>
 
-
 namespace nslib
 {
   namespace congen
   {
-
     class CongenPopItem
       : public QObject
       , public QGraphicsEllipseItem
@@ -49,9 +48,8 @@ namespace nslib
       Q_PROPERTY( qreal scale READ scale WRITE setScale )
 
     public:
-
       CongenPopItem( const CongenPopRep& entityRep,
-        unsigned int size = 100, bool interactive = true );
+        const unsigned int size = 100, const bool interactive = true );
 
       virtual ~CongenPopItem( void );
 
@@ -61,18 +59,9 @@ namespace nslib
 
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
-      // virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      // {
-      //   if ( _interactive )
-      //     InteractionManager::mousePressEvent( this, event_ );
-      // }
-
-
     protected:
       ItemText* _itemText;
-
     };
-
 
   } // namespace congen
 } // namespace nslib

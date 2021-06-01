@@ -29,15 +29,11 @@ namespace nslib
 {
   class DataLoader
   {
+    public:
+      virtual ~DataLoader( void ) {}
 
-  public:
-
-    virtual ~DataLoader( void ) {}
-
-    virtual bool cliLoadData(
-      const NeuroSchemeInputArguments& arguments ) = 0;
-
-
+      virtual bool cliLoadData(
+        const NeuroSchemeInputArguments& arguments ) = 0;
   };
 } // namespace nslib
 

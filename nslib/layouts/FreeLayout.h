@@ -33,51 +33,51 @@ namespace nslib
   class NSLIB_API FreeLayout : public Layout
   {
     public:
-    FreeLayout( QStatusBar* statusBar_ );
+      FreeLayout( QStatusBar* statusBar_ );
 
-    void startMoveRepresentation( QGraphicsItem* item_,
-      const QPointF clickPos_ );
+      void startMoveRepresentation( QGraphicsItem* item_,
+        const QPointF clickPos_ );
 
-    void refresh( bool animate ) override;
+      void refresh( bool animate ) override;
 
-    void stopMoveActualRepresentation( void );
+      void stopMoveActualRepresentation( void );
 
-    void init( void );
+      void init( void );
 
-    void moveRepresentation( const QPointF newPos_ );
+      void moveRepresentation( const QPointF newPos_ );
 
-    void display( shift::Entities& entities,
-      shift::Representations& representations,
-      bool animate = true ) override;
+      void display( shift::Entities& entities,
+        shift::Representations& representations,
+        bool animate = true ) override;
 
-    void removeRelationshipsReps( void );
+      void removeRelationshipsReps( void );
 
-    bool moveNewEntitiesChecked( void );
+      bool moveNewEntitiesChecked( void );
 
-    void moveNewEntitiesChecked( bool moveNewEntitiesChecked_ );
+      void moveNewEntitiesChecked( bool moveNewEntitiesChecked_ );
 
     protected:
-    void _addRepresentations( const shift::Representations& reps ) override;
-    void _addRepresentations( const shift::Representations& reps,
-      const bool isEntity );
-    void _removeRepresentations( const shift::Representations& reps );
+      void _addRepresentations( const shift::Representations& reps ) override;
+      void _addRepresentations( const shift::Representations& reps,
+        const bool isEntity );
+      void _removeRepresentations( const shift::Representations& reps );
 
-    void _arrangeItems( const shift::Representations& reps, bool animate = true,
-      const shift::Representations& postFilterReps = shift::Representations( ))
-    override;
+      void _arrangeItems( const shift::Representations& reps, bool animate = true,
+        const shift::Representations& postFilterReps = shift::Representations( ))
+      override;
 
-    void _updateOptionsWidget( void ) override;
+      void _updateOptionsWidget( void ) override;
 
-    Layout* clone( void ) const override;
+      Layout* clone( void ) const override;
 
     private:
-    QGraphicsItem* _movedItem;
-    QPointF _moveStart;
-    QCheckBox* _moveNewCheckBox;
-    OpConfig preRenderOpConfig;
-    shift::Representations _relationshipReps;
-    shift::Representations _entitiesReps;
-    QStatusBar* _statusBar;
+      QGraphicsItem* _movedItem;
+      QPointF _moveStart;
+      QCheckBox* _moveNewCheckBox;
+      OpConfig preRenderOpConfig;
+      shift::Representations _relationshipReps;
+      shift::Representations _entitiesReps;
+      QStatusBar* _statusBar;
   };
 
 }

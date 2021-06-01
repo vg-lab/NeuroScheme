@@ -37,6 +37,7 @@ namespace nslib
     {
       public:
       Circle( QGraphicsItem* parent_ );
+      virtual ~Circle() {};
 
       shift::Representation* parentRep( void ) const final;
 
@@ -45,7 +46,6 @@ namespace nslib
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
 
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
-
     };
   }
 }

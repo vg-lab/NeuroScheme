@@ -33,14 +33,12 @@
 
 namespace nslib
 {
-
   class NSLIB_API GraphicsView : public QGraphicsView
   {
-
     Q_OBJECT;
 
   public:
-    GraphicsView( QWidget* parent = 0 );
+    GraphicsView( QWidget* parent = nullptr );
     void mousePressEvent( QMouseEvent* event ) override;
     void mouseReleaseEvent( QMouseEvent* event ) override;
     void mouseMoveEvent( QMouseEvent* event ) override;
@@ -61,12 +59,11 @@ namespace nslib
 
   }; // class GraphicsScene
 
-
   class NSLIB_API Canvas : public QFrame
   {
     Q_OBJECT
   public:
-    Canvas( QWidget* parent = 0 );
+    Canvas( QWidget* parent = nullptr );
     ~Canvas( void );
 
     const GraphicsScene& scene( void ) const;
@@ -90,16 +87,14 @@ namespace nslib
     void removeEntity( const shift::Entity* entity_,
       const bool isInput = false );
 
-    int activeLayoutIndex( void );
+    int activeLayoutIndex( void ) const;
     void activeLayoutIndex( int );
-
-    std::string name;
 
     void displayEntities( shift::Entities& entities_, bool animate,
       bool refreshProperties );
     void displayEntities( bool animate, bool refreshProperties );
     void setEntities( shift::Entities& entities_ );
-//    void displayReps( shift::Representations&, bool animate );
+
     Canvas* clone( void );
     const shift::Representations& reps( void ) const;
     shift::Representations& reps( void );
@@ -108,8 +103,10 @@ namespace nslib
     const TProperties& properties( void ) { return _properties; }
     void refreshProperties( void );
 
-    void repsScale( qreal repsScale_ );
+    void repsScale( const qreal repsScale_ );
     qreal repsScale ( void ) const;
+
+    std::string name;
 
 protected:
     GraphicsView* _graphicsView;
@@ -127,9 +124,6 @@ protected:
   public slots:
     void layoutChanged( int );
   }; // class Canvas
-
-
-
 } // namespace nslib
 
 #endif // __NSLIB__CANVAS__

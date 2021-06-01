@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSPLUGINS_CONGEN__REPRESENTATION_CREATOR__
 #define __NSPLUGINS_CONGEN__REPRESENTATION_CREATOR__
 #include <shift/shift.h>
@@ -36,15 +37,13 @@ namespace nslib
 {
   namespace congen
   {
-
     class NSLIBCONGEN_API RepresentationCreator
         : public shift::RepresentationCreator
     {
     public:
-
       RepresentationCreator( void );
-
-      virtual ~RepresentationCreator( void ) {};
+      virtual ~RepresentationCreator( void )
+      {};
 
       void updateRepresentation(
           const shift::Entity* entity_,
@@ -94,7 +93,7 @@ namespace nslib
       void maxLevelsPerSuperPop( unsigned int _maxLevelsPerSuperPop,
         bool compare = false );
 
-      protected:
+    protected:
       unsigned int _maxNeuronsPerPopulation;
       unsigned int _maxLevelsPerSuperPop;
       float _maxAbsoluteWeight;
@@ -124,8 +123,7 @@ namespace nslib
 
       void updateOutputRep( const shift::Entity* entity_,
         shift::Representation* entityRep_ );
-};
-
+    };
   } // namespace congen
 } // namespace nslib
 

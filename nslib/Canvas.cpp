@@ -35,21 +35,24 @@
 
 namespace nslib
 {
-
+  // NOTE: compilers warn if you turn this into constexpr because of definition in GraphicsView.
   const double GraphicsView::scaleFactor = 1.04;
   const double GraphicsView::scaleFactorInv = 1.0 / 1.04;
 
   GraphicsView::GraphicsView( QWidget* parent_ )
     : QGraphicsView( parent_ )
-  {
-  }
+  {}
 
   void GraphicsView::mousePressEvent( QMouseEvent* event_ )
   {
-    if ( this->parentWidget( ) &&
-         dynamic_cast< Canvas* >( this->parentWidget( )))
-      PaneManager::activePane(
-        dynamic_cast< Canvas* >( this->parentWidget( )));
+    if ( this->parentWidget( ) )
+    {
+      auto canvas = dynamic_cast< Canvas* >( this->parentWidget( ));
+      if(canvas)
+      {
+        PaneManager::activePane(canvas);
+      }
+    }
 
     auto item = itemAt( event_->pos( ));
     InteractionManager::mousePressEvent( this, item, event_ );
@@ -76,11 +79,10 @@ namespace nslib
 
   void GraphicsView::wheelEvent( QWheelEvent* event_ )
   {
-
     setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
 
     // Scale the view / do the zoom
-    int delta = event_->angleDelta( ).y( );
+    const int delta = event_->angleDelta( ).y( );
 
     if ( delta > 0 )
     {
@@ -92,6 +94,11 @@ namespace nslib
       // Zooming out
       this->scale( scaleFactorInv, scaleFactorInv );
     }
+    else
+    {
+      // sceneRect should be the same
+      return;
+    }
 
     auto sceneRect = this->scene( )->itemsBoundingRect( );
     this->setSceneRect( sceneRect );
@@ -102,7 +109,7 @@ namespace nslib
 
   void GraphicsScene::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
   {
-    QPointF mousePoint = event_->scenePos( );
+    const QPointF mousePoint = event_->scenePos( );
     // If not clicked in an item
     if ( !this->itemAt( mousePoint, QTransform( )))
     {
@@ -171,11 +178,8 @@ namespace nslib
 
   void Canvas::connectLayoutSelector( void )
   {
-    connect( this->layouts( ).layoutSelector( ),
-      SIGNAL( currentIndexChanged( int )),
-      this,
-      SLOT( layoutChanged( int )));
-
+    connect( this->layouts( ).layoutSelector( ), SIGNAL( currentIndexChanged( int )),
+             this, SLOT( layoutChanged( int )));
   }
 
   const GraphicsScene& Canvas::scene( void ) const
@@ -208,7 +212,6 @@ namespace nslib
     // nslib::PaneManager::activePane( this );
     // this->setObjectName("pane");
     // this->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
-
   }
 
   void Canvas::leaveEvent( QEvent*  )
@@ -247,7 +250,7 @@ namespace nslib
                                  viewerSize.width( ) -2,
                                  viewerSize.height( ) -2);
 
-    QTransform transf = this->view( ).transform( );
+    const auto transf = this->view( ).transform( );
     this->view( ).fitInView( rectf, Qt::KeepAspectRatio );
     this->view( ).setSceneRect( rectf );
     this->view( ).setTransform( transf );
@@ -260,9 +263,8 @@ namespace nslib
 
   void Canvas::showEvent( QShowEvent* /* event_ */ )
   {
-    resizeEvent( 0 );
+    resizeEvent( nullptr );
   }
-
 
   const Layouts& Canvas::layouts( void ) const
   {
@@ -273,7 +275,7 @@ namespace nslib
     return _layouts;
   }
 
-  int Canvas::activeLayoutIndex( void )
+  int Canvas::activeLayoutIndex( void ) const
   {
     return _activeLayoutIndex;
   }
@@ -292,19 +294,22 @@ namespace nslib
 
       return;
     }
+
     if ( index == _activeLayoutIndex )
     {
       Loggers::get( )->log( "Trying to change to a layout already in use",
         LOG_LEVEL_VERBOSE );
       return;
     }
+
     Loggers::get( )->log( "Layout changed to " + std::to_string( index ),
       LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+
     if ( _layouts.getLayout( index ))
     {
       _activeLayoutIndex = index;
       auto actualLayout = _layouts.getLayout( index );
-      actualLayout->optionsWidget( );
+      auto actualOptions = actualLayout->optionsWidget( );
       _layouts.layoutSelector( )->setCurrentIndex( index );
       auto layout_ = PaneManager::layout( );
       if ( layout_ )
@@ -313,6 +318,7 @@ namespace nslib
         {
           dynamic_cast< FreeLayout* >( actualLayout )->init( );
         }
+
         auto item = layout_->itemAtPosition( 2, 0 );
         if ( item )
         {
@@ -328,10 +334,9 @@ namespace nslib
           }
         }
 
-        layout_->addWidget( _layouts.getLayout( index )->optionsWidget( ),
-          2, 0 );
+        layout_->addWidget( actualOptions, 2, 0 );
         displayEntities( true, false );
-        _layouts.getLayout( index )->optionsWidget( )->show( );
+        actualOptions->show( );
 
       }
       else
@@ -341,7 +346,6 @@ namespace nslib
     else
       Loggers::get( )->log( "Null layout with index" + std::to_string( index ),
         LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
-
   }
 
   void Canvas::displayEntities( bool animate, bool refreshProperties_ )
@@ -403,56 +407,57 @@ namespace nslib
     switch ( this->_activeLayoutIndex )
     {
       case Layout::TLayoutIndexes::FREE:
-      {
-        FreeLayout* origFreeLayout = dynamic_cast< FreeLayout* >(
-          this->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
-        FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
-          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
-        freeLayout->init( );
-        bool moveNewEntities = origFreeLayout->moveNewEntitiesChecked( );
-        freeLayout->moveNewEntitiesChecked( false );
-        for( shift::Representation* rep : this->_reps )
         {
-          auto graphicsItemRep =
-            dynamic_cast< QGraphicsItemRepresentation* >( rep );
-          if( graphicsItemRep )
+          FreeLayout* origFreeLayout = dynamic_cast< FreeLayout* >(
+            this->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+          FreeLayout* freeLayout = dynamic_cast< FreeLayout* >(
+            canvas->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
+          freeLayout->init( );
+          bool moveNewEntities = origFreeLayout->moveNewEntitiesChecked( );
+          freeLayout->moveNewEntitiesChecked( false );
+          for( shift::Representation* rep : this->_reps )
           {
-            auto oldItem = graphicsItemRep->item( &this->scene( ));
-            auto item = graphicsItemRep->item( &canvas->scene( ));
-            canvas->scene( ).addItem( item );
-            item->setScale( canvas->_repsScale );
-            item->setPos( oldItem->pos( ));
+            auto graphicsItemRep =
+              dynamic_cast< QGraphicsItemRepresentation* >( rep );
+            if( graphicsItemRep )
+            {
+              auto oldItem = graphicsItemRep->item( &this->scene( ));
+              auto item = graphicsItemRep->item( &canvas->scene( ));
+              canvas->scene( ).addItem( item );
+              item->setScale( canvas->_repsScale );
+              item->setPos( oldItem->pos( ));
+            }
           }
+          canvas->displayEntities( false, true );
+          freeLayout->moveNewEntitiesChecked( moveNewEntities );
         }
-        canvas->displayEntities( false, true );
-        freeLayout->moveNewEntitiesChecked( moveNewEntities );
-      }
         break;
       case Layout::TLayoutIndexes::CIRCULAR:
-      {
-        CircularLayout* origCricularLayout = dynamic_cast< CircularLayout* >(
-          this->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
-        CircularLayout* circularLayout = dynamic_cast< CircularLayout* >(
-          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
-        circularLayout->radius( origCricularLayout->radius( ));
-      }
+        {
+          CircularLayout* origCricularLayout = dynamic_cast< CircularLayout* >(
+            this->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
+          CircularLayout* circularLayout = dynamic_cast< CircularLayout* >(
+            canvas->layouts( ).getLayout( Layout::TLayoutIndexes::CIRCULAR ));
+          circularLayout->radius( origCricularLayout->radius( ));
+        }
         break;
       case Layout::TLayoutIndexes::GRID:
-      {
-        GridLayout* origGridLayout = dynamic_cast< GridLayout* >(
-          this->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
-        GridLayout* gridLayout = dynamic_cast< GridLayout* >(
-          canvas->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
-        gridLayout->padding( origGridLayout->paddingX( ),
-          origGridLayout->paddingY( ));
-      }
+        {
+          GridLayout* origGridLayout = dynamic_cast< GridLayout* >(
+            this->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
+          GridLayout* gridLayout = dynamic_cast< GridLayout* >(
+            canvas->layouts( ).getLayout( Layout::TLayoutIndexes::GRID ));
+          gridLayout->padding( origGridLayout->paddingX( ),
+            origGridLayout->paddingY( ));
+        }
         break;
       default:
-      {
-        canvas->displayEntities( false, true );
-      }
+        {
+          canvas->displayEntities( false, true );
+        }
         break;
     }
+
     canvas->layouts( ).layoutSelector( )->setCurrentIndex(
       this->_activeLayoutIndex );
     canvas->connectLayoutSelector( );
@@ -547,7 +552,6 @@ namespace nslib
             fires::PropertyCaster::CEIL )
         };
     }
-
   }
 
   void Canvas::addEntity( shift::Entity* entity_, const bool isInput_  )
@@ -559,8 +563,7 @@ namespace nslib
     _entities.add( entity_ );
   }
 
-  void Canvas::removeEntity( const shift::Entity* entity_,
-    const bool isInput_  )
+  void Canvas::removeEntity( const shift::Entity* entity_, const bool isInput_  )
   {
     if( !isInput_)
     {
@@ -574,7 +577,7 @@ namespace nslib
     return _repsScale;
   }
 
-  void Canvas::repsScale( qreal repsScale_ )
+  void Canvas::repsScale( const qreal repsScale_ )
   {
     _repsScale = repsScale_;
   }

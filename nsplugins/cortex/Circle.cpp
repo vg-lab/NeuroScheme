@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <nslib/InteractionManager.h>
 #include "Circle.h"
 
@@ -26,7 +27,6 @@ namespace nslib
 {
   namespace cortex
   {
-
     Circle::Circle( QGraphicsItem* parent_ )
         : QGraphicsEllipseItem( parent_ )
     {
@@ -36,22 +36,17 @@ namespace nslib
 
     shift::Representation* Circle::parentRep( void ) const
     {
-      return dynamic_cast< Item* >(this->parentItem( ))->
-        parentRep( );
+      return dynamic_cast< Item* >(this->parentItem( ))->parentRep( );
     }
 
     void Circle::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       InteractionManager::hoverEnterEvent( this, event_ );
-      // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-      // event_ );
     }
 
     void Circle::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       InteractionManager::hoverLeaveEvent( this, event_ );
-      // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-      // event_ );
     }
 
     void Circle::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )

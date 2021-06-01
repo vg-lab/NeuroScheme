@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CORTEX_DATA_LOADER__
 #define __NSLIB__CORTEX_DATA_LOADER__
 
@@ -40,7 +41,6 @@ namespace nslib
       : public ::nslib::DataLoader
     {
     public:
-
       virtual ~DataLoader( void ) {}
 
       bool cliLoadData(

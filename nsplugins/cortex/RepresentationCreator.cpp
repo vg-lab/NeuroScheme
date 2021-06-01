@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <scoop/scoop.h>
 #include <nslib/mappers/VariableMapper.h>
 #include <nslib/error.h>
@@ -36,7 +37,6 @@ namespace nslib
 {
   namespace cortex
   {
-
     void RepresentationCreator::updateRepresentation(
       const shift::Entity* entity,
       shift::Representation* entityRep )
@@ -44,7 +44,6 @@ namespace nslib
       if ( dynamic_cast< const Neuron* >( entity ))
       {
         updateNeuronRep( entity, entityRep );
-
       }
       else if ( dynamic_cast< const Column* >( entity ))
       {
@@ -91,29 +90,20 @@ namespace nslib
       bool linkRepsToEntities
       )
     {
-
       nslib::Loggers::get( )->log( "create",
         LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-      // if ( linkEntitiesToReps )
-      //   entitiesToReps.clear( );
-      // if ( linkRepsToEntities )
-      //   repsToEntities.clear( );
 
       for ( const auto entity : entities.vector( ))
       {
-        // std::cout << ", new entity " << entity->entityGid( )
-                  // << " --> LayersMap size = "
-                  //   << _layersMap.size( ) 
-                  //<< std::endl;
         // if the entity has already a rep(s) don't create it
         if ( entitiesToReps.find( entity ) != entitiesToReps.end( ))
         {
-          // std::cout << "Entity with already a rep" << std::endl;
           for ( const auto rep : entitiesToReps[ entity ] )
             representations.push_back( rep );
+
           continue;
         }
-//        auto& entity = entityPair.second;
+
         shift::Representation* entityRep = nullptr;
         if ( dynamic_cast< Neuron* >( entity ))
         {
@@ -123,24 +113,12 @@ namespace nslib
         } // end if its Neuron entity
         else if ( dynamic_cast< Column* >( entity ))
         {
-          // entity->registerProperty( "tt", uint( 0 ));
-          // std::cout << " id type: "
-          //           << entity->getProperty( "tt" ).type( ) << " --> "
-          //           << demangleType( entity->getProperty( "tt" ).type( )) << "  "
-          //           << entity->getProperty( "Id" ).type( ) << " --> "
-          //           << demangleType( entity->getProperty( "Id" ).type( )) << " "
-          //           << std::endl;
           entityRep = new ColumnRep( );
-       // std::cout << ", RepresentationCreator::updateColumnOrMiniColumnRep" << std::endl;
-
           updateColumnOrMiniColumnRep( entity, entityRep, 0 );
-          // std::cout << ", POST updateColumnOrMiniColumnRep LayersMap size = "
-          //           << _layersMap.size( ) << std::endl;
 
         } // it its MiniColumn entity
         else if ( dynamic_cast< MiniColumn* >( entity ))
         {
-          // std::cout << "creating minicolumn rep" << std::endl;
           entityRep = new MiniColumnRep( );
           updateColumnOrMiniColumnRep( entity, entityRep, 1 );
 
@@ -151,8 +129,6 @@ namespace nslib
         } // if Layer
         else if ( dynamic_cast< NeuronTypeAggregation* >( entity ))
         {
-          // std::cout << ", RepresentationCreator "
-          //           << _neuronTypeAggsMap.size( ) << std::endl;
           entityRep = getNeuronTypeAggregationRep( entity );
 
         } // if NeuronTypeAggregationRep
@@ -169,9 +145,6 @@ namespace nslib
           gidsToEntitiesReps
             .insert( TripleKey( entity->entityGid( ), entity, entityRep ));
         }
-
-        // std::cout << ", end entity --> LayersMap size = "
-        //           << _layersMap.size( ) << std::endl;
       } // for all entities
 
       // Create subentities
@@ -179,18 +152,21 @@ namespace nslib
         *( DataManager::entities( ).
            relationships( )[ "isSuperEntityOf" ]->asOneToN( ));
       shift::Entities subEntities;
+
       for ( const auto& entity : entities.vector( ))
       {
-        auto entityGid = entity->entityGid( );
+        const auto entityGid = entity->entityGid( );
         if ( relSuperEntityOf.count( entityGid ) > 0 )
           for ( const auto& subEntity : relSuperEntityOf.at( entityGid ))
             subEntities.add( DataManager::entities( ).at( subEntity.first ));
       }
+
       if ( subEntities.size( ) > 0 )
+      {
         this->create( subEntities, representations,
           entitiesToReps, repsToEntities, gidsToEntitiesReps,
           linkEntitiesToReps, linkRepsToEntities );
-
+      }
     }
 
     shift::Representation* RepresentationCreator::getLayerRep(
@@ -202,10 +178,12 @@ namespace nslib
         entity_->hasProperty( "Parent Id" ) &&
         entity_->hasProperty( "Parent Type" ) &&
         entity_->hasProperty( "Layer" );
+
       if ( !correctProperties )
       {
         Loggers::get( )->log( "Expected properties.", LOG_LEVEL_WARNING );
       }
+
       const LayersMapKey layerKey = correctProperties ? QuadKey(
         entity_->getPropertyValue< unsigned int >( "Parent gid", 0u ),
         entity_->getPropertyValue< unsigned int >( "Parent Id", 0u ),
@@ -224,6 +202,7 @@ namespace nslib
       {
         entityRep = layerPair->second;
       }
+
       return entityRep;
     }
 
@@ -237,10 +216,12 @@ namespace nslib
         entity_->hasProperty( "Parent Type" ) &&
         entity_->hasProperty( "Layer" ) &&
         entity_->hasProperty( "Morpho Type" );
+
       if ( !correctProperties )
       {
         Loggers::get( )->log( "Expected properties.", LOG_LEVEL_WARNING );
       }
+
       NeuronTypeAggsMapKey neuronTypeAggKey = correctProperties ? PentaKey(
         entity_->getPropertyValue< unsigned int >( "Parent gid", 0u ),
         entity_->getPropertyValue< unsigned int >( "Parent Id", 0u ),
@@ -263,17 +244,13 @@ namespace nslib
       {
         entityRep = neuronTypeAggPair->second;
       }
+
       return entityRep;
     }
 
     void RepresentationCreator::updateNeuronRep( const shift::Entity* entity_,
        shift::Representation* entityRep_ )
     {
-      // std::cout
-      //   << fires::PropertyManager::getPropertyCaster(
-      //     "morphoType" )->toString(
-      //     neuron->getProperty( "morphoType" )) << std::endl;
-
       switch ( entity_->getPropertyValue< Neuron::TMorphologicalType >(
         "Morpho Type", Neuron::UNDEFINED_MORPHOLOGICAL_TYPE ))
       {
@@ -315,9 +292,6 @@ namespace nslib
       shiftgen::Ring somaRing;
       somaRing.setProperty( "angle", int( roundf( _somaAreaToAngle.map(
         entity_->getPropertyValue< float >( "Soma Surface", .0f )))));
-      // greenMapper.value( ) =
-      //   neuron->getProperty( "Soma Volume" ).value< float >( );
-      // somaRing.setProperty( "color", greenMapper.map( ));
 
       somaRing.setProperty( "color", _greenMapper.getColor(
         entity_->getPropertyValue< float >( "Soma Volume", .0f )));
@@ -326,9 +300,6 @@ namespace nslib
       shiftgen::Ring dendRing;
       dendRing.setProperty( "angle", int( roundf( _dendAreaToAngle.map(
         entity_->getPropertyValue< float >( "Dendritic Surface", .0f )))));
-      // _redMapper.value( ) =
-      //   neuron->getProperty( "Dendritic Volume" ).value< float >( );
-      // dendRing.setProperty( "color", _redMapper.map( ));
 
       dendRing.setProperty( "color", _redMapper.getColor(
         entity_->getPropertyValue< float >( "Dendritic Volume", .0f )));
@@ -440,12 +411,6 @@ namespace nslib
           if( otherEntityConnection == entityRelations->second->end( ))
             continue;
 
-          //auto numberOfConnections = 1
-          //  //entityRelations->count( other->entityGid( ));
-
-          //if( numberOfConnections == 0 )
-          //  continue;
-
           // TODO: Change to equal_range whenever multiple relationships between
           // the same elements are imported. Then, create a loop to iterate
           // over the given results and create a new one if not found.
@@ -492,16 +457,9 @@ namespace nslib
 
       shiftgen::NeuronAggregationRep::Rings rings;
 
-
-      // somaVolumeToColor.value( ) =
-      //   entity->getProperty( "meanSomaVolume" ).value< float >( );
-
       shiftgen::Ring somaRing;
       somaRing.setProperty( "angle", int( roundf( _somaAreaToAngle.map(
         entity_->getPropertyValue< float >( "meanSomaArea", .0f )))));
-      // somaVolumeToColor.value( ) =
-      //   entity->getProperty( "meanSomaVolume" ).value< float >( );
-      // somaRing.setProperty( "color", somaVolumeToColor.map( ));
       somaRing.setProperty( "color", _redMapper.getColor(
         entity_->getPropertyValue< float >( "meanSomaVolume", .0f )));
       rings.push_back( somaRing );
@@ -509,9 +467,6 @@ namespace nslib
       shiftgen::Ring dendRing;
       dendRing.setProperty( "angle", int( roundf( _dendAreaToAngle.map(
         entity_->getPropertyValue< float >( "meanDendArea", .0f )))));
-      // dendVolumeToColor.value( ) =
-      //   entity->getProperty( "meanDendVolume" ).value< float >( );
-      // dendRing.setProperty( "color", dendVolumeToColor.map( ));
       dendRing.setProperty( "color", _greenMapper.getColor(
         entity_->getPropertyValue< float >( "meanDendVolume", .0f )));
       rings.push_back( dendRing );
@@ -540,7 +495,6 @@ namespace nslib
           entityID,
           columnOrMiniColumn,
           layer );
-
 
         if ( _layersMap.count( layerKey ) == 0 )
         {
@@ -595,14 +549,13 @@ namespace nslib
       entityRep_->registerProperty( "neuronTypeAggregations", neuronTypeAggsReps );
     }
 
-
     bool RepresentationCreator::entityUpdatedOrCreated(
       const shift::Entity* entity )
     {
       bool needToClearCache = false;
       if ( dynamic_cast< const Neuron* >( entity ))
       {
-        float newMaxSomaVolume =
+        const float newMaxSomaVolume =
             entity->getPropertyValue< float >( "Soma Volume", .0f );
         if ( newMaxSomaVolume > _maxNeuronSomaVolume )
         {
@@ -610,7 +563,7 @@ namespace nslib
           maxNeuronSomaVolume( newMaxSomaVolume, false );
         }
 
-        float newMaxSomaArea =
+        const float newMaxSomaArea =
             entity->getPropertyValue< float >( "Soma Surface", .0f );
         if ( newMaxSomaArea > _maxNeuronSomaArea )
         {
@@ -618,7 +571,7 @@ namespace nslib
           maxNeuronSomaArea( newMaxSomaArea, false );
         }
 
-        float newMaxDendriticVolume =
+        const float newMaxDendriticVolume =
             entity->getPropertyValue< float >( "Dendritic Volume", .0f );
         if ( newMaxDendriticVolume > _maxNeuronDendsVolume )
         {
@@ -626,7 +579,7 @@ namespace nslib
           maxNeuronDendsVolume( newMaxDendriticVolume, false );
         }
 
-        float newMaxDendsArea =
+        const float newMaxDendsArea =
             entity->getPropertyValue< float >( "Dendritic Surface", .0f );
         if ( newMaxDendsArea > _maxNeuronDendsArea )
         {
@@ -636,7 +589,7 @@ namespace nslib
       }
       else if ( dynamic_cast< const Layer* >( entity ))
       {
-        unsigned int newMaxNeurons = std::max(
+        const unsigned int newMaxNeurons = std::max(
             entity->getPropertyValue< unsigned int > ( "Num Pyramidals", 0u ),
             entity->getPropertyValue< unsigned int >( "Num Interneurons", 0u ));
         if ( newMaxNeurons > _maxNeurons )
@@ -656,6 +609,7 @@ namespace nslib
         return false;
       }
     }
+
     void RepresentationCreator::reset( void )
     {
       clear( );
@@ -667,7 +621,6 @@ namespace nslib
       _layersMap.clear( );
       _neuronTypeAggsMap.clear( );
     }
-
 
     float RepresentationCreator::maxNeuronSomaVolume( void ) const
     {

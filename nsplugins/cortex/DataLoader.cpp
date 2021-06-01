@@ -32,17 +32,18 @@ namespace nslib
 {
   namespace cortex
   {
-
     using ConnectsWith = shiftgen::ConnectsWith;
 
-    bool DataLoader::cliLoadData(
-      const ::nslib::NeuroSchemeInputArguments& args )
+    bool DataLoader::cliLoadData( const ::nslib::NeuroSchemeInputArguments& args )
     {
 #ifdef NEUROSCHEME_USE_NSOL
-      // std::cout << "Loading data" << std::endl;
+
       if ( args.empty( ))
+      {
         Loggers::get( )->log( "No arguments provided",
                               LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+        return false;
+      }
 
       if ( args.count( "-bc" ) > 0 && args.count( "-xml" ) > 0 )
       {
@@ -61,12 +62,14 @@ namespace nslib
                                 LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
+
         if ( args.count( "-target" ) != 1 )
         {
           Loggers::get( )->log( "-bc provided but no -target found",
                                 LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
+
         if ( args.at( "-target" ).size( ) != 1 )
         {
           Loggers::get( )->log( "-target expect one target name but " +
@@ -75,6 +78,7 @@ namespace nslib
                                 LOG_LEVEL_CRITICAL, NEUROSCHEME_FILE_LINE );
           return false;
         }
+
         if ( args.count( "-cns" ) == 1 )
         {
           if ( args.at( "-cns" ).size( ) != 1 )
@@ -85,8 +89,10 @@ namespace nslib
             return false;
           }
         }
+
         Loggers::get( )->log( "Loading blue config",
                               nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
+
         nslib::DataManager::loadBlueConfig(
           args.at( "-bc" )[0],
           args.at( "-target" )[0],
@@ -99,7 +105,6 @@ namespace nslib
           nslib::DataManager::nsolDataSet( ).circuit( ),
           args.count( "-nm" ) == 0,
           ( args.count( "-cns" ) == 1 ? args.at( "-cns" )[0] : std::string( )));
-
       }
 
       if ( args.count( "-xml" ) == 1 )
@@ -122,10 +127,10 @@ namespace nslib
         createEntitiesFromNsolColumns(
           nslib::DataManager::nsolDataSet( ).columns( ),
           nslib::DataManager::nsolDataSet( ).circuit( ));
-
       }
 
       nslib::DataManager::nsolDataSet( ).close( );
+
       return true;
 #else
       if ( args.count( "-bc" ) > 0 || args.count( "-xml" ) > 0 )
@@ -134,95 +139,97 @@ namespace nslib
                                      NEUROSCHEME_FILE_LINE );
         return false;
       }
+
       return true;
 #endif
     }
 
 #ifdef NEUROSCHEME_USE_NSOL
 
-    std::string NeuronMorphologyToLabel(
-      nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat )
+    std::string NeuronMorphologyToLabel( nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat )
     {
       switch( stat )
       {
         // Volume
-      case nsol::NeuronMorphologyStats::DENDRITIC_VOLUME:
-        return std::string("Dendritic Volume");
-        break;
-      case nsol::NeuronMorphologyStats::AXON_VOLUME:
-        return std::string("Axon Volume");
-        break;
-      case nsol::NeuronMorphologyStats::NEURITIC_VOLUME:
-        return std::string("Neuritic Volume");
-        break;
-      case nsol::NeuronMorphologyStats::SOMA_VOLUME:
-        return std::string("Soma Volume");
-        break;
-      case nsol::NeuronMorphologyStats::VOLUME:
-        return std::string("Volume");
-        break;
+        case nsol::NeuronMorphologyStats::DENDRITIC_VOLUME:
+          return std::string("Dendritic Volume");
+          break;
+        case nsol::NeuronMorphologyStats::AXON_VOLUME:
+          return std::string("Axon Volume");
+          break;
+        case nsol::NeuronMorphologyStats::NEURITIC_VOLUME:
+          return std::string("Neuritic Volume");
+          break;
+        case nsol::NeuronMorphologyStats::SOMA_VOLUME:
+          return std::string("Soma Volume");
+          break;
+        case nsol::NeuronMorphologyStats::VOLUME:
+          return std::string("Volume");
+          break;
 
-        // Surface
-      case nsol::NeuronMorphologyStats::DENDRITIC_SURFACE:
-        return std::string("Dendritic Surface");
-        break;
-      case nsol::NeuronMorphologyStats::AXON_SURFACE:
-        return std::string("Axon Surface");
-        break;
-      case nsol::NeuronMorphologyStats::NEURITIC_SURFACE:
-        return std::string("Neuritic Surface");
-        break;
-      case nsol::NeuronMorphologyStats::SOMA_SURFACE:
-        return std::string("Soma Surface");
-        break;
-      case nsol::NeuronMorphologyStats::SURFACE:
-        return std::string("Surface");
-        break;
+          // Surface
+        case nsol::NeuronMorphologyStats::DENDRITIC_SURFACE:
+          return std::string("Dendritic Surface");
+          break;
+        case nsol::NeuronMorphologyStats::AXON_SURFACE:
+          return std::string("Axon Surface");
+          break;
+        case nsol::NeuronMorphologyStats::NEURITIC_SURFACE:
+          return std::string("Neuritic Surface");
+          break;
+        case nsol::NeuronMorphologyStats::SOMA_SURFACE:
+          return std::string("Soma Surface");
+          break;
+        case nsol::NeuronMorphologyStats::SURFACE:
+          return std::string("Surface");
+          break;
 
-        // Length
-      case nsol::NeuronMorphologyStats::DENDRITIC_LENGTH:
-        return std::string("Dendritic Length");
-        break;
-      case nsol::NeuronMorphologyStats::AXON_LENGTH:
-        return std::string("Axon Length");
-        break;
-      case nsol::NeuronMorphologyStats::NEURITIC_LENGTH:
-        return std::string("Neuritic Length");
-        break;
+          // Length
+        case nsol::NeuronMorphologyStats::DENDRITIC_LENGTH:
+          return std::string("Dendritic Length");
+          break;
+        case nsol::NeuronMorphologyStats::AXON_LENGTH:
+          return std::string("Axon Length");
+          break;
+        case nsol::NeuronMorphologyStats::NEURITIC_LENGTH:
+          return std::string("Neuritic Length");
+          break;
 
-        // Bifurcations
-      case nsol::NeuronMorphologyStats::DENDRITIC_BIFURCATIONS:
-        return std::string("Dendritic Bifurcations");
-        break;
-      case nsol::NeuronMorphologyStats::AXON_BIFURCATIONS:
-        return std::string("Axon Bifurcations");
-        break;
-      case nsol::NeuronMorphologyStats::NEURITIC_BIFURCATIONS:
-        return std::string("Neuritic Bifurcations");
-        break;
+          // Bifurcations
+        case nsol::NeuronMorphologyStats::DENDRITIC_BIFURCATIONS:
+          return std::string("Dendritic Bifurcations");
+          break;
+        case nsol::NeuronMorphologyStats::AXON_BIFURCATIONS:
+          return std::string("Axon Bifurcations");
+          break;
+        case nsol::NeuronMorphologyStats::NEURITIC_BIFURCATIONS:
+          return std::string("Neuritic Bifurcations");
+          break;
 
-      default:
-        break;
+        default:
+          break;
       }
       return std::string("");
     }
+
     shiftgen::Neuron::TMorphologicalType
     nsolToShiftMorphologicalType( nsol::Neuron::TMorphologicalType nsolType )
     {
       switch ( nsolType )
       {
-      case nsol::Neuron::TMorphologicalType::UNDEFINED:
-        return shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE;
-        break;
-      case nsol::Neuron::TMorphologicalType::PYRAMIDAL:
-        return shiftgen::Neuron::PYRAMIDAL;
-        break;
-      case nsol::Neuron::TMorphologicalType::INTERNEURON:
-        return shiftgen::Neuron::INTERNEURON;
-        break;
-      default:
-        break;
+        case nsol::Neuron::TMorphologicalType::UNDEFINED:
+          return shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE;
+          break;
+        case nsol::Neuron::TMorphologicalType::PYRAMIDAL:
+          return shiftgen::Neuron::PYRAMIDAL;
+          break;
+        case nsol::Neuron::TMorphologicalType::INTERNEURON:
+          return shiftgen::Neuron::INTERNEURON;
+          break;
+        default:
+          break;
       }
+
       return shiftgen::Neuron::UNDEFINED_MORPHOLOGICAL_TYPE;
     }
 
@@ -231,18 +238,19 @@ namespace nslib
     {
       switch ( nsolType )
       {
-      case nsol::Neuron::TFunctionalType::UNDEFINED_FUNCTIONAL_TYPE:
-        return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
-        break;
-      case nsol::Neuron::TFunctionalType::INHIBITORY:
-        return shiftgen::Neuron::INHIBITORY;
-        break;
-      case nsol::Neuron::TFunctionalType::EXCITATORY:
-        return shiftgen::Neuron::EXCITATORY;
-        break;
-      default:
-        break;
+        case nsol::Neuron::TFunctionalType::UNDEFINED_FUNCTIONAL_TYPE:
+          return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
+          break;
+        case nsol::Neuron::TFunctionalType::INHIBITORY:
+          return shiftgen::Neuron::INHIBITORY;
+          break;
+        case nsol::Neuron::TFunctionalType::EXCITATORY:
+          return shiftgen::Neuron::EXCITATORY;
+          break;
+        default:
+          break;
       }
+
       return shiftgen::Neuron::UNDEFINED_FUNCTIONAL_TYPE;
     }
 
@@ -257,7 +265,7 @@ namespace nslib
 
       auto& _entities = nslib::DataManager::entities( );
       auto& _rootEntities = nslib::DataManager::rootEntities( );
-      //fires::PropertyManager::clear( );
+
       _entities.clear( );
 
       auto& relParentOf=
@@ -325,6 +333,7 @@ namespace nslib
         Loggers::get( )->log( "Loading neuron morphology stats from " +
                               csvNeuronStatsFileName, LOG_LEVEL_VERBOSE,
                               NEUROSCHEME_FILE_LINE );
+
         std::ifstream csvNeuronStatsFile( csvNeuronStatsFileName );
         if ( !csvNeuronStatsFile.is_open( ))
         {
@@ -402,36 +411,36 @@ namespace nslib
           totalBifurcations += ( unsigned long )
             neuronStats.second.morphologyStats[NNMS::DENDRITIC_BIFURCATIONS];
 
-          auto neuronSomaVolume =
+          const auto neuronSomaVolume =
             neuronStats.second.morphologyStats[NNMS::SOMA_VOLUME];
           if ( neuronSomaVolume > maxNeuronSomaVolume )
             maxNeuronSomaVolume = neuronSomaVolume;
           totalSomaVolume += neuronSomaVolume;
 
-          auto neuronSomaArea =
+          const auto neuronSomaArea =
             neuronStats.second.morphologyStats[NNMS::SOMA_SURFACE];
           if ( neuronSomaArea > maxNeuronSomaArea )
             maxNeuronSomaArea = neuronSomaArea;
           totalSomaArea += neuronSomaArea;
 
-          auto neuronDendVolume =
+          const auto neuronDendVolume =
             neuronStats.second.morphologyStats[NNMS::DENDRITIC_VOLUME];
           if ( neuronDendVolume > maxNeuronDendVolume )
             maxNeuronDendVolume = neuronDendVolume;
           totalDendsVolume += neuronDendVolume;
 
-          auto neuronDendArea =
+          const auto neuronDendArea =
             neuronStats.second.morphologyStats[NNMS::DENDRITIC_SURFACE];
           if ( neuronDendArea > maxNeuronDendArea )
             maxNeuronDendArea = neuronDendArea;
           totalDendsArea += neuronDendArea;
 
-          auto neuronAxonVolume =
+          const auto neuronAxonVolume =
             neuronStats.second.morphologyStats[NNMS::AXON_VOLUME];
           if ( neuronAxonVolume > maxNeuronAxonVolume )
             maxNeuronAxonVolume = neuronAxonVolume;
 
-          auto neuronAxonArea =
+          const auto neuronAxonArea =
             neuronStats.second.morphologyStats[NNMS::AXON_SURFACE];
           if ( neuronAxonArea > maxNeuronAxonArea )
             maxNeuronAxonArea = neuronAxonArea;
@@ -439,7 +448,7 @@ namespace nslib
 
         if ( neuronsStats.size( ) > 0 )
         {
-          float size_1 =  1.0f / float( neuronsStats.size( ));
+          const float size_1 =  1.0f / float( neuronsStats.size( ));
 
           meanSomaArea = totalSomaArea * size_1;
           meanSomaVolume = totalSomaVolume * size_1;
@@ -457,32 +466,32 @@ namespace nslib
         {
           NSOL_DEBUG_CHECK( col->stats( ), "no stats in column" );
 
-          float colMaxNeuronSomaVolume =
+          const float colMaxNeuronSomaVolume =
             col->stats( )->getStat( nsol::ColumnStats::SOMA_VOLUME,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
 
-          float colMaxNeuronSomaArea =
+          const float colMaxNeuronSomaArea =
             col->stats( )->getStat( nsol::ColumnStats::SOMA_SURFACE,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
 
-          float colMaxNeuronDendVolume =
+          const float colMaxNeuronDendVolume =
             col->stats( )->getStat( nsol::ColumnStats::DENDRITIC_VOLUME,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
 
-          float colMaxNeuronDendArea =
+          const float colMaxNeuronDendArea =
             col->stats( )->getStat( nsol::ColumnStats::DENDRITIC_SURFACE,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
 
-          float colMaxNeuronAxonVolume =
+          const float colMaxNeuronAxonVolume =
             col->stats( )->getStat( nsol::ColumnStats::AXON_VOLUME,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
 
-          float colMaxNeuronAxonArea =
+          const float colMaxNeuronAxonArea =
             col->stats( )->getStat( nsol::ColumnStats::AXON_SURFACE,
                                     nsol::TAggregation::MAX,
                                     nsol::TAggregation::MAX );
@@ -608,12 +617,10 @@ namespace nslib
         if ( counter > 0 )
           meanCenter /= counter;
 
-        // std::cout << boundingBox.max( ) << std::endl;
-        // std::cout << boundingBox.min( ) << std::endl;
-        auto maxMin = boundingBox.max( ) - boundingBox.min( );
-        double matrix[ 16 ]  = { 1, 0, 0, 0,
-                                 0, 1, 0, 0,
-                                 0, 0, 1, 0,
+        const auto maxMin = boundingBox.max( ) - boundingBox.min( );
+        const double matrix[ 16 ]  = { 1, 0, 0, 0,
+                                       0, 1, 0, 0,
+                                       0, 0, 1, 0,
                                  - maxMin.x( ) / 2,
                                  - maxMin.y( ) / 2,
                                  - maxMin.y( ) * 1.5, 1 };
@@ -625,7 +632,7 @@ namespace nslib
           {
             for ( const auto& neuron : mc->neurons( ))
             {
-              auto gid = neuron->gid( );
+              const auto gid = neuron->gid( );
               numNeurons++;
               totalBifurcations += ( unsigned long )
                 neuronsStats[gid].morphologyStats[NNMS::DENDRITIC_BIFURCATIONS];
@@ -641,7 +648,7 @@ namespace nslib
           }
           if ( neuronsStats.size( ) > 0 )
           {
-            float size_1 =  1.0f / float( numNeurons );
+            const float size_1 =  1.0f / float( numNeurons );
             meanSomaArea = totalSomaArea * size_1;
             meanSomaVolume = totalSomaVolume * size_1;
             meanDendsArea = totalDendsArea * size_1;
@@ -774,7 +781,6 @@ namespace nslib
           if ( counter > 0 )
             mcMeanCenter /= mcNeuronCounter;
 
-          // std::cout << "mc " << miniColumnsCounter << " center: " << mcMeanCenter << std::endl;
           unsigned long totalMiniColBifurcations = 0;
           double totalMiniColSomaArea = .0f;
           double totalMiniColSomaVolume = .0f;
@@ -798,9 +804,10 @@ namespace nslib
               totalMiniColDendsArea +=
                 neuronsStats[gid].morphologyStats[NNMS::DENDRITIC_SURFACE];
             }
+
             if ( neuronsStats.size( ) > 0 )
             {
-              float size_1 =  1.0f / float( numMiniColNeurons );
+              const float size_1 =  1.0f / float( numMiniColNeurons );
 
               meanSomaArea = totalMiniColSomaArea * size_1;
               meanSomaVolume = totalMiniColSomaVolume * size_1;
@@ -808,20 +815,24 @@ namespace nslib
               meanDendsVolume = totalMiniColDendsVolume * size_1;
               meanBifurcations = totalMiniColBifurcations * size_1;
             }
-          } else if ( withMorphologies )
+          }
+          else
           {
-            meanSomaArea = mc->stats( )->getStat(
-              nsol::MiniColumnStats::SOMA_SURFACE,
-              nsol::TAggregation::MEAN );
-            meanSomaVolume = mc->stats( )->getStat(
-              nsol::MiniColumnStats::SOMA_VOLUME,
-              nsol::TAggregation::MEAN );
-            meanDendsArea = mc->stats( )->getStat(
-              nsol::MiniColumnStats::DENDRITIC_SURFACE,
-              nsol::TAggregation::MEAN );
-            meanDendsVolume = mc->stats( )->getStat(
-              nsol::MiniColumnStats::DENDRITIC_VOLUME,
-              nsol::TAggregation::MEAN );
+            if ( withMorphologies )
+            {
+              meanSomaArea = mc->stats( )->getStat(
+                nsol::MiniColumnStats::SOMA_SURFACE,
+                nsol::TAggregation::MEAN );
+              meanSomaVolume = mc->stats( )->getStat(
+                nsol::MiniColumnStats::SOMA_VOLUME,
+                nsol::TAggregation::MEAN );
+              meanDendsArea = mc->stats( )->getStat(
+                nsol::MiniColumnStats::DENDRITIC_SURFACE,
+                nsol::TAggregation::MEAN );
+              meanDendsVolume = mc->stats( )->getStat(
+                nsol::MiniColumnStats::DENDRITIC_VOLUME,
+                nsol::TAggregation::MEAN );
+            }
           }
 
           shift::Entity* mcEntity =
@@ -917,11 +928,11 @@ namespace nslib
             shift::Entity* neuronEntity;
             if ( !csvNeuronStatsFileName.empty( ))
             {
-              auto neuronGid = neuron->gid( );
+              const auto neuronGid = neuron->gid( );
 #define MORPHO_STATS neuronsStats[neuronGid].morphologyStats
               neuronEntity =
                 new shiftgen::Neuron(
-                  "n" + std::to_string( uint( neuronGid )), neuronGid,
+                  "n" + std::to_string( neuronGid ), neuronGid,
                   nsolToShiftMorphologicalType( neuron->morphologicalType( )),
                   nsolToShiftFunctionalType( neuron->functionalType( )),
                   MORPHO_STATS[NNMS::SOMA_VOLUME],
@@ -959,38 +970,36 @@ namespace nslib
             if ( neuron->morphology( ) && withMorphologies &&
                 csvNeuronStatsFileName.empty( ))
             {
-
               nsol::NeuronMorphologyStats* nms = neuron->morphology( )->stats( );
 
-              for ( int stat_ = 0;
-              stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS;
-              ++stat_ )
+              for ( int stat_ = 0; stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS; ++stat_ )
               {
-              nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
-                nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
+                nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
+                  nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
 
-              fires::PropertyManager::registerProperty(
-              neuronEntity, NeuronMorphologyToLabel( stat ),
-                nms->getStat( stat ));
+                fires::PropertyManager::registerProperty(
+                neuronEntity, NeuronMorphologyToLabel( stat ),
+                  nms->getStat( stat ));
+              }
             }
-            }
-            else if ( !csvNeuronStatsFileName.empty( ))
+            else
             {
-              for ( int stat_ = 0;
-              stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS;
-              ++stat_ )
+              if ( !csvNeuronStatsFileName.empty( ))
               {
-              nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
-                nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
+                for ( int stat_ = 0; stat_ < NSOL_NEURON_MORPHOLOGY_NUM_STATS; ++stat_ )
+                {
+                  nsol::NeuronMorphologyStats::TNeuronMorphologyStat stat =
+                    nsol::NeuronMorphologyStats::TNeuronMorphologyStat( stat_ );
 
-              fires::PropertyManager::registerProperty(
-              neuronEntity, NeuronMorphologyToLabel( stat ),
-                neuronsStats[ neuron->gid( ) ].morphologyStats[stat] );
+                  fires::PropertyManager::registerProperty(
+                  neuronEntity, NeuronMorphologyToLabel( stat ),
+                    neuronsStats[ neuron->gid( ) ].morphologyStats[stat] );
+                }
+              }
             }
-            }
+
             fires::PropertyManager::registerProperty(
               neuronEntity, "Layer", uint( neuron->layer( )));
-
 
             _entities.add( neuronEntity );
 
@@ -1019,7 +1028,6 @@ namespace nslib
                 colLayerEntities[ layer ], neuronEntity );
               }
             }
-
 
             if ( neuron->morphologicalType( ) == nsol::Neuron::PYRAMIDAL )
             {
@@ -1068,19 +1076,12 @@ namespace nslib
             neuronEntitiesByGid[ neuron->gid( )] = neuronEntity;
           } // for all neurons
 
-          std::cout << "\r("
-                    << 100 * ( columnsCounter + 1 ) / columns.size( )
-                    << "%) \tColumn:\t " << columnsCounter
-                    << "\tMiniColumn:\t " << miniColumnsCounter;
-
           ++miniColumnsCounter;
 
         } // for all minicols
 
         ++columnsCounter;
       } // for all colums
-
-      std::cout << "\n";
 
       const auto& childrenIds = relParentOf[ 0 ];
       _rootEntities.clear( );
@@ -1091,9 +1092,9 @@ namespace nslib
       for ( const auto& preSynapse:
               circuit.synapses( nsol::Circuit::PRESYNAPTICCONNECTIONS ))
       {
-        auto preNeuronGid =
+        const auto preNeuronGid =
           neuronEntitiesByGid[ preSynapse->preSynapticNeuron( )]->entityGid( );
-        auto postNeuronGid =
+        const auto postNeuronGid =
           neuronEntitiesByGid[ preSynapse->postSynapticNeuron( )]->entityGid( );
 
         auto connectsToIt = relConnectsTo.find( preNeuronGid );
@@ -1105,14 +1106,14 @@ namespace nslib
             auto& connectsToProperty =
               connectsToMMIt->second->getProperty( "count" );
 
-            unsigned int value = connectsToProperty.value< unsigned int >( ) + 1;
+            const unsigned int value = connectsToProperty.value< unsigned int >( ) + 1;
             if ( value > maxConnectionsPerNeuron )
               maxConnectionsPerNeuron = value;
             connectsToProperty.set< unsigned int >( value );
           }
           else
           {
-            std::string connectionName = neuronEntitiesByGid[ preSynapse->
+            const std::string connectionName = neuronEntitiesByGid[ preSynapse->
               preSynapticNeuron( )]->getProperty( "Entity name" ).
               value<std::string>( ) + std::string("-") +
               neuronEntitiesByGid[ preSynapse->
@@ -1127,7 +1128,7 @@ namespace nslib
         }
         else
         {
-          std::string connectionName = neuronEntitiesByGid[ preSynapse->
+          const std::string connectionName = neuronEntitiesByGid[ preSynapse->
             preSynapticNeuron( )]->getProperty( "Entity name" ).
             value<std::string>( ) + std::string("-") +
             neuronEntitiesByGid[ preSynapse->
@@ -1142,7 +1143,6 @@ namespace nslib
       }
       neuronEntitiesByGid.clear( );
 
-      // auto repCretor = new RepresentationCreator( );
       auto repCreator = RepresentationCreatorManager::getCreator( );
       assert( repCreator );
       auto cortexRepCreator = dynamic_cast< RepresentationCreator* >( repCreator );
@@ -1153,9 +1153,6 @@ namespace nslib
                                      maxNeuronsPerColumnLayer,
                                      maxNeuronsPerMiniColumnLayer,
                                      maxConnectionsPerNeuron );
-
-      // nslib::RepresentationCreatorManager::addCreator( repCretor );
-
     }
 #endif
   } // namespace cortex

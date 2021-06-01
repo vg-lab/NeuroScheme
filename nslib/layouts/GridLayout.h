@@ -28,7 +28,6 @@
 
 namespace nslib
 {
-
   class NSLIB_API GridLayout : public Layout
   {
   public:
@@ -36,22 +35,19 @@ namespace nslib
     void padding( float paddingX, float paddingY );
     float paddingX( void ) const;
     float paddingY( void ) const;
-    // void displayItems( QGraphicsScene* _scene,
-    //                    const shift::Representations& reps );
+
   protected:
     void _arrangeItems( const shift::Representations& reps,
       bool animate = true,
       const shift::Representations& postFilterReps =
-      shift::Representations( ));
-    void _updateOptionsWidget( void );
+      shift::Representations( )) override;
+    void _updateOptionsWidget( void ) override;
 
-    Layout* clone( void ) const;
+    Layout* clone( void ) const override;
 
     QDoubleSpinBox* _lineEditPaddingX;
     QDoubleSpinBox* _lineEditPaddingY;
-
   };
-
 }
 
 #endif

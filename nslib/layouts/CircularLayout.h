@@ -28,11 +28,11 @@
 
 namespace nslib
 {
-
   class NSLIB_API CircularLayout : public Layout
   {
   public:
     CircularLayout( void );
+
     void radius( float radius );
     float radius( void ) const;
 
@@ -40,14 +40,13 @@ namespace nslib
     void _arrangeItems( const shift::Representations& reps,
       bool animate = true,
       const shift::Representations& postFilterReps =
-      shift::Representations( ));
-    void _updateOptionsWidget( void );
+      shift::Representations( )) override;
+    void _updateOptionsWidget( void ) override;
 
-    Layout* clone( void ) const;
+    Layout* clone( void ) const override;
 
     QDoubleSpinBox* _lineEditRadius;
   };
-
 }
 
 #endif

@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "AutoConnectionArrowRep.h"
 #include "ConnectionArrowItem.h"
 #include "AutoConnectionArrowItem.h"
@@ -28,12 +29,10 @@ namespace nslib
 {
   namespace congen
   {
-
     AutoConnectionArrowRep::AutoConnectionArrowRep(
       shift::Representation* Rep_ )
       : ConnectionArrowRep( Rep_, Rep_, false )
-    {
-    }
+    {}
 
     void AutoConnectionArrowRep::preRender( shift::OpConfig* opConfig_ )
     {
@@ -42,8 +41,8 @@ namespace nslib
       {
         return;
       }
-      GraphicsScene* scene = opConfig->scene( );
 
+      GraphicsScene* scene = opConfig->scene( );
       auto arrowItem = this->item( scene );
 
       //Checks whether the current scene is being animated
@@ -58,7 +57,10 @@ namespace nslib
         {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+
+          return;
         }
+
         auto originItemB = dynamic_cast< QGraphicsItemRepresentation* >(
           _originRep )->item( scene );
 
@@ -72,21 +74,21 @@ namespace nslib
         lineAnim.setDuration( ANIM_DURATION );
 
         //Change of the NeuronPop glyph's Scale during the animation
-        float glyphScaleStart =
+        const float glyphScaleStart =
           originItem->scaleAnim( ).startValue( ).toFloat( );
-        float glyphScaleEnd = originItem->scaleAnim( ).endValue( ).toFloat( );
+        const float glyphScaleEnd = originItem->scaleAnim( ).endValue( ).toFloat( );
 
         //Radius of the glyph to animate
-        float glyphBoundingRect =
+        const float glyphBoundingRect =
           0.5f * float( originItemB->boundingRect( ).width( ));
 
         //Change of glyph center position during the animation
-        auto originPosAnimStart =
+        const auto originPosAnimStart =
           originItem->posAnim( ).startValue( ).toPointF( );
-        auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
+        const auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
 
         float glyphRadius = glyphScaleStart * glyphBoundingRect;
-        float isGrid = ( opConfig->isGrid( )) ? 1.0f : 0.0f;
+        const float isGrid = ( opConfig->isGrid( )) ? 1.0f : 0.0f;
 
         //Start values of the animation
         lineAnim.setStartValue( QLineF( QPointF( glyphRadius, isGrid ),
@@ -99,7 +101,6 @@ namespace nslib
 
         //Starts the animation
         lineAnim.start( );
-
       }
       else
       {
@@ -107,11 +108,11 @@ namespace nslib
           _originRep )->item( scene );
 
         //Calculates glyph Radius
-        float glyphRadius = 0.5f * float( originItem->scale( ))
-          * float( originItem->boundingRect( ).width( ));
+        const float glyphRadius = 0.5f * static_cast<float>( originItem->scale( ))
+          * static_cast<float>( originItem->boundingRect( ).width( ));
 
         //Calculates center of the Glyph
-        QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ));
+        const QPointF glyphCenter = QPointF( originItem->x( ), originItem->y( ));
 
         //Draws the new arrow
         dynamic_cast< AutoConnectionArrowItem* >( arrowItem )->

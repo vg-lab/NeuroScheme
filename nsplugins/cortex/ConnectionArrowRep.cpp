@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "ConnectionArrowItem.h"
 #include "NeuronItem.h"
 #include <nslib/Color.h>
@@ -30,7 +31,6 @@ namespace nslib
 {
   namespace cortex
   {
-
     ConnectionArrowRep::ConnectionArrowRep( shift::Representation* originRep_,
                                             shift::Representation* destRep_ )
       : shiftgen::ConnectionArrowRep( )
@@ -64,7 +64,8 @@ namespace nslib
 
       GraphicsScene* scene = opConfig->scene( );
 
-      auto  arrowItem   = this->item( scene );
+      auto arrowItem = this->item( scene );
+      auto originArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
 
       if (opConfig->isAnimating())
       {
@@ -77,51 +78,56 @@ namespace nslib
         auto destItem = dynamic_cast< Item* >( destRep->item( scene ));
 
         if ( originItem == nullptr )
+        {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
                                 LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          return;
+        }
 
         if ( destItem == nullptr )
+        {
           Loggers::get( )->log( "No successfully dynamic cast on destItem",
                                 LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+          return;
+        }
 
-        auto originArrowItem = dynamic_cast< ConnectionArrowItem* >( arrowItem );
         auto& lineAnim = originArrowItem->lineAnim( );
         lineAnim.setPropertyName( "line" );
         lineAnim.setTargetObject( originArrowItem );
         lineAnim.setDuration( ANIM_DURATION );
 
 
-        auto originPosAnimStart = originItem->posAnim( ).startValue( ).toPointF( );
-        auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
-        auto destPosAnimStart = destItem->posAnim( ).startValue( ).toPointF( );
-        auto destPosAnimEnd = destItem->posAnim( ).endValue( ).toPointF( );
-        auto originWidth_2 =
+        const auto originPosAnimStart = originItem->posAnim( ).startValue( ).toPointF( );
+        const auto originPosAnimEnd = originItem->posAnim( ).endValue( ).toPointF( );
+        const auto destPosAnimStart = destItem->posAnim( ).startValue( ).toPointF( );
+        const auto destPosAnimEnd = destItem->posAnim( ).endValue( ).toPointF( );
+        const auto originWidth_2 =
           originRep->item( scene )->boundingRect( ).width( ) * 0.5f;
-        auto destWidth_2 =
+        const auto destWidth_2 =
           destRep->item( scene )->boundingRect( ).width( ) * 0.5f;
 
         const auto& originScaleAnim = originItem->scaleAnim( );
         const auto& destScaleAnim = destItem->scaleAnim( );
 
-        auto normAnimStart =
+        const auto normAnimStart =
           QVector2D( destPosAnimStart - originPosAnimStart ).normalized( );
-        auto normAnimEnd =
+        const auto normAnimEnd =
           QVector2D( destPosAnimEnd - originPosAnimEnd ).normalized( );
 
 
-        auto destIniOri =
+        const auto destIniOri =
           QVector2D( originPosAnimStart ) + originWidth_2 *
           originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
-        auto destIniDest =
+        const auto destIniDest =
           QVector2D( destPosAnimStart ) - destWidth_2 *
           originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
-        auto destEndOri =
+        const auto destEndOri =
           QVector2D( originPosAnimEnd ) + originWidth_2 *
           originScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
-        auto destEndDest =
+        const auto destEndDest =
           QVector2D( destPosAnimEnd ) - destWidth_2 *
           destScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
@@ -146,50 +152,47 @@ namespace nslib
           dynamic_cast< QGraphicsItemRepresentation* >(
             _destRep )->item( scene ));
 
-        auto destOri = QVector2D( originItem->pos( )) +
+        const auto destOri = QVector2D( originItem->pos( )) +
           (( originItem->boundingRect().width( ) * 0.5f * originItem->scale( )) *
            QVector2D(destItem->pos( ) - originItem->pos( )).normalized( ));
 
-        auto destDest =  QVector2D( destItem->pos( )) -
+        const auto destDest =  QVector2D( destItem->pos( )) -
           ((destItem->boundingRect().width() * 0.5f * originItem->scale( )) *
            QVector2D(destItem->pos( ) - originItem->pos( )).normalized());
 
-        dynamic_cast< ConnectionArrowItem* >( arrowItem )->
-          createArrow( QPointF(destOri.x( ), destOri.y( ) ),
-                       QPointF(destDest.x( ), destDest.y( ) ));
-
+        originArrowItem->createArrow( QPointF(destOri.x( ), destOri.y( ) ),
+                                      QPointF(destDest.x( ), destDest.y( ) ));
       }
     }
 
-
     void ConnectionArrowRep::hoverEnterEvent( QGraphicsSceneHoverEvent*  )
     {
-      for ( auto item_ : _items )
+      auto hoverEventEnter = [](std::pair<QGraphicsScene *, QGraphicsItem *> p)
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
-        if ( arrowItem )
-          arrowItem->hoverEnter( );
-      }
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( p.second );
+        if ( arrowItem ) arrowItem->hoverEnter( );
+      };
+      std::for_each(_items.begin(), _items.end(), hoverEventEnter);
     }
 
     void ConnectionArrowRep::hoverLeaveEvent( QGraphicsSceneHoverEvent*  )
     {
-      for ( auto item_ : _items )
+      auto hoverEventLeave = [](std::pair<QGraphicsScene *, QGraphicsItem *> p)
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
-        if ( arrowItem )
-          arrowItem->hoverLeave( );
-      }
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( p.second );
+        if ( arrowItem ) arrowItem->hoverLeave( );
+      };
+      std::for_each(_items.begin(), _items.end(), hoverEventLeave);
     }
 
     void ConnectionArrowRep::highlight( const scoop::Color& color )
     {
-      for ( auto item_ : _items )
+      auto highlightArrow = [&color](std::pair<QGraphicsScene *, QGraphicsItem *> p)
       {
-        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( item_.second );
-        if ( arrowItem )
-          arrowItem->highlight( color );
-      }
+        auto arrowItem = dynamic_cast< ConnectionArrowItem* >( p.second );
+        if ( arrowItem ) arrowItem->highlight(color);
+      };
+      std::for_each(_items.begin(), _items.end(), highlightArrow);
     }
 
   } // namespace cortex

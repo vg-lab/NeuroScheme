@@ -42,8 +42,8 @@
 
 namespace nslib
 {
-
   class GraphicsScene;
+
   class OpConfig : public shift::OpConfig
   {
   public:
@@ -88,6 +88,7 @@ namespace nslib
       CAMERA_ENABLED = 0x04,
       SCATTERPLOT_ENABLED = 0x08
     };
+
     enum TLayoutIndexes {
       UNDEFINED = -1,
       GRID = 0,
@@ -120,6 +121,7 @@ namespace nslib
     {
       _canvas = canvas_;
     }
+
     virtual Layout* clone( void ) const = 0;
 
     void animateItem( QGraphicsItem* graphicsItem,
@@ -151,7 +153,6 @@ namespace nslib
     QWidget* _layoutSpecialProperties;
     bool _isGrid;
   };
-
 }
 
 #endif

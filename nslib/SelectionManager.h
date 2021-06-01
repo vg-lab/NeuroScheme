@@ -28,7 +28,6 @@
 
 namespace nslib
 {
-
   class SelectableEntity
   {
   public:
@@ -77,7 +76,6 @@ namespace nslib
 
     static TSelection _activeSelection;
     static TSelections _storedSelections;
-    //static unsigned int _storedSelectionNextId;
   };
 }
 

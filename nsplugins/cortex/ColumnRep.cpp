@@ -19,18 +19,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "ColumnRep.h"
 #include "ColumnItem.h"
 #include "NeuronRep.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
-
 namespace nslib
 {
   namespace cortex
   {
-
     ColumnRep::ColumnRep( void )
       : shiftgen::NeuronAggregationRep( )
     {
@@ -46,7 +45,6 @@ namespace nslib
       : shiftgen::NeuronAggregationRep( other )
     {
     }
-
 
     QGraphicsItem* ColumnRep::item( QGraphicsScene* scene, bool create )
     {

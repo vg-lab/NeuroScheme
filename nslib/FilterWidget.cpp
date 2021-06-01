@@ -46,7 +46,7 @@ namespace nslib
                                         QSizePolicy::Expanding );
     _propertiesSelector->setMinimumSize( 190, 20 );
 
-    QIcon addIcon( QString::fromUtf8(":/icons/add.png"));
+    QIcon addIcon(":/icons/add.svg");
     _addFilterButton = new QToolButton( );
     _addFilterButton->setIcon( addIcon );
 
@@ -97,9 +97,7 @@ namespace nslib
 
     connect( _opacitySlider, SIGNAL( valueChanged( int )),
       this, SLOT( refreshParentLayout( )));
-
   }
-
 
   void FilterWidget::addedFilterProperty( void )
   {
@@ -107,39 +105,35 @@ namespace nslib
     auto propertyLabel = _propertiesSelector->currentText( ).toStdString( );
 
     // If property already inserted just return
-    if ( std::find_if(
-           filters.begin( ), filters.end( ),
-           [ propertyLabel ]( fires::FilterSetConfig::TFilterPair& p )->bool
-           {
-             return p.first == propertyLabel;
-           }) != filters.end( ))
+    auto equalProp = [propertyLabel]( const fires::FilterSetConfig::TFilterPair& p )->bool
+    {
+          return p.first == propertyLabel;
+    };
+    if ( std::find_if(filters.cbegin( ), filters.cend( ), equalProp) != filters.cend())
       return;
 
-    std::cout << "<><><><> Added filtered propery "
-              << _propertiesSelector->currentText( ).toStdString( )
-              << std::endl;
-
-    QLabel* propertyQLabel = new QLabel( _propertiesSelector->currentText( ));
-    QIcon removePropertyIcon( QString::fromUtf8( ":/icons/close.png" ));
+    auto propertyQLabel = new QLabel( _propertiesSelector->currentText( ));
+    QIcon removePropertyIcon(":/icons/close.svg");
     QToolButton* removePropertyButton = new QToolButton( this );
     removePropertyButton->setIcon( removePropertyIcon );
 
+    const auto vMin = _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMin;
+    const auto vMax = _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMax;
     auto spanSlider = new QxtSpanSlider( Qt::Horizontal, this );
     spanSlider->setSpan( 0, 100 );
-    spanSlider->setMinimum(
-      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMin );
-    spanSlider->setMaximum(
-      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMax );
-    spanSlider->setLowerPosition(
-      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMin );
-    spanSlider->setUpperPosition(
-      _parentLayout->_canvas->properties( ).at( propertyLabel ).rangeMax );
+    spanSlider->setMinimum(vMin);
+    spanSlider->setMaximum(vMax);
+    spanSlider->setLowerPosition(vMin);
+    spanSlider->setUpperPosition(vMax);
     spanSlider->setEnabled( true );
 
-    auto rangeLabel =  new QLabel(
-      QString( "[" ) + QString::number( spanSlider->lowerValue( )) +
-      QString( "," ) + QString::number( spanSlider->upperValue( )) +
-      QString( "]" ) );
+    const auto rangeText = QString( "[" ) + QString::number( spanSlider->lowerValue( )) +
+                           QString( "," ) + QString::number( spanSlider->upperValue( )) +
+                           QString( "]" );
+
+    auto rangeLabel =  new QRangeLabel(tr("%1 - Span %1").arg(rangeText));
+    connect( spanSlider, SIGNAL( spanChanged( int, int )),
+             rangeLabel, SLOT(updateRange(int, int)));
 
     auto layout_ = dynamic_cast< QGridLayout* >( this->layout( ));
 
@@ -147,6 +141,7 @@ namespace nslib
 #define REMOVE_POS  5 + idx * 3, 1
 #define SLIDER_POS  6 + idx * 3, 0
 #define RANGE_POS   7 + idx * 3, 0
+
     auto idx = _numFilterProperties;
     layout_->addWidget( propertyQLabel, LABEL_POS, 1, 1, Qt::AlignLeft );
     layout_->addWidget( removePropertyButton, REMOVE_POS,
@@ -179,26 +174,17 @@ namespace nslib
                                            QString( propertyLabel.c_str( )));
     connect( _changeSliderSignalMapper, SIGNAL( mapped( const QString& )),
              this, SLOT( sliderChanged( const QString&  )));
-
-//     std::cout << "["
-//               << _filterConfig.properties( ).size( ) << "]: ";
-//     for ( const auto& p : _filterConfig.properties( ))
-//     {
-//       std::cout << "{" << p.label << "," << (int) p.order << "}";
-//       assert( p.filterer );
-//     }
-//     std::cout <<  std::endl;
-
   }
 
   void FilterWidget::clear( void )
   {
     if ( _propertiesSelector )
       _propertiesSelector->clear( );
+
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
     for ( const auto& row : _layoutRowsMap )
     {
-      auto idx = row.second;
+      const auto idx = row.second;
       auto item = qGridLayout->itemAtPosition( LABEL_POS );
       assert( item );
       delete item->widget( );
@@ -214,8 +200,8 @@ namespace nslib
       item = qGridLayout->itemAtPosition( RANGE_POS );
       assert( item );
       delete item->widget( );
-
     }
+
     _layoutRowsMap.clear( );
     _numFilterProperties = 0;
     _filterSetConfig.clear( );
@@ -223,31 +209,26 @@ namespace nslib
     _removeSignalMapper = new QSignalMapper;
   }
 
-
   void FilterWidget::removeFilterProperty( const QString& propertyLabel_ )
   {
     auto& filters = _filterSetConfig.filters( );
-    auto propertyLabel = propertyLabel_.toStdString( );
+    const auto propertyLabel = propertyLabel_.toStdString( );
 
     // If property not inserted just return
-    auto filter = std::find_if(
-      filters.begin( ), filters.end( ),
-      [ propertyLabel ]( fires::FilterSetConfig::TFilterPair& p )->bool
-      {
-             return p.first == propertyLabel;
-      });
-    if ( filter == filters.end( ))
+    auto equalProp = [propertyLabel](fires::FilterSetConfig::TFilterPair& p )->bool
+    {
+      return p.first == propertyLabel;
+    };
+    auto it = std::find_if(filters.begin( ), filters.end( ), equalProp);
+    if ( it == filters.end( ))
       return;
 
-    std::cout << "Remove property "
-              << propertyLabel_.toStdString( ) << std::endl;
-
-    filters.erase( filter );
+    filters.erase( it );
 
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
 
-    auto idx = _layoutRowsMap[ propertyLabel ];
-    std::cout << "remove idx = " << idx << " " << propertyLabel << std::endl;
+    const auto idx = _layoutRowsMap[ propertyLabel ];
+
     auto item = qGridLayout->itemAtPosition( LABEL_POS );
     assert( item );
     delete item->widget( );
@@ -265,16 +246,6 @@ namespace nslib
     delete item->widget( );
 
     _layoutRowsMap.erase( propertyLabel );
-
-    // std::cout << "["
-    //           << _filterConfig.properties( ).size( ) << "]: ";
-    // for ( const auto& p : _filterConfig.properties( ))
-    // {
-    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
-    //   assert( p.filterer );
-    // }
-    // std::cout <<  std::endl;
-
   }
 
   void FilterWidget::sliderChanged( const QString& propertyLabel_ )
@@ -283,21 +254,17 @@ namespace nslib
     auto propertyLabel = propertyLabel_.toStdString( );
 
     // If property not inserted just return
-    auto filter = std::find_if(
-      filters.begin( ), filters.end( ),
-      [ propertyLabel ]( fires::FilterSetConfig::TFilterPair& p )->bool
-      {
-             return p.first == propertyLabel;
-      });
-    if ( filter == filters.end( ))
+    auto equalProp = [propertyLabel]( const fires::FilterSetConfig::TFilterPair& p )->bool
+    {
+      return p.first == propertyLabel;
+    };
+    auto it = std::find_if(filters.cbegin( ), filters.cend( ), equalProp);
+    if ( it == filters.cend( ))
       return;
-
-    // std::cout << "Changed slider of property "
-    //           << propertyLabel_.toStdString( ) << std::endl;
 
     auto qGridLayout = dynamic_cast< QGridLayout* >( this->layout( ));
 
-    auto idx = _layoutRowsMap[ propertyLabel ];
+    const auto idx = _layoutRowsMap[ propertyLabel ];
     auto item = qGridLayout->itemAtPosition( SLIDER_POS );
     assert( item );
     auto spanSlider = dynamic_cast< QxtSpanSlider* >( item->widget( ));
@@ -310,14 +277,14 @@ namespace nslib
                                             spanSlider->upperPosition( ));
 
     if ( _autoFilterCheckBox->isChecked( ))
-      refreshParentLayout( ); //_parentLayout->refresh( false, false );
-
-  } // sliderChanged
+    {
+      refreshParentLayout( );
+    }
+  }
 
   void FilterWidget::refreshParentLayout( void )
   {
-    _parentLayout->refresh( false// , false
-      );
+    _parentLayout->refresh( false );
   }
 
   void FilterWidget::_autoFilterCheckBoxChanged( void )
@@ -334,7 +301,6 @@ namespace nslib
     refreshParentLayout( );
   }
 
-
   FilterWidget::~FilterWidget( void )
   {
     delete _propertiesSelector;
@@ -346,4 +312,16 @@ namespace nslib
     delete _opacitySlider;
   }
 
+  void QRangeLabel::updateRange(int l, int u)
+  {
+    auto slider = qobject_cast<QxtSpanSlider *>(sender());
+    if(slider)
+    {
+      auto rangeText = tr("[%1,%2]");
+      auto current = rangeText.arg(QString::number(l)).arg(QString::number(u));
+      auto total = rangeText.arg(QString::number(slider->minimum())).arg(QString::number(slider->maximum()));
+
+      setText(tr("%1 - Span %2").arg(total).arg(current));
+    }
+  }
 }

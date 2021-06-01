@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONGEN__CONNECTION_ARROW_ITEM__
 #define __NSLIB__CONGEN__CONNECTION_ARROW_ITEM__
 
@@ -40,7 +41,6 @@ namespace nslib
 {
   namespace congen
   {
-
     class ConnectionArrowItem
       : public QObject,
         public QGraphicsPathItem,
@@ -55,60 +55,56 @@ namespace nslib
         setLine )
 
       public:
+        ConnectionArrowItem(
+          const ConnectionArrowRep& connectionArrowRep,
+          const bool interactive_ = true );
 
-      ConnectionArrowItem(
-        const ConnectionArrowRep& connectionArrowRep,
-        const bool interactive_ = true );
+        virtual ~ConnectionArrowItem( void )
+        {};
 
-      virtual ~ConnectionArrowItem( void );
+        virtual const QLineF& line( void );
 
-      virtual const QLineF& line( void );
+        virtual void setLine( const QLineF& line_ );
 
-      virtual void setLine( const QLineF& line_ );
+        void createArrow( const QPointF& origin, const QPointF& dest );
 
-      void createArrow( const QPointF& origin, const QPointF& dest );
+        QPropertyAnimation& lineAnim( void );
 
-      QPropertyAnimation& lineAnim( void );
+        virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) override;
+        virtual void hoverEnter( void );
 
-      virtual void hoverEnter( void );
+        virtual void highlight( const scoop::Color color_ );
 
-      virtual void highlight( scoop::Color color_ );
+        virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
+        virtual void hoverLeave( void );
 
-      virtual void hoverLeave( void );
+        virtual bool connectionRep( void ) const override;
 
-      virtual bool connectionRep( void ) const override;
+        virtual void contextMenuEvent(
+          QGraphicsSceneContextMenuEvent* event_ ) override;
 
-      virtual void contextMenuEvent(
-        QGraphicsSceneContextMenuEvent* event_ ) override;
-
-      static QColor color;
-      static QColor hoverColor;
+        static QColor color;
+        static QColor hoverColor;
 
       protected:
-      //QGraphicsEllipseItem* _arrowOriItem;
+        const static float M_PI_Float;
+        const static float M_PI_3;
+        const static float M_PI_Inverse;
+        static const float M_PI_x2;
+        static const float M_PI_067;
 
-      const static float M_PI_Float;
-      const static float M_PI_3;
-      const static float M_PI_Inverse;
-      static const float M_PI_x2;
-      static const float M_PI_067;
+        QGraphicsEllipseItem* _arrowCircleEnd;
 
+        float _arrowThickness;
+        QLineF _line;
+        QPointF _arrowOrigin;
+        QPointF _arrowDest;
 
-      QGraphicsEllipseItem* _arrowCircleEnd;
-
-      float _arrowThickness;
-      QLineF _line;
-      QPointF _arrowOrigin;
-      QPointF _arrowDest;
-
-      QPropertyAnimation _lineAnim;
-      Qt::PenStyle _lineStyle;
-      QPen _actualPen;
-
+        QPropertyAnimation _lineAnim;
+        Qt::PenStyle _lineStyle;
+        QPen _actualPen;
     };
   } // namespace congen
 } // namespace nslib

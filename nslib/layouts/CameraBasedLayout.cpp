@@ -36,22 +36,16 @@ namespace nslib
   CameraBasedLayout::CameraBasedLayout( void )
     : Layout( "3D", Layout::CAMERA_ENABLED )
   {
-    // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D1" ), 0, 0 );
-    // _optionsWidget->layout( )->addWidget( new QPushButton( "hola 3D2" ), 0, 1 );
   }
 
   void CameraBasedLayout::_arrangeItems( const shift::Representations& reps,
                                          bool animate,
                                          const shift::Representations& )
   {
-    std::cout << "CameraBasedLayout::_arrangeItems" << std::endl;
-
     const auto sceneWidth = 1000; //_scene->width( );
     const auto sceneHeight = 1000; //_scene->height( );
-
-    float ratio = float( sceneWidth ) / float( sceneHeight );
-
-    double S = 1.0 / ( tan( FOV * 0.5 * M_PI / 180.0 ));
+    const float ratio = static_cast<float>( sceneWidth ) / static_cast<float>( sceneHeight );
+    const double S = 1.0 / ( tan( FOV * 0.5 * M_PI / 180.0 ));
 
     Matrix4f _projectionMatrix;
     _projectionMatrix.row( 0 ) = Vector4f( -S / ratio, 0, 0, 0);
@@ -69,11 +63,7 @@ namespace nslib
     {
       auto graphicsItemRep =
         dynamic_cast< nslib::QGraphicsItemRepresentation* >( representation );
-      if ( !graphicsItemRep )
-      {
-        std::cerr << "Item null" << std::endl;
-      }
-      else
+      if ( graphicsItemRep )
       {
         auto graphicsItem = graphicsItemRep->item( &_canvas->scene( ));
         if ( graphicsItem->parentItem( ))

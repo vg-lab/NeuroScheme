@@ -32,8 +32,8 @@ namespace nslib
                       Color color )
   {
     // Define outer circle
-    int x_ = int( xRadius );
-    int y_ = int( yRadius );
+    int x_ = static_cast<int>( xRadius );
+    int y_ = static_cast<int>( yRadius );
     QPainterPath outerArc( QPoint( 0, 0 ));
     outerArc.arcTo( -x_, -y_, x_ * 2, y_ * 2, initAngle, angle );
     QPainterPath outerFill( QPoint( 0, 0 ));
@@ -42,8 +42,8 @@ namespace nslib
     ( void ) outerFill.united( outerArc );
 
     // Define inner circle
-    x_ = int( xRadius ) - int( width );
-    y_ = int( yRadius ) - int( width );
+    x_ = static_cast<int>( xRadius ) - static_cast<int>( width );
+    y_ = static_cast<int>( yRadius ) - static_cast<int>( width );
     QPainterPath innerArc( QPoint( 0, 0 ));
     innerArc.arcTo( -x_, -y_, x_ * 2, y_ * 2, initAngle, angle );
     QPainterPath innerFill( QPoint( 0, 0 ));
@@ -56,7 +56,5 @@ namespace nslib
     this->setPath( ringFill );
 
     setBrush( QBrush( color ));
-
   }
-
 } // namespace nslib

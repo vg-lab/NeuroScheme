@@ -19,12 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "LayerRep.h"
 #include "NeuronAggregationItem.h"
 #include "NeuronRep.h"
 #include <nslib/Color.h>
 #include <stdint.h>
-
 
 namespace nslib
 {
@@ -32,14 +32,11 @@ namespace nslib
   {
     LayerRep::LayerRep( void )
       : shiftgen::LayerRep( )
-    {
-    }
+    {}
 
     LayerRep::LayerRep( const LayerRep& other )
       : shiftgen::LayerRep( other )
-    {
-    }
-
+    {}
 
     QGraphicsItem* LayerRep::item( QGraphicsScene* scene, bool create )
     {
@@ -50,6 +47,5 @@ namespace nslib
       }
       return _items.at( scene );
     }
-
   }
 } // namespace nslib

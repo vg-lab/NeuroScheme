@@ -40,12 +40,12 @@ namespace nslib
   {
     Q_OBJECT;
   public:
-    ScatterPlotWidget( Layout* parentLayout_, QWidget* parent_ = 0 );
-    ~ScatterPlotWidget( void );
+    ScatterPlotWidget( Layout* parentLayout_, QWidget* parent_ = nullptr );
+    virtual ~ScatterPlotWidget( void );
     void blockChildrenSignals( bool block );
     QComboBox* propertyXSelector( void ) { return _propertyXSelector; }
     QComboBox* propertyYSelector( void ) { return _propertyYSelector; }
-    int scale( void ) { return _scaleSlider->value( ); }
+    int scale( void ) const { return _scaleSlider->value( ); }
 public slots:
     void refreshParentLayout( void );
 

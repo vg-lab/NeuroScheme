@@ -80,6 +80,21 @@ namespace nslib
     QCheckBox* _useOpacityCheckBox;
   };
 
+  class QRangeLabel: public QLabel
+  {
+      Q_OBJECT
+    public:
+      explicit QRangeLabel(QWidget *parent=nullptr, Qt::WindowFlags f=Qt::WindowFlags())
+      : QLabel(parent, f)
+      {};
+
+      explicit QRangeLabel(const QString &text, QWidget *parent=nullptr, Qt::WindowFlags f=Qt::WindowFlags())
+      : QLabel(text, parent, f)
+      {};
+
+    public slots:
+      void updateRange(int l, int u);
+  };
 }
 
 #endif

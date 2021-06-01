@@ -26,26 +26,15 @@
 #include "../Color.h"
 #include <QGraphicsPathItem>
 
-
 namespace nslib
 {
-
-
     class NSLIB_API RingItem : public QGraphicsPathItem
     {
-
-    public:
-
-      RingItem( unsigned int initAngle, unsigned int xRadius,
-                unsigned int yRadius, unsigned int width,
-                int angle, Color color );
-
-    protected:
-
-
-    }; // class RingItem
-
+      public:
+        RingItem( unsigned int initAngle, unsigned int xRadius,
+                  unsigned int yRadius, unsigned int width,
+                  int angle, Color color );
+    };
 } // namespace nslib
-
 
 #endif // __NSLIB__RING_ITEM__

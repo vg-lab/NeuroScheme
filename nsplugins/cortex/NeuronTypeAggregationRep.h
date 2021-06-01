@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_TYPE_AGGREGATION_REP__
 #define __NSLIB__NEURON_TYPE_AGGREGATION_REP__
 
@@ -31,18 +32,15 @@ namespace nslib
 {
   namespace cortex
   {
-
     class NeuronTypeAggregationRep
       : public shiftgen::NeuronTypeAggregationRep
       , public QGraphicsItemRepresentation
     {
-    public:
-
-      NeuronTypeAggregationRep( void );
-      NeuronTypeAggregationRep( const NeuronTypeAggregationRep& );
-      virtual ~NeuronTypeAggregationRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
-
+      public:
+        NeuronTypeAggregationRep( void );
+        NeuronTypeAggregationRep( const NeuronTypeAggregationRep& );
+        virtual ~NeuronTypeAggregationRep( void ) {}
+        QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
     };
 
   } // namespace cortex

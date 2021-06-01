@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <QApplication>
 #include <nslib/Loggers.h>
 #include <nslib/Config.h>
@@ -29,7 +30,6 @@
 #include <nsplugins/congen/Domain.h>
 #include <nslib/InteractionManager.h>
 #include "MainWindow.h"
-
 
 void usageMessage( const std::string& errorMsg = "" )
 {
@@ -264,7 +264,6 @@ int main( int argc, char** argv )
   }
 
   QApplication app( argc, argv );
-  //QGuiApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   MainWindow mainWindow( nullptr,  zeroEQ );
   nslib::InteractionManager::start( );
@@ -272,10 +271,10 @@ int main( int argc, char** argv )
 
   if ( initWindowSize )
     mainWindow.resize( initWindowWidth, initWindowHeight );
-  // else
-  //   mainWindow.resize( 800, 600 );
+
   if ( initWindowMaximized )
     mainWindow.showMaximized( );
+
   if ( fullscreen )
     mainWindow.showFullScreen( );
 

@@ -29,10 +29,14 @@ namespace nslib
   class ConnectivityRep
   {
   public:
-    virtual ~ConnectivityRep( void ) {}
+    virtual ~ConnectivityRep( void )
+    {}
+
     virtual void highlight( const scoop::Color& color = scoop::Color( 255, 0, 0 ))
     { ( void ) color; }
-    virtual void unHighlight( void ) {}
+
+    virtual void unHighlight( void )
+    {}
   };
 }
 #endif

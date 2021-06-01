@@ -32,7 +32,6 @@
 
 namespace nslib
 {
-
   class NSLIB_API DataManager
   {
   public:
@@ -43,12 +42,12 @@ namespace nslib
 
     static void reset( void );
 
-    static void loadBlueConfig( const std::string& blueConfig,
+    static bool loadBlueConfig( const std::string& blueConfig,
       const std::string& targetLabel,  const bool loadMorphologies,
       const std::string& csvNeuronStatsFileName,
       const bool loadConnectivity );
 
-    static void loadNsolXmlScene( const std::string& xmlSceneFile );
+    static bool loadNsolXmlScene( const std::string& xmlSceneFile );
 
 #ifdef NEUROSCHEME_USE_NSOL
     static nsol::DataSet& nsolDataSet( void ) { return _nsolDataSet; }

@@ -88,8 +88,6 @@ namespace nslib
       NEUROSCHEME_USE_ZEROEQ_IMPL;
 #endif
 
-    static bool _publishSelection;
-    static bool _publishFocusOnSelection;
 #ifdef NEUROSCHEME_USE_ZEROEQ
     static zeroeq::Subscriber *_subscriber;
     static zeroeq::Publisher *_publisher;

@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIBCORTEX__MINICOLUMN_REP__
 #define __NSLIBCORTEX__MINICOLUMN_REP__
 
@@ -31,21 +32,17 @@ namespace nslib
 {
   namespace cortex
   {
-
     class MiniColumnRep
       : public shiftgen::NeuronAggregationRep
       , public QGraphicsItemRepresentation
     {
-    public:
-
-      MiniColumnRep( void );
-      MiniColumnRep( const MiniColumnRep& );
-      MiniColumnRep( const shiftgen::NeuronAggregationRep& );
-      virtual ~MiniColumnRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
-
+      public:
+        MiniColumnRep( void );
+        MiniColumnRep( const MiniColumnRep& );
+        MiniColumnRep( const shiftgen::NeuronAggregationRep& );
+        virtual ~MiniColumnRep( void ) {}
+        QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
     };
-
   }
 } // namespace nslib
 

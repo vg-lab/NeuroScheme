@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIBCORTEX__LAYER_ITEM__
 #define __NSLIBCORTEX__LAYER_ITEM__
 
@@ -43,29 +44,27 @@ namespace nslib
       Q_PROPERTY( qreal opacity READ opacity WRITE setOpacity )
 
       public:
+        virtual ~LayerItem( void ) {}
+        LayerItem( const LayerRep& layerRep );
 
+        void create( const unsigned int layer_, QGraphicsItem *parent_,
+          const QPoint& pLayerUL, const QPoint& pLayerUM, const QPoint& pLayerUR,
+          unsigned int layerHeight, unsigned int numNeuronsHeight, float percPyr,
+          float percInter, const QBrush& brush_ );
 
-      LayerItem( const LayerRep& layerRep );
+        unsigned int& layer( void );
 
-      void create( unsigned int layer_, QGraphicsItem *parent_,
-        const QPoint& pLayerUL, const QPoint& pLayerUM, const QPoint& pLayerUR,
-        unsigned int layerHeight, unsigned int numNeuronsHeight, float percPyr,
-        float percInter, const QBrush& brush_ );
+        virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
-      unsigned int& layer( void );
-      virtual ~LayerItem( void ) {}
+        virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
-      virtual void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ );
-
-      virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ );
-
-      virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
+        virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ ) override;
 
       public slots:
-      void disable( void );
+        void disable( void );
 
       protected:
-      unsigned int _layer;
+        unsigned int _layer;
     };
   }
 }

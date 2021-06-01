@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "NeuronItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
@@ -36,13 +37,12 @@ namespace nslib
       setInteractive( interactive_ );
       if ( interactive_ )
       {
-        //std::cout << "Hover events" << std::endl;
         this->setAcceptHoverEvents( true );
       }
-//else
-      //     std::cout << "No events" << std::endl;
 
-      int size_2 = ceil( float( size ) / 1.3f );
+      const int size_2 = ceil( static_cast<float>( size ) / 1.3f );
+      const int iSize = static_cast<int>(size);
+
       this->setRect ( -size_2, -size_2,
                       size_2 * 2 , size_2 * 2 );
       this->setPen( QPen( Qt::NoPen ));
@@ -54,8 +54,8 @@ namespace nslib
         neuronRep->getPropertyValue< NeuronRep::Rings >( "rings" );
 
       auto somaItem = new QGraphicsEllipseItem( );
-      somaItem->setRect( - int( size ) / 2,
-                         - int( size ) / 2,
+      somaItem->setRect( -iSize / 2,
+                         -iSize / 2,
                          size,
                          size );
       somaItem->setPen( Qt::NoPen );
@@ -63,7 +63,7 @@ namespace nslib
 
       QGraphicsItem* symbolItem = _createSymbolItem( symbol, size );
 
-      const unsigned int ringItemsWidth = int( size / 10 );
+      const unsigned int ringItemsWidth = iSize / 10;
       const unsigned int ringItemPadding = 2;
 
       somaItem->setParentItem( this );
@@ -107,6 +107,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -117,6 +118,8 @@ namespace nslib
                 qAbstractGraphicItem, event_ );
             }
           }
+        }
+
         InteractionManager::highlightConnectivity( this );
       }
     }
@@ -128,6 +131,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -138,8 +142,9 @@ namespace nslib
                 event_ );
             }
           }
-        InteractionManager::highlightConnectivity( this, false );
+        }
 
+        InteractionManager::highlightConnectivity( this, false );
       }
     }
 
@@ -155,45 +160,41 @@ namespace nslib
                                                   unsigned int size )
     {
       QGraphicsItem* symbolItem = nullptr;
+      const int iSize = static_cast<int>(size);
 
       switch ( symbol )
       {
-      case NeuronRep::TRIANGLE:
-      {
-        QPolygonF triangle;
-        triangle.append( QPointF(                 0, - int( size ) / 3 ));
-        triangle.append( QPointF(          size / 3, size/4 ));
-        triangle.append( QPointF( - int( size ) / 3, size / 4 ));
-        triangle.append( QPointF(                 0, - int( size ) / 3 ));
+        case NeuronRep::TRIANGLE:
+        {
+          QPolygonF triangle;
+          triangle.append( QPointF(          0, -iSize / 3 ));
+          triangle.append( QPointF(   size / 3,   size / 4 ));
+          triangle.append( QPointF( - iSize/ 3,   size / 4 ));
+          triangle.append( QPointF(          0, -iSize / 3 ));
 
-        auto triangleItem =
-          new QGraphicsPolygonItem( triangle );
+          auto triangleItem = new QGraphicsPolygonItem( triangle );
+          triangleItem->setPen( Qt::NoPen );
+          triangleItem->setBrush( QBrush( QColor( 255, 255, 255 )));
+          triangleItem->setX( 0 );
+          triangleItem->setY( - iSize /20 );
 
-        triangleItem->setPen( Qt::NoPen );
-        triangleItem->setBrush( QBrush( QColor( 255, 255, 255 )));
-        triangleItem->setX( 0 );
-        triangleItem->setY( - int( size ) /20 );
+          symbolItem = triangleItem;
+          break;
+        }
+        case NeuronRep::CIRCLE:
+        {
+          auto circleItem = new QGraphicsEllipseItem( );
+          circleItem->setRect( - iSize / 4, - iSize / 4,
+                                  size / 2,    size / 2);
+          circleItem->setPen( Qt::NoPen );
+          circleItem->setBrush( QBrush( QColor(255, 255, 255 )));
 
-        symbolItem = triangleItem;
-
-        break;
-      }
-      case NeuronRep::CIRCLE:
-      {
-
-        auto circleItem = new QGraphicsEllipseItem( );
-        circleItem->setRect( - int( size ) / 4, - int( size ) / 4,
-                             size / 2, size / 2);
-        circleItem->setPen( Qt::NoPen );
-        circleItem->setBrush( QBrush( QColor(255, 255, 255 )));
-
-        symbolItem = circleItem;
-
-        break;
-      }
-      default:
-        break;
-        // no symbol needed
+          symbolItem = circleItem;
+          break;
+        }
+        default:
+          // no symbol needed
+          break;
       }
 
       return symbolItem;
@@ -201,7 +202,7 @@ namespace nslib
 
     NeuronItem::~NeuronItem( void )
     {
-      delete _itemText;
+      if(_itemText) delete _itemText;
     }
 
   } // namespace cortex

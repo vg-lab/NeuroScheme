@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_SUPER_ITEM__
 #define __NSLIB__NEURON_SUPER_ITEM__
 
@@ -36,7 +37,6 @@ namespace nslib
 {
   namespace congen
   {
-
     class NeuronSuperPopItem
       : public QObject
       , public QGraphicsEllipseItem
@@ -49,9 +49,8 @@ namespace nslib
       Q_PROPERTY( qreal scale READ scale WRITE setScale )
 
     public:
-
       NeuronSuperPopItem( const NeuronSuperPopRep& entityRep,
-        unsigned int size = 100, bool interactive = true );
+        const unsigned int size = 100, bool interactive = true );
 
       virtual ~NeuronSuperPopItem( void );
 
@@ -61,23 +60,13 @@ namespace nslib
 
       virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ );
 
-      // virtual void mousePressEvent( QGraphicsSceneMouseEvent* event_ )
-      // {
-      //   if ( _interactive )
-      //     InteractionManager::mousePressEvent( this, event_ );
-      // }
-
-
       static const float minCircle;
       static const float maxCircle;
       static const float rangeCircle;
 
       protected:
       ItemText* _itemText;
-
     };
-
-
   } // namespace congen
 } // namespace nslib
 

@@ -30,7 +30,6 @@ namespace nslib
   class InteractiveItem
   {
   public:
-
     enum
     {
       HIERARCHY_ENABLED = 0x01,
@@ -41,7 +40,9 @@ namespace nslib
       , _interactiveItemFlags( flags_ )
     {
     }
-    virtual ~InteractiveItem( void ) { }
+
+    virtual ~InteractiveItem( void )
+    {}
 
     bool setInteractive( bool interactive_ )
     {
@@ -61,9 +62,7 @@ namespace nslib
   protected:
     bool _interactive;
     unsigned int _interactiveItemFlags;
-
   };
-
 } // namespace nslib
 
 #endif // __NSLIB_COLLAPSABLE_ITEM__

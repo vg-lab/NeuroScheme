@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #define _USE_MATH_DEFINES
 
 #include "AutoConnectionArrowItem.h"
@@ -75,20 +76,20 @@ namespace nslib
     void AutoConnectionArrowItem::setLine( const QLineF& line_ )
     {
       _line = line_;
-      createAutoArrow( float( _line.p1( ).x( )), _line.p1( ).y( ) == 1.0f ,
+      createAutoArrow( static_cast<float>( _line.p1( ).x( )), _line.p1( ).y( ) == 1.0f ,
         _line.p2( ));
     }
 
     void AutoConnectionArrowItem::createAutoArrow( float glyphRadius_,
       bool isGrid_, QPointF glyphCenter_ )
     {
-      float itemInvScale = 1.0f
+      const float itemInvScale = 1.0f
         / static_cast< float >( this->scale( ));
 
       auto glyphCenter = itemInvScale * glyphCenter_;
 
       //Recalculates static data when relevant changes have been made
-      auto newGlyphRadius = glyphRadius_ * itemInvScale;
+      const auto newGlyphRadius = glyphRadius_ * itemInvScale;
       if( newGlyphRadius != glyphRadius )
       {
         glyphRadius = newGlyphRadius;
@@ -105,7 +106,7 @@ namespace nslib
       {
         //Fixes arrow position to the point furthest from the canvas centre
         relativeAngle = atanf(
-          float( glyphCenter.y( ) / glyphCenter.x( )));
+          static_cast<float>( glyphCenter.y( ) / glyphCenter.x( )));
         if( glyphCenter.x( ) < 0 )
         {
           relativeAngle += M_PI_Float;
@@ -113,7 +114,7 @@ namespace nslib
       }
 
       //Arrow arc center
-      QPointF arcCenter = QPointF(
+      const QPointF arcCenter = QPointF(
         glyphCenter.x( ) + dist * cosf( relativeAngle ),
         glyphCenter.y( ) + dist * sinf( relativeAngle ));
 
@@ -131,15 +132,15 @@ namespace nslib
         arcCenter.y( ) - arcRadius * sinf( relativeAngle + arcDegrees ));
 
       //Data necessary to draw the arrow
-      float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
+      const float arrowWidth = 0.23f * nslib::Config::scale( ) * arcRadius;
       float arrowAngle = M_PI_0825 + arcDegrees + relativeAngle;
 
-      QPointF arrowHead1 = _arrowDest - QPointF(
+      const QPointF arrowHead1 = _arrowDest - QPointF(
         sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
       arrowAngle = M_PI_1115 + arcDegrees + relativeAngle;
 
-      QPointF arrowHead2 = _arrowDest - QPointF(
+      const QPointF arrowHead2 = _arrowDest - QPointF(
         sinf( arrowAngle ) * arrowWidth, cosf( arrowAngle ) * arrowWidth );
 
       //Creates arrowhead
@@ -152,16 +153,16 @@ namespace nslib
       //Draws the back of the arrow
       if( arcDegrees < M_PI_x2 )
       {
-        QPointF relativeDir = _arrowOrigin - glyphCenter;
+        const QPointF relativeDir = _arrowOrigin - glyphCenter;
 
         Eigen::Vector2d vector( relativeDir.x( ), relativeDir.y( ));
         vector.normalize( );
         vector = vector * arrowWidth;
 
-        QPointF arrowBack = QPointF( -vector.y( ), vector.x( ));
+        const QPointF arrowBack = QPointF( -vector.y( ), vector.x( ));
 
-        QPointF arrowI1 = _arrowOrigin + arrowBack;
-        QPointF arrowI2 = _arrowOrigin - arrowBack;
+        const QPointF arrowI1 = _arrowOrigin + arrowBack;
+        const QPointF arrowI2 = _arrowOrigin - arrowBack;
 
         painterPath.moveTo( arrowI1 );
         painterPath.lineTo( arrowI2 );
@@ -180,7 +181,6 @@ namespace nslib
       this->setPen( QPen( QBrush( color ), _arrowThickness ));
       this->setPath( painterPath );
       this->setZValue( -100.0f );
-
     }
 
     void AutoConnectionArrowItem::recalcArcData( )
@@ -202,6 +202,7 @@ namespace nslib
       {
         startAngle = 0.0f;
       }
+
       //Degrees covered by the arc
       arcDegrees = M_PI_x2 - startAngle - startAngle;
     }
@@ -266,8 +267,6 @@ namespace nslib
     {
       _arcSizeFactor = arcSizeFactor_;
       glyphRadius = 0.0f;
-
     }
-
   } // namespace congen
 } // namespace nslib

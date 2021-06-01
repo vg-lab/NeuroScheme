@@ -32,7 +32,6 @@
 
 namespace nslib
 {
-
   LayoutOptionsWidget::LayoutOptionsWidget( void )
     : _layout( new QGridLayout )
   {
@@ -63,28 +62,28 @@ namespace nslib
     {
       _toolbox->addItem( layoutOptions_, QString("Layout options"));
     }
+
     if ( _flags & SORT_ENABLED )
     {
       _sortWidget = new SortWidget( this );
-      QIcon sortIcon( QString::fromUtf8( ":/icons/sort.png"));
+      QIcon sortIcon(":/icons/sort.svg");
       _toolbox->addItem( _sortWidget, sortIcon, QString( "Sort" ));
     }
+
     if ( _flags & FILTER_ENABLED )
     {
       _filterWidget = new FilterWidget( this );
-      QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png"));
+      QIcon filterIcon(":/icons/filter.svg");
       _toolbox->addItem( _filterWidget, filterIcon, QString( "Filter" ));
     }
+
     if ( _flags & SCATTERPLOT_ENABLED )
     {
       _scatterPlotWidget = new ScatterPlotWidget( this );
-      QIcon filterIcon( QString::fromUtf8( ":/icons/filter.png" ));
+      QIcon filterIcon(":/icons/filter.svg" );
       _toolbox->addItem( _scatterPlotWidget, filterIcon,
         QString( "ScatterPlot" ));
     }
-
-    // _toolbox->show( );
-    // _optionsWidget->show( );
   }
 
   Layout::~Layout( void )
@@ -116,11 +115,11 @@ namespace nslib
       LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
     representations.clear( );
 
-    bool doFiltering =
+    const bool doFiltering =
       _filterWidget &&
       !_filterWidget->filterSetConfig( ).filters( ).empty( );
 
-    bool doSorting =
+    const bool doSorting =
       _sortWidget &&
       !_sortWidget->sortConfig( ).properties( ).empty( );
 
@@ -144,6 +143,7 @@ namespace nslib
         else
           objects.add( entity );
       }
+
       if ( doSorting )
       {
         fires::Sort firesSort;
@@ -182,20 +182,16 @@ namespace nslib
           filteredAndSortedEntities, relationshipReps,
           "aggregatedConnectsTo", true );
       }
-
     }
     else
     {
       // Default sorting by ShiFT's gid
-      auto& vector = entities.vector( );
-      std::sort( vector.begin( ), vector.end( ),
-                 []( const shift::Entity* a, const shift::Entity* b )
-                 { return b->entityGid( ) < a->entityGid( ); } );
-      RepresentationCreatorManager::create(
-       entities, representations,
-        true, true );
+      auto lessThanGid = []( const shift::Entity* a, const shift::Entity* b )
+      { return b->entityGid( ) < a->entityGid( ); };
 
-      // std::cout << "-----" << entities.size( ) << " " << representations.size( ) << std::endl;
+      auto& vector = entities.vector( );
+      std::sort( vector.begin( ), vector.end( ), lessThanGid );
+      RepresentationCreatorManager::create( entities, representations, true, true );
 
       if ( Config::showConnectivity( ))
       {
@@ -207,18 +203,11 @@ namespace nslib
       }
     }
 
-    // shift::Representations relationshipReps;
-    // // Generate relationship representations
-    // nslib::RepresentationCreatorManager::generateRelations( entities,
-    //                                                         relationshipReps,
-    //                                                         "connectsTo" );
-
     _clearScene( );
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
       _addRepresentations( preFilterRepresentations );
     else
       _addRepresentations( representations );
-
 
     if ( doFiltering && _filterWidget->useOpacityForFiltering( ))
     {
@@ -242,11 +231,10 @@ namespace nslib
     }
   }
 
-   void Layout::refreshWidgetsProperties(
-    const TProperties& properties )
-   {
-     Loggers::get( )->log( "Refreshing property " + _name, LOG_LEVEL_VERBOSE,
-                          NEUROSCHEME_FILE_LINE );
+  void Layout::refreshWidgetsProperties( const TProperties& properties )
+  {
+    Loggers::get( )->log( "Refreshing property " + _name, LOG_LEVEL_VERBOSE,
+                         NEUROSCHEME_FILE_LINE );
 
     if ( _sortWidget &&
          _sortWidget->propertiesSelector( ))
@@ -291,21 +279,20 @@ namespace nslib
       }
       _scatterPlotWidget->blockChildrenSignals( false );
       _scatterPlotWidget->blockSignals( false );
-
     }
-
   }
 
   void Layout::_drawCorners( )
   {
     NEUROSCHEME_DEBUG_CHECK( _canvas->scene( ).views( ).size( ) != 0,
                              "Scene with no view" );
+
     QGraphicsView* gv = _canvas->scene( ).views( )[0];
 
-    // std::cout << gv->width( ) << " x " << gv->height( ) << std::endl;
     QGraphicsEllipseItem* center =
       new QGraphicsEllipseItem( -10, -10, 20, 20 );
     _canvas->scene( ).addItem( center );
+
     QGraphicsEllipseItem* tl =
       new QGraphicsEllipseItem( -gv->width( ) / 2 - 10,
                                 -gv->height( ) / 2 - 10,
@@ -330,17 +317,6 @@ namespace nslib
         _canvas->scene( ).removeItem( item );
       }
     }
-
-    // // Remove the rest
-    // for ( auto& item : _canvas->scene( ).items( ))
-    // {
-    //   _canvas->scene( ).removeItem( item );
-    // }
-
-
-    // Remove the rest
-    // NOTE: removed this clear because it delete de objects
-    //_canvas->scene( ).clear( );
   }
 
   void Layout::_addRepresentations( const shift::Representations& reps )
@@ -359,19 +335,12 @@ namespace nslib
       }
       else
       {
-        // std::cout << "+++++ Retrieving item" << std::endl;
         auto item = graphicsItemRep->item( &_canvas->scene( ));
 
-        if ( item->parentItem( ))
-        {
+        if ( !item || item->parentItem( ))
           continue;
-        }
 
-        // Find out if its entity is selected
-        // and if so set its pen
-        // const auto& repsToEntities =
-        //   RepresentationCreatorManager::repsToEntities( );
-
+        // Find out if its entity is selected and if so set its pen
         if ( repsToEntities.count( representation ) > 0 )
         {
           const auto entities = repsToEntities.at( representation );
@@ -386,12 +355,11 @@ namespace nslib
             auto selectedState = SelectionManager::getSelectedState(
               *entities.begin( ));
 
-            // if ( selectedState == selectedStateSelectedState::SELECTED )
             selectableItem->setSelected( selectedState );
-
 
             auto shapeItem =
               dynamic_cast< QAbstractGraphicsShapeItem* >( item );
+
             if ( shapeItem )
             {
               if ( selectedState == SelectedState::SELECTED )
@@ -402,14 +370,14 @@ namespace nslib
             }
           }
         }
-        //std::cout << &scene << " add item " << std::endl;
-        // std::cout << "Adding item" << item << std::endl;
 
         if ( !item->parentItem( ))
+        {
           _canvas->scene( ).addItem( item );
+        }
       }
     }
-  } // _addRepresentations
+  }
 
   void Layout::updateSelection( void )
   {
@@ -421,13 +389,10 @@ namespace nslib
       {
         auto item = dynamic_cast< Item* >( *qitem );
         if ( !item ) continue;
+
         const auto& repsToEntities =
           RepresentationCreatorManager::repsToEntities( );
 
-        // if ( item->parentRep( )) {
-        //   std::cerr << "Item without parent" << std::endl;
-        //   continue;
-        // }
         if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
         {
           const auto entities = repsToEntities.at( item->parentRep( ));
@@ -448,7 +413,6 @@ namespace nslib
             else if ( state == SelectedState::PARTIALLY_SELECTED )
               shapeItem->setPen(
                 SelectableItem::partiallySelectedPen( ));
-
           }
         }
       }
@@ -507,12 +471,10 @@ namespace nslib
 
     posAnim.start( );
     scaleAnim.start( );
-
   }
 
   void Layout::refreshCanvas( void )
   {
     _canvas->displayEntities( false, false );
   }
-
 }

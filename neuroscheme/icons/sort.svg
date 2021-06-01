@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4198"
+   sodipodi:docname="sort.svg"
+   viewBox="0 0 48 48"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   version="1.1">
+  <defs
+     id="defs4200" />
+  <sodipodi:namedview
+     id="base"
+     bordercolor="#bebebe"
+     inkscape:pageshadow="2"
+     inkscape:window-y="27"
+     pagecolor="#ffffff"
+     inkscape:window-height="1016"
+     inkscape:grid-bbox="true"
+     inkscape:zoom="16.970563"
+     inkscape:window-x="54"
+     showgrid="true"
+     borderopacity="1.0000000"
+     inkscape:current-layer="layer1"
+     inkscape:cx="14.764491"
+     inkscape:cy="21.86053"
+     inkscape:showpageshadow="false"
+     inkscape:window-width="1866"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px"
+     inkscape:window-maximized="1" />
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <g
+       id="g4191"
+       style="fill:#000000;fill-opacity:1"
+       transform="matrix(1.2084382,0,0,1.4124789,-1.1169467,-8.0168716)">
+      <rect
+         x="-23.999998"
+         y="10"
+         width="7.333333"
+         height="2"
+         transform="scale(-1,1)"
+         style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+         id="rect4248" />
+      <rect
+         x="-27.499998"
+         y="16"
+         width="10.833333"
+         height="2"
+         transform="scale(-1,1)"
+         style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+         id="rect4250" />
+      <rect
+         x="-30.833332"
+         y="22"
+         width="14.166666"
+         height="2"
+         transform="scale(-1,1)"
+         style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+         id="rect4252" />
+      <rect
+         x="-34.333332"
+         y="28"
+         width="17.666666"
+         height="2"
+         transform="scale(-1,1)"
+         style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+         id="rect4254" />
+      <rect
+         x="-39"
+         y="34"
+         width="22.333332"
+         height="2"
+         transform="scale(-1,1)"
+         style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+         id="rect4256" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path8643"
+       sodipodi:nodetypes="cccccccc"
+       style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.29663479;stroke-opacity:1"
+       d="M 12.421719,6.7752041 H 5.936204 V 31.7938 H 2.740173 l 6.4527248,9.832404 6.3680142,-9.835 H 12.42008 Z" />
+  </g>
+  <metadata
+     id="metadata30">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2010-03-22T13:08:59</dc:date>
+        <dc:description>&quot;Justify fill&quot; icon from &lt;A href=&quot;http://tango.freedesktop.org/Tango_Desktop_Project&quot;&gt; Tango Project &lt;/A&gt; 
+\n&lt;BR&gt;&lt;BR&gt;
+\nSince version 0.8.90 Tango Project icons are Public Domain: &lt;A href=&quot;http://tango.freedesktop.org/Frequently_Asked_Questions#Terms_of_Use.3F&quot;&gt; Tango Project FAQ &lt;/A&gt;</dc:description>
+        <dc:source>https://openclipart.org/detail/33025/tango-format-justify-fill-by-warszawianka</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>warszawianka</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>externalsource</rdf:li>
+            <rdf:li>fill</rdf:li>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>justify</rdf:li>
+            <rdf:li>tango</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

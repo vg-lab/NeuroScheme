@@ -8,7 +8,6 @@
 
 namespace nslib
 {
-
   CollapseButtonItem::CollapseButtonItem( void )
   {
     this->setAcceptHoverEvents( true );
@@ -37,6 +36,5 @@ namespace nslib
   {
     this->setBrush( QBrush( QColor( 85, 85, 100 )));
   }
-
 
 } // namespace nslib

@@ -31,12 +31,15 @@ namespace nslib
   {
   public:
     ScatterPlotLayout( void );
+    virtual ~ScatterPlotLayout() {};
+
     virtual void _arrangeItems( const shift::Representations& /* reps */,
                                 bool /* animate */,
                                 const shift::Representations&
                                 preFilterReps =
                                 shift::Representations( )) final;
-    Layout* clone( void ) const
+
+    Layout* clone( void ) const override
     {
       return new ScatterPlotLayout;
     }

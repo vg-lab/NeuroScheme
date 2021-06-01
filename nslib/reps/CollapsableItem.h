@@ -29,8 +29,12 @@ namespace nslib
   public:
 
     CollapsableItem( bool collapsed_ = true )
-      : _collapsed( collapsed_ ) { }
-    virtual ~CollapsableItem( void ) { }
+      : _collapsed( collapsed_ )
+    {}
+
+    virtual ~CollapsableItem( void )
+    {}
+
     virtual void toggleCollapse( void )
     {
       if ( _collapsed )
@@ -38,8 +42,11 @@ namespace nslib
       else
         this->collapse( );
     }
+
     virtual void collapse(bool anim = true) = 0;
+
     virtual void uncollapse(bool anim = true) = 0;
+
   protected:
     bool _collapsed;
   };

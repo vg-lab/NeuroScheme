@@ -28,20 +28,14 @@
 
 namespace nslib
 {
-
   ScatterPlotLayout::ScatterPlotLayout( void )
     : Layout( "ScatterPlot", Layout::SCATTERPLOT_ENABLED )
-  {
-  }
-
+  {}
 
   void ScatterPlotLayout::_arrangeItems(
     const shift::Representations& reps ,
     bool animate,
-    const shift::Representations&
-    // preFilterReps =
-    // shift::Representations( )
-   )
+    const shift::Representations& )
   {
     if ( reps.size( ) == 0 )
     {
@@ -49,15 +43,15 @@ namespace nslib
                            LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
       return;
     }
-    unsigned int margin = 150;
+    constexpr unsigned int margin = 150;
 
     QGraphicsView* gv = _canvas->scene( ).views( )[0];
-    auto width = gv->width( );
-    auto height = gv->height( );
-    float xMin = -float( width ) / 2.0f + margin;
-    float xMax = width/2 - margin;
-    float yMin = -float( height ) / 2.0f + margin;
-    float yMax = height / 2.0f - margin;
+    const auto width = gv->width( );
+    const auto height = gv->height( );
+    const float xMin = -float( width ) / 2.0f + margin;
+    const float xMax = width/2 - margin;
+    const float yMin = -float( height ) / 2.0f + margin;
+    const float yMax = height / 2.0f - margin;
 
     // auto xAxis = new QGraphicsLineItem( -_scene->width( )/2 + margin,
     //                                     +_scene->height( )/2 - margin,
@@ -70,17 +64,18 @@ namespace nslib
     // _scene->addItem( xAxis );
     // _scene->addItem( yAxis );
 
-    auto xProp =
+    const auto xProp =
       _scatterPlotWidget->propertyXSelector( )->currentText( ).toStdString( );
-    auto yProp =
+    const auto yProp =
       _scatterPlotWidget->propertyYSelector( )->currentText( ).toStdString( );
 
     if ( xProp.empty( ) || yProp.empty( ))
       return;
-    float xMaxValue = _canvas->properties( ).at( xProp ).rangeMax;
-    float xMinValue = _canvas->properties( ).at( xProp ).rangeMin;
-    float yMaxValue = _canvas->properties( ).at( yProp ).rangeMax;
-    float yMinValue = _canvas->properties( ).at( yProp ).rangeMin;
+
+    const float xMaxValue = _canvas->properties( ).at( xProp ).rangeMax;
+    const float xMinValue = _canvas->properties( ).at( xProp ).rangeMin;
+    const float yMaxValue = _canvas->properties( ).at( yProp ).rangeMax;
+    const float yMinValue = _canvas->properties( ).at( yProp ).rangeMin;
 
     MapperFloatToFloat xMapper( xMinValue, xMaxValue, xMin, xMax );
     MapperFloatToFloat yMapper( yMinValue, yMaxValue, yMin, yMax );
@@ -118,7 +113,7 @@ namespace nslib
           qreal posY = - yMapper.map( yVal );
           if ( posX != posX ) posX = 0;
           if ( posY != posY ) posY = 0;
-          qreal scale_ = _scatterPlotWidget->scale( ) / 100.0f;
+          const qreal scale_ = _scatterPlotWidget->scale( ) / 100.0f;
 
           if ( obj && animate )
           {
@@ -133,6 +128,5 @@ namespace nslib
       }
     } // for all reps
   }
-
 
 } // namespace nslib

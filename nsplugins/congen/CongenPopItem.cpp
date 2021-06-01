@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "CongenPopItem.h"
 #include <nslib/reps/RingItem.h>
 #include <QPen>
@@ -30,7 +31,7 @@ namespace nslib
   namespace congen
   {
     CongenPopItem::CongenPopItem( const CongenPopRep& entityRep,
-      unsigned int size, bool interactive_ )
+      const unsigned int size, const bool interactive_ )
       :_itemText( nullptr )
     {
       setInteractive( interactive_ );
@@ -39,31 +40,31 @@ namespace nslib
         this->setAcceptHoverEvents( true );
       }
 
-      int itemSize = static_cast< int >( ceilf( float( size ) * 0.5f ));
+      const int itemSize = static_cast<int>( ceilf( static_cast<float>( size ) * 0.5f ));
       this->setRect ( -itemSize, -itemSize, itemSize * 2 , itemSize * 2 );
       this->setPen( QPen( Qt::NoPen ));
 
       const Color& bgColor = entityRep.getPropertyValue< Color >( "color" );
       auto circleItem = new QGraphicsEllipseItem( this );
-      float circleItemSize = size * 0.9f;
-      float halfcircleItemSize = - 0.5f * circleItemSize;
+      const float circleItemSize = size * 0.9f;
+      const float halfcircleItemSize = - 0.5f * circleItemSize;
       circleItem->setRect( halfcircleItemSize, halfcircleItemSize,
         circleItemSize, circleItemSize );
       circleItem->setPen( Qt::NoPen );
       circleItem->setBrush( QBrush( bgColor ));
 
       auto circleItemInner = new QGraphicsEllipseItem( this );
-      float circleItemSizeInner = size * 0.7f;
-      float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
+      const float circleItemSizeInner = size * 0.7f;
+      const float halfcircleItemSizeInner = - 0.5f * circleItemSizeInner;
       circleItemInner->setRect( halfcircleItemSizeInner, halfcircleItemSizeInner,
         circleItemSizeInner, circleItemSizeInner );
       circleItemInner->setPen( Qt::NoPen );
       circleItemInner->setBrush( QBrush( QColor( 255, 255, 255 )));
 
-      float barHeight = size * 0.1f;
-      float halfBarHeight = - 0.5f * barHeight;
-      float barWidth = circleItemSizeInner * 1.1f;
-      float halfBarWidth = - 0.5f * barWidth;
+      const float barHeight = size * 0.1f;
+      const float halfBarHeight = - 0.5f * barHeight;
+      const float barWidth = circleItemSizeInner * 1.1f;
+      const float halfBarWidth = - 0.5f * barWidth;
 
       auto bar = new QGraphicsRectItem(
         halfBarWidth, halfBarHeight,
@@ -97,6 +98,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -107,9 +109,12 @@ namespace nslib
                 qAbstractGraphicItem, event_ );
             }
           }
+        }
+
         InteractionManager::highlightConnectivity( this );
       }
     }
+
     void CongenPopItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       if ( _interactive )
@@ -117,6 +122,7 @@ namespace nslib
         auto qGraphicsItemRep =
           dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
         if ( qGraphicsItemRep )
+        {
           for ( auto& item : qGraphicsItemRep->items( ))
           {
             auto qAbstractGraphicItem =
@@ -128,12 +134,13 @@ namespace nslib
             }
 
           }
+        }
+
         InteractionManager::highlightConnectivity( this, false );
       }
     }
 
-    void CongenPopItem::contextMenuEvent(
-      QGraphicsSceneContextMenuEvent* event_ )
+    void CongenPopItem::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
     {
       if ( _interactive )
       {
@@ -143,7 +150,7 @@ namespace nslib
 
     CongenPopItem::~CongenPopItem( void )
     {
-      delete _itemText;
+      if(_itemText) delete _itemText;
     }
 
   } // namespace congen

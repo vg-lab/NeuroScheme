@@ -19,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "Loggers.h"
 
+#include "Loggers.h"
 
 namespace nslib
 {

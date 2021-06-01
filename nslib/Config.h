@@ -29,7 +29,6 @@
 
 namespace nslib
 {
-
   class NeuroSchemeInputArguments
     : public std::unordered_map< std::string, std::vector< std::string >>
   {
@@ -67,9 +66,7 @@ namespace nslib
         return std::string( );
       return argFound;
     }
-
   };
-
 
 #define NSLIB_CONFIG( TYPE, NAME )                                        \
   protected: static TYPE _##NAME ;                                        \
@@ -95,7 +92,6 @@ public: NSLIB_API static TYPE NAME( void ) { return _##NAME; }
     NSLIB_CONFIG( bool, autoPublishFocusOnDisplayed );
     NSLIB_CONFIG( float, scale );
     NSLIB_CONFIG( std::string, zeroEQSession );
-
 
   protected:
     static NeuroSchemeInputArguments _inputArgs;

@@ -40,7 +40,6 @@
 #include <zeroeq/version.h>
 #endif
 
-
 #include <QGridLayout>
 #include <QPushButton>
 #include <QInputDialog>
@@ -49,6 +48,7 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QMessageBox>
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
@@ -56,21 +56,11 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   , minDockSizeY(25u)
   , _ui( new Ui::MainWindow )
 {
-  ( void ) zeroEQ;
+#ifndef NEUROSCHEME_USE_ZEROEQ
+  (void) zeroEQ;
+#endif
 
   _ui->setupUi( this );
-
-  // This is a WAR to show the menu in some
-  // systems that does not appear
-  //_ui->menubar->setNativeMenuBar( false );
-
-// #ifdef NSOL_USE_BRION
-//   _ui->actionLoadBlueConfig->setEnabled( true );
-// #endif
-
-// #ifdef NSOL_USE_QT5CORE
-//   _ui->actionOpenXmlScene->setEnabled( true );
-// #endif
 
   connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
            this, SLOT( importFromJSON( )));
@@ -82,7 +72,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
            this, SLOT( exportToJSON( )));
 
   connect( _ui->actionQuit, SIGNAL( triggered( )),
-           this, SLOT( quit( )));
+           this, SLOT( close()));
 
   // ZeroEQ related actions ///////////////////////////////////////
 #ifdef NEUROSCHEME_USE_ZEROEQ
@@ -133,7 +123,6 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   // // Connect save dialog
   // connect( _ui->actionSave, SIGNAL( triggered( )), this, SLOT( saveScene( )));
 
-  // Connect about dialog
   connect( _ui->actionAbout, SIGNAL( triggered( )), this, SLOT( aboutDialog( )));
 
   connect( _ui->actionShowConnectivity, SIGNAL( triggered( )),
@@ -164,7 +153,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   nslib::Config::showEntitiesName( true );
   nslib::Config::showConnectivity( true );
 
-  QSplitter* widget = new QSplitter( this );
+  auto widget = new QSplitter( this );
   widget->setSizePolicy( QSizePolicy::Expanding,
                          QSizePolicy::Expanding );
   this->setCentralWidget( widget );
@@ -192,51 +181,49 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     nslib::DomainManager::getActiveDomain( )->importJSON( inputfile );
   }
 
-  // Layouts dock
+  auto createDock = [=](QDockWidget * &d, const QString title)
   {
-    _layoutsDock = new QDockWidget( );
-    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-      _layoutsDock, Qt::Vertical);
-    _layoutsDock->setMinimumSize( minDockSizeX, minDockSizeY );
-    _layoutsDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-      QSizePolicy::Expanding );
-    _layoutsDock->setFeatures( QDockWidget::DockWidgetClosable |
-      QDockWidget::DockWidgetMovable |
-      QDockWidget::DockWidgetFloatable );
+    d = new QDockWidget;
+    d->setMinimumSize( minDockSizeX, minDockSizeY );
+    d->setWindowTitle(title);
+    d->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+    d->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
+    this->addDockWidget( Qt::RightDockWidgetArea, d, Qt::Vertical );
 
-    _layoutsDock->setWindowTitle( QString( "Layouts" ));
-    _layoutsDock->close( );
+    d->close( );
+  };
+
+  createDock(_layoutsDock, "Layouts");
+  createDock(_storedSelections.dock, "Stored Selections");
+  createDock(_entityEditDock, "Entity Inspector");
+  createDock(_connectionEditDock, "Connection Inspector");
+  createDock(_connectionListDock, "Entity Connections List");
+
+  // assign docks
+  nslib::EntityEditWidget::parentDock(_entityEditDock);
+  nslib::ConnectionRelationshipEditWidget::parentDock(_connectionEditDock);
+  nslib::EntityConnectionListWidget::parentDock(_connectionListDock);
+
+  // Layouts dock configuration
+  {
     _ui->actionLayouts->setChecked( false );
+
     connect( _layoutsDock->toggleViewAction( ), SIGNAL( toggled( bool )),
       _ui->actionLayouts, SLOT( setChecked( bool )));
     connect( _ui->actionLayouts, SIGNAL( triggered( )),
       this, SLOT( updateLayoutsDock( )));
 
-    QWidget* dockWidget = new QWidget( );
+    auto dockWidget = new QWidget( );
     QGridLayout* layoutsConfigLayout = new QGridLayout( dockWidget );
     layoutsConfigLayout->setAlignment( Qt::AlignTop );
     nslib::PaneManager::layout( layoutsConfigLayout );
     nslib::PaneManager::activePane( canvas );
 
-    // QWidget* dockWidget = new QWidget( );
-    // dockWidget->setLayout( layoutsConfigLayout );
     _layoutsDock->setWidget( dockWidget );
   }
 
-  // Stored selections dock
+  // Stored selections dock config
   {
-    _storedSelections.dock = new QDockWidget( );
-    _storedSelections.dock->setMinimumSize( minDockSizeX, minDockSizeY );
-    _storedSelections.dock->setWindowTitle( QString( "Stored selections" ));
-    _storedSelections.dock->setSizePolicy( QSizePolicy::MinimumExpanding,
-      QSizePolicy::MinimumExpanding );
-
-    _storedSelections.dock->setFeatures( QDockWidget::DockWidgetClosable |
-      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-      _storedSelections.dock, Qt::Vertical );
-
-    _storedSelections.dock->close( );
     _ui->actionStoredSelections->setChecked( false );
     connect( _storedSelections.dock->toggleViewAction( ),
       SIGNAL( toggled( bool )), _ui->actionStoredSelections,
@@ -244,8 +231,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     connect( _ui->actionStoredSelections, SIGNAL( triggered( )),
       this, SLOT( updateStoredSelectionsDock( )));
 
-
-    QWidget* dockWidget = new QWidget( );
+    auto dockWidget = new QWidget( );
     QGridLayout* selectionLayout = new QGridLayout( dockWidget );
 
     _storedSelections.counter = 0;
@@ -259,38 +245,33 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
     }
 
     _storedSelections.table->setHorizontalHeaderLabels( tableHeader );
-    _storedSelections.table->horizontalHeader( )->setSectionResizeMode(
-      QHeaderView::ResizeToContents );
+    _storedSelections.table->horizontalHeader( )->setSectionResizeMode(QHeaderView::ResizeToContents );
     _storedSelections.table->horizontalHeader( )->setSectionsClickable( true );
     _storedSelections.table->verticalHeader( )->setVisible( false );
 
-    connect( _storedSelections.table->horizontalHeader( ),
-      SIGNAL( sectionClicked( int )), this,
-      SLOT( sortStoredSelectionsTable( int )));
+    connect(_storedSelections.table->horizontalHeader( ), SIGNAL( sectionClicked( int )),
+        this, SLOT( sortStoredSelectionsTable( int )));
 
-    _storedSelections.table->setEditTriggers(
-      QAbstractItemView::NoEditTriggers );
-    _storedSelections.table->setSelectionBehavior(
-      QAbstractItemView::SelectRows );
-    _storedSelections.table->setSelectionMode(
-      QAbstractItemView::SingleSelection );
+    _storedSelections.table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    _storedSelections.table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    _storedSelections.table->setSelectionMode(QAbstractItemView::SingleSelection );
 
     selectionLayout->addWidget( _storedSelections.table, 0, 0, 1, 2 );
 
-    QPushButton* saveButton = new QPushButton( "Save selection" );
+    auto saveButton = new QPushButton( "Save selection" );
     saveButton->setToolTip( QString( "Saves the current selection" ));
     selectionLayout->addWidget( saveButton, 1, 0 );
 
     connect( saveButton, SIGNAL(clicked()), this, SLOT( storeSelection( ) ));
 
-    QPushButton* restoreButton = new QPushButton( " Restore selection" );
+    auto restoreButton = new QPushButton( " Restore selection" );
     restoreButton->setToolTip( QString ( "Restores the selection to current" ));
     selectionLayout->addWidget( restoreButton, 1, 1 );
 
     connect( restoreButton, SIGNAL( clicked( )),
       this, SLOT( restoreSelection( )));
 
-    QPushButton* deleteButton = new QPushButton( "Delete selected" );
+    auto deleteButton = new QPushButton( "Delete selected" );
     deleteButton->setToolTip( QString( "Deletes the selected selection"));
     selectionLayout->addWidget( deleteButton, 2, 0, 1, 2 );
 
@@ -301,54 +282,6 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 
     _storedSelections.dock->setWidget( dockWidget );
     _storedSelections.dock->close( );
-
-  } // END selection dock
-
-  {
-    _entityEditDock = new QDockWidget;
-    _entityEditDock->setMinimumSize( minDockSizeX, minDockSizeY );
-    nslib::EntityEditWidget::parentDock( _entityEditDock );
-    _entityEditDock->setWindowTitle( QString( "Entity Inspector" ));
-    _entityEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-       QSizePolicy::MinimumExpanding );
-
-    _entityEditDock->setFeatures( QDockWidget::DockWidgetClosable |
-       QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
-
-    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-      _entityEditDock, Qt::Vertical );
-    _entityEditDock->close( );
-  }
-
-  {
-    _connectionEditDock = new QDockWidget;
-    _connectionEditDock->setMinimumSize( minDockSizeX, minDockSizeY );
-    nslib::ConnectionRelationshipEditWidget::parentDock( _connectionEditDock );
-    _connectionEditDock->setWindowTitle( QString( "Connection Inspector" ));
-    _connectionEditDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-      QSizePolicy::MinimumExpanding );
-
-    _connectionEditDock->setFeatures( QDockWidget::DockWidgetClosable |
-      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
-
-    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-      _connectionEditDock, Qt::Vertical );
-    _connectionEditDock->close( );
-  }
-  {
-    _connectionListDock = new QDockWidget;
-    _connectionListDock->setMinimumSize( minDockSizeX, minDockSizeY );
-    nslib::EntityConnectionListWidget::parentDock( _connectionListDock );
-    _connectionListDock->setWindowTitle( QString( "Entity Connections List" ));
-    _connectionListDock->setSizePolicy( QSizePolicy::MinimumExpanding,
-      QSizePolicy::MinimumExpanding );
-
-    _connectionListDock->setFeatures( QDockWidget::DockWidgetClosable |
-      QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
-
-    this->addDockWidget( Qt::DockWidgetAreas::enum_type::RightDockWidgetArea,
-      _connectionListDock, Qt::Vertical );
-    _connectionListDock->close( );
   }
 }
 
@@ -367,23 +300,26 @@ void MainWindow::selectDomain( void )
       this, "Select domain", "Domain name:", availableDomains,  0, false );
   }
   else
+  {
     domainSelected =
       QString::fromStdString( nslib::Config::inputArgs( )[ domainArg ][0] );
+  }
 
   nslib::Domain* domain = nullptr;
 
-  if ( domainSelected == "cortex" )
+  const auto &inputArgs = nslib::Config::inputArgs( );
+  if ( domainSelected.compare("cortex", Qt::CaseInsensitive) == 0 )
   {
     domain = new nslib::cortex::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
+    if (!inputArgs.empty() && !domain->dataLoader( )->cliLoadData( inputArgs ))
       exit( -1 );
   }
-  else if ( domainSelected == "congen" )
+  else if ( domainSelected.compare("congen", Qt::CaseInsensitive) == 0 )
   {
     domain = new nslib::congen::Domain;
     nslib::DomainManager::setActiveDomain( domain );
-    if ( !domain->dataLoader( )->cliLoadData( nslib::Config::inputArgs( )))
+    if (!inputArgs.empty() && !domain->dataLoader( )->cliLoadData( inputArgs ))
       exit( -1 );
   }
   else
@@ -403,7 +339,7 @@ void MainWindow::selectDomain( void )
   }
 
   resizeEvent( nullptr );
-} // MainWindow::selectDomain
+}
 
 MainWindow::~MainWindow( void )
 {
@@ -412,7 +348,7 @@ MainWindow::~MainWindow( void )
     delete _canvas;
 }
 
-QString MainWindow::_tableColumnToString( TTableColumns column )
+QString MainWindow::_tableColumnToString( const TTableColumns column )
 {
   switch ( column)
   {
@@ -442,13 +378,9 @@ void MainWindow::updateStoredSelectionsDock( void )
 void MainWindow::updateLayoutsDock( void )
 {
   if ( _ui->actionLayouts->isChecked( ))
-  {
     _layoutsDock->show( );
-  }
   else
-  {
     _layoutsDock->close( );
-  }
 
   resizeEvent( nullptr );
 }
@@ -527,9 +459,6 @@ void MainWindow::storeSelection( void )
     _storedSelections.table->setItem( row, TTableColumns::COLUMN_DATETIME,
       new QTableWidgetItem( date ));
   }
-// #ifdef NEUROSCHEME_USE_ZEROEQ
-//   updateCellSetOperationSelections( );
-// #endif
 }
 
 void MainWindow::restoreSelection( void )
@@ -540,13 +469,12 @@ void MainWindow::restoreSelection( void )
       _storedSelections.table->selectedItems( ).at( 0 );
     const auto label = firstItem->text( );
 
-    nslib::SelectionManager::restoreStoredSelection(
-      label.toStdString( ));
+    nslib::SelectionManager::restoreStoredSelection( label.toStdString( ));
+
     resizeEvent( nullptr );
-    for ( const auto& pane : nslib::PaneManager( ).panes( ))
-    {
-      pane->resizeEvent( 0 );
-    }
+
+    auto &panes = nslib::PaneManager().panes();
+    std::for_each(panes.begin(), panes.end(), [](nslib::Canvas *c){ c->resizeEvent(nullptr); });
   }
 }
 
@@ -554,12 +482,8 @@ void MainWindow::deleteStoredSelection( void )
 {
   if ( _storedSelections.table->selectedItems( ).size( ) > 0 )
   {
-    QTableWidgetItem* firstItem =
-      _storedSelections.table->selectedItems( ).at( 0 );
+    const auto firstItem = _storedSelections.table->selectedItems( ).at( 0 );
     const auto label = firstItem->text( );
-
-    // Delete selection from storage
-    //deleteSelectedSelection( label );
 
     // Remove selection from table
     const unsigned int row = _storedSelections.table->row( firstItem );
@@ -572,14 +496,9 @@ void MainWindow::deleteStoredSelection( void )
       nslib::Loggers::get( )->log(
         "Tried to delete a non existing saved selection ",
         nslib::LOG_LEVEL_WARNING );
-
     }
-// #ifdef NEUROSCHEME_USE_ZEROEQ
-//     updateCellSetOperationSelections( );
-// #endif
   }
 }
-
 
 void MainWindow::sortStoredSelectionsTable( int column )
 {
@@ -605,8 +524,7 @@ void MainWindow::duplicateActivePane( void )
 
 void MainWindow::home( void )
 {
-  nslib::PaneManager::activePane( )->displayEntities(
-    nslib::DataManager::rootEntities( ), false, true );
+  nslib::PaneManager::activePane( )->displayEntities( nslib::DataManager::rootEntities( ), false, true );
 }
 
 void MainWindow::aboutDialog( void )
@@ -647,7 +565,7 @@ void MainWindow::aboutDialog( void )
 #else
     "</li><li>Deflect " + tr ("support not built.") +
 #endif
-
+    "</li><li>Qt " + QT_VERSION_STR +
     "</li></ul>" +
     "<h4>" + tr( "Developed by:" ) + "</h4>" +
     "VG-Lab / URJC / UPM"
@@ -665,39 +583,30 @@ void MainWindow::aboutDialog( void )
 
 void MainWindow::toggleShowConnectivity( void )
 {
-
   nslib::Config::showConnectivity( _ui->actionShowConnectivity->isChecked( ));
-  // WAR to force repaint
-  resizeEvent( 0 );
-  for ( auto canvas : nslib::PaneManager::panes( ))
-  {
-    canvas->resizeEvent( nullptr );
-    // canvas->layouts( ).getLayout(
-    //   canvas->activeLayoutIndex( ))->refresh( false );
-  }
+  resizeEvent(nullptr);
+
+  auto &panes = nslib::PaneManager::panes();
+  std::for_each(panes.begin(), panes.end(), [](nslib::Canvas *c) { c->resizeEvent(nullptr); });
 }
 
 void MainWindow::toggleShowNoHierarchyEntities( void )
 {
   nslib::Config::showNoHierarchyEntities( _ui->actionShowNoHierarchyEntities->isChecked( ));
 
-  for ( auto canvas : nslib::PaneManager::panes( ))
-  {
-    canvas->displayEntities( canvas->sceneEntities( ), false, false );
-    // canvas->layouts( ).getLayout(
-    //   canvas->activeLayoutIndex( ))->refresh( false );
-  }
+  auto displayNon = [](nslib::Canvas *c){ c->displayEntities(c->sceneEntities(), false, false); };
+  auto &panes = nslib::PaneManager::panes();
+  std::for_each(panes.begin(), panes.end(), displayNon);
 }
 
 void MainWindow::toggleShowEntitiesName( void )
 {
   nslib::Config::showEntitiesName( _ui->actionShowEntitiesName->isChecked( ));
   nslib::RepresentationCreatorManager::clearCaches( );
-  for ( auto canvas : nslib::PaneManager::panes( ))
-  {
-    canvas->displayEntities( false, false );
-  }
 
+  auto displayEntities = [](nslib::Canvas *c){ c->displayEntities(false, false); };
+  auto &panes = nslib::PaneManager::panes();
+  std::for_each(panes.begin(), panes.end(), displayEntities);
 }
 
 // void MainWindow::saveScene( void )
@@ -709,20 +618,17 @@ void MainWindow::toggleShowEntitiesName( void )
 
 void MainWindow::actionPublishSelectionToggle( void )
 {
-  nslib::Config::autoPublishSelection(
-    _ui->actionAutoPublishSelection->isChecked( ));
+  nslib::Config::autoPublishSelection(_ui->actionAutoPublishSelection->isChecked());
 }
 
 void MainWindow::actionPublishFocusOnSelectionToggle( void )
 {
-  nslib::Config::autoPublishFocusOnSelection(
-    _ui->actionAutoFocusOnSelection->isChecked( ));
+  nslib::Config::autoPublishFocusOnSelection(_ui->actionAutoFocusOnSelection->isChecked());
 }
 
 void MainWindow::actionPublishFocusOnDisplayedToggle( void )
 {
-  nslib::Config::autoPublishFocusOnDisplayed(
-    _ui->actionAutoFocusOnDisplayed->isChecked( ));
+  nslib::Config::autoPublishFocusOnDisplayed(_ui->actionAutoFocusOnDisplayed->isChecked());
 }
 
 void MainWindow::actionPublishSelection( void )
@@ -741,33 +647,74 @@ void MainWindow::actionPublishFocusOnSelection( void )
 
 void MainWindow::actionPublishFocusOnDisplayed( void )
 {
-  std::cerr << "TODO" << std::endl;
+  nslib::Loggers::get( )->log(
+    std::string("actionPublishFocusOnDisplayed not implemented."),
+    nslib::LOG_LEVEL_WARNING,
+    NEUROSCHEME_FILE_LINE );
 }
 
 void MainWindow::toggleZeroEQ( void )
 {
+  auto disableZeroEQ = [this]()
+  {
+    _ui->actionToggleZeroEQ->blockSignals(true);
+    _ui->actionToggleZeroEQ->setChecked(false);
+    _ui->actionToggleZeroEQ->setEnabled(false);
+    _ui->actionToggleZeroEQ->blockSignals(false);
+    _ui->actionPublishSelection->setEnabled(false);
+    _ui->actionAutoPublishSelection->setEnabled(false);
+  };
+
   if ( _ui->actionToggleZeroEQ->isChecked( ))
   {
     bool ok;
-    QString text = QInputDialog::getText(
+    const QString text = QInputDialog::getText(
       this, tr("Please select ZeroEQ session" ),
       tr("ZeroEQ session:"), QLineEdit::Normal,
       QString::fromStdString( nslib::Config::zeroEQSession( )), &ok );
+
     if ( ok && !text.isEmpty( ))
     {
-      nslib::Config::zeroEQSession( text.toStdString( ));
-      nslib::ZeroEQManager::connect( nslib::Config::zeroEQSession( ));
+      try
+      {
+        nslib::Config::zeroEQSession( text.toStdString( ));
+        nslib::ZeroEQManager::connect( nslib::Config::zeroEQSession( ));
+      }
+      catch(const std::exception &e)
+      {
+        nslib::Loggers::get( )->log(
+          std::string("Unable to connect to ZeroEQ session: ") + e.what(),
+          nslib::LOG_LEVEL_CRITICAL );
+
+        disableZeroEQ();
+
+        const auto title = tr("ZeroEQ");
+        const auto message = QString("Unable to connect to ZeroEQ session: %1").arg(text);
+        QMessageBox::critical(this, title, message, QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
+      }
     }
     else
       _ui->actionToggleZeroEQ->setChecked( false );
   }
   else
-    nslib::ZeroEQManager::disconnect( );
-}
+  {
+    try
+    {
+      nslib::ZeroEQManager::disconnect( );
+    }
+    catch(const std::exception &e)
+    {
+      nslib::Loggers::get( )->log(
+        std::string("Unable to disconnect ZeroEQ: ") + e.what(),
+        nslib::LOG_LEVEL_CRITICAL );
 
-void MainWindow::quit( void )
-{
-  QCoreApplication::quit( );
+      disableZeroEQ();
+
+      const auto title = tr("ZeroEQ");
+      const auto message = QString("Unable to disconnect ZeroEQ session.");
+      QMessageBox::critical(this, title, message, QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
+    }
+  }
 }
 
 void MainWindow::exportToJSON( void )
@@ -822,9 +769,8 @@ void MainWindow::cleanScene( void )
   nslib::DataManager::reset( );
   nslib::RepresentationCreatorManager::clearCaches( );
   nslib::RepresentationCreatorManager::clearMaximums( );
-  for( auto canvas : nslib::PaneManager::panes( ))
-  {
-    canvas->displayEntities(
-      nslib::DataManager::rootEntities( ), false, true );
-  }
+
+  auto displayRoot = [](nslib::Canvas *c){ c->displayEntities( nslib::DataManager::rootEntities( ), false, true ); };
+  auto &panes = nslib::PaneManager::panes();
+  std::for_each(panes.begin(), panes.end(), displayRoot);
 }

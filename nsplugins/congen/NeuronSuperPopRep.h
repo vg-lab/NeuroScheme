@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_SUPER_REP__
 #define __NSLIB__NEURON_SUPER_REP__
 
@@ -36,17 +37,13 @@ namespace nslib
       , public QGraphicsItemRepresentation
     {
     public:
-
       NeuronSuperPopRep( void );
       NeuronSuperPopRep( const NeuronSuperPopRep& );
       NeuronSuperPopRep( const shiftgen::NeuronSuperPopRep& );
       virtual ~NeuronSuperPopRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr,
         bool create = true );
-
     };
-
-
   } // namespace congen
 } // namespace nslib
 

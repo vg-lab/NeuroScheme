@@ -30,7 +30,6 @@
 
 namespace nslib
 {
-
   CircularLayout::CircularLayout( void )
     : Layout( "Circular", Layout::SORT_ENABLED | Layout::FILTER_ENABLED,
         new QWidget )
@@ -49,7 +48,7 @@ namespace nslib
     layout_->addWidget( labelRadius, 0, 0 );
     layout_->addWidget( _lineEditRadius, 0, 1 );
 
-    QPushButton* button = new QPushButton( "Apply" );
+    auto button = new QPushButton( "Apply" );
 
     layout_->addWidget( button, 1, 0, 1, 2 );
 
@@ -89,7 +88,6 @@ namespace nslib
         auto item = graphicsItemRep->item( &_canvas->scene( ));
         if ( !item->parentItem( ))
         {
-          // std::cout << "++++++ Arranging " << item << std::endl;
           ++repsToBeArranged;
           if ( doFiltering && useOpacityForFilter )
           {
@@ -107,27 +105,24 @@ namespace nslib
           if ( rect.height( ) > maxItemHeight )
             maxItemHeight = static_cast< unsigned int >(rect.height( ));
         }
-        // else std::cout << "Item with parentItem, skipping" << std::endl;
       }
-    } // for all reps
-    //std::cout << "filtered out " << filteredOutItems.size( ) << std::endl;
-    // std::cout << "Arranging " << repsToBeArranged << std::endl;
+    }
 
-    const unsigned int marginX = 20;
-    const unsigned int marginY = 20;
+    constexpr unsigned int marginX = 20;
+    constexpr unsigned int marginY = 20;
 
     int counter = 0;
 
     QGraphicsView* gv = _canvas->scene( ).views( )[0];
 
-    float deltaAngle = 2.0f * static_cast< float >( M_PI ) / repsToBeArranged;
-    float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
-    float deltaAngleMultRadius =
+    const float deltaAngle = 2.0f * static_cast< float >( M_PI ) / repsToBeArranged;
+    const float radius = std::min( gv->width( ), gv->height( )) * 0.5f;
+    const float deltaAngleMultRadius =
       ( 1.0f - static_cast< float >( _lineEditRadius->value( )) * 0.01f )
       * deltaAngle * radius;
 
-    auto opacity = _filterWidget
-      ? float( _filterWidget->opacityValue( )) * 0.01 : 1.0f;
+    const auto opacity = _filterWidget
+      ? float( _filterWidget->opacityValue( )) * 0.01f : 1.0f;
     qreal repsScale = 1.0f;
     for ( const auto representation : reps )
     {
@@ -157,18 +152,18 @@ namespace nslib
 
           if ( repsToBeArranged == 1 )
           {
-            scaleX = float( ( gv->width( ) - 2 * marginX )  / rect.width( ));
-            scaleY = float( ( gv->height( ) - 2 * marginY ) / rect.height( ));
+            scaleX = static_cast<float>( ( gv->width( ) - 2 * marginX )  / rect.width( ));
+            scaleY = static_cast<float>( ( gv->height( ) - 2 * marginY ) / rect.height( ));
             repsScale = std::min( scaleX, scaleY );
             posX = 0;
             posY = 0;
           }
           else
           {
-            scaleX = float( deltaAngleMultRadius / rect.width( ));
-            scaleY = float( deltaAngleMultRadius / rect.height( ));
+            scaleX = static_cast<float>( deltaAngleMultRadius / rect.width( ));
+            scaleY = static_cast<float>( deltaAngleMultRadius / rect.height( ));
             repsScale = std::min( scaleX, scaleY );
-            qreal angle = counter * deltaAngle;
+            const qreal angle = counter * deltaAngle;
             posX = radius * cos( angle );
             posY = radius * sin( angle );
           }
@@ -176,7 +171,6 @@ namespace nslib
           if ( useOpacityForFilter &&
                filteredOutItems.count( graphicsItem ) == 1 )
           {
-            //std::cout << "opacity " << _filterWidget->opacityValue( ) << std::endl;
             graphicsItem->setOpacity( opacity );
           }
           else
@@ -191,18 +185,15 @@ namespace nslib
             graphicsItem->setPos( posX, posY );
             graphicsItem->setScale( repsScale );
           }
-          // std::cout << posX << " " << posY << " " << scale_ << std::endl;
         }
       }
       _canvas->repsScale( repsScale );
       ++counter;
     }
-
   }
 
   void CircularLayout::_updateOptionsWidget( void )
   {
-
   }
 
   Layout* CircularLayout::clone( void ) const
@@ -211,5 +202,4 @@ namespace nslib
     layout->radius(this->radius( ));
     return layout;
   }
-
 }

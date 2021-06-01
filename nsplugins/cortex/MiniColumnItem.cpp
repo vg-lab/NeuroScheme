@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <nslib/error.h>
 #include <nslib/reps/CollapseButtonItem.h>
 #include "MiniColumnItem.h"
@@ -30,20 +31,14 @@ namespace nslib
 {
   namespace cortex
   {
+    const QColor BASE_COLOR = QColor( 126, 204, 145 );
 
     MiniColumnItem::MiniColumnItem( const MiniColumnRep& miniColumnRep,
                                     QGraphicsScene* scene_,
-                                    unsigned int size )
+                                    const unsigned int size )
       : NeuronAggregationItem( )
       , _itemText( nullptr )
     {
-      // std::cout << "props: " << miniColumnRep.properties( ).size( ) << std::endl;;
-      // for ( const auto p : miniColumnRep.properties( ))
-      //   std::cout << p.first << std::endl;
-      // const auto& shiftNeuronRep =
-      //   miniColumnRep.getProperty( "meanNeuron" ).value< shiftgen::NeuronRep >( );
-      // NeuronRep meanNeuron( shiftNeuronRep );
-
       const NeuronRep* meanNeuron = new NeuronRep(
         miniColumnRep.getPropertyValue< NeuronRep >( "meanNeuron" ));
       const auto& layers =
@@ -55,13 +50,14 @@ namespace nslib
       QPainterPath path_;
       QPolygon poly;
 
-      QPoint pUL (-int(size)/3, -int(size)/24);
-      QPoint pUM (           0, -int(size)/6);
-      QPoint pUR ( int(size)/3, -int(size)/24);
+      const int iSize = static_cast<int>(size);
+      QPoint pUL (-iSize/3, -iSize/24);
+      QPoint pUM (       0, -iSize/6);
+      QPoint pUR ( iSize/3, -iSize/24);
 
-      QPoint pLR ( int(size)/3, +int(size)/24);
-      QPoint pLM (           0, +int(size)/6);
-      QPoint pLL (-int(size)/3, +int(size)/24);
+      QPoint pLR ( iSize/3,  iSize/24);
+      QPoint pLM (       0,  iSize/6);
+      QPoint pLL (-iSize/3,  iSize/24);
 
       poly << pLR << pLM << pLL
            << pUL << pUM << pUR;
@@ -75,7 +71,7 @@ namespace nslib
         neuronAggReps,
         path_,
         pLL, pLM, pLR,
-        QColor( 126, 204, 145 ),
+        BASE_COLOR,
         size );
 
       this->_parentRep = &( const_cast< MiniColumnRep& >( miniColumnRep ));
@@ -86,13 +82,11 @@ namespace nslib
           .getPropertyValue< std::string >( "Entity name", "" )), this,
           0.4f, 1.0f );
       }
-
-      //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
     }
 
     MiniColumnItem::~MiniColumnItem( void )
     {
-      delete _itemText;
+      if(_itemText) delete _itemText;
     }
   } // namespace cortex
 } // namespace nslib

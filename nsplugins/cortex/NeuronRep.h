@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__NEURON_REP__
 #define __NSLIB__NEURON_REP__
 
@@ -30,25 +31,20 @@ namespace nslib
 {
   namespace cortex
   {
-
-
     class NeuronRep
       : public shiftgen::NeuronRep
       , public QGraphicsItemRepresentation
     {
-    public:
+      public:
+        NeuronRep( void );
+        NeuronRep( const NeuronRep& );
+        NeuronRep( const shiftgen::NeuronRep& );
+        virtual ~NeuronRep( void ) {}
+        QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                             bool create = true );
 
-      NeuronRep( void );
-      NeuronRep( const NeuronRep& );
-      NeuronRep( const shiftgen::NeuronRep& );
-      virtual ~NeuronRep( void ) {}
-      QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                           bool create = true );
-
-      NeuronRep& operator=(const nslib::cortex::NeuronRep&) = default;
+        NeuronRep& operator=(const nslib::cortex::NeuronRep&) = default;
     };
-
-
   } // namespace cortex
 } // namespace nslib
 

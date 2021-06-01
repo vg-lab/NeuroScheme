@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONGEN_CONNECTION_ARROW_REP__
 #define __NSLIB__CONGEN_CONNECTION_ARROW_REP__
 
@@ -37,37 +38,37 @@ namespace nslib
           public ConnectivityRep
     {
       public:
+        ConnectionArrowRep( shift::Representation* originRep_,
+           shift::Representation* destRep_, const bool isAggregated_ );
 
-      ConnectionArrowRep( shift::Representation* originRep_,
-         shift::Representation* destRep_, const bool isAggregated_ );
+        ConnectionArrowRep( const ConnectionArrowRep& );
 
-      ConnectionArrowRep( const ConnectionArrowRep& );
+        virtual ~ConnectionArrowRep( void )
+        {}
 
-      virtual Qt::PenStyle lineStyle( void ) const;
+        virtual Qt::PenStyle lineStyle( void ) const;
 
-      virtual ~ConnectionArrowRep( void ) { }
+        virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+          bool create = true );
 
-      virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-        bool create = true );
+        virtual void preRender( shift::OpConfig* opConfig = nullptr );
 
-      virtual void preRender( shift::OpConfig* opConfig = nullptr );
+        void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
 
-      void hoverEnterEvent( QGraphicsSceneHoverEvent* event );
+        void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
 
-      void hoverLeaveEvent( QGraphicsSceneHoverEvent* event );
+        virtual void editConnectionWidget( void );
 
-      virtual void editConnectionWidget( void );
+        virtual void highlight(
+          const scoop::Color& color = scoop::Color( 255, 0, 0 ));
 
-      virtual void highlight(
-        const scoop::Color& color = scoop::Color( 255, 0, 0 ));
-
-      virtual void unHighlight( void ) final;
+        virtual void unHighlight( void ) final;
 
       protected:
-      shift::Representation* _originRep;
-      shift::Representation* _destRep;
-      bool _isAggregated;
-      Qt::PenStyle _lineStyle;
+        shift::Representation* _originRep;
+        shift::Representation* _destRep;
+        bool _isAggregated;
+        Qt::PenStyle _lineStyle;
     };
   } // namespace congen
 } // namespace nslib

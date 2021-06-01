@@ -31,12 +31,8 @@ namespace nslib
 {
   namespace cortex
   {
-
-    LayerItem::LayerItem( // unsigned int layer_,
-      // QGraphicsItem *parent_
-      const LayerRep& layerRep )
-    // : QGraphicsPathItem( parent_ )
-    // , _layer( layer_  )
+    LayerItem::LayerItem( const LayerRep& layerRep )
+    : _layer{0}
     {
       setAcceptHoverEvents( true );
       setFlags( QGraphicsItem::ItemIsPanel );
@@ -45,7 +41,7 @@ namespace nslib
     }
 
     void LayerItem::create(
-      unsigned int layer_,
+      const unsigned int layer_,
       QGraphicsItem *parent_,
       const QPoint& pLayerUL,
       const QPoint& pLayerUM,
@@ -78,7 +74,7 @@ namespace nslib
       this->setBrush( brush_ );
 
       {
-        float numNeuronsPercWidth = percPyr;
+        const float numNeuronsPercWidth = percPyr;
         QPoint pWidget = ( pLayerLL - pLayerLM ) * numNeuronsPercWidth;
         QPolygon numNeuronsPoly;
         numNeuronsPoly << pLayerLM + pWidget - QPoint( 0,numNeuronsHeight )
@@ -95,10 +91,10 @@ namespace nslib
         numNeuronsPathItem->setPath( layerPath );
         numNeuronsPathItem->setPen( Qt::NoPen );
         numNeuronsPathItem->setBrush( QBrush( QColor( 200,100,100 )));
-
       }
+
       {
-        float numNeuronsPercWidth = percInter;
+        const float numNeuronsPercWidth = percInter;
         QPoint pWidget = ( pLayerLR - pLayerLM ) * numNeuronsPercWidth;
 
         QPolygon numNeuronsPoly;
@@ -125,7 +121,6 @@ namespace nslib
       return _layer;
     }
 
-
   void NeuronAggregationItem::_createNeuronAggregationItem(
     QGraphicsScene* scene_,
     const NeuronRep* meanNeuron,
@@ -140,25 +135,24 @@ namespace nslib
   {
     this->setPath( path_ );
     this->setPen( Qt::NoPen );
-//    this->setBrush( QBrush( QColor( 114, 188, 196 )));
     this->setBrush( QBrush( baseColor ));
 
-    unsigned int nrSize = size/7;
+    const unsigned int nrSize = size/7;
+    const int inrSize = static_cast<int>(nrSize);
 
     // Container for neuron
     QGraphicsEllipseItem *nrCont = new QGraphicsEllipseItem( this );
 
-    nrCont->setRect( -int( nrSize ) * 0.8f,  -int( nrSize ) * 0.8f,
+    nrCont->setRect( -inrSize * 0.8f,  -inrSize * 0.8f,
                      nrSize * 1.6f,  nrSize * 1.6f );
 
     nrCont->setPen( Qt::NoPen );
     nrCont->setBrush( QBrush( QColor( 255, 255, 255 )));
-    //nrCont->setPos( 0, -int( size ) / 16 );
 
     auto _meanNeuronItem = new NeuronItem( meanNeuron, nrSize, false );
+
     // To avoid destruction of parent which is not dynamically allocated
     //_meanNeuronItem->parentRep( nullptr );
-
     _meanNeuronItem->setParentItem( nrCont );
 
     // Collapse button
@@ -166,8 +160,8 @@ namespace nslib
     QGraphicsEllipseItem* collapseButton;
     QGraphicsLineItem* collapseItemHorizontalLine;
 
-    int collapseButtonSize = int( roundf( float( size ) * 0.04f ));
-    QPoint collapseButtonPos( 0, int( size ) / 6 );
+    const int collapseButtonSize = static_cast<int>( roundf( static_cast<float>( size ) * 0.04f ));
+    QPoint collapseButtonPos( 0, static_cast<int>( size ) / 6 );
     collapseButton = new CollapseButtonItem( );
     collapseButton->setRect( - collapseButtonSize / 2,
                              - collapseButtonSize / 2,
@@ -196,14 +190,11 @@ namespace nslib
     _collapseItemVerticalLine->setOpacity(1);
     _collapseItemVerticalLine->setParentItem( collapseButton );
 
-    // Layers
-    // const auto& layers =
-    //   columnRep.getProperty( "layers" ).value< ColumnRep::Layers >( );
     NEUROSCHEME_DEBUG_CHECK(
       layers.size( ) == 7,
       "nslib::ColumnItem: incorrect number of LayerReps" );
-    unsigned int layerHeight = size / 20;
-    unsigned int layerPadding = size/100;
+    const unsigned int layerHeight = size / 20;
+    const unsigned int layerPadding = size/100;
     for ( int layer = 1; layer <= 6; ++layer )
     {
       QPoint pLayerUL =
@@ -244,7 +235,6 @@ namespace nslib
           QColor( std::min( baseColor.red( ) + layer * 8, 255 ),
                   std::min( baseColor.green( ) + layer * 8, 255 ),
                   std::min( baseColor.blue( ) + layer * 5 , 255 ))));
-      //layerItem->setParentItem( collapseButton );
 
       layerItem->setFlag( QGraphicsItem::ItemStacksBehindParent );
       _layerItems[ layer - 1 ] = layerItem;
@@ -269,7 +259,9 @@ namespace nslib
             QColor( std::min( baseColor.red( ) + layer * 8, 255 ),
                     std::min( baseColor.green( ) + layer * 8, 255 ),
                     std::min( baseColor.blue( ) + layer * 5 , 255 ))));
+
         item->setPen( Qt::NoPen );
+
         if ( i == 0 )
         {
           item->setX(( pLayerUL - collapseButtonPos ).x( ) - int(size)/20 );
@@ -282,6 +274,7 @@ namespace nslib
         }
       }
     }
+
     for ( int i = 0; i < 2; ++i )
     {
       auto neuronTypeAggRep =
@@ -309,7 +302,6 @@ namespace nslib
       }
     }
 
-
     NEUROSCHEME_DEBUG_CHECK(
       neuronTypeAggs.size( ) == 14,
       "nslib::NeuronAggregationItem: incorrect number"
@@ -331,13 +323,10 @@ namespace nslib
     //   item->setPen( Qt::NoPen );
     //   item->setX( pLayerUL.x( ) - size / 1.5f );
     //   item->setY( pLayerUL.y( ) + size / 2 );
-
     // }
 
     this->collapse( false ); // Start collapsed
-
   }
-
 
   void NeuronAggregationItem::collapse( bool anim )
   {
@@ -359,12 +348,9 @@ namespace nslib
         _layerItems[ i ]->setEnabled( false );
         _layerItems[ i ]->setVisible( false );
       }
-
-
     }
+
     _collapsed = true;
-
-
   }
 
   void NeuronAggregationItem::uncollapse( bool anim )
@@ -389,6 +375,7 @@ namespace nslib
       else
         _layerItems[ i ]->setOpacity( 1 );
     }
+
     _collapsed = false;
   }
 
@@ -398,6 +385,7 @@ namespace nslib
       auto qGraphicsItemRep =
         dynamic_cast< QGraphicsItemRepresentation* >( _parentRep );
       if ( qGraphicsItemRep )
+      {
         for ( auto& item : qGraphicsItemRep->items( ))
         {
           auto qAbstractGraphicItem =
@@ -408,6 +396,7 @@ namespace nslib
               qAbstractGraphicItem, event_ );
           }
         }
+      }
     }
 
     void NeuronAggregationItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
@@ -428,10 +417,10 @@ namespace nslib
       }
     }
 
-      void NeuronAggregationItem::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
-      {
-        InteractionManager::contextMenuEvent( this, event_ );
-      }
+    void NeuronAggregationItem::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )
+    {
+      InteractionManager::contextMenuEvent( this, event_ );
+    }
 
   } // namespace cortex
 } // namespace nslib

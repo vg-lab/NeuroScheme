@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIBCORTEX__LAYER_REP__
 #define __NSLIBCORTEX__LAYER_REP__
 
@@ -36,12 +37,10 @@ namespace nslib
       , public QGraphicsItemRepresentation
     {
     public:
-
       LayerRep( void );
       LayerRep( const LayerRep& );
       virtual ~LayerRep( void ) {}
       QGraphicsItem* item( QGraphicsScene* scene = nullptr, bool create = true );
-
     };
 
   }
