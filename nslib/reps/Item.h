@@ -28,18 +28,16 @@
 
 namespace nslib
 {
-
   class Item
   {
-
   public:
-
     Item( void )
       : _parentRep( nullptr )
     {
       _scaleAnim.setPropertyName( "scale" );
       _posAnim.setPropertyName( "pos" );
     }
+
     virtual ~Item( void )
     {
      if ( _parentRep )
@@ -50,10 +48,12 @@ namespace nslib
           parentRep_->clearItems( );
       }
     }
+
     virtual shift::Representation* parentRep( void ) const
     {
       return _parentRep;
     }
+
     virtual void parentRep( shift::Representation* parentRep_ )
     {
       _parentRep = parentRep_;
@@ -66,15 +66,12 @@ namespace nslib
 
     QPropertyAnimation& posAnim( ) { return _posAnim; }
     QPropertyAnimation& scaleAnim( ) { return _scaleAnim; }
-  protected:
 
+  protected:
     shift::Representation* _parentRep;
     QPropertyAnimation _posAnim;
     QPropertyAnimation _scaleAnim;
-
   };
-
-
 } // namespace nslib
 
 #endif // __NSLIB_ITEM__

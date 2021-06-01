@@ -31,8 +31,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
-#include <assert.h>
 
+#include <assert.h>
 
 namespace nslib
 {
@@ -55,51 +55,45 @@ namespace nslib
     , _cancelButton( new QPushButton( QString( tr( "Cancel" ))))
     , _gridLayout( new QGridLayout( ))
     , _gridPropertiesLayout( new QGridLayout( ))
-    , _connectionUpdateTimer( new QTimer( this ))
   {
-  unsigned int numProp = 0u;
-  _gridLayout->setAlignment( Qt::AlignTop );
-  _gridLayout->setColumnStretch( 0, 1 );
-  _gridLayout->setColumnStretch( 1, 1 );
-  _labelTitleRel->setStyleSheet( "font-weight:bold" );
-  _labelEntitiesRel->setStyleSheet( "font-weight:bold" );
-  _gridLayout->addWidget( _labelTitleRel, numProp, 0, 1, 0 );
-  _gridLayout->addWidget( _labelEntitiesRel, ++numProp, 0, 1, 0 );
+    unsigned int numProp = 0u;
+    _gridLayout->setAlignment( Qt::AlignTop );
+    _gridLayout->setColumnStretch( 0, 1 );
+    _gridLayout->setColumnStretch( 1, 1 );
+    _labelTitleRel->setStyleSheet( "font-weight:bold" );
+    _labelEntitiesRel->setStyleSheet( "font-weight:bold" );
+    _gridLayout->addWidget( _labelTitleRel, numProp, 0, 1, 0 );
+    _gridLayout->addWidget( _labelEntitiesRel, ++numProp, 0, 1, 0 );
 
-  _gridLayout->addLayout(_gridPropertiesLayout, ++numProp, 0, 1, 2 );
+    _gridLayout->addLayout(_gridPropertiesLayout, ++numProp, 0, 1, 2 );
 
-  auto separation = new QFrame( );
-  separation->setFrameShape( QFrame::HLine );
-  _gridLayout->addWidget( separation, ++numProp, 0, 1, 2 );
+    auto separation = new QFrame( );
+    separation->setFrameShape( QFrame::HLine );
+    _gridLayout->addWidget( separation, ++numProp, 0, 1, 2 );
 
-  _gridLayout->addWidget( _cancelButton, ++numProp, 0 );
+    _gridLayout->addWidget( _cancelButton, ++numProp, 0 );
 
-  _gridLayout->addWidget( _validationButton, numProp, 1 );
-  _gridLayout->addWidget( _eraseButton, ++numProp, 0, 1, 2);
-  QLabel* autoCloseLabel =  new QLabel( tr( "Auto-close" ));
-  _gridLayout->addWidget( autoCloseLabel, ++numProp, 0 );
+    _gridLayout->addWidget( _validationButton, numProp, 1 );
+    _gridLayout->addWidget( _eraseButton, ++numProp, 0, 1, 2);
+    auto autoCloseLabel =  new QLabel( tr( "Auto-close" ));
+    _gridLayout->addWidget( autoCloseLabel, ++numProp, 0 );
 
-  _autoCloseCheck->setChecked( _autoCloseChecked );
-  _gridLayout->addWidget( _autoCloseCheck, numProp, 1 );
+    _autoCloseCheck->setChecked( _autoCloseChecked );
+    _gridLayout->addWidget( _autoCloseCheck, numProp, 1 );
 
-  connect( _eraseButton, SIGNAL( clicked( )), this,
-    SLOT( breakDialog( )));
-  connect( _validationButton, SIGNAL( clicked( )),
-    this, SLOT( validateDialog( )));
-  connect( _cancelButton, SIGNAL( clicked( )), this,
-    SLOT( cancelDialog( )));
-  connect( _autoCloseCheck, SIGNAL( clicked( )),
-    this, SLOT( toggleAutoClose( )));
+    connect( _eraseButton, SIGNAL( clicked( )), this,
+      SLOT( breakDialog( )));
+    connect( _validationButton, SIGNAL( clicked( )),
+      this, SLOT( validateDialog( )));
+    connect( _cancelButton, SIGNAL( clicked( )), this,
+      SLOT( cancelDialog( )));
+    connect( _autoCloseCheck, SIGNAL( clicked( )),
+      this, SLOT( toggleAutoClose( )));
 
-  setLayout( _gridLayout );
+    setLayout( _gridLayout );
 
-  _parentDock->setWidget( this );
-
-    connect( _connectionUpdateTimer, SIGNAL(timeout( )), this,
-      SLOT( refreshEntities( )));
-    _connectionUpdateTimer->start(/*timeout*/ );
-    //timeout of 0 will time out as soon as all events in the event queue
-    // have been processed
+    if(_parentDock)
+      _parentDock->setWidget( this );
   }
 
   void ConnectionRelationshipEditWidget::updateWidget(
@@ -110,6 +104,7 @@ namespace nslib
     _updateDestEntity = destinationEntity_;
     _updateConnectionType = connectionType_;
 
+    refreshEntities();
   }
 
   void ConnectionRelationshipEditWidget::validateDialog( void )
@@ -145,7 +140,8 @@ namespace nslib
       if( _autoCloseCheck->isChecked( ) )
       {
         this->hide( );
-        _parentDock->close( );
+        if(_parentDock)
+          _parentDock->close( );
       }
     }
 
@@ -155,7 +151,7 @@ namespace nslib
     RepresentationCreatorManager::clearRelationshipsCache( );
     // }
 
-    for ( auto pane : PaneManager::panes( ))
+    for ( auto &pane : PaneManager::panes( ))
     {
       pane->displayEntities( false, true );
     }
@@ -194,11 +190,11 @@ namespace nslib
     }
   }
 
-
   void ConnectionRelationshipEditWidget::cancelDialog( void )
   {
     this->hide( );
-    _parentDock->close( );
+    if(_parentDock)
+      _parentDock->close( );
   }
 
   ConnectionRelationshipEditWidget::~ConnectionRelationshipEditWidget( void )
@@ -236,7 +232,7 @@ namespace nslib
     const auto origGid = _originEntity->entityGid( );
     const auto destGid = _destEntity->entityGid( );
 
-    for ( auto pane : PaneManager::panes( ))
+    for ( auto &pane : PaneManager::panes( ))
     {
       pane->resizeEvent( nullptr );
     }
@@ -275,7 +271,8 @@ namespace nslib
     if ( _autoCloseCheck->isChecked( ))
     {
       this->hide( );
-      _parentDock->close( );
+      if(_parentDock)
+        _parentDock->close( );
     }
     else if( _isNew )
     {
@@ -328,7 +325,8 @@ namespace nslib
               " cannot be connected to a " + _updateDestEntity->typeName( ) +
               '.', LOG_LEVEL_WARNING, NEUROSCHEME_FILE_LINE );
             this->hide( );
-            _parentDock->hide( );
+            if(_parentDock)
+              _parentDock->hide( );
             return;
           }
           else
@@ -463,6 +461,7 @@ namespace nslib
               std::make_tuple( widgetType, label, widget ));
         }
       }
+
       if( _isNew )
       {
         _validationButton->setText( tr( "Create" ));
@@ -480,12 +479,13 @@ namespace nslib
         }
         _validationButton->setText( tr( "Save" ));
       }
-      _parentDock->show( );
+
+      if(_parentDock)
+        _parentDock->show( );
       this->show( );
       _originEntity = _updateOriginEntity;
       _destEntity = _updateDestEntity;
       _updateOriginEntity = _updateDestEntity = nullptr;
     }
   }
-
 }

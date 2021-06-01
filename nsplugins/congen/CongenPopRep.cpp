@@ -19,31 +19,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "CongenPopRep.h"
 #include "CongenPopItem.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
-
 namespace nslib
 {
   namespace congen
   {
-
     CongenPopRep::CongenPopRep( void )
       : shiftgen::CongenPopRep( )
-    {
-    }
+    {}
 
     CongenPopRep::CongenPopRep( const CongenPopRep& other )
       : shiftgen::CongenPopRep( other )
-    {
-    }
+    {}
 
     CongenPopRep::CongenPopRep( const shiftgen::CongenPopRep& other )
       : shiftgen::CongenPopRep( other )
-    {
-    }
+    {}
 
 
     QGraphicsItem* CongenPopRep::item( QGraphicsScene* scene, bool create )

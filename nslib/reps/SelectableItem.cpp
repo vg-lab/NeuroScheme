@@ -34,7 +34,6 @@ namespace  nslib
 
   void SelectableItem::init( void )
   {
-
     auto penWidth = 2 * nslib::Config::scale( );
 
     _selectedPen =
@@ -69,5 +68,4 @@ namespace  nslib
     _unselectedPen.setCosmetic( true );
     _hoverUnselectedPen.setCosmetic( true );
   }
-
 }

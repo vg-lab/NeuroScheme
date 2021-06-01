@@ -67,25 +67,25 @@ list( APPEND SHIFT_GENERATED_HEADER_FILES
 
 set( NSLIBCORTEX_SOURCES
   ${SHIFT_GENERATED_IMPL_FILES}
+  Circle.cpp
   ColumnItem.cpp
   ColumnRep.cpp
   ConnectionArrowItem.cpp
   ConnectionArrowRep.cpp
   DataLoader.cpp
   Domain.cpp
+  Eigen4VectorCaster.cpp
+  LayerItem.cpp
   LayerRep.cpp
   MiniColumnItem.cpp
   MiniColumnRep.cpp
   NeuronAggregationItem.cpp
+  NeuronItem.cpp
+  NeuronRep.cpp
   NeuronTypeAggregationItem.cpp
   NeuronTypeAggregationRep.cpp
-  NeuronRep.cpp
-  NeuronItem.cpp
   RepresentationCreator.cpp
-  Circle.cpp
   Triangle.cpp
-  Eigen4VectorCaster.cpp
-  LayerItem.cpp
   )
 
 set( NSLIBCORTEX_HEADERS

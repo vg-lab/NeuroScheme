@@ -33,14 +33,20 @@ namespace nslib
   Domain::Domain( void )
     : _dataLoader( nullptr )
     , _entitiesTypes( nullptr )
+    , _relationshipPropertiesTypes ( nullptr )
   {
   }
 
   Domain::~Domain( void )
   {
-    delete this->_dataLoader;
-    delete this->_entitiesTypes;
-    delete this->_relationshipPropertiesTypes;
+    if(_dataLoader)
+      delete _dataLoader;
+
+    if(_entitiesTypes)
+      delete _entitiesTypes;
+
+    if(_relationshipPropertiesTypes)
+      delete _relationshipPropertiesTypes;
   }
 
   std::string& Domain::domainName( void )
@@ -166,7 +172,7 @@ namespace nslib
     {
       boost::property_tree::read_json( inputStream, root );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception & ex )
     {
       Loggers::get( )->log( "ERROR: reading JSON: " + std::string( ex.what( )),
         LOG_LEVEL_ERROR );
@@ -181,14 +187,14 @@ namespace nslib
     }
     try
     {
-      std::string domainValue = root.get< std::string >( "domain" );
+      const std::string domainValue = root.get< std::string >( "domain" );
       if( domainValue != _domainName )
       {
         Loggers::get( )->log( "ERROR parsing object: the domain must specify a "
           + _domainName + " domain.", LOG_LEVEL_ERROR );
       }
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting Domain from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -199,13 +205,13 @@ namespace nslib
       boost::property_tree::ptree maximums = root.get_child( "maximums" );
       importMaximumsJSON( maximums );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting maximums object from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
     };
 
-    auto oldGIDToEntity =
+    const auto oldGIDToEntity =
       new std::unordered_map <unsigned int,shift::Entity*>( );
 
     try
@@ -213,7 +219,7 @@ namespace nslib
       boost::property_tree::ptree entities = root.get_child( "entities" );
       importEntititiesJSON( entities, oldGIDToEntity, replaceGIDs );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting entities Array from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -225,7 +231,7 @@ namespace nslib
         root.get_child( "relationships" );
       importRelationshipsJSON( relationships, oldGIDToEntity );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting relationships Array from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -234,10 +240,9 @@ namespace nslib
     try
     {
       boost::property_tree::ptree layout = root.get_child( "layout" );
-      std::cout << "lectura correcta" <<std::endl;
       importLayoutJSON( layout, oldGIDToEntity );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting layout Object from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -385,10 +390,11 @@ namespace nslib
   {
     try
     {
-      std::string entityType = entityJSON.get< std::string >( "EntityType" );
+      const std::string entityType = entityJSON.get< std::string >( "EntityType" );
+      if(!_entitiesTypes) throw std::runtime_error("Uninitialized _entitiesTypes.");
       entity = _entitiesTypes->getEntityObject( entityType )->create( );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting EntityType from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -398,7 +404,7 @@ namespace nslib
     {
       isRootEntity = entityJSON.get< std::string >( "RootEntity" )[ 0 ] == 't';
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting RootEntity from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -413,7 +419,7 @@ namespace nslib
         shift::Entity::shiftEntityGid( entityGID, true );
       }
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting EntityGID from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -425,7 +431,7 @@ namespace nslib
         entityJSON.get_child( "EntityData" );
       entity->deserialize( firesJSON );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting EntityData from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -444,7 +450,7 @@ namespace nslib
       {
         relationType = relation.second.get< std::string >( "relationType");
       }
-      catch ( std::exception const& ex )
+      catch ( const std::exception &ex )
       {
         Loggers::get( )->log( "ERROR: getting relationType from JSON: "
           + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -457,7 +463,7 @@ namespace nslib
           return ( boost::property_tree::ptree& )
             relation.second.get_child( "relations" );
         }
-        catch ( std::exception const& ex )
+        catch ( const std::exception &ex )
         {
           Loggers::get( )->log( "ERROR: getting relations array from JSON: "
             + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -475,7 +481,7 @@ namespace nslib
   {
     try
     {
-      unsigned int origGID = relation.get< unsigned int >( "Source" );
+      const unsigned int origGID = relation.get< unsigned int >( "Source" );
       auto search = oldGIDToEntity->find( origGID );
       if( search == oldGIDToEntity->end( ))
       {
@@ -486,7 +492,7 @@ namespace nslib
         }
       origEntity = search->second;
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting Source from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -494,7 +500,7 @@ namespace nslib
 
     try
     {
-      unsigned int destGID = relation.get< unsigned int >( "Dest");
+      const unsigned int destGID = relation.get< unsigned int >( "Dest");
       auto search = oldGIDToEntity->find( destGID );
       if( search == oldGIDToEntity->end( ))
       {
@@ -505,13 +511,14 @@ namespace nslib
       }
       destEntity = search->second;
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       origEntity = destEntity = nullptr;
       Loggers::get( )->log( "ERROR: getting Dest from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
       return;
     };
+
     if( checkConstrained && !shift::RelationshipPropertiesTypes::isConstrained(
         relationName, origEntity->typeName( ), destEntity->typeName( )) )
     {
@@ -534,8 +541,8 @@ namespace nslib
 
     for ( const auto& relation : relations )
     {
-      shift::Entity* origEntity;
-      shift::Entity* destEntity;
+      shift::Entity* origEntity = nullptr;
+      shift::Entity* destEntity = nullptr;
 
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ConnectedTo", true );
@@ -546,18 +553,28 @@ namespace nslib
         {
           firesData = relation.second.get_child( "RelationData" );
         }
-        catch( std::exception& ex )
+        catch( const std::exception &ex )
         {
           Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
             + std::string( ex.what( )), LOG_LEVEL_WARNING );
         }
-        shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
-          ->getRelationshipProperties( "connectsTo" )->create( );
-        propObject->deserialize( firesData );
-        shift::Relationship::EstablishAndAggregate(
-          relAggregatedConnectsTo,relAggregatedConnectedBy,
-          DataManager::entities( ), origEntity, destEntity, propObject,
-          propObject, false );
+
+        try
+        {
+          if(!_relationshipPropertiesTypes) throw std::runtime_error("Uninitialized _relationshipPropertiesTypes.");
+          shift::RelationshipProperties* propObject = _relationshipPropertiesTypes
+            ->getRelationshipProperties( "connectsTo" )->create( );
+          propObject->deserialize( firesData );
+          shift::Relationship::EstablishAndAggregate(
+            relAggregatedConnectsTo,relAggregatedConnectedBy,
+            DataManager::entities( ), origEntity, destEntity, propObject,
+            propObject, false );
+        }
+        catch( const std::exception &ex)
+        {
+          Loggers::get( )->log( "ERROR: getting RelationshipPropertiesTypes from JSON: "
+            + std::string( ex.what( )), LOG_LEVEL_WARNING );
+        }
       }
     }
   }
@@ -574,8 +591,8 @@ namespace nslib
 
     for ( const auto& relation : relations )
     {
-      shift::Entity* origEntity;
-      shift::Entity* destEntity;
+      shift::Entity* origEntity = nullptr;
+      shift::Entity* destEntity = nullptr;
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, "ParentOf", true );
       if ( origEntity != nullptr && destEntity != nullptr )
@@ -593,7 +610,7 @@ namespace nslib
   {
     for ( const auto& entityJSON : entities )
     {
-      shift::Entity* entity ;
+      shift::Entity* entity = nullptr;
       bool isRootEntity;
       unsigned int oldGID;
       importEntityJSON( entityJSON.second, entity, isRootEntity,
@@ -638,7 +655,7 @@ namespace nslib
     auto entities = DataManager::entities( ).vector( );
     auto rootEntitiesMap = DataManager::rootEntities( ).map( );
     bool firstIteration = true;
-    for ( auto entity : entities )
+    for ( const auto &entity : entities )
     {
       if ( firstIteration )
       {
@@ -648,8 +665,8 @@ namespace nslib
       {
         outputStream << continueBracket;
       }
-      auto entityGID = entity->entityGid( );
-      char isRoot = ( rootEntitiesMap.find( entityGID )
+      const auto entityGID = entity->entityGid( );
+      const char isRoot = ( rootEntitiesMap.find( entityGID )
         != rootEntitiesMap.end( )) ? 't' : 'f';
 
       outputStream << entityTypeLabel  << entity->typeName( )
@@ -668,8 +685,8 @@ namespace nslib
       .relationships( )[ name ]->asAggregatedOneToN( ));
     for ( const auto& relation : relations )
     {
-      shift::Entity* origEntity;
-      shift::Entity* destEntity;
+      shift::Entity* origEntity = nullptr;
+      shift::Entity* destEntity = nullptr;
 
       importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
         destEntity, name, false );
@@ -681,7 +698,7 @@ namespace nslib
         {
           firesData = relation.second.get_child( "RelationData" );
         }
-        catch( std::exception& ex )
+        catch( const std::exception &ex )
         {
           Loggers::get( )->log( "ERROR: getting RelationData from JSON: "
             + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -725,9 +742,10 @@ namespace nslib
       entityPosXLabel = ",\n        \"PosX\": ";
       entityPosYLabel = ",\n        \"PosY\": ";
     }
-    Canvas* actualCanvas = PaneManager::activePane( );
-    int layoutIndex = actualCanvas->activeLayoutIndex( );
-    shift::Entities& paneEntities = actualCanvas->sceneEntities( );
+
+    auto currentCanvas = PaneManager::activePane( );
+    const int layoutIndex = currentCanvas->activeLayoutIndex( );
+    shift::Entities& paneEntities = currentCanvas->sceneEntities( );
     outputStream << layoutTypeLabel << layoutIndex << entitiesLabel;
     bool firstIteration = true;
     if (layoutIndex == Layout::TLayoutIndexes::FREE )
@@ -755,11 +773,13 @@ namespace nslib
         {
           outputStream << continueBracket;
         }
-        auto entityGid = entity->entityGid( );
+
+        const auto entityGid = entity->entityGid( );
         float posx = 0.0f;
         float posy = 0.0f;
         auto rep =
           gidsToEntitiesReps.find( entityGid );
+
         if ( rep == gidsToEntitiesReps.end( ))
         {
           Loggers::get( )->log( "Representation not found", LOG_LEVEL_WARNING );
@@ -770,7 +790,7 @@ namespace nslib
             dynamic_cast< QGraphicsItemRepresentation* >( rep->second.second );
           if ( graphicsItemRep)
           {
-            auto item = graphicsItemRep->item( &actualCanvas->scene( ));
+            auto item = graphicsItemRep->item( &currentCanvas->scene( ));
             auto itemPos = item->pos( );
             posx = static_cast<float>(itemPos.x( ));
             posy = static_cast<float>(itemPos.y( ));
@@ -781,6 +801,7 @@ namespace nslib
               LOG_LEVEL_WARNING );
           }
         }
+
         outputStream << entityGIDLabel << entityGid << entityPosXLabel
           << posx << entityPosYLabel << posy;
       }
@@ -813,7 +834,7 @@ namespace nslib
     {
       layoutTypeIndex = layoutObject.get<int>( "LayoutType" );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting LayoutType from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -824,7 +845,7 @@ namespace nslib
     {
       entities = layoutObject.get_child( "SceneEntities" );
     }
-    catch ( std::exception const& ex )
+    catch ( const std::exception &ex )
     {
       Loggers::get( )->log( "ERROR: getting Scene entities Array from JSON: "
         + std::string( ex.what( )), LOG_LEVEL_WARNING );
@@ -842,7 +863,7 @@ namespace nslib
         shift::Entity* entity = nullptr;
         try
         {
-          auto entiyGID = entityJSON.second.get<int>( "EntityGID" );
+          const auto entiyGID = entityJSON.second.get<int>( "EntityGID" );
           auto search = oldGIDToEntity->find( entiyGID );
           if ( search == oldGIDToEntity->end( ))
           {
@@ -854,7 +875,7 @@ namespace nslib
             entity = search->second;
           }
         }
-        catch( std::exception const& ex )
+        catch( const std::exception &ex )
         {
           entity = nullptr;
           Loggers::get( )->log( "ERROR: getting scene EntityGID from JSON: "
@@ -868,7 +889,7 @@ namespace nslib
           {
             posx = entityJSON.second.get<float>( "PosX" );
           }
-          catch( std::exception const& ex )
+          catch( const std::exception &ex )
           {
             Loggers::get( )->log(
               "ERROR: getting entity pos x from JSON: "
@@ -878,7 +899,7 @@ namespace nslib
           {
             posy = entityJSON.second.get<float>( "PosY" );
           }
-          catch( std::exception const& ex )
+          catch( const std::exception &ex )
           {
             Loggers::get( )->log(
               "ERROR: getting entity pos y from JSON: "
@@ -934,7 +955,7 @@ namespace nslib
             entitiesNewScene.add( entity );
           }
         }
-        catch( std::exception const& ex )
+        catch( const std::exception &ex )
         {
           Loggers::get( )->log( "ERROR: getting scene EntityGID from JSON: "
             + std::string( ex.what( )), LOG_LEVEL_ERROR );
@@ -943,5 +964,4 @@ namespace nslib
       canvas->displayEntities( entitiesNewScene, false, true );
     }
   }
-
 }

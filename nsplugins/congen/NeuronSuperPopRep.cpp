@@ -20,33 +20,28 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "NeuronSuperPopRep.h"
 #include "NeuronSuperPopItem.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
-
 namespace nslib
 {
   namespace congen
   {
-
     NeuronSuperPopRep::NeuronSuperPopRep( void )
       : shiftgen::NeuronSuperPopRep( )
-    {
-    }
+    {}
 
     NeuronSuperPopRep::NeuronSuperPopRep( const NeuronSuperPopRep& other )
       : shiftgen::NeuronSuperPopRep( other )
-    {
-    }
+    {}
 
     NeuronSuperPopRep::NeuronSuperPopRep(
       const shiftgen::NeuronSuperPopRep& other )
       : shiftgen::NeuronSuperPopRep( other )
-    {
-    }
-
+    {}
 
     QGraphicsItem* NeuronSuperPopRep::item( QGraphicsScene* scene, bool create )
     {
@@ -57,6 +52,5 @@ namespace nslib
       }
       return _items.at( scene );
     }
-
   } // namespace congen
 } // namespace nslib

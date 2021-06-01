@@ -119,11 +119,11 @@ namespace nslib
     default:
       break;
     }
-    return std::string("");
+    return std::string();
   }
 #endif
 
-  void DataManager::loadBlueConfig( const std::string& blueConfig,
+  bool DataManager::loadBlueConfig( const std::string& blueConfig,
     const std::string& targetLabel, const bool loadMorphologies,
     const std::string& csvNeuronStatsFileName,
     const bool loadConnectivity )
@@ -139,12 +139,11 @@ namespace nslib
       LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
     QMessageBox::critical(0, "Error loading BlueConfig",
       "Brion support not built-in");
-    return;
+    return false;
 #else
     ( void ) csvNeuronStatsFileName;
     try
     {
-
       //this->closeData( );
       _nsolDataSet.loadBlueConfigHierarchy<
         nsol::Node,
@@ -184,28 +183,27 @@ namespace nslib
           nsol::MiniColumnStats,
           nsol::ColumnStats >( );
       }
-    } catch ( std::exception& ex )
+    }
+    catch ( const std::exception& ex )
     {
       std::string msg("Error loading BlueConfig: " + std::string( ex.what( )));
       Loggers::get( )->log(msg, LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
 
       QMessageBox::critical(0, "Error loading BlueConfig",
                             QString::fromStdString(msg));
-      return;
+      return false;
     }
-    // createEntitiesFromNsolColumns( _nsolDataSet.columns( ), loadMorphologies,
-    //                                csvNeuronStatsFileName );
 
+    return true;
 #endif
   }
 
 
-  void DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
+  bool DataManager::loadNsolXmlScene( const std::string& xmlSceneFile )
   {
 #ifdef NSOL_USE_QT5CORE
     try
     {
-      // this->CloseData( );
       _nsolDataSet.loadXmlScene<
         nsol::NodeCached,
         nsol::NeuronMorphologySectionCachedStats,
@@ -216,22 +214,25 @@ namespace nslib
         nsol::Neuron,
         nsol::MiniColumnStats,
         nsol::ColumnStats >( xmlSceneFile );
-    } catch ( std::exception& ex )
+    }
+    catch ( const std::exception& ex )
     {
       Loggers::get( )->log( "Error loading XML scene: " +
                            std::string( ex.what( )), LOG_LEVEL_ERROR,
                            NEUROSCHEME_FILE_LINE );
+
       QMessageBox::critical(0, "Error loading XML Scene",
                             QString::fromStdString(xmlSceneFile + " : " + ex.what( )));
-      return;
+      return false;
     }
 
 #else
     (void) xmlSceneFile;
     Loggers::get( )->log( "nsol not built or built without QtCore",
       LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-
 #endif
+
+    return true;
   }
 
   void DataManager::reset( void )
@@ -246,6 +247,5 @@ namespace nslib
     _rootEntities.clear( );
     shift::Entity::shiftEntityGid( 0 );
   }
-
 
 } // namespace nslib

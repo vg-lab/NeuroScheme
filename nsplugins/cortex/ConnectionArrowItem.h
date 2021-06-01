@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONNECTION_ARROW_ITEM__
 #define __NSLIB__CONNECTION_ARROW_ITEM__
 
@@ -39,7 +40,6 @@ namespace nslib
 {
   namespace cortex
   {
-
     class ConnectionArrowItem
       : public QObject
       , public QGraphicsPolygonItem
@@ -50,9 +50,7 @@ namespace nslib
       Q_PROPERTY( QLineF line READ line WRITE setLine )
 
     public:
-
       ConnectionArrowItem( const ConnectionArrowRep& connectionArrowRep );
-
       virtual ~ConnectionArrowItem( void ) {}
 
       const QLineF& line( void ) const;
@@ -66,7 +64,7 @@ namespace nslib
 
       virtual void hoverEnter( void );
 
-      virtual void highlight( scoop::Color color_ );
+      virtual void highlight( const scoop::Color color_ );
 
       virtual void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) override;
 
@@ -74,8 +72,8 @@ namespace nslib
 
       virtual bool connectionRep( void ) const override;
 
-      static QColor color;
-      static QColor hoverColor;
+      const static QColor color;
+      const static QColor hoverColor;
 
     protected:
       QGraphicsEllipseItem* _arrowOriItem;

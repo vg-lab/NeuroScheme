@@ -28,31 +28,22 @@
 
 namespace nslib
 {
-
-
   class NSLIB_API CameraBasedLayout : public Layout
   {
   public:
     CameraBasedLayout( void );
-    // void displayItems( QGraphicsScene* scene,
-    //                       const shift::Representations& reps );
+
   protected:
     void _arrangeItems( const shift::Representations& reps,
                         bool animate = true,
                         const shift::Representations& postFilterReps =
                         shift::Representations( )) final;
 
-    Layout* clone( void ) const
+    Layout* clone( void ) const override
     {
       return new CameraBasedLayout;
     }
-
-    // Matrix4f _viewMatrix;
-    //Matrix4f _projectionMatrix;
-
   };
-
-
 }
 
 #endif

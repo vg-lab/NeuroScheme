@@ -26,8 +26,6 @@
 
 namespace nslib
 {
-
-
   ItemText::ItemText( const QString& string, QGraphicsItem* item_,
     const float maxHeight_, const float maxWidth_, const QColor colorBrush_,
     const QColor colorPen_ )

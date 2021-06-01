@@ -60,72 +60,46 @@ namespace nslib
     _activePane = pane;
     assert( _activePane->layouts( ).layoutSelector( ));
 
-    pane->setStyleSheet("#pane { border: 3px dotted rgba( 0,0,0,15%); }");
-    for ( auto& otherPane : _panes )
-      if ( pane != otherPane )
-        otherPane->setStyleSheet(
-          "#pane { border: 3px dotted rgba( 0,0,0,0%); }" );
+    auto setStyle = [&pane](Canvas *c)
+    {
+      c->setStyleSheet(QString("#pane { border: 3px dotted rgba( 0,0,0,%1%); }").arg(c == pane ? "25":"0"));
+    };
+    std::for_each(_panes.begin(), _panes.end(), setStyle);
+
+    auto replaceWidget = [](int idx, QWidget *newWidget)
+    {
+      auto item = _layout->itemAtPosition( idx, 0 );
+      if ( item )
+      {
+        auto widget = item->widget( );
+        if ( widget )
+        {
+          auto index = _layout->indexOf( widget );
+          if ( index != -1 )
+          {
+            _layout->takeAt( index );
+            widget->hide( );
+          }
+        }
+      }
+      _layout->addWidget( newWidget, idx, 0 );
+      newWidget->show();
+    };
 
     if ( _layout )
     {
-
       // Replace pane name
-      auto item = _layout->itemAtPosition( 0, 0 );
-      if ( item )
-      {
-        auto widget = item->widget( );
-        if ( widget )
-        {
-          auto index = _layout->indexOf( widget );
-          if ( index != -1 )
-          {
-            _layout->takeAt( index );
-            widget->hide( );
-          }
-        }
-      }
-      _layout->addWidget( new QLabel( _activePane->name.c_str( )), 0, 0 );
-
+      auto label = new QLabel( _activePane->name.c_str( ));
+      replaceWidget(0, label);
 
       // Replace layout selector
-      item = _layout->itemAtPosition( 1, 0 );
-      if ( item )
-      {
-        auto widget = item->widget( );
-        if ( widget )
-        {
-          auto index = _layout->indexOf( widget );
-          if ( index != -1 )
-          {
-            _layout->takeAt( index );
-            widget->hide( );
-          }
-        }
-      }
-      _layout->addWidget( _activePane->layouts( ).layoutSelector( ), 1, 0 );
-      _activePane->layouts( ).layoutSelector( )->show( );
-
+      auto selector = _activePane->layouts( ).layoutSelector( );
+      replaceWidget(1, selector);
 
       // Replace layout options
-      item = _layout->itemAtPosition( 2, 0 );
-      if ( item )
-      {
-        auto widget = item->widget( );
-        if ( widget )
-        {
-          auto index = _layout->indexOf( widget );
-          if ( index != -1 )
-          {
-            _layout->takeAt( index );
-            widget->hide( );
-          }
-        }
-      }
       auto layoutIdx = _activePane->activeLayoutIndex( );
       auto activeLayout = _activePane->layouts( ).getLayout( layoutIdx );
-      _layout->addWidget( activeLayout->optionsWidget( ) , 2, 0 );
-      activeLayout->optionsWidget( )->show( );
-
+      replaceWidget(2, activeLayout->optionsWidget());
     }
   }
 
@@ -190,46 +164,57 @@ namespace nslib
 
   void PaneManager::killPane( Canvas* orig )
   {
-    auto parentSplitter =
-      dynamic_cast< QSplitter* >( orig->parentWidget( ));
+    if(!orig || !orig->parentWidget())
+    {
+      nslib::Loggers::get( )->log(
+        "Unable to kill pane", nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+      return;
+    }
+
+    auto parentSplitter = dynamic_cast< QSplitter* >( orig->parentWidget( ));
     assert( parentSplitter );
-    auto grandParentSplitter =
-      dynamic_cast< QSplitter* >( parentSplitter->parentWidget( ));
+    auto grandParentSplitter = dynamic_cast< QSplitter* >( parentSplitter->parentWidget( ));
 
     if ( grandParentSplitter )
     {
-      // std::cout << "index of parent to kill" << parentSplitter->indexOf( orig ) << std::endl;
-      auto indexOfSibling = parentSplitter->indexOf( orig ) == 0 ? 0 : 1;
-      auto sibling = dynamic_cast< Canvas* >(
-        parentSplitter->children( )[ indexOfSibling ] );
-      //WAR review if there is a better way
-      if( sibling == orig )
+      Canvas *sibling = nullptr;
+      const auto children = parentSplitter->children();
+      for(int i = 0; i < children.size(); ++i)
       {
-        indexOfSibling = parentSplitter->indexOf( orig ) == 0 ? 1 : 0;
-        sibling = dynamic_cast< Canvas* >(
-          parentSplitter->children( )[ indexOfSibling ] );
+        auto item = dynamic_cast<Canvas *>(children.at(i));
+        if(!item) continue;
+        if(orig == item) continue;
+        sibling = item;
+        break;
       }
-      assert( sibling != orig );
-      assert( sibling );
-      auto indexOfParentSplitter =
-        grandParentSplitter->indexOf( parentSplitter );
-       grandParentSplitter->insertWidget( indexOfParentSplitter, sibling );
-       auto paneIt = std::find( _panes.begin( ), _panes.end( ), orig );
-       _panes.erase( paneIt );
-       delete orig;
+
+      if(!sibling)
+      {
+        nslib::Loggers::get( )->log(
+          "Unable to kill pane", nslib::LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+
+        return;
+      }
+
+      auto indexOfParentSplitter = grandParentSplitter->indexOf( parentSplitter );
+      grandParentSplitter->insertWidget( indexOfParentSplitter, sibling );
+      auto paneIt = std::find( _panes.begin( ), _panes.end( ), orig );
+      _panes.erase( paneIt );
+      delete orig;
+      delete parentSplitter;
+
       activePane( sibling );
     }
   }
 
   void PaneManager::updateSelection( void )
   {
-    for ( auto canvas : _panes )
+    auto updateCanvasSelection = [](Canvas *c)
     {
-      canvas->layouts( ).getLayout(
-          canvas->activeLayoutIndex( ))->updateSelection( );
-    }
+      c->layouts( ).getLayout(c->activeLayoutIndex( ))->updateSelection( );
+    };
+    std::for_each(_panes.begin(), _panes.end(), updateCanvasSelection);
   }
-
 
   void PaneManager::killActivePane( void )
   {
@@ -247,35 +232,31 @@ namespace nslib
     _modelViewMatrix.row( 3 ) =
       Vector4f( values[3], values[7], values[11], values[15] );
 
-    int elapsedMs = std::chrono::duration_cast< std::chrono::milliseconds >
+    const int elapsedMs = std::chrono::duration_cast< std::chrono::milliseconds >
       ( std::chrono::system_clock::now( ) - lastMatrixClock ).count( );
 
     // Only update if 50ms passed
     if ( elapsedMs > 50 )
     {
-      for ( auto canvas : _panes )
+      auto refreshPane = [](Canvas *c)
       {
-        auto layout
-          = canvas->layouts( ).getLayout( canvas->activeLayoutIndex( ));
-        if ( layout->flags( ) & Layout::CAMERA_ENABLED )
-          layout->refresh( false// , false 
-            );
-      }
+        auto l = c->layouts( ).getLayout( c->activeLayoutIndex( ));
+        if ( l->flags( ) & Layout::CAMERA_ENABLED )
+          l->refresh( false );
+      };
+      std::for_each(_panes.begin(), _panes.end(), refreshPane);
+
       lastMatrixClock = std::chrono::system_clock::now( );
     }
   }
 
   bool PaneManager::freeLayoutInUse( void )
   {
-    for( const auto& pane : PaneManager::panes( ))
-    {
-      if( pane->activeLayoutIndex( ) == Layout::TLayoutIndexes::FREE )
-      {
-        return true;
-      }
-    }
-    return false;
-  }
+    const auto panes = PaneManager::panes();
+    auto isFree = [](const Canvas *c){ return c->activeLayoutIndex() == Layout::TLayoutIndexes::FREE; };
+    auto it = std::find_if(panes.cbegin(), panes.cend(), isFree);
 
+    return it != panes.cend();
+  }
 
 } // namespace nslib

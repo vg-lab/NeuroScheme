@@ -26,7 +26,6 @@
 
 namespace nslib
 {
-
   std::unordered_map< unsigned int, shift::RepresentationCreator* >
   RepresentationCreatorManager::_repCreators =
     std::unordered_map< unsigned int, shift::RepresentationCreator* >( );
@@ -47,13 +46,20 @@ namespace nslib
   RepresentationCreatorManager::_gidsToEntitiesReps =
     std::unordered_map< unsigned int, shift::TGidToEntitiesReps >( );
 
-
   void RepresentationCreatorManager::addCreator(
     shift::RepresentationCreator* repCreator,
     unsigned int repCreatorId )
   {
-    //TODO check if exists
-    _repCreators[ repCreatorId ] = repCreator;
+    if(_repCreators.find(repCreatorId) == _repCreators.end())
+    {
+      _repCreators[ repCreatorId ] = repCreator;
+    }
+    else
+    {
+      Loggers::get( )->log(
+        std::string("Representation creator already exists:") + std::to_string(repCreatorId),
+         LOG_LEVEL_WARNING );
+    }
   }
 
   shift::RepresentationCreator* RepresentationCreatorManager::getCreator(
@@ -90,7 +96,6 @@ namespace nslib
         linkRepsToObjs );
   }
 
-
   void RepresentationCreatorManager::generateRelations(
       const shift::Entities& entities,
       shift::Representations& representations,
@@ -126,6 +131,7 @@ namespace nslib
   {
     return _entitiesToReps[ repCreatorId ];
   }
+
   const shift::TRepsToEntities& RepresentationCreatorManager::repsToEntities(
     unsigned int repCreatorId )
   {
@@ -170,12 +176,14 @@ namespace nslib
     }
     shift::RepresentationCreator* creatorRep_ =
       RepresentationCreatorManager::getCreator( repCreatorId );
+
     for ( shift::Representation* rep : entityReps_ )
     {
       creatorRep_->updateRepresentation( entity_, rep );
       auto graphicsItemRep =
         dynamic_cast< QGraphicsItemRepresentation* >( rep );
       auto graphicsItems = graphicsItemRep->items( );
+
       if( freeLayoutInUse_ )
       {
         for( auto itemIt : graphicsItems )

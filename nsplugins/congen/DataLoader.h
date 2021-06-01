@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONGEN_DATA_LOADER__
 #define __NSLIB__CONGEN_DATA_LOADER__
 
@@ -41,7 +42,6 @@ namespace nslib
       : public ::nslib::DataLoader
     {
     public:
-
       virtual ~DataLoader( void ) {}
 
       bool cliLoadData(
@@ -63,7 +63,6 @@ namespace nslib
       static void _loadInput(
           QXmlStreamReader& xml,
           std::unordered_map< std::string, unsigned int >& popNameToGid );
-
     };
   }
 }

@@ -38,6 +38,7 @@ namespace nslib
       const float maxHeight_ = 0.15, const float maxWidth_ = 0.90,
       const QColor colorBrush_ = QColor::fromRgb( 5, 5, 5, 255 ),
       const QColor colorPen_ = QColor::fromRgb( 245, 245, 245, 255 ));
+    virtual ~ItemText() {};
   };
 }
 #endif

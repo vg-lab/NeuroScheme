@@ -27,7 +27,6 @@
 
 namespace nslib
 {
-
   //
   // MapperToFloat
   //
@@ -48,7 +47,6 @@ namespace nslib
     protected:
       float _outMin;
       float _outMax;
-
   };
 
   //
@@ -58,7 +56,6 @@ namespace nslib
   class NSLIB_API MapperFloatToFloat
     : public MapperToFloat
   {
-
   public:
 
     typedef enum
@@ -90,11 +87,6 @@ namespace nslib
     TLinearity _linearity;
     float _exponent;
   };
-
-
 } // namespace nslib
-
-// EOF
-
 
 #endif

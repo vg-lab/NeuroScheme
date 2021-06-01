@@ -42,8 +42,9 @@ public:
   QDockWidget* dock;
   QTableWidget* table;
   unsigned int counter;
-  std::unordered_map< std::string, QTableWidgetItem* >
-  tableWidgets;
+  std::unordered_map< std::string, QTableWidgetItem* > tableWidgets;
+
+  StoredSelections(): dock{nullptr}, table{nullptr}, counter{0} {};
 };
 
 class MainWindow : public QMainWindow
@@ -51,28 +52,19 @@ class MainWindow : public QMainWindow
   Q_OBJECT;
 
 public:
-
-  enum TTableColumns
-  {
-    COLUMN_LABEL = 0,
-    COLUMN_COUNT,
-    COLUMN_DATETIME,
-    COLUMN_MAX_COLUMS
-  };
-
   explicit MainWindow( QWidget *parent , bool zeroEQ );
-  ~MainWindow( void );
+  virtual ~MainWindow( void );
   void selectDomain( void );
 
 public slots:
-
-  // Stored selections solts
+  // Stored selections slots
   void aboutDialog( void );
   void updateStoredSelectionsDock( void );
   void sortStoredSelectionsTable( int column );
   void storeSelection( void );
   void deleteStoredSelection( void );
   void restoreSelection( void );
+
   void updateLayoutsDock( void );
   void killActivePane( void );
   void duplicateActivePane( void );
@@ -88,14 +80,21 @@ public slots:
   void actionPublishFocusOnSelection( void );
   void actionPublishFocusOnDisplayed( void );
   void toggleZeroEQ( void );
-  void quit( void );
   void exportToJSON( void );
   void importFromJSON( void );
   void cleanScene( void );
 
 protected:
 
-  QString _tableColumnToString( TTableColumns column );
+  enum TTableColumns
+  {
+    COLUMN_LABEL = 0,
+    COLUMN_COUNT,
+    COLUMN_DATETIME,
+    COLUMN_MAX_COLUMS
+  };
+
+  QString _tableColumnToString( const TTableColumns column );
   StoredSelections _storedSelections;
   QDockWidget* _layoutsDock = nullptr;
   QDockWidget* _entityEditDock = nullptr;

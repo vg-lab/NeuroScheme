@@ -19,10 +19,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <nslib/Loggers.h>
 #include "Eigen4VectorCaster.h"
 #include <Eigen/Dense>
-
 
 namespace nslib
 {
@@ -37,11 +37,10 @@ namespace nslib
     {
       Eigen::Vector4f vector = prop.value<Eigen::Vector4f>( );
 
-      float array[] = { vector[ 0 ], vector[ 1 ], vector[ 2 ], vector[ 3 ] };
-      auto space = std::string( " " );
-      return std::to_string( array[ 0 ] ) + space +
-        std::to_string( array[ 1 ] ) + space + std::to_string( array[ 2 ] )
-        + space + std::to_string( array[ 3 ] );
+      const auto space = std::string(" ");
+      std::stringstream ss;
+      ss << vector[0] << space << vector[1] << space << vector[2] << space << vector[3];
+      return ss.str();
     };
 
     void Eigen4VectorCaster::fromString(

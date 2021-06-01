@@ -14,30 +14,17 @@
     <file>icons/autofocusonselection.svg</file>
     <file>icons/autofocusondisplay.svg</file>
     <file>icons/ns_icon.png</file>
-    <file>icons/fullscreen.png</file>
     <file>icons/savedselections.svg</file>
-    <file>icons/autofocusondisplayed.png</file>
-    <file>icons/focusondisplayed.png</file>
-    <file>icons/open_xml.png</file>
     <file>icons/settings.svg</file>
-    <file>icons/focusonselection.png</file>
-    <file>icons/autofocus.png</file>
-    <file>icons/deflect.png</file>
-    <file>icons/switch_camera.png</file>
     <file>icons/home.svg</file>
-    <file>icons/network.png</file>
-    <file>icons/close.png</file>
-    <file>icons/open_bc.png</file>
+    <file>icons/close.svg</file>
     <file>icons/logoVGLAB.png</file>
     <file>icons/logoURJC.png</file>
     <file>icons/logoUPM.png</file>
-    <file>icons/alphabetical_sorting_az.png</file>
-    <file>icons/alphabetical_sorting_za.png</file>
-    <file>icons/query.png</file>
-    <file>icons/add.png</file>
-    <file>icons/cellsetop.png</file>
-    <file>icons/filter.png</file>
-    <file>icons/sort.png</file>
+    <file>icons/alphabetical_sorting_az.svg</file>
+    <file>icons/add.svg</file>
+    <file>icons/filter.svg</file>
+    <file>icons/sort.svg</file>
     <file>icons/horizontalSplit.svg</file>
     <file>icons/verticalSplit.svg</file>
     <file>icons/documentClose.svg</file>

@@ -43,7 +43,7 @@ namespace nslib
   class TemporalConnectionLine : public QGraphicsLineItem
   {
   public:
-    ~TemporalConnectionLine( void )
+    virtual ~TemporalConnectionLine( void )
     {
       // This check could be removed but for the moment serves as a watchdog
       // that ensures that if the line is deleted by any of the QtGraphicsScene

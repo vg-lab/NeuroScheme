@@ -83,7 +83,7 @@ namespace nslib
     class BlueConfigOptions : public QDialog
     {
     public:
-      BlueConfigOptions( QWidget* parent = Q_NULLPTR,
+      BlueConfigOptions( QWidget* parent = nullptr,
                          Qt::WindowFlags flags = Qt::WindowFlags( ))
         : QDialog( parent, flags )
       {
@@ -129,9 +129,6 @@ namespace nslib
       bool loadConnectivity( void ) { return _checkLoadConnectivity->isChecked( ); }
       bool loadCSVStats( void ) { return _checkLoadCSVStats->isChecked( ); }
 
-    // public slots:
-    //   void ok( void ) { this->close( ); }
-
     protected:
       QLabel* _labelLoadMorpho;
       QCheckBox* _checkLoadMorpho;
@@ -162,7 +159,7 @@ namespace nslib
       if ( !path.isEmpty( ))
       {
         bool ok;
-        QString text = QInputDialog::getText( _mw, tr("Please select target"),
+        const QString text = QInputDialog::getText( _mw, tr("Please select target"),
                                               tr("Cell target:"),
                                               QLineEdit::Normal,
                                               "Column", &ok );
@@ -189,10 +186,9 @@ namespace nslib
                 cns = fd->selectedFiles( )[0].toStdString( );
 
               delete fd;
-
             }
 
-            auto targetLabel = text.toStdString( );
+            const auto targetLabel = text.toStdString( );
             Loggers::get( )->log( std::string(" Loading target " ) +
                                   std::string( targetLabel ));
 
@@ -201,8 +197,12 @@ namespace nslib
 
             Loggers::get( )->log( "Loading blue config",
                                   nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-            nslib::DataManager::loadBlueConfig(
-              fileName, targetLabel, loadMorphology, cns, loadConnectivity );
+
+            if(!nslib::DataManager::loadBlueConfig(
+              fileName, targetLabel, loadMorphology, cns, loadConnectivity ))
+            {
+              return;
+            }
 
             DataLoader::createEntitiesFromNsolColumns(
               nslib::DataManager::nsolDataSet( ).columns( ),
@@ -233,14 +233,18 @@ namespace nslib
       if ( fd->exec( ))
         path = fd->selectedFiles( )[0];
 
-      if ( path != QString(""))
+      if ( !path.isEmpty() )
       {
         _lastOpenedFileName = QFileInfo( path ).path( );
-        auto fileName = path.toStdString( );
+        const auto fileName = path.toStdString( );
 
-        Loggers::get( )->log( "Loading blue config",
+        Loggers::get( )->log( "Loading xml scene",
                               nslib::LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
-        nslib::DataManager::loadNsolXmlScene( fileName );
+
+        if(!nslib::DataManager::loadNsolXmlScene( fileName ))
+        {
+          return;
+        }
 
         DataLoader::createEntitiesFromNsolColumns(
           nslib::DataManager::nsolDataSet( ).columns( ),
@@ -272,7 +276,7 @@ namespace nslib
       auto repCreator = new cortex::RepresentationCreator( );
       RepresentationCreatorManager::addCreator( repCreator );
       auto& _entities = DataManager::entities( );
-      //fires::PropertyManager::clear( );
+
       _entities.clear( );
 
       _entities.relationships( )[ "isParentOf" ] =
@@ -321,7 +325,6 @@ namespace nslib
 
     const Vector4f Domain::entity3DPosition ( shift::Entity* entity ) const
     {
-      // std::cout << entity->getProperty( "Position3D" ).type( ) << std::endl;
       return entity->getPropertyValue< Vector4f >( "Position3D", Vector4f( ));
     }
 
@@ -339,14 +342,12 @@ namespace nslib
                 << "\t\t[ -lc | --load-connectivity ] "
                 << std::endl << std::endl
                 << "\t\t(*1) only for BlueConfig files" << std::endl;
-
     }
 
     void Domain::importRelationshipsJSON(
       const boost::property_tree::ptree& relationships,
       std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity )
     {
-
       addIsParentOfRelationshipsFromJSON( getRelationsOfType(
         "isParentOf", relationships ), oldGIDToEntity );
 
@@ -379,8 +380,8 @@ namespace nslib
 
       for ( const auto& relation : relations )
       {
-        shift::Entity* origEntity;
-        shift::Entity* destEntity;
+        shift::Entity* origEntity = nullptr;
+        shift::Entity* destEntity = nullptr;
 
         importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "GroupOf", true );
@@ -405,8 +406,8 @@ namespace nslib
 
       for ( const auto& relation : relations )
       {
-        shift::Entity* origEntity;
-        shift::Entity* destEntity;
+        shift::Entity* origEntity = nullptr;
+        shift::Entity* destEntity = nullptr;
 
         importJSONRelationGIDS( relation.second, oldGIDToEntity, origEntity,
           destEntity, "SuperEntityOf", true );
@@ -456,6 +457,7 @@ namespace nslib
         maxConnsPerEntityLabel = "\",\n    \"maxConnectionsPerEntity\": \"";
         closeQuotationsLabel = "\"\n";
       }
+
       auto repCreator = ( cortex::RepresentationCreator* )
         RepresentationCreatorManager::getCreator( );
 
@@ -478,7 +480,7 @@ namespace nslib
 
       try
       {
-        float maxNeuronSomaVolume =
+        const float maxNeuronSomaVolume =
           maximums.get< float >( "maxNeuronSomaVolume" );
         repCreator->maxNeuronSomaVolume( maxNeuronSomaVolume, true );
       }
@@ -490,7 +492,7 @@ namespace nslib
 
       try
       {
-        float maxNeuronSomaArea =
+        const float maxNeuronSomaArea =
           maximums.get< float >( "maxNeuronSomaArea" );
         repCreator->maxNeuronSomaArea( maxNeuronSomaArea, true);
       }
@@ -502,7 +504,7 @@ namespace nslib
 
       try
       {
-        float maxNeuronDendsVolume =
+        const float maxNeuronDendsVolume =
           maximums.get< float >( "maxNeuronDendsVolume" );
         repCreator->maxNeuronDendsVolume( maxNeuronDendsVolume, true );
       }
@@ -514,7 +516,7 @@ namespace nslib
 
       try
       {
-        float maxNeuronDendsArea =
+        const float maxNeuronDendsArea =
           maximums.get< float >( "maxNeuronDendsArea" );
         repCreator->maxNeuronDendsArea( maxNeuronDendsArea, true );
       }
@@ -526,7 +528,7 @@ namespace nslib
 
       try
       {
-        unsigned int maxNeurons =
+        const unsigned int maxNeurons =
           maximums.get< unsigned int >( "maxNeurons" );
         repCreator->maxNeurons( maxNeurons, true );
       }
@@ -538,7 +540,7 @@ namespace nslib
 
       try
       {
-        unsigned int maxNeuronsPerColumn =
+        const unsigned int maxNeuronsPerColumn =
           maximums.get< unsigned int >( "maxNeuronsPerColumn" );
         repCreator->maxNeuronsPerColumn( maxNeuronsPerColumn, true );
       }
@@ -551,7 +553,7 @@ namespace nslib
 
       try
       {
-        unsigned int maxNeuronsPerMiniColumn =
+        const unsigned int maxNeuronsPerMiniColumn =
           maximums.get< unsigned int >( "maxNeuronsPerMiniColumn" );
         repCreator->maxNeuronsPerMiniColumn( maxNeuronsPerMiniColumn, true );
       }
@@ -564,7 +566,7 @@ namespace nslib
 
       try
       {
-        unsigned int maxConnsPerEntity =
+        const unsigned int maxConnsPerEntity =
           maximums.get< unsigned int >( "maxConnectionsPerEntity" );
         repCreator->maxConnectionsPerEntity( maxConnsPerEntity, true );
       }
@@ -574,6 +576,5 @@ namespace nslib
           + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
     }
-
   }
 }

@@ -45,8 +45,6 @@ namespace nslib
 
     static void create( const shift::Entities& entities,
       shift::Representations& representations,
-      // TEntitiesToReps& entitiesToReps,
-      // TRepsToEntities& repsToEntities,
       bool linkEntitiesToReps = false,
       bool linkRepsToObjs = false,
       unsigned int repCreatorId = 0 );

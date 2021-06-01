@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "ConnectionArrowItem.h"
 #include "ConnectionArrowRep.h"
 
@@ -31,7 +32,6 @@ namespace nslib
 {
   namespace congen
   {
-
     ConnectionArrowRep::ConnectionArrowRep( shift::Representation* originRep_,
       shift::Representation* destRep_, const bool isAggregated_ )
       : shiftgen::ConnectionArrowRep( )
@@ -40,8 +40,7 @@ namespace nslib
       , _isAggregated( isAggregated_ )
       , _lineStyle( _isAggregated ?
         Qt::PenStyle::DotLine : Qt::PenStyle::SolidLine )
-    {
-    }
+    {}
 
     ConnectionArrowRep::ConnectionArrowRep( const ConnectionArrowRep& other )
       : shiftgen::ConnectionArrowRep( other )
@@ -50,13 +49,11 @@ namespace nslib
       , _isAggregated( other._isAggregated )
       , _lineStyle( _isAggregated ?
         Qt::PenStyle::DotLine : Qt::PenStyle::SolidLine )
-    {
-    }
+    {}
 
     QGraphicsItem*
     ConnectionArrowRep::item( QGraphicsScene* scene, bool create )
     {
-
       QGraphicsItem* item;
       auto it = _items.find( scene );
       if ( create && it == _items.end())
@@ -98,12 +95,16 @@ namespace nslib
         {
           Loggers::get( )->log( "No successfully dynamic cast on originItem",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+
+          return;
         }
 
         if( destItem == nullptr )
         {
           Loggers::get( )->log( "No successfully dynamic cast on destItem",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+
+          return;
         }
 
         auto originArrowItem =
@@ -126,24 +127,24 @@ namespace nslib
         const auto& originScaleAnim = originItem->scaleAnim( );
         const auto& destScaleAnim = destItem->scaleAnim( );
 
-        auto normAnimStart =
+        const auto normAnimStart =
           QVector2D( destPosAnimStart - originPosAnimStart ).normalized( );
-        auto normAnimEnd =
+        const auto normAnimEnd =
           QVector2D( destPosAnimEnd - originPosAnimEnd ).normalized( );
 
-        auto destIniOri =
+        const auto destIniOri =
           QVector2D( originPosAnimStart ) + originWidth_2 *
             originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
-        auto destIniDest =
+        const auto destIniDest =
           QVector2D( destPosAnimStart ) - destWidth_2 *
             originScaleAnim.startValue( ).toDouble( ) * normAnimStart;
 
-        auto destEndOri =
+        const auto destEndOri =
           QVector2D( originPosAnimEnd ) + originWidth_2 *
             originScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
-        auto destEndDest =
+        const auto destEndDest =
           QVector2D( destPosAnimEnd ) - destWidth_2 *
             destScaleAnim.endValue( ).toDouble( ) * normAnimEnd;
 
@@ -156,7 +157,6 @@ namespace nslib
             QPointF( destEndDest.x( ), destEndDest.y( ))));
 
         lineAnim.start( );
-
       }
       else
       {
@@ -168,12 +168,12 @@ namespace nslib
           dynamic_cast< QGraphicsItemRepresentation* >(
             _destRep )->item( scene ));
 
-        auto destOri = QVector2D( originItem->pos( )) +
+        const auto destOri = QVector2D( originItem->pos( )) +
           ( ( originItem->boundingRect( ).width( ) * 0.5f *
             originItem->scale( )) * QVector2D( destItem->pos( ) -
             originItem->pos( )).normalized( ));
 
-        auto destDest = QVector2D( destItem->pos( )) -
+        const auto destDest = QVector2D( destItem->pos( )) -
           ( ( destItem->boundingRect( ).width( ) * 0.5f *
             originItem->scale( )) * QVector2D( destItem->pos( ) -
             originItem->pos( )).normalized( ));
@@ -181,7 +181,6 @@ namespace nslib
         dynamic_cast< ConnectionArrowItem* >( arrowItem )->
           createArrow( QPointF( destOri.x( ), destOri.y( )),
           QPointF( destDest.x( ), destDest.y( )));
-
       }
     }
 

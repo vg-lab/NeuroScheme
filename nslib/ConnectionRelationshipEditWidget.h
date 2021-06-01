@@ -34,7 +34,6 @@
 #include <shift/shift.h>
 #include <QDockWidget>
 #include <QGridLayout>
-#include <QTimer>
 
 namespace nslib
 {
@@ -87,8 +86,6 @@ namespace nslib
     QPushButton* _cancelButton;
     QGridLayout* _gridLayout;
     QGridLayout* _gridPropertiesLayout;
-
-    QTimer* _connectionUpdateTimer;
 
     static QDockWidget* _parentDock;
     static bool _autoCloseChecked;

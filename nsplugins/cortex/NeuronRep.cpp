@@ -19,32 +19,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "NeuronRep.h"
 #include "NeuronItem.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
-
 namespace nslib
 {
   namespace cortex
   {
-
     NeuronRep::NeuronRep( void )
       : shiftgen::NeuronRep( )
-    {
-    }
+    {}
 
     NeuronRep::NeuronRep( const NeuronRep& other )
       : shiftgen::NeuronRep( other )
-    {
-    }
+    {}
 
     NeuronRep::NeuronRep( const shiftgen::NeuronRep& other )
       : shiftgen::NeuronRep( other )
-    {
-    }
-
+    {}
 
     QGraphicsItem* NeuronRep::item( QGraphicsScene* scene, bool create )
     {

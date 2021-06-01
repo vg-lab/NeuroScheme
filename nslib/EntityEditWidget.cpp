@@ -61,7 +61,6 @@ namespace nslib
     , _separation( new QFrame( ))
     , _entity( nullptr )
     , _updateEntity( nullptr )
-    , _entityUpdateTimer( new QTimer( this ))
   {
     _gridLayout->setAlignment( Qt::AlignTop );
     _gridLayout->setColumnStretch( 0, 1 );
@@ -114,12 +113,9 @@ namespace nslib
       this, SLOT( eraseEntity( )));
 
     setLayout( _gridLayout );
-    _parentDock->setWidget( this );
-    connect( _entityUpdateTimer, SIGNAL(timeout( )), this,
-      SLOT( refreshEntity( )));
-    _entityUpdateTimer->start(/*timeout*/ );
-    //timeout of 0 will time out as soon as all events in the event queue
-    // have been processed
+
+    if(_parentDock)
+      _parentDock->setWidget( this );
   }
 
   void EntityEditWidget::eraseEntity( )
@@ -138,6 +134,8 @@ namespace nslib
     _updateAddToScene = addToScene_;
     _updateChangeParent = changeParent_;
     _updateEntity = entity_;
+
+    refreshEntity();
   }
 
   void EntityEditWidget::refreshEntity( )
@@ -276,7 +274,8 @@ namespace nslib
           }
         }
       }
-      _parentDock->show( );
+      if(_parentDock)
+        _parentDock->show( );
       this->show( );
     }
   }
@@ -544,7 +543,8 @@ namespace nslib
   void EntityEditWidget::cancelDialog( void )
   {
     this->hide( );
-    _parentDock->close( );
+    if(_parentDock)
+      _parentDock->close( );
   }
 
   void EntityEditWidget::parentDock( QDockWidget* parentDock_ )
@@ -565,10 +565,6 @@ namespace nslib
   void EntityEditWidget::toggleCheckUniqueness( void )
   {
     _checkUniquenessChecked = _checkUniquenessCheck->isChecked( );
-  }
-
-  EntityEditWidget::~EntityEditWidget( void )
-  {
   }
 
   shift::Entity* EntityEditWidget::entity( )

@@ -30,10 +30,11 @@ namespace nslib
 {
   namespace cortex
   {
+    const QColor BASE_COLOR = QColor( 114, 188, 196 );
 
     ColumnItem::ColumnItem( const ColumnRep& columnRep,
                             QGraphicsScene* scene_,
-                            unsigned int size )
+                            const unsigned int size )
       : NeuronAggregationItem( )
       , _itemText( nullptr )
     {
@@ -48,11 +49,12 @@ namespace nslib
       QPainterPath path_;
       QPolygon poly;
 
-      QPoint pUL ( -int( size )/3, -int( size )/6 );
-      QPoint pUR (  int( size )/3, -int( size )/6 );
-      QPoint pLR (  int( size )/3, +int( size )/24 );
-      QPoint pLM (              0, +int( size )/6 );
-      QPoint pLL ( -int( size )/3, +int( size )/24 );
+      const int iSize = static_cast<int>(size);
+      QPoint pUL ( -iSize/3, -iSize/6 );
+      QPoint pUR (  iSize/3, -iSize/6 );
+      QPoint pLR (  iSize/3,  iSize/24 );
+      QPoint pLM (        0,  iSize/6 );
+      QPoint pLL ( -iSize/3,  iSize/24 );
 
       poly << pUL << pUR << pLR << pLM << pLL;
 
@@ -66,7 +68,7 @@ namespace nslib
         neuronAggReps,
         path_,
         pLL, pLM, pLR,
-        QColor( 114, 188, 196 ),
+        BASE_COLOR,
         size );
 
       if ( Config::showEntitiesName( ))
@@ -77,12 +79,11 @@ namespace nslib
       }
 
       this->_parentRep = &( const_cast< ColumnRep& >( columnRep ));
-      //  this->setBrush( QBrush( QColor( 114, 188, 196 )));
     }
 
     ColumnItem::~ColumnItem( void )
     {
-      delete _itemText;
+      if(_itemText) delete _itemText;
     }
 
   } // namespace cortex

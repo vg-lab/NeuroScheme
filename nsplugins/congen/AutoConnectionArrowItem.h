@@ -21,6 +21,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef NEUROSCHEME_AUTOCONNECTIONAROWITEM_H
 #define NEUROSCHEME_AUTOCONNECTIONAROWITEM_H
 
@@ -127,7 +128,6 @@ namespace nslib
       void centersDistFactor( float centersDistFactor_ );
 
     protected:
-
       //the following determine various values needed to paint auto-connections
       static float arcRadius;
       static float dist;
@@ -148,7 +148,6 @@ namespace nslib
       static const float M_PI_0825;
       static const float M_PI_1115;
       static const float M_PI_175;
-
     };
   } // namespace congen
 } // namespace nslib

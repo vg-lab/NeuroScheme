@@ -31,58 +31,55 @@
 
 namespace nslib
 {
-
   class QGraphicsItemRepresentation
   {
-
-  public:
-
-    QGraphicsItemRepresentation( void )
-    //: _item( nullptr )
-    {
-      _items[ nullptr ] = nullptr;
-    }
-    virtual ~QGraphicsItemRepresentation( void ) {}
-    //virtual QGraphicsItem* item( bool create = true ) = 0;
-    virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
-                         bool create = true ) = 0;
-    virtual void setItem( QGraphicsItem* item_,
-                          GraphicsScene* scene )
-    {
-      _items[ scene ] = item_;
-    }
-    virtual void clearItems( void )
-    {
-      _items.clear( );
-    }
-
-    virtual void deleteItem( QGraphicsScene* scene_ )
-    {
-      auto it = _items.find( scene_ );
-      if ( it != _items.end( ))
+    public:
+      QGraphicsItemRepresentation( void )
       {
-        _items.erase(it);
-        delete it->second;
+        _items[ nullptr ] = nullptr;
       }
-    }
 
-    const std::map< QGraphicsScene*, QGraphicsItem* >& items( void ) const
-    {
-      return _items;
-    }
+      virtual ~QGraphicsItemRepresentation( void )
+      {}
 
-    std::map< QGraphicsScene*, QGraphicsItem* >& items( void )
-    {
-      return _items;
-    }
+      virtual QGraphicsItem* item( QGraphicsScene* scene = nullptr,
+                           bool create = true ) = 0;
 
-  protected:
+      virtual void setItem( QGraphicsItem* item_,
+                            GraphicsScene* scene )
+      {
+        _items[ scene ] = item_;
+      }
 
-    std::map< QGraphicsScene*, QGraphicsItem* > _items;
+      virtual void clearItems( void )
+      {
+        _items.clear( );
+      }
+
+      virtual void deleteItem( QGraphicsScene* scene_ )
+      {
+        auto it = _items.find( scene_ );
+        if ( it != _items.end( ))
+        {
+          _items.erase(it);
+          delete it->second;
+        }
+      }
+
+      const std::map< QGraphicsScene*, QGraphicsItem* >& items( void ) const
+      {
+        return _items;
+      }
+
+      std::map< QGraphicsScene*, QGraphicsItem* >& items( void )
+      {
+        return _items;
+      }
+
+    protected:
+        std::map< QGraphicsScene*, QGraphicsItem* > _items;
 
   };
-
-
 } // namespace nslib
 
 #endif // NEUROSCHEME_USE_QT5WIDGETS

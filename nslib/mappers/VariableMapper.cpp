@@ -25,7 +25,6 @@
 
 namespace nslib
 {
-
   //
   // MapperToFloat
   //
@@ -53,11 +52,9 @@ namespace nslib
     return _outMin;
   }
 
-
   //
   // MapperFloatToFloat
   //
-
 
   MapperFloatToFloat::MapperFloatToFloat( float inMin_,
                                           float inMax_,
@@ -72,7 +69,6 @@ namespace nslib
     , _linearity( linearity_ )
     , _exponent( exponent_ )
   {
-
   }
 
   float & MapperFloatToFloat::inMax( void )
@@ -148,9 +144,4 @@ namespace nslib
     this->value() = value_;
     return this->map();
   }
-
-
-
 } // namespace neurosheme
-
-// EOF

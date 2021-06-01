@@ -19,27 +19,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "NeuronTypeAggregationRep.h"
 #include "NeuronTypeAggregationItem.h"
 #include <stdint.h>
-
 
 namespace nslib
 {
   namespace cortex
   {
-
     NeuronTypeAggregationRep::NeuronTypeAggregationRep( void )
       : shiftgen::NeuronTypeAggregationRep( )
-    {
-    }
+    {}
 
     NeuronTypeAggregationRep::NeuronTypeAggregationRep(
       const NeuronTypeAggregationRep& other )
       : shiftgen::NeuronTypeAggregationRep( other )
-    {
-    }
-
+    {}
 
     QGraphicsItem* NeuronTypeAggregationRep::item(
       QGraphicsScene* scene, bool create )

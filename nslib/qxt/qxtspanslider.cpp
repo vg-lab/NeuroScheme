@@ -515,8 +515,8 @@ void QxtSpanSlider::setLowerPosition(int newLower)
             emit lowerPositionChanged(newLower);
         if (hasTracking() && !qxt_d().blockTracking)
         {
-            bool main = (qxt_d().mainControl == QxtSpanSlider::LowerHandle);
-            qxt_d().triggerAction(SliderMove, main);
+            const bool main = (qxt_d().mainControl == QxtSpanSlider::LowerHandle);
+            qxt_d().triggerAction(SliderNoAction, main);
         }
     }
 }
@@ -541,8 +541,8 @@ void QxtSpanSlider::setUpperPosition(int upper)
             emit upperPositionChanged(upper);
         if (hasTracking() && !qxt_d().blockTracking)
         {
-            bool main = (qxt_d().mainControl == QxtSpanSlider::UpperHandle);
-            qxt_d().triggerAction(SliderMove, main);
+            const bool main = (qxt_d().mainControl == QxtSpanSlider::UpperHandle);
+            qxt_d().triggerAction(SliderNoAction, main);
         }
     }
 }

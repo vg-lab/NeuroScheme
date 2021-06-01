@@ -23,29 +23,26 @@
 #define __NSLIB_LAYOUTS__
 
 #include "Layout.h"
-#include <QComboBox>
 #include <map>
+#include <QComboBox>
 #include <QtGui/QStandardItemModel>
 
 namespace nslib
 {
-
   class Layouts
   {
   public:
     Layouts( )
       : _layoutSelector( new QComboBox )
-    {
-    }
+    {}
+
     void setLayout(
       unsigned int layoutIndex, Layout* layout, bool disabled = false )
     {
       _layouts[ layoutIndex ] = layout;
-      _layoutSelector->insertItem( layoutIndex,
-        QString( layout->name( ).c_str( )));
-      QStandardItemModel* selectorModel =
-        qobject_cast< QStandardItemModel* >( _layoutSelector->model( ));
-      QStandardItem *item = selectorModel->item( layoutIndex );
+      _layoutSelector->insertItem( layoutIndex, QString( layout->name( ).c_str( )));
+      auto selectorModel = qobject_cast< QStandardItemModel* >( _layoutSelector->model( ));
+      auto item = selectorModel->item( layoutIndex );
       item->setFlags( disabled ? item->flags() & ~Qt::ItemIsEnabled
        : item->flags( ) | Qt::ItemIsEnabled );
     }
@@ -81,8 +78,6 @@ namespace nslib
     std::map< unsigned int, Layout* > _layouts;
     QComboBox* _layoutSelector;
   };
-
-
 }
 
 #endif

@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CORTEX_DOMAIN_MANAGER__
 #define __NSLIB__CORTEX_DOMAIN_MANAGER__
 
@@ -29,13 +30,13 @@ namespace nslib
 {
   namespace cortex
   {
-
     class DomainGUI : QObject
     {
       Q_OBJECT;
 
     public:
       DomainGUI( QMainWindow* mw_, QMenuBar* menubar );
+      virtual ~DomainGUI() {};
 
     public slots:
       void loadBlueConfig( void );
@@ -51,10 +52,9 @@ namespace nslib
     class NSLIBCORTEX_API Domain
       : public ::nslib::Domain
     {
-
     public:
-
       Domain( void );
+      virtual ~Domain() {};
 
       bool isSelectableEntity( shift::Entity* entity ) const override;
       unsigned int selectableEntityId( shift::Entity* entity ) const override;
@@ -65,7 +65,6 @@ namespace nslib
       {
         _domainGUI.reset( new DomainGUI( mw, menubar ));
       }
-
 
     protected:
       std::unique_ptr< DomainGUI > _domainGUI;
@@ -86,7 +85,6 @@ namespace nslib
         std::unordered_map < unsigned int, shift::Entity* >* oldGIDToEntity );
 
       void importMaximumsJSON( const boost::property_tree::ptree& maximums ) override;
-
     };
   }
 }

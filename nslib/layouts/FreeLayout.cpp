@@ -38,6 +38,7 @@ namespace nslib
 
   FreeLayout::FreeLayout( QStatusBar* statusBar_ )
     : Layout( "Free", 0, new QWidget )
+    , _movedItem{nullptr}
     , _moveNewCheckBox( new QCheckBox )
     , _statusBar(statusBar_)
   {
@@ -64,16 +65,16 @@ namespace nslib
 
   void FreeLayout::stopMoveActualRepresentation( void )
   {
-    auto itemSize = _movedItem->boundingRect( );
+    const auto itemSize = _movedItem->boundingRect( );
     auto itemsBoundingRect = _canvas->scene( ).itemsBoundingRect( );
 
     itemsBoundingRect.moveBottomLeft( QPoint(
-      ( int ) std::min( itemSize.left( ), itemsBoundingRect.left( )),
-      ( int ) std::min( itemSize.bottom( ), itemsBoundingRect.bottom( ))));
+      static_cast<int>(std::min( itemSize.left( ), itemsBoundingRect.left( ))),
+      static_cast<int>(std::min( itemSize.bottom( ), itemsBoundingRect.bottom( )))));
 
     itemsBoundingRect.moveTopRight( QPoint(
-      ( int ) std::max( itemSize.right( ), itemsBoundingRect.right( )),
-      ( int ) std::max( itemSize.top( ), itemsBoundingRect.top( ))));
+      static_cast<int>(std::max( itemSize.right( ), itemsBoundingRect.right( ))),
+      static_cast<int>(std::max( itemSize.top( ), itemsBoundingRect.top( )))));
 
     _movedItem = nullptr;
     _statusBar->showMessage( "", 5 );
@@ -91,20 +92,24 @@ namespace nslib
       item_ = parentItem;
       parentItem = item_->parentItem( );
     }
+
     auto nslibItem = dynamic_cast< Item* >( item_ );
-    auto itemRepresentation =
-      dynamic_cast< QGraphicsItemRepresentation* >( nslibItem->parentRep( ));
-    _movedItem = itemRepresentation->item( &_canvas->scene( ));
-    _moveStart = item_->pos( )- clickPos_;
-    if( Config::showConnectivity( ))
+    if(nslibItem)
     {
-      preRenderOpConfig = OpConfig( &_canvas->scene( ), false, _isGrid );
+      auto itemRepresentation =
+        dynamic_cast< QGraphicsItemRepresentation* >( nslibItem->parentRep( ));
+      _movedItem = itemRepresentation->item( &_canvas->scene( ));
+      _moveStart = item_->pos( )- clickPos_;
+      if( Config::showConnectivity( ))
+      {
+        preRenderOpConfig = OpConfig( &_canvas->scene( ), false, _isGrid );
+      }
     }
   }
 
   void FreeLayout::moveRepresentation( const QPointF newPos_ )
   {
-    QPointF newItemPos = newPos_ - _moveStart;
+    const QPointF newItemPos = newPos_ - _moveStart;
     _movedItem->setPos( newItemPos );
     _statusBar->showMessage(
       QString( "X: " ) + QString::number( newItemPos.x( )) +
@@ -120,7 +125,6 @@ namespace nslib
 
   void FreeLayout::_updateOptionsWidget( void )
   {
-
   }
 
   void FreeLayout::display( shift::Entities& entities,
@@ -161,7 +165,6 @@ namespace nslib
     }
 
     _addRepresentations( newReps, true );
-    //_addRepresentations( updateReps, true );
     _entitiesReps = representations;
 
     removeRelationshipsReps( );
@@ -184,7 +187,6 @@ namespace nslib
 
   void FreeLayout::refresh( bool animate )
   {
-    //init( );
     display( _canvas->allEntities( ), _canvas->reps( ), animate );
   }
 
@@ -194,7 +196,7 @@ namespace nslib
     const auto& repsToEntities =
       RepresentationCreatorManager::repsToEntities( );
 
-    qreal repsScale = _canvas->repsScale( );
+    const qreal repsScale = _canvas->repsScale( );
     auto view = _canvas->scene( ).views( ).first( );
     const bool moveNewEntities = _moveNewCheckBox->isChecked( );
 
@@ -208,18 +210,12 @@ namespace nslib
       }
       else
       {
-        // std::cout << "+++++ Retrieving item" << std::endl;
         auto item = graphicsItemRep->item( &_canvas->scene( ));
 
-        if ( item->parentItem( ))
+        if ( !item || item->parentItem( ))
         {
           continue;
         }
-
-        // Find out if its entity is selected
-        // and if so set its pen
-        // const auto& repsToEntities =
-        //   RepresentationCreatorManager::repsToEntities( );
 
         if ( repsToEntities.count( representation ) > 0 )
         {
@@ -236,7 +232,6 @@ namespace nslib
             auto selectedState = SelectionManager::getSelectedState(
               *entities.begin( ));
 
-            // if ( selectedState == selectedStateSelectedState::SELECTED )
             selectableItem->setSelected( selectedState );
 
             auto shapeItem =
@@ -255,8 +250,6 @@ namespace nslib
             }
           }
         }
-        //std::cout << &scene << " add item " << std::endl;
-        // std::cout << "Adding item" << item << std::endl;
 
         if ( !item->parentItem( )
           && !_canvas->scene( ).items( ).contains( item ))
@@ -267,7 +260,7 @@ namespace nslib
             {
               qreal posX = view->x( );
               qreal posY = item->y( );
-              qreal glyphRadius =
+              const qreal glyphRadius =
                 2.05f * float( item->scale( ))
                 * float( item->boundingRect( ).width( ));
               auto viewItem = view->itemAt( view->mapFromScene( posX, posY ));
@@ -289,7 +282,7 @@ namespace nslib
         }
       }
     }
-  } // _addRepresentations
+  }
 
   void FreeLayout::_removeRepresentations( const shift::Representations& reps )
   {
@@ -303,13 +296,13 @@ namespace nslib
       }
       else
       {
-        // std::cout << "+++++ Retrieving item" << std::endl;
         auto item = graphicsItemRep->item( &_canvas->scene( ));
 
-        if ( item->parentItem( ))
+        if ( !item || item->parentItem( ))
         {
           continue;
         }
+
         if ( !item->parentItem( )
              && _canvas->scene( ).items( ).contains( item ))
         {
@@ -318,7 +311,7 @@ namespace nslib
 
       }
     }
-  } // _removeRepresentations
+  }
 
   Layout* FreeLayout::clone( void ) const
   {
@@ -351,5 +344,4 @@ namespace nslib
   {
     _moveNewCheckBox->setChecked( moveNewEntitiesChecked_ );
   }
-
 }

@@ -23,7 +23,6 @@
 #include "DataManager.h"
 #include "DomainManager.h"
 #include "InteractionManager.h"
-#include "layouts/LayoutManager.h"
 #include "layouts/FreeLayout.h"
 #include "Loggers.h"
 #include "RepresentationCreatorManager.h"
@@ -33,7 +32,6 @@
 #include "ZeroEQManager.h"
 #include <shift/Entity.h>
 #include <shift/Entities.h>
-//#include "domains/domains.h"
 #include <unordered_set>
 
 #include <QGuiApplication>
@@ -97,41 +95,42 @@ namespace nslib
     auto item = dynamic_cast< Item* >( shapeItem );
     if ( item )
     {
-      assert( item->parentRep( ));
-
-      const auto& entities = repsToEntities.find( item->parentRep( ));
-      if ( entities != repsToEntities.end( ))
+      if( item->parentRep( ))
       {
-        auto entityGid = ( *entities->second.begin( ))->entityGid( );
-        for ( const auto& relPair : rels )
+        const auto& entities = repsToEntities.find( item->parentRep( ));
+        if ( entities != repsToEntities.end( ))
         {
-          std::vector< unsigned  int > connectingEntitiesGID;
-          if ( std::get< HiglightRelationPair::HLC_AGGREGATED >( relPair ))
+          auto entityGid = ( *entities->second.begin( ))->entityGid( );
+          for ( const auto& relPair : rels )
           {
-            const auto& rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
-              ( relPair )->asAggregatedOneToN( )->mapAggregatedRels( );
-
-            auto connectingEntities = rel.find( entityGid );
-            if ( connectingEntities != rel.end( ))
+            std::vector< unsigned  int > connectingEntitiesGID;
+            if ( std::get< HiglightRelationPair::HLC_AGGREGATED >( relPair ))
             {
-              for( const auto& connectingEntity : *connectingEntities->second )
+              const auto& rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
+                ( relPair )->asAggregatedOneToN( )->mapAggregatedRels( );
+
+              auto connectingEntities = rel.find( entityGid );
+              if ( connectingEntities != rel.end( ))
               {
-                highlightConnection( highlight, relatedEntities,
-                  entityGid, relPair, connectingEntity.first );}
+                for( const auto& connectingEntity : *connectingEntities->second )
+                {
+                  highlightConnection( highlight, relatedEntities,
+                    entityGid, relPair, connectingEntity.first );}
+              }
             }
-          }
-          else
-          {
-            const auto rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
-              ( relPair )->asOneToN( );
-
-            auto connectingEntities = rel->find( entityGid );
-            if ( connectingEntities != rel->end( ))
+            else
             {
-              for ( const auto& connectingEntity : connectingEntities->second )
+              const auto rel = std::get< HiglightRelationPair::HLC_RELATIONSHIP >
+                ( relPair )->asOneToN( );
+
+              auto connectingEntities = rel->find( entityGid );
+              if ( connectingEntities != rel->end( ))
               {
-                highlightConnection( highlight, relatedEntities,
-                  entityGid, relPair, connectingEntity.first );
+                for ( const auto& connectingEntity : connectingEntities->second )
+                {
+                  highlightConnection( highlight, relatedEntities,
+                    entityGid, relPair, connectingEntity.first );
+                }
               }
             }
           }
@@ -150,23 +149,24 @@ namespace nslib
       ( std::get< HiglightRelationPair::HLC_INVERT >( relPair ) ?
       std::make_pair( connectingEntityGID, entityGid ) :
       std::make_pair( entityGid, connectingEntityGID )));
-    if ( relationRep != relatedEntities.end( ))
+
+    if (relationRep != relatedEntities.end())
+    {
+      shift::Representation *rep = std::get<0>(relationRep->second);
+      auto *connRep = dynamic_cast<ConnectivityRep*>(rep);
+      if (connRep)
       {
-        shift::Representation* rep = std::get< 0 >( relationRep->second );
-        auto* connRep = dynamic_cast< ConnectivityRep* >( rep );
-        if ( connRep )
+        if (highlight)
         {
-          if ( highlight )
-          {
-            connRep->highlight(
-              std::get<HiglightRelationPair::HLC_COLOR>( relPair ));
-          }
-          else
-          {
-            connRep->unHighlight( );
-          }
+          connRep->highlight(
+              std::get<HiglightRelationPair::HLC_COLOR>(relPair));
+        }
+        else
+        {
+          connRep->unHighlight();
         }
       }
+    }
   }
 
   void InteractionManager::hoverEnterEvent(
@@ -176,7 +176,7 @@ namespace nslib
     if( lastShapeItemHoveredOnMouseMove != shapeItem )
     {
       hoverLeaveEvent( lastShapeItemHoveredOnMouseMove, event );
-      // std::cout << "hover" << std::endl;
+
       auto selectableItem = dynamic_cast< SelectableItem* >( shapeItem );
       if ( selectableItem )
       {
@@ -194,10 +194,9 @@ namespace nslib
         if ( item )
         {
           assert( item->parentRep( ));
-          const auto& repsToEntities =
-            RepresentationCreatorManager::repsToEntities( );
-          if ( repsToEntities.find( item->parentRep( )) !=
-            repsToEntities.end( ))
+          const auto& repsToEntities = RepresentationCreatorManager::repsToEntities( );
+
+          if ( repsToEntities.find( item->parentRep( )) != repsToEntities.end( ))
           {
             const auto entities = repsToEntities.at( item->parentRep( ));
             createOrEditEntity( *entities.begin( ),
@@ -208,7 +207,6 @@ namespace nslib
       lastShapeItemHoveredOnMouseMove = shapeItem;
     }
   }
-
 
   void InteractionManager::hoverLeaveEvent(
     QAbstractGraphicsShapeItem* item,
@@ -231,14 +229,14 @@ namespace nslib
           {
             item->setPen( SelectableItem::unselectedPen( ));
           }
-          lastShapeItemHoveredOnMouseMove = nullptr;
-          return;
+
+          break;
         }
       }
+
       lastShapeItemHoveredOnMouseMove = nullptr;
     }
   }
-
 
   void InteractionManager::contextMenuEvent(
     QAbstractGraphicsShapeItem* shapeItem,
@@ -369,7 +367,7 @@ namespace nslib
           {
             domainEntitiesTypes = domain->entitiesTypes( );
             shift::Entity* parentEntity = nullptr;
-            int commonParent = (int ) entityGid;
+            int commonParent = static_cast<int>(entityGid);
             childAction = addCreateEntitiesContextMenu( commonParent,
               domainEntitiesTypes, dataEntities, parentEntity,
               actionToIdx, newEntitiesTypes, true, isParentEntity ) != 0;
@@ -577,7 +575,6 @@ namespace nslib
         {
           Loggers::get( )->log( "item without entity",
             LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
-          return;
         }
       }
       else
@@ -586,8 +583,8 @@ namespace nslib
           LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
       }
     }
-    tmpConnectionLineRemove( );
 
+    tmpConnectionLineRemove( );
   }
 
   void InteractionManager::tmpConnectionLineRemove( )
@@ -600,14 +597,11 @@ namespace nslib
     }
   } // context menu
 
-
   void InteractionManager::mousePressEvent( const QGraphicsView* graphicsView,
     QGraphicsItem* item, const QMouseEvent* event )
   {
     if ( item )
     {
-      // _tmpConnectionLine.reset(
-      //   new QGraphicsLineItem( QLineF( item->scenePos( ), item->scenePos( ))));
       if ( event->modifiers( ).testFlag( Qt::ShiftModifier ))
       {
         Canvas* movingPane = PaneManager::activePane( );
@@ -616,7 +610,6 @@ namespace nslib
           movingPane->layouts( ).getLayout( Layout::TLayoutIndexes::FREE ));
         auto newPos = graphicsView->mapToScene( event->pos( ));
         _movingLayout->startMoveRepresentation(item, newPos );
-
       }
       else
       {
@@ -693,6 +686,7 @@ namespace nslib
           auto selectableItem = dynamic_cast< SelectableItem*>( item_ );
           if ( selectableItem )
             break;
+
           item_ = parentItem;
           parentItem = item_->parentItem( );
         }
@@ -722,27 +716,20 @@ namespace nslib
                   selectableItem->toggleSelected( );
                 }
 
-// std::cout << "-------- Selecting entities "
-//           << entities.size( ) << std::endl;
                 for( const auto& entity : entities )
-              {
-// std::cout << "-------- " << entity->entityGid( ) << std::endl;
-// std::cout << "-- ShiFT gid: "
-//           << int( entity->entityGid( )) << std::endl;
-
-                  if ( selectableItem->selected( ))
+                {
+                  if (selectableItem->selected())
                   {
-                    SelectionManager::setSelectedState(
-                      entity, SelectedState::SELECTED );
+                    SelectionManager::setSelectedState(entity,
+                        SelectedState::SELECTED);
                   }
                   else
                   {
-                    SelectionManager::setSelectedState(
-                      entity, SelectedState::UNSELECTED );
+                    SelectionManager::setSelectedState(entity,
+                        SelectedState::UNSELECTED);
                   }
 
                   auto entityState = SelectionManager::getSelectedState( entity );
-                  // auto entityGid = ( *entities.begin( ))->entityGid( );
                   auto entityGid = entity->entityGid( );
 
                   const auto& allEntities = DataManager::entities( );
@@ -764,33 +751,29 @@ namespace nslib
                     if ( relAGroupOf.count( entityGid ) > 0 )
                     {
                       const auto& groupedIds = relAGroupOf.at( entityGid );
-                      // std::cout << " -- Parent of: ";
-                      // std::cout << ",,,, Grouped " << groupedIds.size( ) << std::endl;
                       for( auto const& groupedId : groupedIds )
                       {
                         SelectionManager::setSelectedState(
                           allEntities.at( groupedId.first ), entityState );
+
                         // Save unique parent set for updating only once per parent
-                        if ( relChildOf.count( groupedId.first ) > 0 )
-                          parentIds.insert( relChildOf.at(
-                          groupedId.first ).entity );
+                        if( relChildOf.count( groupedId.first ) > 0 )
+                          parentIds.insert( relChildOf.at(groupedId.first ).entity );
                       }
-                      _updateSelectedStateOfSubEntities(
-                        allEntities, relSuperEntityOf, relAGroupOf,
-                        relSubEntityOf.at( entityGid ).entity );
+
+                      _updateSelectedStateOfSubEntities(allEntities, relSuperEntityOf, relAGroupOf,
+                          relSubEntityOf.at( entityGid ).entity );
+
                       std::unordered_set< unsigned int > uniqueParentChildIds;
                       for ( auto const& parentId : parentIds )
                       {
-                        uniqueParentChildIds.insert(
-                          relParentOf.at( parentId ).begin( )->first );
+                        uniqueParentChildIds.insert(relParentOf.at( parentId ).begin( )->first );
                       }
-                      // std::cout << ",,,, Parents: " << parentIds.size( ) << std::endl;
+
                       for ( auto const& uniqueParentChildId : uniqueParentChildIds )
                       {
-                        _propagateSelectedStateToParent(
-                          allEntities, relChildOf, relParentOf,
-                          relSuperEntityOf, relAGroupOf,
-                          uniqueParentChildId, entityState );
+                        _propagateSelectedStateToParent(allEntities, relChildOf, relParentOf,
+                            relSuperEntityOf, relAGroupOf,uniqueParentChildId, entityState );
                       }
                     }
                   } // if subentity
@@ -801,29 +784,22 @@ namespace nslib
                       const auto& subEntities =
                         relSuperEntityOf.at( entityGid );
                       for ( const auto& subEntity : subEntities )
-                        SelectionManager::setSelectedState(
-                          allEntities.at( subEntity.first ), entityState );
+                        SelectionManager::setSelectedState(allEntities.at( subEntity.first ), entityState );
                     }
 
-                    // std::cout << "Propagate to children of " << entityGid << std::endl;
-                    _propagateSelectedStateToChilds(
-                      allEntities, relParentOf, relSuperEntityOf,
-                      entityGid, entityState );
-
-                    _propagateSelectedStateToParent(
-                      allEntities, relChildOf, relParentOf,
-                      relSuperEntityOf, relAGroupOf,
-                      entityGid, entityState );
-                    //std::cout << std::endl;
+                    _propagateSelectedStateToChilds(allEntities, relParentOf, relSuperEntityOf,entityGid, entityState );
+                    _propagateSelectedStateToParent(allEntities, relChildOf, relParentOf, relSuperEntityOf, relAGroupOf, entityGid, entityState );
                   }
-                  //LayoutManager::updateAllScenesSelection( );
                   PaneManager::updateSelection( );
                 }
               }
               else
               {
-                Loggers::get( )->log( "item without entity",
-                  LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+                Loggers::get( )->log( "item without entity", LOG_LEVEL_ERROR, NEUROSCHEME_FILE_LINE );
+                tmpConnectionLineRemove( );
+                _item = nullptr;
+                _buttons = Qt::MouseButtons( );
+
                 return;
               }
             }
@@ -834,6 +810,7 @@ namespace nslib
 
             if ( Config::autoPublishSelection( ))
               ZeroEQManager::publishSelection( ids );
+
             if ( Config::autoPublishFocusOnSelection( ))
               ZeroEQManager::publishFocusOnSelection( ids );
           } // selection event
@@ -869,7 +846,6 @@ namespace nslib
     }
 
     tmpConnectionLineRemove( );
-
     _item = nullptr;
     _buttons = Qt::MouseButtons( );
   }
@@ -906,7 +882,6 @@ namespace nslib
       _propagateSelectedStateToChilds( entities, relParentOf, relSuperEntityOf,
         childId.first, state );
     }
-
   }
 
   void InteractionManager::_propagateSelectedStateToParent(
@@ -926,7 +901,6 @@ namespace nslib
 
     if ( childState == SelectedState::PARTIALLY_SELECTED )
     {
-      //std::cout << "<>Partially selected" << std::endl;
       SelectionManager::setSelectedState(
         entities.at( parentId ), childState );
       _propagateSelectedStateToParent( entities, relChildOf, relParentOf,
@@ -938,7 +912,7 @@ namespace nslib
     bool allChildrenSelected, noChildrenSelected;
     queryChildrenSelectedState( entities, relParentOf, parentId,
                                 allChildrenSelected, noChildrenSelected );
-    //std::cout << "<>AllChildSelected? = " << allChildrenSelected << std::endl;
+
     SelectedState state;
     if ( noChildrenSelected )
       state = SelectedState::UNSELECTED;
@@ -963,7 +937,7 @@ namespace nslib
     const shift::RelationshipOneToN& relAGroupOf,
     unsigned int entityGid )
   {
-    if ( relSuperEntityOf.count( entityGid ) < 1 )
+    if ( relSuperEntityOf.count( entityGid ) == 0 )
       return;
 
     for ( const auto& subEntityId : relSuperEntityOf.at( entityGid ))
@@ -981,7 +955,6 @@ namespace nslib
 
       SelectionManager::setSelectedState(
         entities.at( subEntityId.first ), groupedState );
-
     }
   }
 
@@ -1038,8 +1011,9 @@ namespace nslib
     shift::Entity* parentEntity_, const bool changeParent_,
     const bool addToScene_)
   {
-   _entityEditWidget->updateEntity( entity_, action_, parentEntity_,
-     changeParent_, addToScene_ );
+    _entityEditWidget->updateEntity( entity_, action_, parentEntity_,
+      changeParent_, addToScene_ );
+    _entityEditWidget->activateWindow();
   }
 
   void InteractionManager::updateEntityConnectionList(

@@ -19,34 +19,29 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "MiniColumnRep.h"
 #include "MiniColumnItem.h"
 #include "NeuronRep.h"
 #include <nslib/Color.h>
 #include <stdint.h>
 
-
 namespace nslib
 {
   namespace cortex
   {
-
     MiniColumnRep::MiniColumnRep( void )
       : shiftgen::NeuronAggregationRep( )
-    {
-    }
+    {}
 
     MiniColumnRep::MiniColumnRep( const MiniColumnRep& other )
       : shiftgen::NeuronAggregationRep( other )
-    {
-    }
+    {}
 
     MiniColumnRep::MiniColumnRep(
       const shiftgen::NeuronAggregationRep& other )
       : shiftgen::NeuronAggregationRep( other )
-    {
-    }
-
+    {}
 
     QGraphicsItem* MiniColumnRep::item( QGraphicsScene* scene, bool create )
     {
@@ -57,6 +52,5 @@ namespace nslib
       }
       return _items.at( scene );
     }
-
   } // namespace cortex
 } // namespace nslib

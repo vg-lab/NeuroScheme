@@ -47,7 +47,6 @@ namespace nslib
 
       public:
           XMLExporter( );
-
           ~XMLExporter( );
 
           const QDomDocument & getXMLConGenDomDocument( ) { return domDoc; }
@@ -73,7 +72,7 @@ namespace nslib
           QDomElement addElement(	QDomDocument& doc,
                                   QDomNode& node,
                                   const QString& tag,
-                                  const QString& value = QString( "" ));
+                                  const QString& value = QString());
 
           void parseConGenXML( );
     };

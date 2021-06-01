@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include "DataLoader.h"
 #include <nslib/Loggers.h>
 #include <nslib/DataManager.h>
@@ -59,7 +60,6 @@ namespace nslib
 
       return true;
     }
-
 
     void DataLoader::_loadPopulation(
       QXmlStreamReader& xml,
@@ -456,8 +456,6 @@ namespace nslib
       repCreator->maxNeuronsPerPopulation( maxNeuronsPerPopulation );
 
       return true;
-
-
     }
   } // namespace congen
 } // namespace nslib

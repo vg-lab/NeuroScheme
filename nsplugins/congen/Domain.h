@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIB__CONGEN_DOMAIN_MANAGER__
 #define __NSLIB__CONGEN_DOMAIN_MANAGER__
 
@@ -31,10 +32,8 @@
 
 namespace nslib
 {
-
   namespace congen
   {
-
     class DomainGUI : QObject
     {
       Q_OBJECT;
@@ -50,21 +49,19 @@ namespace nslib
       QString _lastOpenedFileName;
       std::unique_ptr< QAction > _actionLoadNeuroML;
       std::unique_ptr< QAction > _actionSaveNeuroML;
-
     };
 
     class NSLIBCONGEN_API Domain
       : public ::nslib::Domain
     {
-
     public:
-
       Domain( void );
 
       bool isSelectableEntity( shift::Entity* entity ) const override ;
       unsigned int selectableEntityId( shift::Entity* entity ) const override;
       const Vector4f entity3DPosition ( shift::Entity* entity ) const override;
       static void usageMessage( void );
+
       void createGUI( QMainWindow* mw, QMenuBar* menubar ) final
       {
         _domainGUI.reset( new DomainGUI( mw, menubar ));
@@ -84,7 +81,6 @@ namespace nslib
       void importMaximumsJSON(
         const boost::property_tree::ptree& maximums ) override;
     };
-
   }
 }
 

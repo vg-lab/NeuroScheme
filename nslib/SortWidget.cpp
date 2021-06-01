@@ -28,13 +28,10 @@
 
 namespace nslib
 {
-
   SortWidget::SortWidget( Layout* parentLayout_, QWidget* parent_ )
     : QFrame( parent_ )
     , _parentLayout( parentLayout_ )
     , _numSortProperties( 0 )
-    // , _removeSignalMapper( new QSignalMapper )
-    // , _changeDirSignalMapper( new QSignalMapper )
   {
     auto layout_ = new QGridLayout;
     layout_->setAlignment( Qt::AlignTop );
@@ -45,7 +42,7 @@ namespace nslib
                                         QSizePolicy::Expanding );
     _propertiesSelector->setMinimumSize( 190, 20 );
 
-    QIcon addIcon( QString::fromUtf8(":/icons/add.png"));
+    QIcon addIcon( QString::fromUtf8(":/icons/add.svg"));
     _sortButton = new QToolButton( );
     _sortButton->setIcon( addIcon );
 
@@ -56,10 +53,6 @@ namespace nslib
 
     connect( _sortButton, SIGNAL( pressed( )),
              this, SLOT( addedSortProperty( )));
-
-    // connect( _changeDirSignalMapper, SIGNAL( mapped( const QString& )),
-    //          this, SLOT( changeSortPropertyDir( const QString&  )));
-
   }
 
   void SortWidget::addedSortProperty( void )
@@ -76,19 +69,14 @@ namespace nslib
            }) != sortProperties.end( ))
       return;
 
-    // std::cout << "<><><><> Added sorted propery "
-    //           << _propertiesSelector->currentText( ).toStdString( )
-    //           << std::endl;
+    auto propertyQLabel = new QLabel( _propertiesSelector->currentText( ));
 
-    QLabel* propertyQLabel = new QLabel( _propertiesSelector->currentText( ));
-
-    QIcon changeSortDirIcon(
-      QString::fromUtf8( ":/icons/alphabetical_sorting_az.png"));
+    QIcon changeSortDirIcon(":/icons/alphabetical_sorting_az.svg");
     QToolButton* changeSortDirButton = new QToolButton( this );;
     changeSortDirButton->setIcon( changeSortDirIcon );
     changeSortDirButton->setCheckable(true);
 
-    QIcon removePropertyIcon( QString::fromUtf8(":/icons/close.png"));
+    QIcon removePropertyIcon(":/icons/close.svg");
     QToolButton* removePropertyButton = new QToolButton( this );
     removePropertyButton->setIcon( removePropertyIcon );
 
@@ -136,18 +124,9 @@ namespace nslib
              SIGNAL( mapped( const QString& )),
              this, SLOT( changeSortPropertyDir( const QString&  )));
 
-    // std::cout << "["
-    //           << _sortConfig.properties( ).size( ) << "]: ";
-    // for ( const auto& p : _sortConfig.properties( ))
-    // {
-    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
-    //   assert( p.sorter );
-    // }
-    // std::cout <<  std::endl;
-
-    _parentLayout->refresh( true// , false 
-      );
+    _parentLayout->refresh( true );
   }
+
   void SortWidget::clear( )
   {
     _propertiesSelector->clear( );
@@ -176,18 +155,10 @@ namespace nslib
     _removeSignalMappers.clear( );
     _numSortProperties = 0;
     _sortConfig.properties( ).clear( );
-    // delete _removeSignalMapper;
-    // _removeSignalMapper = new QSignalMapper;
-    // delete _changeDirSignalMapper;
-    // _changeDirSignalMapper = new QSignalMapper;
-
   }
 
   void SortWidget::removeSortProperty( const QString& propertyLabel_ )
   {
-    // std::cout << "Remove property "
-    //           << propertyLabel_.toStdString( ) << std::endl;
-
     auto& sortProperties = _sortConfig.properties( );
     auto propertyLabel = propertyLabel_.toStdString( );
 
@@ -197,6 +168,7 @@ namespace nslib
       {
         return p.label == propertyLabel;
       });
+
     // If property already inserted just return
     if ( sortProperty == sortProperties.end( )) return;
 
@@ -219,21 +191,11 @@ namespace nslib
     assert( item );
     delete item->widget( );
 
-    // std::cout << "["
-    //           << _sortConfig.properties( ).size( ) << "]: ";
-    // for ( const auto& p : _sortConfig.properties( ))
-    // {
-    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
-    //   assert( p.sorter );
-    // }
-    // std::cout <<  std::endl;
-
     _layoutRowsMap.erase( propertyLabel );
     _removeSignalMappers.erase( propertyLabel );
     _changeDirSignalMappers.erase( propertyLabel );
 
-    _parentLayout->refresh( true// , false 
-      );
+    _parentLayout->refresh( true );
   }
 
   void SortWidget::changeSortPropertyDir( const QString& propertyLabel_ )
@@ -241,14 +203,13 @@ namespace nslib
     auto& sortProperties = _sortConfig.properties( );
     auto propertyLabel = propertyLabel_.toStdString( );
 
-    // std::cout << "//changind sort dir of " << propertyLabel << std::endl;
-
     fires::SortConfig::TSortProperties::iterator sortProperty = std::find_if(
       sortProperties.begin( ), sortProperties.end( ),
       [ propertyLabel ]( fires::SortConfig::TSortProperty& p )->bool
       {
         return p.label == propertyLabel;
       });
+
     // If property already inserted just return
     assert( sortProperty != sortProperties.end( ));
 
@@ -257,29 +218,13 @@ namespace nslib
       sortProperty->order =fires::SortConfig::DESCENDING :
       sortProperty->order = fires::SortConfig::ASCENDING;
 
-    // std::cout << "//Change sort dir "
-    //           << propertyLabel << " to "
-    //           << (int) sortProperty->order << std::endl;
-
-    // std::cout << "["
-    //           << _sortConfig.properties( ).size( ) << "]: ";
-    // for ( const auto& p : _sortConfig.properties( ))
-    // {
-    //   std::cout << "{" << p.label << "," << (int) p.order << "}";
-    //   assert( p.sorter );
-    // }
-    // std::cout <<  std::endl;
-
-    _parentLayout->refresh( true// , false 
-      );
+    _parentLayout->refresh( true );
   }
 
   SortWidget::~SortWidget( void )
   {
     delete _propertiesSelector;
     delete _sortButton;
-    // delete _removeSignalMapper;
-    // delete _changeDirSignalMapper;
   }
 
 }

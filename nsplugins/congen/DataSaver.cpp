@@ -42,7 +42,7 @@ namespace nslib
 
       const auto fileName = QFileDialog::getSaveFileName( ptr, title, QDir::currentPath(),
                                                           filters, &selectedFilter, options);
-      if ( fileName != "" )
+      if ( !fileName.isEmpty() )
       {
         XMLExporter* exporter_ = new XMLExporter;
         std::vector< unsigned int > entitiesGids;
@@ -63,6 +63,7 @@ namespace nslib
                "0", "0", "0", "0", "0", "0" );
            }
         }
+
         const auto& relConnectsTo = *( DataManager::entities( ).
           relationships( )[ "connectsTo" ]->asOneToN( ));
         saveXmlConnections( relConnectsTo, exporter_ );

@@ -214,7 +214,7 @@ namespace nslib
   {
     if( index_.isValid( ) && role_ == Qt::DisplayRole )
     {
-      auto indexRow = index_.row( );
+      const auto indexRow = index_.row( );
       if( _numConnections == 0 )
       {
         return _emptyString;
@@ -300,6 +300,7 @@ namespace nslib
         }
         entitiesIt2 += _numProperties;
       }
+
       if( index1 != sortIndex )
       {
         auto entitiesIt3 = _tableData.begin( )+ ( index1 *_numProperties );
@@ -416,8 +417,8 @@ namespace nslib
     }
     else
     {
+      const QRect rect = option_.rect;
       QStyleOptionButton editButtonStyle;
-      QRect rect = option_.rect;
       editButtonStyle.text = "Edit";
       editButtonStyle.state = QStyle::State_Enabled;
       if( _model->isAggregated( ))
@@ -427,7 +428,7 @@ namespace nslib
       }
       else
       {
-        int buttonWidth = static_cast<int>( 0.5f * rect.width( ));
+        const int buttonWidth = static_cast<int>( 0.5f * rect.width( ));
         editButtonStyle.rect =QRect( rect.left( ), rect.top( ), buttonWidth,
           rect.height( ));
 
@@ -453,24 +454,18 @@ namespace nslib
       if( event_->type( ) == QEvent::MouseButtonRelease )
       {
         auto mouseEvent = dynamic_cast<QMouseEvent*>( event_ );
-        int clickX = mouseEvent->x( );
-        int clickY = mouseEvent->y( );
+        const QRect rect = option_.rect;
 
-        QRect rect = option_.rect;
-        int cellWidth = rect.width( );
-        int cellX = rect.left( );
-        int cellY = rect.top( );
-        if( clickY > cellY && clickY < cellY + rect.height( )
-          && clickX > cellX && clickX < cellX + cellWidth )
+        if( rect.contains(mouseEvent->pos(), true) )
         {
-          unsigned int rowIndex = index_.row( );
+          const unsigned int rowIndex = index_.row( );
           auto entity = _model->entity( );
           auto connectedEntity = _model->connectedEntityAt( rowIndex );
           if(!connectedEntity) return false;
 
           const bool isAggregated = _model->isAggregated( );
-          if( isAggregated || clickX < cellX +
-            static_cast< int >( cellWidth * 0.5f ))
+          if( isAggregated || mouseEvent->x() < rect.left() +
+            static_cast< int >( rect.width() * 0.5f ))
           {
             auto type = isAggregated
               ? ConnectionRelationshipEditWidget::TConnectionType::AGGREGATED

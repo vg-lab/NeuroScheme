@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #include <nslib/InteractionManager.h>
 #include "Triangle.h"
 
@@ -41,15 +42,11 @@ namespace nslib
     void Triangle::hoverEnterEvent( QGraphicsSceneHoverEvent* event_ )
     {
       InteractionManager::hoverEnterEvent( this, event_ );
-      // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-      // event_ );
     }
 
     void Triangle::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       InteractionManager::hoverLeaveEvent( this, event_ );
-      // dynamic_cast< QAbstractGraphicsShapeItem* >(this ->parentItem( )),
-      // event_ );
     }
 
     void Triangle::contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ )

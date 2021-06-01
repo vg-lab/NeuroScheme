@@ -68,7 +68,6 @@ namespace nslib
             iconLoad.addFile( QStringLiteral( ":/icons/open.svg" ),
               QSize( ), QIcon::Normal, QIcon::Off );
             _actionLoadNeuroML->setIcon( iconLoad );
-
           }
         }
       }
@@ -93,10 +92,6 @@ namespace nslib
           LOG_LEVEL_VERBOSE, NEUROSCHEME_FILE_LINE );
 
         congen::DataLoader::loadNeuroML( fileName );
-
-        // DataLoader::createEntitiesFromNsolColumns(
-        //   DataManager::nsolDataSet( ).columns( ),
-        //   DataManager::nsolDataSet( ).circuit( ));
 
         auto canvas = PaneManager::activePane( );
         canvas->displayEntities(
@@ -196,7 +191,6 @@ namespace nslib
       addAggregatedConnectionFromJSON( getRelationsOfType(
         "aggregatedConnectsTo", relationships ),"aggregatedConnectsTo",
         oldGIDToEntity );
-
     }
 
     void Domain::exportRepresentationMaxMin( std::ostream& outputStream,
@@ -256,6 +250,7 @@ namespace nslib
         Loggers::get( )->log( "ERROR: getting maxWeight from JSON: "
           + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
+
       try
       {
         unsigned int maxSuperPopLevels =
@@ -268,6 +263,5 @@ namespace nslib
           + std::string( ex.what( )), LOG_LEVEL_WARNING );
       };
     }
-
   }
 }

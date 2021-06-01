@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__
 #define __NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__
 
@@ -33,9 +34,7 @@ namespace nslib
       public:
 
       virtual ~Eigen4VectorCaster( void )
-      {
-      }
-
+      {}
 
       int toInt( const fires::Property&, TIntRounding ) override;
 
@@ -48,6 +47,5 @@ namespace nslib
     };
   }
 }
-
 
 #endif //__NSLIBCORTEX__EIGEN_4_VECTOR_CASTER__

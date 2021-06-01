@@ -144,7 +144,8 @@ namespace nslib
         toggleAutoClose( );
       });
     setLayout( _gridLayout );
-    _parentDock->setWidget( this );
+    if(_parentDock)
+      _parentDock->setWidget( this );
   }
 
   void EntityConnectionListWidget::setConnections( shift::Entity*  entity_,
@@ -163,15 +164,16 @@ namespace nslib
     _connectedByTable->setTableData( connectedByMap_, _entity,
       _allPropsChecked );
     _connectsToTable->setTableData( connectsToMap_, _entity, _allPropsChecked );
-    _parentDock->show( );
+    if(_parentDock)
+      _parentDock->show( );
     this->show( );
   }
 
-
-  void EntityConnectionListWidget::cancelDialog(  )
+  void EntityConnectionListWidget::cancelDialog()
   {
     this->hide( );
-    _parentDock->close( );
+    if(_parentDock)
+      _parentDock->close( );
   }
 
   void EntityConnectionListWidget::parentDock( QDockWidget* parentDock_ )
@@ -207,7 +209,7 @@ namespace nslib
   {
     if( _entity )
     {
-      auto entityGid = _entity->entityGid( );
+      const auto entityGid = _entity->entityGid( );
       auto dataRelations = DataManager::entities( ).relationships( );
       auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ));
       auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ));
@@ -259,7 +261,7 @@ namespace nslib
   {
     if ( _entity )
     {
-      auto entityGid = _entity->entityGid( );
+      const auto entityGid = _entity->entityGid( );
       auto dataRelations = DataManager::entities( ).relationships( );
       auto relConnectsTo = *( dataRelations[ "connectsTo" ]->asOneToN( ) );
       auto relConnectedBy = *( dataRelations[ "connectedBy" ]->asOneToN( ) );
@@ -303,7 +305,8 @@ namespace nslib
     if ( _autoCloseCheck->isChecked( ))
     {
       this->hide( );
-      _parentDock->close( );
+      if(_parentDock)
+        _parentDock->close( );
     }
   }
 

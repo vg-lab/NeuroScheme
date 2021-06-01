@@ -20,6 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -30,11 +31,10 @@ namespace nslib
 {
   namespace cortex
   {
+    constexpr auto M_PI_3 = static_cast<float>( M_PI ) * 0.33f;
 
-    const auto M_PI_3 = float( M_PI ) * 0.33f;
-
-    QColor ConnectionArrowItem::color = QColor( 100, 100, 100, 255 );
-    QColor ConnectionArrowItem::hoverColor = QColor( 255, 100, 100, 255 );
+    const QColor ConnectionArrowItem::color = QColor( 100, 100, 100, 255 );
+    const QColor ConnectionArrowItem::hoverColor = QColor( 255, 100, 100, 255 );
 
     ConnectionArrowItem::ConnectionArrowItem(
       const ConnectionArrowRep& connectionArrowRep )
@@ -46,7 +46,6 @@ namespace nslib
 	  {
       this->_parentRep =
         &( const_cast< ConnectionArrowRep& >( connectionArrowRep ));
-
 
       this->setAcceptHoverEvents( true );
 
@@ -61,17 +60,17 @@ namespace nslib
       arrowShape.clear( );
       if ( origin != dest ) //Arrows with same origin and destiny are not drawn.
       {
-        float itemInvScale = 1.0f / static_cast< float >( this->scale( ));
+        const float itemInvScale = 1.0f / static_cast< float >( this->scale( ));
 
         _arrowOrigin = itemInvScale * origin;
         _arrowDest = itemInvScale * dest;
 
-        float arrowWidth = 3 * itemInvScale * nslib::Config::scale( );
-        float arrowLength = arrowWidth;
+        const float arrowWidth = 3 * itemInvScale * nslib::Config::scale( );
+        const float arrowLength = arrowWidth;
 
         QLineF auxLine( _arrowOrigin, _arrowDest );
 
-        auto lengthInv = 1.0f / auxLine.length( );
+        const auto lengthInv = 1.0f / auxLine.length( );
 
         double angle = ::acos( auxLine.dx( ) * lengthInv );
         if ( auxLine.dy( ) >= 0 )
@@ -86,8 +85,7 @@ namespace nslib
           QPointF( sin( angle + M_PI - M_PI_3 ) * arrowWidth,
           cos( angle + M_PI - M_PI_3 ) * arrowWidth );
 
-        float size = arrowLength;
-
+        const float size = arrowLength;
 
         if ( _arrowOriItem != nullptr ) delete _arrowOriItem;
         _arrowOriItem = new QGraphicsEllipseItem( );
@@ -148,7 +146,7 @@ namespace nslib
       _arrowOriItem->setBrush( QBrush( hoverColor ) );
     }
 
-    void ConnectionArrowItem::highlight( scoop::Color color_ )
+    void ConnectionArrowItem::highlight( const scoop::Color color_ )
     {
       this->setZValue( 100 );
       this->setBrush( QBrush( color_ ) );
@@ -157,8 +155,7 @@ namespace nslib
       _arrowOriItem->setBrush( QBrush( color_ ) );
     }
 
-    void
-    ConnectionArrowItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
+    void ConnectionArrowItem::hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ )
     {
       auto rep = dynamic_cast< ConnectionArrowRep* >( _parentRep );
       if( rep )

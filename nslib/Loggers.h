@@ -31,7 +31,6 @@ namespace nslib
   class Loggers
   {
   public:
-
     static Logger* get( unsigned int idx = 0 )
     {
       return _loggers.at( idx );

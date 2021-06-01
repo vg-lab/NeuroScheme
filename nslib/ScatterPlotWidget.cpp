@@ -74,7 +74,6 @@ namespace nslib
              this, SLOT( _propertiesChanged( )));
     connect( _scaleSlider, SIGNAL( valueChanged( int )),
              this, SLOT( refreshParentLayout( )));
-
   }
 
   void ScatterPlotWidget::blockChildrenSignals( bool block )
@@ -89,7 +88,6 @@ namespace nslib
     // refresh witout animation
     _parentLayout->refresh( false );
   }
-
 
   void ScatterPlotWidget::_propertiesChanged( void )
   {

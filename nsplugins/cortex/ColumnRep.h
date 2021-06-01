@@ -29,16 +29,13 @@
 
 namespace nslib
 {
-
   namespace cortex
   {
-
     class ColumnRep
       : public shiftgen::NeuronAggregationRep
       , public QGraphicsItemRepresentation
     {
     public:
-
       ColumnRep( void );
       ColumnRep( const ColumnRep& );
       ColumnRep( const shiftgen::NeuronAggregationRep& );

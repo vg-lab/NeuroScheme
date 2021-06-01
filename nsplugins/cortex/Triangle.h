@@ -19,6 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef __NSLIBCORTEX__TRIANGLE__
 #define __NSLIBCORTEX__TRIANGLE__
 
@@ -35,15 +36,16 @@ namespace nslib
       , public Item
     {
       public:
-      Triangle( QPolygonF polygon_, QGraphicsItem* parent_ );
+        Triangle( QPolygonF polygon_, QGraphicsItem* parent_ );
+        virtual ~Triangle() {};
 
-      shift::Representation* parentRep( void ) const final;
+        shift::Representation* parentRep( void ) const final;
 
-      void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) final;
+        void hoverEnterEvent( QGraphicsSceneHoverEvent* event_ ) final;
 
-      void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) final;
+        void hoverLeaveEvent( QGraphicsSceneHoverEvent* event_ ) final;
 
-      void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ ) final;
+        void contextMenuEvent( QGraphicsSceneContextMenuEvent* event_ ) final;
 
     };
   }
