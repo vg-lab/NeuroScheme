@@ -61,6 +61,13 @@
     <addaction name="actionFocusOnSelection"/>
     <addaction name="actionAutoFocusOnSelection"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionRecorder"/>
+    <addaction name="actionAdvancedRecorderOptions"/>
+   </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
@@ -76,6 +83,7 @@
    <addaction name="menuPanes"/>
    <addaction name="menuView"/>
    <addaction name="menuEvents"/>
+   <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -105,6 +113,8 @@
    <addaction name="actionAutoFocusOnSelection"/>
    <addaction name="actionFocusOnDisplayed"/>
    <addaction name="actionAutoFocusOnDisplayed"/>
+   <addaction name="separator"/>
+   <addaction name="actionRecorder"/>
   </widget>
   <action name="actionLayouts">
    <property name="checkable">
@@ -382,6 +392,32 @@
    </property>
    <property name="text">
     <string>Export JSON</string>
+   </property>
+  </action>
+  <action name="actionRecorder">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/recorder.svg</normaloff>:/icons/recorder.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Recorder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionAdvancedRecorderOptions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Advanced recorder options</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable advanced recorder options</string>
    </property>
   </action>
  </widget>

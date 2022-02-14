@@ -28,5 +28,6 @@
     <file>icons/horizontalSplit.svg</file>
     <file>icons/verticalSplit.svg</file>
     <file>icons/documentClose.svg</file>
+    <file>icons/recorder.svg</file>
   </qresource>
 </RCC>

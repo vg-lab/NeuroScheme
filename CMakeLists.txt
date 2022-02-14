@@ -8,7 +8,7 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
-project( NeuroScheme VERSION 0.6.0 )
+project( NeuroScheme VERSION 0.7.0 )
 set( NeuroScheme_VERSION_ABI 12 )
 
 # Disable in source building
@@ -70,9 +70,10 @@ common_find_package( Lexis ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package( ZeroEQ ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package( Servus ${NEUROSCHEME_OPTS_FIND_ARGS} )
 common_find_package( gmrvlex ${NEUROSCHEME_OPTS_FIND_ARGS} )
+common_find_package( acuterecorder )
 common_find_package_post( )
 
-list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT scoop Qt5Widgets )
+list( APPEND NEUROSCHEME_DEPENDENT_LIBRARIES ShiFT scoop Qt5Widgets acuterecorder )
 
 add_subdirectory( nslib )
 add_subdirectory( nsplugins )
