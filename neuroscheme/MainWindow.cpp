@@ -40,6 +40,8 @@
 #include <zeroeq/version.h>
 #endif
 
+#include <acuterecorder/acuterecorder.h>
+
 #include <QGridLayout>
 #include <QPushButton>
 #include <QInputDialog>
@@ -52,6 +54,7 @@
 
 MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   : QMainWindow( parent_ )
+  , _recorder( nullptr )
   , minDockSizeX(305u)
   , minDockSizeY(25u)
   , _ui( new Ui::MainWindow )
@@ -73,6 +76,9 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 
   connect( _ui->actionQuit, SIGNAL( triggered( )),
            this, SLOT( close()));
+
+  connect( _ui->actionRecorder , SIGNAL( triggered( void )) ,
+           this ,SLOT( openRecorder( void )));
 
   // ZeroEQ related actions ///////////////////////////////////////
 #ifdef NEUROSCHEME_USE_ZEROEQ
@@ -773,4 +779,53 @@ void MainWindow::cleanScene( void )
   auto displayRoot = [](nslib::Canvas *c){ c->displayEntities( nslib::DataManager::rootEntities( ), false, true ); };
   auto &panes = nslib::PaneManager::panes();
   std::for_each(panes.begin(), panes.end(), displayRoot);
+}
+
+void MainWindow::openRecorder( void )
+{
+
+  // The button stops the recorder if found.
+  if( _recorder != nullptr )
+  {
+    _ui->actionRecorder->setDisabled( true );
+    _recorder->stop();
+
+    // Recorder will be deleted after finishing.
+    _recorder = nullptr;
+    _ui->actionRecorder->setChecked( false );
+    return;
+  }
+
+  RSWParameters params;
+  params.widgetsToRecord.emplace_back( "Main Widget" , this );
+  params.includeScreens = false;
+
+  if(!_ui->actionAdvancedRecorderOptions->isChecked())
+  {
+    params.showWorker = false;
+    params.showWidgetSourceMode = false;
+    params.showSourceParameters = false;
+  }
+
+  auto dialog = new RecorderDialog( nullptr , params , true );
+  dialog->setWindowIcon( QIcon( ":/visimpl.png" ));
+  dialog->setFixedSize( 800 , 600 );
+  if ( dialog->exec( ) == QDialog::Accepted)
+  {
+    _recorder = dialog->getRecorder( );
+    connect( _recorder , SIGNAL( finished( )) ,
+             _recorder , SLOT( deleteLater( )));
+    connect( _recorder , SIGNAL( finished( )) ,
+             this , SLOT( finishRecording( )));
+    _ui->actionRecorder->setChecked( true );
+  } else
+  {
+    _ui->actionRecorder->setChecked( false );
+  }
+  dialog->deleteLater( );
+}
+
+void MainWindow::finishRecording( )
+{
+  _ui->actionRecorder->setEnabled( true );
 }

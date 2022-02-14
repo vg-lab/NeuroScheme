@@ -14,6 +14,7 @@ set( NEUROSCHEME_LINK_LIBRARIES
   nslib
   nslibcortex
   nslibcongen
+  acuterecorder
   )
 
 include_directories(

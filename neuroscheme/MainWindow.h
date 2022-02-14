@@ -35,6 +35,8 @@ namespace Ui
     class MainWindow;
 }
 
+class Recorder;
+
 class StoredSelections
 {
 public:
@@ -84,6 +86,12 @@ public slots:
   void importFromJSON( void );
   void cleanScene( void );
 
+  void openRecorder( void );
+
+protected slots:
+
+  void finishRecording( );
+
 protected:
 
   enum TTableColumns
@@ -101,6 +109,9 @@ protected:
   QDockWidget* _connectionEditDock = nullptr;
   QDockWidget* _connectionListDock = nullptr;
   QString _lastOpenedFileName;
+
+  // Recorder
+  Recorder* _recorder;
 
 private:
   const unsigned int minDockSizeX;

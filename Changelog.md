@@ -2,6 +2,10 @@
 
 ## git master
 
+## version 0.7
+
+* [!109] Added a recorder option, which allows users to record the application.
+
 ## version 0.4
 
 * [!106] Release 0.4 preparation.
