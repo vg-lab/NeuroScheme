@@ -808,7 +808,7 @@ void MainWindow::openRecorder( void )
   }
 
   auto dialog = new RecorderDialog( nullptr , params , true );
-  dialog->setWindowIcon( QIcon( ":/visimpl.png" ));
+  dialog->setWindowIcon( QIcon( ":/icons/ns_icon.png" ));
   dialog->setFixedSize( 800 , 600 );
   if ( dialog->exec( ) == QDialog::Accepted)
   {
