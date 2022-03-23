@@ -571,8 +571,10 @@ void MainWindow::aboutDialog( void )
 #else
     "</li><li>Deflect " + tr ("support not built.") +
 #endif
-    "</li><li>Qt " + QT_VERSION_STR +
-    "</li></ul>" +
+
+    "</li><li>AcuteRecorder " + ACUTERECORDER_REV_STRING +
+
+    "</li><li>Qt " + QT_VERSION_STR + "</li></ul>" +
     "<h4>" + tr( "Developed by:" ) + "</h4>" +
     "VG-Lab / URJC / UPM"
     "<br><a href='https://vg-lab.es'>https://vg-lab.es</a>"
