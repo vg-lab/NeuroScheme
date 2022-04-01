@@ -5,7 +5,7 @@
 #git_subproject(gmrvlex git@gitlab.vg-lab.es:nsviz/gmrvlex.git c20b194)
 git_subproject(ShiFT https://github.com/vg-lab/shift ef486e96)
 git_subproject(scoop https://github.com/vg-lab/scoop cc02a23)
-git_subproject(acuterecorder https://github.com/vg-lab/AcuteRecorder.git 81a16150 )
+git_subproject(acuterecorder https://github.com/vg-lab/AcuteRecorder.git 7485cd8b )
 if(NEUROSCHEME_NSOL_ENABLED)
   git_subproject(nsol https://github.com/vg-lab/nsol 872fe14f)
 endif()

@@ -65,6 +65,10 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
 
   _ui->setupUi( this );
 
+  auto recorderAction = RecorderUtils::recorderAction();
+  _ui->menuTools->insertAction(_ui->menuTools->actions().first(), recorderAction );
+  _ui->toolBar->addAction(recorderAction);
+
   connect( _ui->actionJSONImporter, SIGNAL( triggered( )),
            this, SLOT( importFromJSON( )));
 
@@ -77,7 +81,7 @@ MainWindow::MainWindow( QWidget* parent_, bool zeroEQ )
   connect( _ui->actionQuit, SIGNAL( triggered( )),
            this, SLOT( close()));
 
-  connect( _ui->actionRecorder , SIGNAL( triggered( void )) ,
+  connect( recorderAction , SIGNAL( triggered( void )) ,
            this ,SLOT( openRecorder( void )));
 
   // ZeroEQ related actions ///////////////////////////////////////
@@ -352,6 +356,29 @@ MainWindow::~MainWindow( void )
   delete _ui;
   for ( const auto& _canvas :  nslib::PaneManager::panes( ))
     delete _canvas;
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+  if(_recorder)
+  {
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Exit NeuroScheme"));
+    msgBox.setWindowIcon(QIcon(":/icons/ns_icon.png"));
+    msgBox.setText(tr("A recording is being made. Do you really want to exit NeuroScheme?"));
+    msgBox.setStandardButtons(QMessageBox::Cancel|QMessageBox::Yes);
+
+    if(msgBox.exec() != QMessageBox::Yes)
+    {
+      e->ignore();
+      return;
+    }
+
+    RecorderUtils::stopAndWait(_recorder, this);
+    _recorder = nullptr;
+  }
+
+  QMainWindow::closeEvent(e);
 }
 
 QString MainWindow::_tableColumnToString( const TTableColumns column )
@@ -785,16 +812,16 @@ void MainWindow::cleanScene( void )
 
 void MainWindow::openRecorder( void )
 {
+  auto recorderAction = qobject_cast<QAction *>(sender());
 
   // The button stops the recorder if found.
   if( _recorder != nullptr )
   {
-    _ui->actionRecorder->setDisabled( true );
-    _recorder->stop();
+    if(recorderAction) recorderAction->setDisabled( true );
 
-    // Recorder will be deleted after finishing.
+    RecorderUtils::stopAndWait(_recorder, this);
+
     _recorder = nullptr;
-    _ui->actionRecorder->setChecked( false );
     return;
   }
 
@@ -809,25 +836,31 @@ void MainWindow::openRecorder( void )
     params.showSourceParameters = false;
   }
 
-  auto dialog = new RecorderDialog( nullptr , params , true );
-  dialog->setWindowIcon( QIcon( ":/icons/ns_icon.png" ));
-  dialog->setFixedSize( 800 , 600 );
-  if ( dialog->exec( ) == QDialog::Accepted)
+  RecorderDialog dialog( nullptr , params , true );
+  dialog.setWindowIcon( QIcon( ":/icons/ns_icon.png" ));
+  dialog.setFixedSize( 800 , 600 );
+  if ( dialog.exec( ) == QDialog::Accepted)
   {
-    _recorder = dialog->getRecorder( );
+    _recorder = dialog.getRecorder( );
     connect( _recorder , SIGNAL( finished( )) ,
              _recorder , SLOT( deleteLater( )));
     connect( _recorder , SIGNAL( finished( )) ,
              this , SLOT( finishRecording( )));
-    _ui->actionRecorder->setChecked( true );
-  } else
-  {
-    _ui->actionRecorder->setChecked( false );
+
+    if(recorderAction) recorderAction->setChecked( true );
   }
-  dialog->deleteLater( );
+  else
+  {
+    if(recorderAction) recorderAction->setChecked( false );
+  }
 }
 
 void MainWindow::finishRecording( )
 {
-  _ui->actionRecorder->setEnabled( true );
+  auto recorderAction = qobject_cast<QAction *>(_ui->menuTools->actions().first());
+  if(recorderAction)
+  {
+    recorderAction->setEnabled( true );
+    recorderAction->setChecked(false);
+  }
 }
