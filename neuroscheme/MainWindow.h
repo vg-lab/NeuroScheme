@@ -94,6 +94,8 @@ protected slots:
 
 protected:
 
+  virtual void closeEvent(QCloseEvent *e) override;
+
   enum TTableColumns
   {
     COLUMN_LABEL = 0,
