@@ -150,8 +150,8 @@ namespace nslib
       parentSplitter->insertWidget( index, newSplitter );
       newSplitter->addWidget( orig );
       newSplitter->addWidget( canvas );
-      newSplitter->setStretchFactor( 0, 1 );
-      newSplitter->setStretchFactor( 1, 1 );
+      parentSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
+      newSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
     }
 
     canvas->name = std::string( "Pane ") + std::to_string( _paneNextNumber++ );
