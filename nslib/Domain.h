@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 GMRV/URJC/UPM.
+ * Copyright (c) 2016 VG-Lab/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
  *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>

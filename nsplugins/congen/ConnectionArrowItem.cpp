@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 GMRV/URJC/UPM.
+ * Copyright (c) 2017 VG-Lab/URJC/UPM.
  *
  * Authors: Pablo Toharia <pablo.toharia@upm.es>
  * 			    Juan Pedro Brito <juanpedro.brito@upm.es>
