@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 GMRV/URJC/UPM.
+ * Copyright (c) 2016 VG-Lab/URJC/UPM.
  *
  * Authors: Juan Pedro Brito <juanpedro.brito@upm.es>
  *          Iago Calvo Lista <i.calvol@alumnos.urjc.es>

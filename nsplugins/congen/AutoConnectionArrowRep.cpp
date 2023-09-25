@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 GMRV/URJC/UPM.
+ * Copyright (c) 2017 VG-Lab/URJC/UPM.
  *
  * Authors: Iago Calvo Lista <i.calvol@alumnos.urjc.es>
  *          Fernando Lucas Pérez <f.lucas@alumnos.urjc.es>

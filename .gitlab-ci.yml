@@ -6,9 +6,9 @@ Ubuntu-Optional-Deps:
  script:
   - module load Qt-5.15.2
   - export APP_VERSION="dev"
-  - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps.private"
+  #- export APPIMAGE_REPO="gitlabci@vg-lab.es:apps.private"
   - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
-  - export DOCKER_REPO="gitlabci@vg-lab.es:apps.private"
+  #- export DOCKER_REPO="gitlabci@vg-lab.es:apps.private"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -24,9 +24,9 @@ Ubuntu-Optional-Deps-master-tags:
  stage: build
  script:
   - module load Qt-5.15.2
-  - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
+  #- export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
   - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
-  - export DOCKER_REPO="gitlabci@vg-lab.es:apps"
+  #- export DOCKER_REPO="gitlabci@vg-lab.es:apps"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -44,9 +44,9 @@ Ubuntu-Optional-Deps-master:
  script:
   - module load Qt-5.15.2
   - export APP_VERSION="git-master"
-  - export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
+  #- export APPIMAGE_REPO="gitlabci@vg-lab.es:apps"
   - export APPIMAGE_ICON="neuroscheme/icons/ns_icon.png"
-  - export DOCKER_REPO="gitlabci@vg-lab.es:apps"
+  #- export DOCKER_REPO="gitlabci@vg-lab.es:apps"
   - export CMAKE_EXTRA_TARGETS="install"
   - export BUILD_OPTIONALS_SUBPROJECTS=1
   - export CMAKE_EXTRA_ARGS="-DCLONE_SUBPROJECTS=ON -DNEUROSCHEME_OPTIONALS_AS_REQUIRED=ON -DNEUROSCHEME_NSOL_ENABLED=ON"
@@ -151,7 +151,7 @@ Win7-Subproject-vs14:
   stage: build
   script:
   - set APP_VERSION=dev
-  - set WINAPP_REPO=gitlabci@vg-lab.es:apps.private
+  #- set WINAPP_REPO=gitlabci@vg-lab.es:apps.private
   - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
@@ -168,7 +168,7 @@ Win7-Subproject-vs14:
 Win7-Subproject-vs14-master-tags:
  stage: build
  script:
-  - set WINAPP_REPO=gitlabci@vg-lab.es:apps
+  #- set WINAPP_REPO=gitlabci@vg-lab.es:apps
   - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat
@@ -187,7 +187,7 @@ Win7-Subproject-vs14-master:
  stage: build
  script:
   - set APP_VERSION=git-master
-  - set WINAPP_REPO=gitlabci@vg-lab.es:apps
+  #- set WINAPP_REPO=gitlabci@vg-lab.es:apps
   - call %ENVFILESDIR%\Boost-1.64-vs14-x64.bat
   - call %ENVFILESDIR%\Qt-5.9-vs14.bat
   - call %ENVFILESDIR%\eigen-3.1.2-vs12-x64.bat

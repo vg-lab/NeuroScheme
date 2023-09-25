@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 GMRV/URJC/UPM.
+ * Copyright (c) 2016 VG-Lab/URJC/UPM.
  *
  * Authors: Iago Calvo <iago.calvo@urjc.es>
  *

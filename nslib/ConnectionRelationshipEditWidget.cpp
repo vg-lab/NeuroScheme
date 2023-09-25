@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 GMRV/URJC/UPM.
+ * Copyright (c) 2017 VG-Lab/URJC/UPM.
  *
  * Authors: Juan Jose Garcia Cantero <juanjose.garcia@urjc.es>
  *
