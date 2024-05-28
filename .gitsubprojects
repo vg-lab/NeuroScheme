@@ -1,8 +1,8 @@
 # -*- mode: cmake -*-
-git_subproject(Brion https://github.com/BlueBrain/Brion.git f74dcc5)
-git_subproject(ZeroEQ https://github.com/HBPVis/ZeroEQ.git 1e66ee3)
-git_subproject(Lexis https://github.com/HBPVis/Lexis.git 617eedb)
-git_subproject(gmrvlex https://github.com/vg-lab/gmrvlex.git c20b194)
+#git_subproject(Brion https://github.com/BlueBrain/Brion.git f74dcc5)
+#git_subproject(ZeroEQ https://github.com/HBPVis/ZeroEQ.git 1e66ee3)
+#git_subproject(Lexis https://github.com/HBPVis/Lexis.git 617eedb)
+#git_subproject(gmrvlex https://github.com/vg-lab/gmrvlex.git c20b194)
 git_subproject(ShiFT https://github.com/vg-lab/shift 360e1a2)
 git_subproject(scoop https://github.com/vg-lab/scoop 1185a5a)
 git_subproject(acuterecorder https://github.com/vg-lab/AcuteRecorder.git 92321d2)
